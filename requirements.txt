@@ -1,0 +1,6 @@
+# Run "pip3 install -r requirements.txt"
+numpy>=1.16.3
+scipy>=1.1.0
+matplotlib>=3.0.2
+PyQt5>=5.12.1
+PyQt5-stubs>=5.12.1
