@@ -13,8 +13,18 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from gui.MainWindow import MainWindow, start
+import sys
 
-if __name__ == "__main__":
-    print("PyMODA")
-    start()
+from PyQt5.QtWidgets import QMainWindow, QApplication
+
+
+class MainWindow(QMainWindow):
+    def __init__(self, *args, **kwargs):
+        super(MainWindow, self).__init__(*args, **kwargs)
+
+
+def start():
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    app.exec_()
