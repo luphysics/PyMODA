@@ -21,9 +21,17 @@ from gui.base.BaseUI import BaseUI
 
 
 class SelectFileDialog(QDialog, BaseUI):
-
-    def __init__(self, parent=None):
-        QDialog.__init__(self, parent)
+    file = "None"
 
     def init_ui(self):
         uic.loadUi(resources.get_ui("dialog_select_file"), self)
+        self.setup_drops()
+
+    def setup_drops(self):
+        drop_target = self.lbl_drag_drop
+        drop_target.setAcceptDrops(True)
+        drop_target.on_drop_complete(self.set_file)
+
+    def set_file(self, file):
+        self.file = file
+        print(self.file)

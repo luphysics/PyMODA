@@ -30,7 +30,6 @@ class TimeFreqWindow(CentredWindow):
         self.set_title("Time-Frequency Analysis")
         uic.loadUi(resources.get_ui("window_time_freq"), self)
         self.setup_menu_bar()
-        self.select_file()
 
     def setup_menu_bar(self):
         menu = self.menubar

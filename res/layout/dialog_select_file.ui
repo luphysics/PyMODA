@@ -17,7 +17,13 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
-      <widget class="QLabel" name="lbl_drag_drop">
+      <widget class="DragDropLabel" name="lbl_drag_drop">
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+         <italic>true</italic>
+        </font>
+       </property>
        <property name="frameShape">
         <enum>QFrame::Box</enum>
        </property>
@@ -69,6 +75,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>DragDropLabel</class>
+   <extends>QLabel</extends>
+   <header>gui.base.DragDropLabel</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>
