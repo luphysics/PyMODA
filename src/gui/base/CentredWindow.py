@@ -14,11 +14,21 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import sys
+from PyQt5.QtWidgets import QMainWindow, QDesktopWidget
 
-from gui.Application import Application
 
-# The entry-point of the program.
-if __name__ == "__main__":
-    app = Application(sys.argv)
-    app.exec_()
+class CentredWindow(QMainWindow):
+    """
+    A window which opens at the centre of the screen.
+    """
+
+    def __init__(self):
+        super(CentredWindow, self).__init__()
+        self.centre()
+
+    def centre(self):
+        """Moves the window to the centre of the screen."""
+        geometry = self.frameGeometry()
+        centre = QDesktopWidget().availableGeometry().center()
+        geometry.moveCenter(centre)
+        self.move(geometry.topLeft())

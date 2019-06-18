@@ -13,12 +13,10 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from gui.base.CentredWindow import CentredWindow
 
-import sys
 
-from gui.Application import Application
+class BaseWindow(CentredWindow):
 
-# The entry-point of the program.
-if __name__ == "__main__":
-    app = Application(sys.argv)
-    app.exec_()
+    def __init__(self):
+        super(BaseWindow, self).__init__()

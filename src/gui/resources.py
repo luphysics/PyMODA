@@ -14,11 +14,22 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import sys
+def get_path():
+    """Returns the path to the resources folder."""
+    return "../res/"
 
-from gui.Application import Application
 
-# The entry-point of the program.
-if __name__ == "__main__":
-    app = Application(sys.argv)
-    app.exec_()
+def get_name():
+    """Returns the name of the program."""
+    return "PyMODA"
+
+
+def get_ui(name):
+    """
+    Gets a .ui file from the resources folder. You may
+    specify the name with or without the .ui extension.
+    """
+    extension = ".ui"
+    if extension not in name:
+        name += extension
+    return get_path() + name

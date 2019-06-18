@@ -13,18 +13,29 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+import os
 import sys
 
+from PyQt5 import uic
 from PyQt5.QtWidgets import QMainWindow, QApplication
 
+from gui import resources
+from gui.base.CentredWindow import CentredWindow
+from gui.resources import get_ui
 
-class MainWindow(QMainWindow):
-    def __init__(self, *args, **kwargs):
-        super(MainWindow, self).__init__(*args, **kwargs)
 
+class LauncherWindow(CentredWindow):
 
-def start():
-    app = QApplication(sys.argv)
-    window = MainWindow()
-    window.show()
-    app.exec_()
+    def __init__(self, application):
+        super(LauncherWindow, self).__init__()
+        self.application = application
+        self.init_ui()
+
+    def init_ui(self):
+        uic.loadUi(get_ui("launcher"), self)
+        self.setWindowTitle(resources.get_name())
+        self.btn_time_freq.clicked.connect(self.click)
+
+    def click(self):
+        self.application.start_time_frequency()

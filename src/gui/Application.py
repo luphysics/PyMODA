@@ -14,11 +14,21 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import sys
+from PyQt5.QtWidgets import QApplication
 
-from gui.Application import Application
+from gui.launcher.LauncherWindow import LauncherWindow
 
-# The entry-point of the program.
-if __name__ == "__main__":
-    app = Application(sys.argv)
-    app.exec_()
+
+class Application(QApplication):
+
+    def __init__(self, args):
+        super(Application, self).__init__(args)
+        self.start_launcher()
+
+    def start_launcher(self):
+        self.launcher_window = LauncherWindow(self)
+        self.launcher_window.show()
+
+    def start_time_frequency(self):
+        # self.window =
+        pass
