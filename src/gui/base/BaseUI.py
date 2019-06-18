@@ -14,23 +14,18 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from PyQt5.QtWidgets import QDesktopWidget
 
-from gui.base.BaseWindow import BaseWindow
-
-
-class CentredWindow(BaseWindow):
+class BaseUI:
     """
-    A window which opens at the centre of the screen.
+    A base UI element which defines the function 'init_ui'.
     """
 
     def __init__(self):
-        super(CentredWindow, self).__init__()
-        self.centre()
+        self.init_ui()
 
-    def centre(self):
-        """Moves the window to the centre of the screen."""
-        geometry = self.frameGeometry()
-        centre = QDesktopWidget().availableGeometry().center()
-        geometry.moveCenter(centre)
-        self.move(geometry.topLeft())
+    def init_ui(self):
+        """
+        A function which should be overridden and used to setup
+        UI components.
+        """
+        pass

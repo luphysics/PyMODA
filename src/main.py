@@ -18,7 +18,13 @@ import sys
 
 from gui.Application import Application
 
-# The entry-point of the program.
-if __name__ == "__main__":
+
+def main():
+    """Starts the application."""
     app = Application(sys.argv)
     app.exec_()
+
+
+# The entry-point of the program.
+if __name__ == "__main__":
+    main()

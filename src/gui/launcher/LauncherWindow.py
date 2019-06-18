@@ -14,13 +14,8 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import os
-import sys
-
 from PyQt5 import uic
-from PyQt5.QtWidgets import QMainWindow, QApplication
 
-from gui import resources
 from gui.base.CentredWindow import CentredWindow
 from gui.resources import get_ui
 
@@ -28,14 +23,16 @@ from gui.resources import get_ui
 class LauncherWindow(CentredWindow):
 
     def __init__(self, application):
-        super(LauncherWindow, self).__init__()
+        super().__init__()
         self.application = application
-        self.init_ui()
 
     def init_ui(self):
-        uic.loadUi(get_ui("launcher"), self)
-        self.setWindowTitle(resources.get_name())
-        self.btn_time_freq.clicked.connect(self.click)
+        uic.loadUi(get_ui("window_launcher"), self)
+        self.btn_time_freq.clicked.connect(self.onclick_time_freq)
 
-    def click(self):
+    def onclick_time_freq(self):
+        """
+        Called when the time-frequency button is
+        clicked.
+        """
         self.application.start_time_frequency()

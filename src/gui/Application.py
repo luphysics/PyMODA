@@ -16,6 +16,7 @@
 
 from PyQt5.QtWidgets import QApplication
 
+from gui.time_freq.TimeFreqWindow import TimeFreqWindow
 from gui.launcher.LauncherWindow import LauncherWindow
 
 
@@ -30,5 +31,5 @@ class Application(QApplication):
         self.launcher_window.show()
 
     def start_time_frequency(self):
-        # self.window =
-        pass
+        self.window = TimeFreqWindow(self)
+        self.window.show()

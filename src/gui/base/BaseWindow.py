@@ -13,10 +13,26 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from gui.base.CentredWindow import CentredWindow
+
+from PyQt5.QtWidgets import QMainWindow
+
+from gui import resources
+from gui.base.BaseUI import BaseUI
 
 
-class BaseWindow(CentredWindow):
+class BaseWindow(QMainWindow, BaseUI):
+    """
+    A base window which inherits from BaseUI.
+    """
 
     def __init__(self):
         super(BaseWindow, self).__init__()
+        # self.init_ui()
+        self.set_title()
+
+    def set_title(self, title=resources.get_name()):
+        """
+        Sets the title of the window. If no title is supplied,
+        the default name of the application is used.
+        """
+        self.setWindowTitle(title)

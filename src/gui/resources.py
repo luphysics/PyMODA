@@ -14,9 +14,20 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-def get_path():
+
+def get_base_path():
     """Returns the path to the resources folder."""
     return "../res/"
+
+
+def get_img_path():
+    """Returns the path to the image folder."""
+    return get_base_path() + "img/"
+
+
+def get_layout_path():
+    """Returns the path to the layout folder."""
+    return get_base_path() + "layout/"
 
 
 def get_name():
@@ -32,4 +43,4 @@ def get_ui(name):
     extension = ".ui"
     if extension not in name:
         name += extension
-    return get_path() + name
+    return get_layout_path() + name

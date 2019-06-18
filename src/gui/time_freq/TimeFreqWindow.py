@@ -13,24 +13,29 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from PyQt5 import uic
 
-from PyQt5.QtWidgets import QDesktopWidget
+from gui import resources
+from gui.base.CentredWindow import CentredWindow
+from gui.base.SelectFileDialog import SelectFileDialog
 
-from gui.base.BaseWindow import BaseWindow
 
+class TimeFreqWindow(CentredWindow):
 
-class CentredWindow(BaseWindow):
-    """
-    A window which opens at the centre of the screen.
-    """
+    def __init__(self, application):
+        super().__init__()
+        self.application = application
 
-    def __init__(self):
-        super(CentredWindow, self).__init__()
-        self.centre()
+    def init_ui(self):
+        self.set_title("Time-Frequency Analysis")
+        uic.loadUi(resources.get_ui("window_time_freq"), self)
+        self.setup_menu_bar()
+        self.select_file()
 
-    def centre(self):
-        """Moves the window to the centre of the screen."""
-        geometry = self.frameGeometry()
-        centre = QDesktopWidget().availableGeometry().center()
-        geometry.moveCenter(centre)
-        self.move(geometry.topLeft())
+    def setup_menu_bar(self):
+        menu = self.menubar
+        file = menu.addMenu("File")
+        file.addAction("Load data file")
+
+    def select_file(self):
+        SelectFileDialog().exec_()

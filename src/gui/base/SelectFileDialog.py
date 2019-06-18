@@ -13,24 +13,17 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from PyQt5 import uic
+from PyQt5.QtWidgets import QDialog
 
-from PyQt5.QtWidgets import QDesktopWidget
+from gui import resources
+from gui.base.BaseUI import BaseUI
 
-from gui.base.BaseWindow import BaseWindow
 
+class SelectFileDialog(QDialog, BaseUI):
 
-class CentredWindow(BaseWindow):
-    """
-    A window which opens at the centre of the screen.
-    """
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
 
-    def __init__(self):
-        super(CentredWindow, self).__init__()
-        self.centre()
-
-    def centre(self):
-        """Moves the window to the centre of the screen."""
-        geometry = self.frameGeometry()
-        centre = QDesktopWidget().availableGeometry().center()
-        geometry.moveCenter(centre)
-        self.move(geometry.topLeft())
+    def init_ui(self):
+        uic.loadUi(resources.get_ui("dialog_select_file"), self)
