@@ -13,24 +13,14 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-from PyQt5.QtWidgets import QDesktopWidget
-
-from gui.base.BaseWindow import BaseWindow
+from gui.base.windows.BaseWindow import BaseWindow
 
 
-class CentredWindow(BaseWindow):
+class MaximisedWindow(BaseWindow):
     """
-    A window which opens at the centre of the screen.
+    A window which is maximised when it opens.
     """
 
     def __init__(self):
-        super(CentredWindow, self).__init__()
-        self.centre()
-
-    def centre(self):
-        """Moves the window to the centre of the screen."""
-        geometry = self.frameGeometry()
-        centre = QDesktopWidget().availableGeometry().center()
-        geometry.moveCenter(centre)
-        self.move(geometry.topLeft())
+        super().__init__()
+        self.showMaximized()

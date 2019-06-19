@@ -14,27 +14,52 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from PyQt5 import uic
+from PyQt5.QtWidgets import QDialog
 
 from gui import resources
-from gui.base.CentredWindow import CentredWindow
+from gui.base.windows.CentredWindow import CentredWindow
 from gui.base.SelectFileDialog import SelectFileDialog
+from gui.base.windows.MaximisedWindow import MaximisedWindow
 
 
-class TimeFreqWindow(CentredWindow):
+class TimeFreqWindow(MaximisedWindow):
+    name = "Time-Frequency Analysis"
+    open_file = None
 
     def __init__(self, application):
         super().__init__()
         self.application = application
 
     def init_ui(self):
-        self.set_title("Time-Frequency Analysis")
         uic.loadUi(resources.get_ui("window_time_freq"), self)
+        self.set_title()
         self.setup_menu_bar()
+
+    def set_title(self, name=""):
+        super(TimeFreqWindow, self).set_title(self.get_window_name())
+
+    def get_window_name(self):
+        """
+        Gets the name of this window, adding the currently open file
+        if applicable.
+        """
+        title = self.name
+        if self.open_file:
+            title += f" - {self.open_file}"
+        return title
 
     def setup_menu_bar(self):
         menu = self.menubar
         file = menu.addMenu("File")
         file.addAction("Load data file")
+        file.triggered.connect(self.select_file)
 
     def select_file(self):
-        SelectFileDialog().exec_()
+        """Opens a dialog to select a file, and gets the result."""
+        dialog = SelectFileDialog()
+
+        code = dialog.exec()
+        if code == QDialog.Accepted:
+            self.open_file = dialog.get_file()
+            print(f"Opening {self.open_file}...")
+            self.set_title()

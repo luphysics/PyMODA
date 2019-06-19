@@ -16,8 +16,7 @@
 
 from PyQt5 import uic
 
-from gui.base.CentredWindow import CentredWindow
-from gui.base.SelectFileDialog import SelectFileDialog
+from gui.base.windows.CentredWindow import CentredWindow
 from gui.resources import get_ui
 
 
@@ -36,5 +35,4 @@ class LauncherWindow(CentredWindow):
         Called when the time-frequency button is
         clicked.
         """
-        # self.application.start_time_frequency()
-        SelectFileDialog().exec_()
+        self.application.start_time_frequency()

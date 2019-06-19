@@ -34,4 +34,6 @@ class SelectFileDialog(QDialog, BaseUI):
 
     def set_file(self, file):
         self.file = file
-        print(self.file)
+
+    def get_file(self):
+        return resources.path_from_file_string(self.file)

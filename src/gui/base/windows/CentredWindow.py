@@ -14,25 +14,23 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QDesktopWidget
 
-from gui.time_freq.TimeFreqWindow import TimeFreqWindow
-from gui.launcher.LauncherWindow import LauncherWindow
+from gui.base.windows.BaseWindow import BaseWindow
 
 
-class Application(QApplication):
-    launcher_window = None
-    windows = []
+class CentredWindow(BaseWindow):
+    """
+    A window which opens at the centre of the screen.
+    """
 
-    def __init__(self, args):
-        super(Application, self).__init__(args)
-        self.start_launcher()
+    def __init__(self):
+        super(CentredWindow, self).__init__()
+        self.centre()
 
-    def start_launcher(self):
-        self.launcher_window = LauncherWindow(self)
-        self.launcher_window.show()
-
-    def start_time_frequency(self):
-        window = TimeFreqWindow(self)
-        self.windows.append(window)
-        window.show()
+    def centre(self):
+        """Moves the window to the centre of the screen."""
+        geometry = self.frameGeometry()
+        centre = QDesktopWidget().availableGeometry().center()
+        geometry.moveCenter(centre)
+        self.move(geometry.topLeft())

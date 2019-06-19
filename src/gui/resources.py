@@ -35,6 +35,14 @@ def get_name():
     return "PyMODA"
 
 
+def path_from_file_string(str):
+    """
+    Returns the file path from a file string which is
+    retrieved from a drag-and-drop event.
+    """
+    return str.replace("file://", "")
+
+
 def get_ui(name):
     """
     Gets a .ui file from the resources folder. You may

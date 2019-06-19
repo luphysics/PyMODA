@@ -13,26 +13,11 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-from PyQt5.QtWidgets import QApplication
-
-from gui.time_freq.TimeFreqWindow import TimeFreqWindow
-from gui.launcher.LauncherWindow import LauncherWindow
+from gui.base.components.BaseComponent import BaseComponent
 
 
-class Application(QApplication):
-    launcher_window = None
-    windows = []
+class PlotComponent(BaseComponent):
+    """A component which enables plotting via matplotlib."""
 
-    def __init__(self, args):
-        super(Application, self).__init__(args)
-        self.start_launcher()
-
-    def start_launcher(self):
-        self.launcher_window = LauncherWindow(self)
-        self.launcher_window.show()
-
-    def start_time_frequency(self):
-        window = TimeFreqWindow(self)
-        self.windows.append(window)
-        window.show()
+    def __init__(self, parent):
+        super(PlotComponent, self).__init__(parent)
