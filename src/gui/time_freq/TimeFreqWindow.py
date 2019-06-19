@@ -17,12 +17,15 @@ from PyQt5 import uic
 from PyQt5.QtWidgets import QDialog
 
 from gui import resources
-from gui.base.windows.CentredWindow import CentredWindow
 from gui.base.SelectFileDialog import SelectFileDialog
 from gui.base.windows.MaximisedWindow import MaximisedWindow
 
 
 class TimeFreqWindow(MaximisedWindow):
+    """
+    The window which is used to perform time-frequency analysis.
+    """
+
     name = "Time-Frequency Analysis"
     open_file = None
 
@@ -30,10 +33,14 @@ class TimeFreqWindow(MaximisedWindow):
         super().__init__()
         self.application = application
 
+    def maximise_on_start(self):
+        return False
+
     def init_ui(self):
         uic.loadUi(resources.get_ui("window_time_freq"), self)
         self.set_title()
         self.setup_menu_bar()
+        self.select_file()
 
     def set_title(self, name=""):
         super(TimeFreqWindow, self).set_title(self.get_window_name())

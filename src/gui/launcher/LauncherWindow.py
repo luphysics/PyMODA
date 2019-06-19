@@ -21,6 +21,10 @@ from gui.resources import get_ui
 
 
 class LauncherWindow(CentredWindow):
+    """
+    The first window that opens, providing options to perform different
+    types of analysis.
+    """
 
     def __init__(self, application):
         super().__init__()

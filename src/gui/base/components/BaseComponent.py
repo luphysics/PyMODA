@@ -19,4 +19,8 @@ from gui.base.BaseUI import BaseUI
 
 
 class BaseComponent(QWidget, BaseUI):
+    """
+    A base UI component. Each window should consist of
+    multiple resizable components.
+    """
     pass

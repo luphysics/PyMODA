@@ -29,14 +29,23 @@ class DragDropLabel(QLabel):
 
         file_name = file_path.split("/")[-1].split("\\")[-1]
         self.setText(f"File selected:\n{file_name}")
+        self.set_background(highlighted=False)
+
+    def dragLeaveEvent(self, a0: QtGui.QDragLeaveEvent) -> None:
+        self.set_background(highlighted=False)
+
+    def set_background(self, highlighted):
+        background = "grey" if highlighted else "transparent"
+        self.setStyleSheet(f"QLabel {{ background-color : {background}; color : black; }}")
 
     def dragEnterEvent(self, event: QtGui.QDragEnterEvent) -> None:
         """Called when a drag event enters the label."""
         if event.mimeData().hasText():
             event.accept()
+            self.set_background(highlighted=True)
         else:
             event.ignore()
 
-    def on_drop_complete(self, callback):
+    def set_drop_callback(self, callback):
         """Sets a callback for when the drop is complete."""
         self.callback = callback

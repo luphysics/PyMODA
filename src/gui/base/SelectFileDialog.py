@@ -21,19 +21,27 @@ from gui.base.BaseUI import BaseUI
 
 
 class SelectFileDialog(QDialog, BaseUI):
-    file = "None"
+    """
+    A dialog allowing the user to select a file. Files can be
+    selected via drag-and-drop, or by browsing with the file
+    explorer.
+    """
+
+    file = None
 
     def init_ui(self):
         uic.loadUi(resources.get_ui("dialog_select_file"), self)
         self.setup_drops()
 
     def setup_drops(self):
+        """Sets up the label to accept drag-and-drop."""
         drop_target = self.lbl_drag_drop
         drop_target.setAcceptDrops(True)
-        drop_target.on_drop_complete(self.set_file)
+        drop_target.set_drop_callback(self.set_file)
 
     def set_file(self, file):
         self.file = file
 
     def get_file(self):
+        """Gets the file path for the selected file."""
         return resources.path_from_file_string(self.file)

@@ -13,7 +13,15 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import time
+
+import numpy as np
+from PyQt5.QtWidgets import QVBoxLayout
+from matplotlib.backends.backend_qt5agg import (FigureCanvas)
+from matplotlib.figure import Figure
+
 from gui.base.components.BaseComponent import BaseComponent
+from gui.base.components.ResizableComponent import ResizableComponent
 
 
 class PlotComponent(BaseComponent):
@@ -21,3 +29,16 @@ class PlotComponent(BaseComponent):
 
     def __init__(self, parent):
         super(PlotComponent, self).__init__(parent)
+        self.canvas = None
+
+    def init_ui(self):
+        super().init_ui()
+        layout = QVBoxLayout(self)
+        self.layout = layout
+
+        self.canvas = FigureCanvas(Figure(figsize=(5, 3)))
+        layout.addWidget(self.canvas)
+
+        self._static_ax = self.canvas.figure.subplots()
+        t = np.linspace(0, 10, 501)
+        self._static_ax.plot(t, np.tan(t), ".")

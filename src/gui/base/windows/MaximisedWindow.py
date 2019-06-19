@@ -23,4 +23,12 @@ class MaximisedWindow(BaseWindow):
 
     def __init__(self):
         super().__init__()
-        self.showMaximized()
+        if self.maximise_on_start():
+            self.showMaximized()
+
+    def maximise_on_start(self):
+        """
+        Override this function to prevent the window being
+        maximised when opened.
+        """
+        return True

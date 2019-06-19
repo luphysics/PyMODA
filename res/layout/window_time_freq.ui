@@ -6,24 +6,32 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>535</width>
-    <height>482</height>
+    <width>874</width>
+    <height>660</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <widget class="PlotComponent" name="widget" native="true"/>
-    </item>
-    <item>
-     <widget class="QPushButton" name="pushButton">
-      <property name="text">
-       <string>PushButton</string>
-      </property>
-     </widget>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <layout class="QHBoxLayout" name="hor_top_plot">
+        <item>
+         <widget class="PlotComponent" name="plot_top" native="true"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="hor_main_plot">
+        <item>
+         <widget class="PlotComponent" name="plot_main" native="true"/>
+        </item>
+       </layout>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>
@@ -33,7 +41,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>535</width>
+     <width>874</width>
      <height>29</height>
     </rect>
    </property>
