@@ -21,14 +21,15 @@ from gui.base.BaseUI import BaseUI
 
 
 class FrequencyDialog(QDialog, BaseUI):
+    """A dialog which allows the sampling frequency to be entered."""
 
     def __init__(self, freq_callback):
         super().__init__()
         self.freq_callback = freq_callback
 
     def init_ui(self):
-        uic.loadUi(resources.get_ui("dialog_frequency"), self)
-        self.edit_freq.changed.connect(self.freq_changed)
+        uic.loadUi(resources.get("layout:dialog_frequency.ui"), self)
+        self.edit_freq.textChanged.connect(self.freq_changed)
 
     def freq_changed(self, value):
         self.freq_callback(value)

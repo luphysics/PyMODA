@@ -13,6 +13,8 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import string
+
 from data.parsing.CSVParser import CSVParser
 from data.parsing.parsing import extension
 
@@ -56,4 +58,31 @@ def get_ui(name):
     return get_layout_path() + name
 
 
+def get(resource: string) -> string:
+    """
+    Gets the path to a resource from the appropriate folder,
+    when given a name beginning with the resource type.
+    """
+    split = resource.split(":")
+    if len(split) != 2:
+        raise ResourceException(f"Error finding resource type for {resource}.")
 
+    res_type = split[0]
+    name = split[-1]
+
+    folder = resources[res_type]
+    if not folder:
+        raise ResourceException(f"Selected resource has no associated folder.")
+
+    return folder + name
+
+
+resources = {
+    "layout": get_layout_path(),
+    "img": get_img_path(),
+    "image": get_img_path()
+}
+
+
+class ResourceException(Exception):
+    pass

@@ -13,6 +13,8 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import string
+
 from PyQt5 import uic
 from PyQt5.QtWidgets import QDialog
 
@@ -29,8 +31,8 @@ class TimeFreqWindow(MaximisedWindow):
     """
 
     name = "Time-Frequency Analysis"
-    open_file = None
-    freq = None
+    open_file: string = None
+    freq: float = None
 
     def __init__(self, application):
         super().__init__()
@@ -78,13 +80,13 @@ class TimeFreqWindow(MaximisedWindow):
     def load_data(self):
         self.time_series = TimeSeries.from_file(self.open_file)
         if not self.time_series.has_frequency():
-            dialog = FrequencyDialog(self.set_frequency)
+            dialog = FrequencyDialog(self.on_freq_changed)
             code = dialog.exec()
             if code == QDialog.Accepted:
                 self.set_frequency(self.freq)
 
     def on_freq_changed(self, freq):
-        self.freq = freq
+        self.freq = float(freq)
 
-    def set_frequency(self, freq):
-        self.time_series.frequency = freq
+    def set_frequency(self, freq: float):
+        self.time_series.set_frequency(freq)

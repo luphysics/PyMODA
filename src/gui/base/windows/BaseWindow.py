@@ -13,7 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMainWindow
 
 from data import resources
@@ -29,6 +29,7 @@ class BaseWindow(QMainWindow, BaseUI):
         super(BaseWindow, self).__init__()
         # self.init_ui()
         self.set_title()
+        self.set_icon()
 
     def set_title(self, title=resources.get_name()):
         """
@@ -36,3 +37,7 @@ class BaseWindow(QMainWindow, BaseUI):
         the default name of the application is used.
         """
         self.setWindowTitle(title)
+
+    def set_icon(self, img=resources.get("image:icon.svg")):
+        icon = QIcon(img)
+        self.setWindowIcon(icon)

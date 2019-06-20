@@ -26,12 +26,32 @@ class TimeSeries:
     to calculate the time for each datum point in the series.
     """
 
+    initial_time = 0
+    times = None
+
     def __init__(self, data, frequency=None):
         self.frequency = frequency
-        self.data = np.asarray(data)
+        self.data = np.asarray(data, dtype="float64")
 
     def has_frequency(self):
+        """Returns whether a frequency has been set."""
         return self.frequency is not None
+
+    def set_frequency(self, freq: float):
+        """
+        Sets the frequency. This will trigger a regeneration
+        of the time values.
+        """
+        self.frequency = freq
+        self.generate_times()
+
+    def generate_times(self):
+        """Generates the time values associated with the data."""
+        times = self.data.copy()
+        for i in range(0, len(self.data)):
+            times[i] = self.initial_time + i / self.frequency
+
+        self.times = times
 
     @staticmethod
     def from_file(file):
@@ -40,5 +60,5 @@ class TimeSeries:
 
 
 def get_parser(filename):
-    ext = extension(filename)
-    return CSVParser(filename)
+    """Gets the appropriate parser for a given file."""
+    return CSVParser(filename)  # Test implementation.
