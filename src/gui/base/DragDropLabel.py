@@ -32,10 +32,10 @@ class DragDropLabel(QLabel):
         if self.callback:
             self.callback(file_path)
 
-        file_name = file_path.split("/")[-1].split("\\")[-1]
-        self.show_selected_file(file_name)
+        self.show_selected_file(file_path)
 
-    def show_selected_file(self, file_name):
+    def show_selected_file(self, file_path):
+        file_name = file_path.split("/")[-1].split("\\")[-1]
         self.setText(f"File selected:\n{file_name}")
         self.set_background(highlighted=False)
 

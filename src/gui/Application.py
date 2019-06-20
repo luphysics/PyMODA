@@ -16,7 +16,7 @@
 
 from PyQt5.QtWidgets import QApplication
 
-from gui.time_freq.TimeFreqWindow import TimeFreqWindow
+from gui.timefrequency.TimeFreqWindow import TimeFreqWindow
 from gui.launcher.LauncherWindow import LauncherWindow
 
 

@@ -16,9 +16,11 @@
 from PyQt5 import uic
 from PyQt5.QtWidgets import QDialog
 
-from gui import resources
+from data import resources
 from gui.base.SelectFileDialog import SelectFileDialog
 from gui.base.windows.MaximisedWindow import MaximisedWindow
+from gui.timefrequency.FrequencyDialog import FrequencyDialog
+from maths.TimeSeries import TimeSeries
 
 
 class TimeFreqWindow(MaximisedWindow):
@@ -28,6 +30,7 @@ class TimeFreqWindow(MaximisedWindow):
 
     name = "Time-Frequency Analysis"
     open_file = None
+    freq = None
 
     def __init__(self, application):
         super().__init__()
@@ -70,3 +73,18 @@ class TimeFreqWindow(MaximisedWindow):
             self.open_file = dialog.get_file()
             print(f"Opening {self.open_file}...")
             self.set_title()
+            self.load_data()
+
+    def load_data(self):
+        self.time_series = TimeSeries.from_file(self.open_file)
+        if not self.time_series.has_frequency():
+            dialog = FrequencyDialog(self.set_frequency)
+            code = dialog.exec()
+            if code == QDialog.Accepted:
+                self.set_frequency(self.freq)
+
+    def on_freq_changed(self, freq):
+        self.freq = freq
+
+    def set_frequency(self, freq):
+        self.time_series.frequency = freq

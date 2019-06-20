@@ -16,7 +16,7 @@
 from PyQt5 import uic
 from PyQt5.QtWidgets import QDialog, QFileDialog
 
-from gui import resources
+from data import resources
 from gui.base.BaseUI import BaseUI
 
 

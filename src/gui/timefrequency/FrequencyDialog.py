@@ -1,5 +1,5 @@
 #  PyMODA, a Python implementation of MODA (Multiscale Oscillatory Dynamics Analysis).
-#  Copyright (C) 2019  Lancaster University
+#  Copyright (C) 2019 Lancaster University
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -13,26 +13,22 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-from PyQt5.QtWidgets import QMainWindow
+from PyQt5 import uic
+from PyQt5.QtWidgets import QDialog
 
 from data import resources
 from gui.base.BaseUI import BaseUI
 
 
-class BaseWindow(QMainWindow, BaseUI):
-    """
-    A base window which inherits from BaseUI.
-    """
+class FrequencyDialog(QDialog, BaseUI):
 
-    def __init__(self):
-        super(BaseWindow, self).__init__()
-        # self.init_ui()
-        self.set_title()
+    def __init__(self, freq_callback):
+        super().__init__()
+        self.freq_callback = freq_callback
 
-    def set_title(self, title=resources.get_name()):
-        """
-        Sets the title of the window. If no title is supplied,
-        the default name of the application is used.
-        """
-        self.setWindowTitle(title)
+    def init_ui(self):
+        uic.loadUi(resources.get_ui("dialog_frequency"), self)
+        self.edit_freq.changed.connect(self.freq_changed)
+
+    def freq_changed(self, value):
+        self.freq_callback(value)

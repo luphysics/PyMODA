@@ -1,5 +1,5 @@
 #  PyMODA, a Python implementation of MODA (Multiscale Oscillatory Dynamics Analysis).
-#  Copyright (C) 2019  Lancaster University
+#  Copyright (C) 2019 Lancaster University
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -13,26 +13,20 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-from PyQt5.QtWidgets import QMainWindow
-
-from data import resources
-from gui.base.BaseUI import BaseUI
+from data.parsing import parsing
+from data.parsing.BaseParser import BaseParser
 
 
-class BaseWindow(QMainWindow, BaseUI):
-    """
-    A base window which inherits from BaseUI.
-    """
+class CSVParser(BaseParser):
 
-    def __init__(self):
-        super(BaseWindow, self).__init__()
-        # self.init_ui()
-        self.set_title()
+    def __init__(self, filename):
+        super().__init__(filename)
 
-    def set_title(self, title=resources.get_name()):
-        """
-        Sets the title of the window. If no title is supplied,
-        the default name of the application is used.
-        """
-        self.setWindowTitle(title)
+    def parse(self):
+        lines = parsing.get_lines(self.filename)
+        data = []
+        for l in lines:
+            for item in l.split(","):
+                data.append(float(item))
+
+        return data

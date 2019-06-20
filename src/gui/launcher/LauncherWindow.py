@@ -17,7 +17,7 @@
 from PyQt5 import uic
 
 from gui.base.windows.CentredWindow import CentredWindow
-from gui.resources import get_ui
+from data.resources import get_ui
 
 
 class LauncherWindow(CentredWindow):
