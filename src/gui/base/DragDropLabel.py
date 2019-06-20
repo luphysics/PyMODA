@@ -19,6 +19,11 @@ from PyQt5.QtWidgets import QLabel
 
 
 class DragDropLabel(QLabel):
+    """
+    A label which accepts drag-and-drop events for files. When a drop
+    succeeds, the filename is shown in the label. The label changes
+    colour while a drag event is in progress.
+    """
     callback = None  # Callback will be used to send the file name.
 
     def dropEvent(self, event: QDropEvent) -> None:
@@ -28,10 +33,13 @@ class DragDropLabel(QLabel):
             self.callback(file_path)
 
         file_name = file_path.split("/")[-1].split("\\")[-1]
+        self.show_selected_file(file_name)
+
+    def show_selected_file(self, file_name):
         self.setText(f"File selected:\n{file_name}")
         self.set_background(highlighted=False)
 
-    def dragLeaveEvent(self, a0: QtGui.QDragLeaveEvent) -> None:
+    def dragLeaveEvent(self, e: QtGui.QDragLeaveEvent) -> None:
         self.set_background(highlighted=False)
 
     def set_background(self, highlighted):

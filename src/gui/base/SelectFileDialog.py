@@ -14,7 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from PyQt5 import uic
-from PyQt5.QtWidgets import QDialog
+from PyQt5.QtWidgets import QDialog, QFileDialog
 
 from gui import resources
 from gui.base.BaseUI import BaseUI
@@ -32,12 +32,23 @@ class SelectFileDialog(QDialog, BaseUI):
     def init_ui(self):
         uic.loadUi(resources.get_ui("dialog_select_file"), self)
         self.setup_drops()
+        self.btn_browse.clicked.connect(self.browse_for_file)
 
     def setup_drops(self):
         """Sets up the label to accept drag-and-drop."""
         drop_target = self.lbl_drag_drop
         drop_target.setAcceptDrops(True)
         drop_target.set_drop_callback(self.set_file)
+
+    def browse_for_file(self):
+        """Opens a file browser dialog for selecting a file."""
+        dialog = QFileDialog()
+        dialog.setFileMode(QFileDialog.AnyFile)
+
+        if dialog.exec_():
+            filenames = dialog.selectedFiles()
+            self.file = filenames[0]
+            self.lbl_drag_drop.show_selected_file(self.file)
 
     def set_file(self, file):
         self.file = file
