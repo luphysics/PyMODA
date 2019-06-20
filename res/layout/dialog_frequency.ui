@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>235</width>
-    <height>169</height>
+    <width>304</width>
+    <height>267</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,6 +29,20 @@
    </item>
    <item>
     <widget class="QLineEdit" name="edit_freq"/>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Recent values:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="combo_recent"/>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">

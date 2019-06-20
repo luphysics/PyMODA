@@ -20,7 +20,7 @@
       <item>
        <layout class="QHBoxLayout" name="hor_top_plot">
         <item>
-         <widget class="PlotComponent" name="plot_top" native="true"/>
+         <widget class="SignalPlot" name="plot_top" native="true"/>
         </item>
        </layout>
       </item>
@@ -52,6 +52,12 @@
    <class>PlotComponent</class>
    <extends>QWidget</extends>
    <header>gui.base.components.PlotComponent</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>SignalPlot</class>
+   <extends>QWidget</extends>
+   <header>gui.timefrequency.SignalPlot</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

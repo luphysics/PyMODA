@@ -27,9 +27,12 @@ from gui.base.components.ResizableComponent import ResizableComponent
 class PlotComponent(BaseComponent):
     """A component which enables plotting via matplotlib."""
 
+    canvas = None
+    layout = None
+    axis = None
+
     def __init__(self, parent):
         super(PlotComponent, self).__init__(parent)
-        self.canvas = None
 
     def init_ui(self):
         super().init_ui()
@@ -39,6 +42,8 @@ class PlotComponent(BaseComponent):
         self.canvas = FigureCanvas(Figure(figsize=(5, 3)))
         layout.addWidget(self.canvas)
 
-        self._static_ax = self.canvas.figure.subplots()
-        t = np.linspace(0, 10, 501)
-        self._static_ax.plot(t, np.tan(t), ".")
+        self.axis = self.canvas.figure.subplots()
+
+        # _static_ax = self.canvas.figure.subplots()
+        # t = np.linspace(0, 10, 501)
+        # _static_ax.plot(t, np.tan(t), ".")

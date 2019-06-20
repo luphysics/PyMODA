@@ -72,15 +72,20 @@ def get(resource: string) -> string:
 
     folder = resources[res_type]
     if not folder:
-        raise ResourceException(f"Selected resource has no associated folder.")
+        raise ResourceException(f"Requested resource type has no associated folder.")
 
     return folder + name
+
+
+def get_test_path():
+    return get_base_path() + "test/"
 
 
 resources = {
     "layout": get_layout_path(),
     "img": get_img_path(),
-    "image": get_img_path()
+    "image": get_img_path(),
+    "test": get_test_path()
 }
 
 

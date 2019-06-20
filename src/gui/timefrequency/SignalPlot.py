@@ -13,22 +13,13 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-import numpy as np
-
-from data.parsing import parsing
-from data.parsing.BaseParser import BaseParser
+from gui.base.components.PlotComponent import PlotComponent
+from maths.TimeSeries import TimeSeries
 
 
-class CSVParser(BaseParser):
+class SignalPlot(PlotComponent):
 
-    def __init__(self, filename):
-        super().__init__(filename)
-
-    def parse(self):
-        lines = parsing.get_lines(self.filename)
-        data = []
-        for l in lines:
-            for item in l.split(","):
-                data.append(float(item))
-
-        return data
+    def plot(self, data: TimeSeries):
+        x = data.times
+        y = data.data
+        self.axis.plot(x, y)

@@ -14,7 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from PyQt5 import uic
-from PyQt5.QtWidgets import QDialog
+from PyQt5.QtWidgets import QDialog, QComboBox
 
 from data import resources
 from gui.base.BaseUI import BaseUI
@@ -22,6 +22,9 @@ from gui.base.BaseUI import BaseUI
 
 class FrequencyDialog(QDialog, BaseUI):
     """A dialog which allows the sampling frequency to be entered."""
+
+    select_text = "Select item"
+    current_selected = None
 
     def __init__(self, freq_callback):
         super().__init__()
@@ -31,5 +34,20 @@ class FrequencyDialog(QDialog, BaseUI):
         uic.loadUi(resources.get("layout:dialog_frequency.ui"), self)
         self.edit_freq.textChanged.connect(self.freq_changed)
 
+    def setup_combo(self):
+        combo: QComboBox = self.combo_recent
+        combo.addItem(self.select_text)
+        combo.addItem(self.combo_text(10))
+        combo.activated.connect(self.on_combo_change)
+
+    def combo_text(self, freq):
+        return f"{freq} Hz"
+
     def freq_changed(self, value):
         self.freq_callback(value)
+
+    def get_frequency(self):
+        combo_value = self.combo_recent.text()
+
+    def on_combo_change(self, value):
+        self.current_selected = value

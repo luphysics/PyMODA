@@ -22,6 +22,7 @@ from data import resources
 from gui.base.SelectFileDialog import SelectFileDialog
 from gui.base.windows.MaximisedWindow import MaximisedWindow
 from gui.timefrequency.FrequencyDialog import FrequencyDialog
+from gui.timefrequency.SignalPlot import SignalPlot
 from maths.TimeSeries import TimeSeries
 
 
@@ -42,7 +43,7 @@ class TimeFreqWindow(MaximisedWindow):
         return False
 
     def init_ui(self):
-        uic.loadUi(resources.get_ui("window_time_freq"), self)
+        uic.loadUi(resources.get("layout:window_time_freq.ui"), self)
         self.set_title()
         self.setup_menu_bar()
         self.select_file()
@@ -84,9 +85,17 @@ class TimeFreqWindow(MaximisedWindow):
             code = dialog.exec()
             if code == QDialog.Accepted:
                 self.set_frequency(self.freq)
+                self.on_data_loaded()
+
+    def on_data_loaded(self):
+        self.plot_signal()
 
     def on_freq_changed(self, freq):
         self.freq = float(freq)
 
     def set_frequency(self, freq: float):
         self.time_series.set_frequency(freq)
+
+    def plot_signal(self):
+        signal_plot: SignalPlot = self.plot_top
+        signal_plot.plot(self.time_series)
