@@ -17,7 +17,8 @@
 
 class Callbacks:
 
-    def __init__(self, move, click, release):
+    def __init__(self, move, click, release, leave):
         self.move = move
         self.click = click
         self.release = release
+        self.leave = leave

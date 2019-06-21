@@ -21,6 +21,7 @@ from gui.launcher.LauncherWindow import LauncherWindow
 
 
 class Application(QApplication):
+    """The base application."""
     launcher_window = None
     windows = []
 

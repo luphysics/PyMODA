@@ -27,7 +27,6 @@ class BaseWindow(QMainWindow, BaseUI):
 
     def __init__(self):
         super(BaseWindow, self).__init__()
-        # self.init_ui()
         self.set_title()
         self.set_icon()
 

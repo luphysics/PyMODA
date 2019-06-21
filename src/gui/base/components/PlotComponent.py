@@ -31,7 +31,8 @@ class PlotComponent(BaseComponent):
     callbacks: Callbacks = None
     temp_plots = []
     selected_plots = []
-    width = 0.7
+    crosshair_width = 0.7
+    show_crosshair = True
 
     def __init__(self, parent):
         super(PlotComponent, self).__init__(parent)
@@ -52,7 +53,8 @@ class PlotComponent(BaseComponent):
         move = self.canvas.mpl_connect("motion_notify_event", self.on_move)
         click = self.canvas.mpl_connect("button_press_event", self.on_click)
         release = self.canvas.mpl_connect("button_release_event", self.on_release)
-        self.callbacks = Callbacks(move, click, release)
+        leave = self.canvas.mpl_connect("axes_leave_event", self.on_leave)
+        self.callbacks = Callbacks(move, click, release, leave)
 
     def on_move(self, event):
         x, y = self.xy(event)
@@ -87,11 +89,17 @@ class PlotComponent(BaseComponent):
 
     def on_release(self, event):
         x, y = self.xy(event)
-        if x and y:
+        if x and y and self.show_crosshair:
             self.pre_update()
             self.selected_plots.append(self.ver_line(x))
             self.selected_plots.append(self.hor_line(y))
             self.update()
+            if len(self.selected_plots) >= 2:
+                self.show_crosshair = False
+
+    def on_leave(self, event):
+        self.pre_update()
+        self.update()
 
     def xy(self, event):
         return event.xdata, event.ydata
@@ -112,14 +120,14 @@ class PlotComponent(BaseComponent):
         self.temp_plots.append(line)
 
     def ver_line(self, x):
-        return self.axis.axvline(x, color="black", linewidth=self.width)
+        return self.axis.axvline(x, color="black", linewidth=self.crosshair_width)
 
     def plot_hor(self, y):
         line = self.hor_line(y)
         self.temp_plots.append(line)
 
     def hor_line(self, y):
-        return self.axis.axhline(y, color="black", linewidth=self.width)
+        return self.axis.axhline(y, color="black", linewidth=self.crosshair_width)
 
     def clear(self):
         """Clears the contents of the plot."""
