@@ -13,15 +13,13 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-import time
 
-import numpy as np
 from PyQt5.QtWidgets import QVBoxLayout
 from matplotlib.backends.backend_qt5agg import (FigureCanvas)
 from matplotlib.figure import Figure
 
 from gui.base.components.BaseComponent import BaseComponent
-from gui.base.components.ResizableComponent import ResizableComponent
+from gui.base.plot.Callbacks import Callbacks
 
 
 class PlotComponent(BaseComponent):
@@ -30,12 +28,17 @@ class PlotComponent(BaseComponent):
     canvas = None
     layout = None
     axis = None
+    callbacks: Callbacks = None
+    temp_plots = []
+    selected_plots = []
+    width = 0.7
 
     def __init__(self, parent):
         super(PlotComponent, self).__init__(parent)
 
     def init_ui(self):
         super().init_ui()
+        self.setMouseTracking(True)
         layout = QVBoxLayout(self)
         self.layout = layout
 
@@ -43,7 +46,90 @@ class PlotComponent(BaseComponent):
         layout.addWidget(self.canvas)
 
         self.axis = self.canvas.figure.subplots()
+        self.init_callbacks()
 
-        # _static_ax = self.canvas.figure.subplots()
-        # t = np.linspace(0, 10, 501)
-        # _static_ax.plot(t, np.tan(t), ".")
+    def init_callbacks(self):
+        move = self.canvas.mpl_connect("motion_notify_event", self.on_move)
+        click = self.canvas.mpl_connect("button_press_event", self.on_click)
+        release = self.canvas.mpl_connect("button_release_event", self.on_release)
+        self.callbacks = Callbacks(move, click, release)
+
+    def on_move(self, event):
+        x, y = self.xy(event)
+        if x and y:
+            self.pre_update()
+            self.draw_lines(x, y)
+            self.update()
+
+    def pre_update(self):
+        self.remove_temp()
+
+    def update(self):
+        self.canvas.draw()
+
+    def remove_temp(self):
+        num = len(self.temp_plots)
+        for i in range(num):
+            # Iterate in reverse order, because the list becomes shorter
+            # with every pop.
+            index = num - i - 1
+
+            item = self.temp_plots.pop(index)
+            item.remove()
+
+    def on_click(self, event):
+        x, y = self.xy(event)
+        if x and y:
+            self.pre_update()
+            self.selected_plots.append(self.ver_line(x))
+            self.selected_plots.append(self.hor_line(y))
+            self.update()
+
+    def on_release(self, event):
+        x, y = self.xy(event)
+        if x and y:
+            self.pre_update()
+            self.selected_plots.append(self.ver_line(x))
+            self.selected_plots.append(self.hor_line(y))
+            self.update()
+
+    def xy(self, event):
+        return event.xdata, event.ydata
+
+    def get_bounds(self):
+        ax = self.axis
+        x1, x2 = ax.get_xlim()
+        y1, y2 = ax.get_ylim()
+        return Bounds(x1, x2, y1, y2)
+
+    def draw_lines(self, x, y):
+        """Draws a horizontal and vertical line, intersecting at (x,y)."""
+        self.plot_hor(y)
+        self.plot_ver(x)
+
+    def plot_ver(self, x):
+        line = self.ver_line(x)
+        self.temp_plots.append(line)
+
+    def ver_line(self, x):
+        return self.axis.axvline(x, color="black", linewidth=self.width)
+
+    def plot_hor(self, y):
+        line = self.hor_line(y)
+        self.temp_plots.append(line)
+
+    def hor_line(self, y):
+        return self.axis.axhline(y, color="black", linewidth=self.width)
+
+    def clear(self):
+        """Clears the contents of the plot."""
+        self.axis.clear()
+
+
+class Bounds:
+
+    def __init__(self, x1, x2, y1, y2):
+        self.x1 = x1
+        self.x2 = x2
+        self.y1 = y1
+        self.y2 = y2

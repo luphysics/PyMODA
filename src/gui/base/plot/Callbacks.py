@@ -13,14 +13,11 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from gui.base.components.PlotComponent import PlotComponent
-from maths.TimeSeries import TimeSeries
 
 
-class SignalPlot(PlotComponent):
+class Callbacks:
 
-    def plot(self, data: TimeSeries):
-        x = data.times
-        y = data.data
-        self.axis.plot(x, y)
-        self.axis.autoscale(False)
+    def __init__(self, move, click, release):
+        self.move = move
+        self.click = click
+        self.release = release
