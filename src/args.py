@@ -20,7 +20,9 @@ args = None
 
 
 def parser():
-    """Creates the argument parser for PyMODA."""
+    """
+    Creates the argument parser for PyMODA.
+    """
     p = ArgumentParser(description="PyMODA argument parser")
     p.add_argument("-files", metavar="test_files", action="store", nargs="+", default=None,
                    help="Test files to load")

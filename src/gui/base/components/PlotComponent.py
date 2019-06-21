@@ -155,7 +155,8 @@ class PlotComponent(BaseComponent):
         rect = self.rect
         width, height = rect.get_width(), rect.get_height()
         x, y = rect.x1, rect.y1
-        self.temp_patch = patches.Rectangle((x, y), width, height, edgecolor="red", alpha=1)
+
+        self.temp_patch = patches.Rectangle((x, y), width, height, edgecolor="red", fill=False, zorder=10)
         self.axes.add_patch(self.temp_patch)
 
     def draw_lines(self, x, y):
