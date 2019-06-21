@@ -16,6 +16,11 @@
 
 
 class Rect:
+    """
+    A simple class representing the coordinates of a rectangle
+    that is drawn in matplotlib. (x1,y1) refer to the upper left
+    corner, while (x2,y2) are the lower right corner.
+    """
 
     x2, y2 = None, None
 

@@ -28,18 +28,18 @@ class PlotComponent(BaseComponent):
     """A component which enables plotting via matplotlib."""
 
     callbacks: Callbacks = None
-    canvas = None
-    layout = None
+    canvas: FigureCanvas = None
+    layout: QVBoxLayout = None
     axes = None
 
-    temp_plots = []
-    selected_plots = []
+    temp_plots = []  # Temporary crosshair plots which should be removed on each update.
+    selected_plots = []  # Selected crosshair plots which should be kept.
 
     crosshair_width = 0.7
     show_crosshair = True
 
     temp_patch = None  # The actual rectangle being drawn on the plot.
-    rect: Rect = None  # The Rect object recording the coordinates of the rectangle.
+    rect: Rect = None  # The Rect object representing the coordinates of the rectangle.
 
     def __init__(self, parent):
         super(PlotComponent, self).__init__(parent)
@@ -57,9 +57,15 @@ class PlotComponent(BaseComponent):
         self.init_callbacks()
 
     def init_callbacks(self):
+        """
+        Creates the callbacks for interacting with the plot.
+        """
         move = self.canvas.mpl_connect("motion_notify_event", self.on_move)
         click = self.canvas.mpl_connect("button_press_event", self.on_click)
         release = self.canvas.mpl_connect("button_release_event", self.on_release)
+
+        # We want "leave" to trigger for the axes and the figure, because a fast
+        # mouse movement can cause the axes mouse event to not trigger.
         axes_leave = self.canvas.mpl_connect("axes_leave_event", self.on_leave)
         figure_leave = self.canvas.mpl_connect("figure_leave_event", self.on_leave)
 
@@ -67,19 +73,26 @@ class PlotComponent(BaseComponent):
         self.callbacks = Callbacks(move, click, release, axes_leave, figure_leave)
 
     def cross_cursor(self, cross=True):
+        """Sets the cursor to a cross, or resets it to the normal arrow style."""
         if cross:
             QApplication.setOverrideCursor(Qt.CrossCursor)
         else:
-            QApplication.restoreOverrideCursor()
+            QApplication.setOverrideCursor(Qt.ArrowCursor)
 
     def pre_update(self):
+        """Should be called before update()."""
         self.remove_temp()
 
     def update(self):
+        """Updates the plot by redrawing the canvas."""
         super().update()
         self.canvas.draw()
 
     def remove_temp_crosshairs(self):
+        """
+        Removes the temporary crosshairs (the crosshairs that follow the cursor
+        as it moves).
+        """
         num = len(self.temp_plots)
         for i in range(num):
             # Iterate in reverse order, because the list becomes shorter
@@ -90,15 +103,22 @@ class PlotComponent(BaseComponent):
             item.remove()
 
     def remove_temp_rectangle(self):
+        """
+        Removes the temporary rectangle. This is necessary because the
+        rectangle must be updated as the cursor moves, and the old version
+        needs to be removed.
+        """
         if self.temp_patch:
             self.temp_patch.remove()
             self.temp_patch = None
 
     def remove_temp(self):
+        """Removes all temporary items on the plot."""
         self.remove_temp_crosshairs()
         self.remove_temp_rectangle()
 
     def on_move(self, event):
+        """Called when the mouse moves over the plot."""
         self.cross_cursor(True)
         x, y = self.xy(event)
         if x and y:
@@ -111,47 +131,58 @@ class PlotComponent(BaseComponent):
             self.update()
 
     def on_click(self, event):
+        """Called when the mouse clicks down on the plot, but before the click is released."""
         x, y = self.xy(event)
         if x and y:
+            self.rect = Rect(x, y)
             self.pre_update()
-            # self.selected_plots.append(self.ver_line(x))
-            # self.selected_plots.append(self.hor_line(y))
             self.update()
 
-            self.rect = Rect(x, y)
-
     def on_release(self, event):
+        """Called when the mouse releases a click on the plot."""
         x, y = self.xy(event)
         if x and y:
-            if self.show_crosshair:
-                self.pre_update()
-                # self.selected_plots.append(self.ver_line(x))
-                # self.selected_plots.append(self.hor_line(y))
-                self.update()
-                if len(self.selected_plots) >= 2:
-                    self.show_crosshair = False
             if self.rect:
                 self.zoom_to(self.rect)
                 self.rect = None
 
+            if self.show_crosshair:
+                if len(self.selected_plots) >= 2:
+                    self.show_crosshair = False
+
+            self.pre_update()
+            self.update()
+
     def zoom_to(self, rect):
-        pass
+        """
+        Zooms the plot to the region designated by the rectangle.
+        """
+        x1, x2 = rect.x1, rect.x2
+        y1, y2 = rect.y1, rect.y2
+        self.axes.set_xlim(x1, x2)
+        self.axes.set_ylim(y1, y2)
 
     def on_leave(self, event):
+        """Called when the mouse is no longer over the figure or the axes."""
         self.cross_cursor(False)
         self.pre_update()
         self.update()
 
     def xy(self, event):
+        """Returns the xy-coordinates from an event as a tuple."""
         return event.xdata, event.ydata
 
     def get_bounds(self):
+        """Gets the bounds of the plot; i.e. the points corresponding to maximum and minimum x and y."""
         ax = self.axes
         x1, x2 = ax.get_xlim()
         y1, y2 = ax.get_ylim()
         return Bounds(x1, x2, y1, y2)
 
     def draw_rect(self):
+        """
+        Draws the rectangle (used to allow the user to zoom on a region).
+        """
         rect = self.rect
         width, height = rect.get_width(), rect.get_height()
         x, y = rect.x1, rect.y1
@@ -165,19 +196,21 @@ class PlotComponent(BaseComponent):
         self.plot_ver(x)
 
     def plot_ver(self, x):
+        """Plots a vertical line at a given x-value, and adds to the list of temporary plots."""
         line = self.ver_line(x)
         self.temp_plots.append(line)
 
     def ver_line(self, x):
-        """Draws a vertical line at a given x-value."""
+        """Creates a vertical line at a given x-value."""
         return self.axes.axvline(x, color="black", linewidth=self.crosshair_width)
 
     def plot_hor(self, y):
+        """Plots a horizontal line at a given y-value, and adds to the list of temporary plots."""
         line = self.hor_line(y)
         self.temp_plots.append(line)
 
     def hor_line(self, y):
-        """Draws a horizontal line at a given y-value."""
+        """Creates a horizontal line at a given y-value."""
         return self.axes.axhline(y, color="black", linewidth=self.crosshair_width)
 
     def clear(self):
@@ -186,6 +219,10 @@ class PlotComponent(BaseComponent):
 
 
 class Bounds:
+    """
+    An object representing the bounds of a plot. It contains the minimum and
+    maximum x and y values.
+    """
 
     def __init__(self, x1, x2, y1, y2):
         self.x1 = x1

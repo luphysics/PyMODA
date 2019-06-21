@@ -35,7 +35,7 @@ class FrequencyDialog(QDialog, BaseUI):
     def init_ui(self):
         uic.loadUi(resources.get("layout:dialog_frequency.ui"), self)
         self.edit_freq.textChanged.connect(self.freq_changed)
-        QTimer.singleShot(1000, self.check_args)
+        QTimer.singleShot(500, self.check_args)
 
     def setup_combo(self):
         combo: QComboBox = self.combo_recent
