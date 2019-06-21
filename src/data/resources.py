@@ -81,6 +81,7 @@ def get_test_path():
     return get_base_path() + "test/"
 
 
+# Used to select the correct path for a given resource type.
 resources = {
     "layout": get_layout_path(),
     "img": get_img_path(),

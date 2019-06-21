@@ -20,6 +20,7 @@ args = None
 
 
 def parser():
+    """Creates the argument parser for PyMODA."""
     p = ArgumentParser(description="PyMODA argument parser")
     p.add_argument("-files", metavar="test_files", action="store", nargs="+", default=None,
                    help="Test files to load")
@@ -29,17 +30,20 @@ def parser():
 
 
 def parse_args():
+    """Parses the args and sets the global 'args' variable."""
     global args
     args = parser().parse_args()
 
 
 def args_file():
+    """Gets the files from the args, or returns None."""
     if args and args.files:
         return args.files
     return None
 
 
 def args_freq():
+    """Gets the frequency from the args, or returns None."""
     if args and args.freq:
         return args.freq[0]
     return None

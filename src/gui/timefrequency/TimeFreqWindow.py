@@ -80,6 +80,7 @@ class TimeFreqWindow(MaximisedWindow):
             self.load_data()
 
     def load_data(self):
+        """Loads the time-series data."""
         self.time_series = TimeSeries.from_file(self.open_file)
         if not self.time_series.has_frequency():
             dialog = FrequencyDialog(self.on_freq_changed)
@@ -89,14 +90,18 @@ class TimeFreqWindow(MaximisedWindow):
                 self.on_data_loaded()
 
     def on_data_loaded(self):
+        """Called when the time-series data has been loaded."""
         self.plot_signal()
 
     def on_freq_changed(self, freq):
+        """Called when the frequency is changed."""
         self.freq = float(freq)
 
     def set_frequency(self, freq: float):
+        """Sets the frequency of the time-series."""
         self.time_series.set_frequency(freq)
 
     def plot_signal(self):
+        """Plots the signal on the SignalPlot."""
         signal_plot: SignalPlot = self.plot_top
         signal_plot.plot(self.time_series)

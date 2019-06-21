@@ -16,7 +16,6 @@
 import numpy as np
 
 from data.parsing.CSVParser import CSVParser
-from data.parsing.parsing import extension
 
 
 class TimeSeries:
