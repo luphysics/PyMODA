@@ -13,13 +13,33 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from argparse import ArgumentParser
+
+# Args are global and should only be modified at startup.
+args = None
 
 
-class Callbacks:
+def parser():
+    p = ArgumentParser(description="PyMODA argument parser")
+    p.add_argument("-files", metavar="test_files", action="store", nargs="+", default=None,
+                   help="Test files to load")
+    p.add_argument("-freq", metavar="frequency", action="store", type=float, nargs=1, default=None,
+                   help="Frequency to use")
+    return p
 
-    def __init__(self, move, click, release, axes_leave, figure_leave):
-        self.move = move
-        self.click = click
-        self.release = release
-        self.axes_leave = axes_leave
-        self.figure_leave = figure_leave
+
+def parse_args():
+    global args
+    args = parser().parse_args()
+
+
+def args_file():
+    if args and args.files:
+        return args.files
+    return None
+
+
+def args_freq():
+    if args and args.freq:
+        return args.freq[0]
+    return None

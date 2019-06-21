@@ -16,6 +16,7 @@
 
 import sys
 
+import args
 from gui.Application import Application
 
 
@@ -27,4 +28,5 @@ def main():
 
 # The entry-point of the program.
 if __name__ == "__main__":
+    args.parse_args()
     main()

@@ -34,6 +34,7 @@ class TimeFreqWindow(MaximisedWindow):
     name = "Time-Frequency Analysis"
     open_file: string = None
     freq: float = None
+    time_series: TimeSeries = None
 
     def __init__(self, application):
         super().__init__()

@@ -53,8 +53,9 @@ class PlotComponent(BaseComponent):
         move = self.canvas.mpl_connect("motion_notify_event", self.on_move)
         click = self.canvas.mpl_connect("button_press_event", self.on_click)
         release = self.canvas.mpl_connect("button_release_event", self.on_release)
-        leave = self.canvas.mpl_connect("axes_leave_event", self.on_leave)
-        self.callbacks = Callbacks(move, click, release, leave)
+        axes_leave = self.canvas.mpl_connect("axes_leave_event", self.on_leave)
+        figure_leave = self.canvas.mpl_connect("figure_leave_event", self.on_leave)
+        self.callbacks = Callbacks(move, click, release, axes_leave, figure_leave)
 
     def on_move(self, event):
         x, y = self.xy(event)

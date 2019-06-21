@@ -14,8 +14,10 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from PyQt5 import uic
+from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QDialog, QComboBox
 
+import args
 from data import resources
 from gui.base.BaseUI import BaseUI
 
@@ -33,12 +35,19 @@ class FrequencyDialog(QDialog, BaseUI):
     def init_ui(self):
         uic.loadUi(resources.get("layout:dialog_frequency.ui"), self)
         self.edit_freq.textChanged.connect(self.freq_changed)
+        QTimer.singleShot(1000, self.check_args)
 
     def setup_combo(self):
         combo: QComboBox = self.combo_recent
         combo.addItem(self.select_text)
         combo.addItem(self.combo_text(10))
         combo.activated.connect(self.on_combo_change)
+
+    def check_args(self):
+        freq: float = args.args_freq()
+        if freq:
+            self.freq_changed(freq)
+            self.accept()
 
     def combo_text(self, freq):
         return f"{freq} Hz"
