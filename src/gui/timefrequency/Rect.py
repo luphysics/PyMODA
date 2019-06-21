@@ -13,14 +13,22 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from gui.base.components.PlotComponent import PlotComponent
-from maths.TimeSeries import TimeSeries
 
 
-class SignalPlot(PlotComponent):
+class Rect:
 
-    def plot(self, data: TimeSeries):
-        x = data.times
-        y = data.data
-        self.axes.plot(x, y)
-        self.axes.autoscale(False)
+    x2, y2 = None, None
+
+    def __init__(self, x1, y1):
+        self.x1 = x1
+        self.y1 = y1
+
+    def set_corner(self, x2, y2):
+        self.x2 = x2
+        self.y2 = y2
+
+    def get_width(self):
+        return self.x2 - self.x1
+
+    def get_height(self):
+        return self.y2 - self.y1
