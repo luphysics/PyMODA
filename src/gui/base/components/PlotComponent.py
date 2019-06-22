@@ -13,6 +13,8 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from typing import List
+
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QVBoxLayout, QApplication
 from matplotlib import patches
@@ -21,6 +23,7 @@ from matplotlib.figure import Figure
 
 from gui.base.components.BaseComponent import BaseComponent
 from gui.base.plot.Callbacks import Callbacks
+from gui.base.plot.PlotOptionsBar import PlotOptionsBar
 from gui.timefrequency.Rect import Rect
 
 
@@ -40,21 +43,25 @@ class PlotComponent(BaseComponent):
 
     temp_patch = None  # The actual rectangle being drawn on the plot.
     rect: Rect = None  # The Rect object representing the coordinates of the rectangle.
+    rect_stack: List = []  # A List of Rect objects corresponding to a stack of previous zoom states.
 
     def __init__(self, parent):
         super(PlotComponent, self).__init__(parent)
 
     def init_ui(self):
         super().init_ui()
-        self.setMouseTracking(True)
-        layout = QVBoxLayout(self)
-        self.layout = layout
 
+        self.setMouseTracking(True)
+        self.layout = QVBoxLayout(self)
         self.canvas = FigureCanvas(Figure())
-        layout.addWidget(self.canvas)
+        self.init_callbacks()
+
+        options = PlotOptionsBar(self.callbacks)
+
+        self.layout.addWidget(self.canvas)
+        self.layout.addWidget(options)
 
         self.axes = self.canvas.figure.subplots()
-        self.init_callbacks()
 
     def init_callbacks(self):
         """
@@ -65,12 +72,21 @@ class PlotComponent(BaseComponent):
         release = self.canvas.mpl_connect("button_release_event", self.on_release)
 
         # We want "leave" to trigger for the axes and the figure, because a fast
-        # mouse movement can cause the axes mouse event to not trigger.
+        # mouse movement can cause the axes leave event to not occur.
         axes_leave = self.canvas.mpl_connect("axes_leave_event", self.on_leave)
         figure_leave = self.canvas.mpl_connect("figure_leave_event", self.on_leave)
 
         # Set the callbacks object to hold references to these callbacks.
-        self.callbacks = Callbacks(move, click, release, axes_leave, figure_leave)
+        self.callbacks = Callbacks(move, click, release,
+                                   axes_leave, figure_leave,
+                                   self.on_reset, self.on_go_back)
+
+    def on_initial_plot_complete(self):
+        """
+        Should be called after the first plot is complete. It will then set the initial state
+        so that the reset button can work.
+        """
+        self.add_rect_state(self.current_rect())
 
     def cross_cursor(self, cross=True):
         """Sets the cursor to a cross, or resets it to the normal arrow style."""
@@ -78,6 +94,15 @@ class PlotComponent(BaseComponent):
             QApplication.setOverrideCursor(Qt.CrossCursor)
         else:
             QApplication.setOverrideCursor(Qt.ArrowCursor)
+
+    def current_rect(self):
+        """Creates a rect corresponding to the current state."""
+        x1, x2 = self.xlim()
+        y1, y2 = self.ylim()
+
+        rect = Rect(x1, y1)
+        rect.set_corner(x2, y2)
+        return rect
 
     def pre_update(self):
         """Should be called before update()."""
@@ -95,12 +120,8 @@ class PlotComponent(BaseComponent):
         """
         num = len(self.temp_plots)
         for i in range(num):
-            # Iterate in reverse order, because the list becomes shorter
-            # with every pop.
-            index = num - i - 1
-
-            item = self.temp_plots.pop(index)
-            item.remove()
+            item = self.temp_plots.pop()  # Take last item and remove from list.
+            item.remove()  # Remove from plot.
 
     def remove_temp_rectangle(self):
         """
@@ -156,11 +177,18 @@ class PlotComponent(BaseComponent):
     def zoom_to(self, rect):
         """
         Zooms the plot to the region designated by the rectangle.
+        Adds the new state to the stack of states.
         """
         x1, x2 = rect.x1, rect.x2
         y1, y2 = rect.y1, rect.y2
         self.axes.set_xlim(x1, x2)
         self.axes.set_ylim(y1, y2)
+
+        self.add_rect_state(rect)
+
+    def add_rect_state(self, rect: Rect):
+        """Adds a rect state to the stack of states."""
+        self.rect_stack.append(rect)
 
     def on_leave(self, event):
         """Called when the mouse is no longer over the figure or the axes."""
@@ -168,16 +196,36 @@ class PlotComponent(BaseComponent):
         self.pre_update()
         self.update()
 
+    def on_reset(self):
+        """Called when the reset button is pressed."""
+        stack = self.rect_stack
+        normal = stack[0]
+        self.zoom_to(normal)
+        self.update()
+
+    def on_go_back(self):
+        """Called when the back button is pressed."""
+        if len(self.rect_stack) > 1:
+            self.rect_stack.pop()  # Remove the current state from the list.
+            state = self.rect_stack.pop()  # Get previous state and remove from list.
+            self.zoom_to(state)
+            self.update()
+
     def xy(self, event):
         """Returns the xy-coordinates from an event as a tuple."""
         return event.xdata, event.ydata
 
-    def get_bounds(self):
+    def get_bounds(self):  # Not currently in use?
         """Gets the bounds of the plot; i.e. the points corresponding to maximum and minimum x and y."""
-        ax = self.axes
-        x1, x2 = ax.get_xlim()
-        y1, y2 = ax.get_ylim()
+        x1, x2 = self.xlim()
+        y1, y2 = self.ylim()
         return Bounds(x1, x2, y1, y2)
+
+    def xlim(self):
+        return self.axes.get_xlim()
+
+    def ylim(self):
+        return self.axes.get_ylim()
 
     def draw_rect(self):
         """

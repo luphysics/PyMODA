@@ -24,3 +24,4 @@ class SignalPlot(PlotComponent):
         y = data.data
         self.axes.plot(x, y)
         self.axes.autoscale(False)
+        self.on_initial_plot_complete()

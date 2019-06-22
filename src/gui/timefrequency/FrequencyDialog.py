@@ -44,6 +44,7 @@ class FrequencyDialog(QDialog, BaseUI):
         combo.activated.connect(self.on_combo_change)
 
     def check_args(self):
+        """Checks whether the frequency has been set in the commandline arguments."""
         freq: float = args.args_freq()
         if freq:
             self.freq_changed(freq)

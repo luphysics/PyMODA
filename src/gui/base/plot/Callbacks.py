@@ -17,9 +17,11 @@
 
 class Callbacks:
 
-    def __init__(self, move, click, release, axes_leave, figure_leave):
+    def __init__(self, move, click, release, axes_leave, figure_leave, reset, back):
         self.move = move
         self.click = click
         self.release = release
         self.axes_leave = axes_leave
         self.figure_leave = figure_leave
+        self.reset = reset
+        self.back = back
