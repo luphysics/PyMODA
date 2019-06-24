@@ -6,22 +6,33 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>628</width>
-    <height>589</height>
+    <width>440</width>
+    <height>360</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout">
+   <layout class="QVBoxLayout" name="verticalLayout_2">
     <property name="leftMargin">
      <number>100</number>
     </property>
     <property name="rightMargin">
      <number>100</number>
     </property>
-    <item row="0" column="0">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0">
+      <item>
+       <widget class="QLabel" name="lbl_physics">
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
        <widget class="QPushButton" name="btn_time_freq">
