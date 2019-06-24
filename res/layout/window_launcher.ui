@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>440</width>
-    <height>360</height>
+    <width>695</width>
+    <height>525</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,18 +15,42 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
+    <property name="spacing">
+     <number>40</number>
+    </property>
     <property name="leftMargin">
-     <number>100</number>
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
     </property>
     <property name="rightMargin">
-     <number>100</number>
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
     </property>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout" stretch="0">
+      <property name="spacing">
+       <number>100</number>
+      </property>
       <item>
        <widget class="QLabel" name="lbl_physics">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
          <string>TextLabel</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+        </property>
+        <property name="margin">
+         <number>50</number>
         </property>
        </widget>
       </item>
@@ -35,69 +59,162 @@
     <item>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="QPushButton" name="btn_time_freq">
-        <property name="minimumSize">
-         <size>
-          <width>100</width>
-          <height>50</height>
-         </size>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <property name="leftMargin">
+         <number>40</number>
         </property>
-        <property name="text">
-         <string>Time-Frequency Analysis</string>
+        <property name="rightMargin">
+         <number>40</number>
         </property>
-       </widget>
+        <item>
+         <widget class="QPushButton" name="btn_time_freq">
+          <property name="minimumSize">
+           <size>
+            <width>300</width>
+            <height>60</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>300</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="baseSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Time-Frequency Analysis</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_wavelet_phase">
+          <property name="minimumSize">
+           <size>
+            <width>300</width>
+            <height>60</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>300</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="baseSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Wavelet Phase Coherence</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
-       <widget class="QPushButton" name="btn_wavelet_phase">
-        <property name="minimumSize">
-         <size>
-          <width>100</width>
-          <height>50</height>
-         </size>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <property name="leftMargin">
+         <number>40</number>
         </property>
-        <property name="text">
-         <string>Wavelet Phase Coherence</string>
+        <property name="rightMargin">
+         <number>40</number>
         </property>
-       </widget>
+        <item>
+         <widget class="QPushButton" name="btn_ridge_extraction">
+          <property name="minimumSize">
+           <size>
+            <width>300</width>
+            <height>60</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>300</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="baseSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Ridge Extraction and Filtering</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_wavlet_bispectrum">
+          <property name="minimumSize">
+           <size>
+            <width>300</width>
+            <height>60</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>300</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="baseSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Wavelet Bispectrum Analysis</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
-       <widget class="QPushButton" name="btn_ridge_extraction">
-        <property name="minimumSize">
-         <size>
-          <width>100</width>
-          <height>50</height>
-         </size>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <property name="leftMargin">
+         <number>40</number>
         </property>
-        <property name="text">
-         <string>Ridge Extraction and Filtering</string>
+        <property name="rightMargin">
+         <number>40</number>
         </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btn_wavlet_bispectrum">
-        <property name="minimumSize">
-         <size>
-          <width>100</width>
-          <height>50</height>
-         </size>
+        <property name="bottomMargin">
+         <number>40</number>
         </property>
-        <property name="text">
-         <string>Wavelet Bispectrum Analysis</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btn_dynamical_bayesian">
-        <property name="minimumSize">
-         <size>
-          <width>100</width>
-          <height>50</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Dynamical Bayesian Interference</string>
-        </property>
-       </widget>
+        <item>
+         <widget class="QPushButton" name="btn_dynamical_bayesian">
+          <property name="minimumSize">
+           <size>
+            <width>300</width>
+            <height>60</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>300</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="baseSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Dynamical Bayesian Inference</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </item>
