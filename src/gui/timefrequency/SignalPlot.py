@@ -30,4 +30,4 @@ class SignalPlot(PlotComponent):
         return "Time (s)"
 
     def get_ylabel(self):
-        return "Signal"
+        return "Value"

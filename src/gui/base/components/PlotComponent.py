@@ -18,6 +18,7 @@ from typing import List
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QVBoxLayout, QApplication
 from matplotlib import patches
+from matplotlib.backend_bases import MouseButton
 from matplotlib.backends.backend_qt5agg import (FigureCanvas)
 from matplotlib.figure import Figure
 
@@ -154,7 +155,6 @@ class PlotComponent(BaseComponent):
         x, y = self.xy(event)
         if x and y:
             self.pre_update()
-            # self.draw_lines(x, y)
             if self.rect:
                 self.rect.set_corner(x, y)
                 self.draw_rect()
@@ -163,26 +163,28 @@ class PlotComponent(BaseComponent):
 
     def on_click(self, event):
         """Called when the mouse clicks down on the plot, but before the click is released."""
-        x, y = self.xy(event)
-        if x and y:
-            self.rect = Rect(x, y)
-            self.pre_update()
-            self.update()
+        if event.button == MouseButton.LEFT:
+            x, y = self.xy(event)
+            if x and y:
+                self.rect = Rect(x, y)
+                self.pre_update()
+                self.update()
 
     def on_release(self, event):
         """Called when the mouse releases a click on the plot."""
-        x, y = self.xy(event)
-        if x and y:
-            if self.rect:
-                self.zoom_to(self.rect)
-                self.rect = None
+        if event.button == MouseButton.LEFT:
+            x, y = self.xy(event)
+            if x and y:
+                if self.rect:
+                    self.zoom_to(self.rect)
+                    self.rect = None
 
-            if self.show_crosshair:
-                if len(self.selected_plots) >= 2:
-                    self.show_crosshair = False
+                if self.show_crosshair:
+                    if len(self.selected_plots) >= 2:
+                        self.show_crosshair = False
 
-            self.pre_update()
-            self.update()
+                self.pre_update()
+                self.update()
 
     def zoom_to(self, rect):
         """
