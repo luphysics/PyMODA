@@ -42,11 +42,17 @@ class PlotOptionsBar(QWidget, BaseUI):
         self.back_button = BackButton()
         self.layout.addWidget(self.back_button)
 
+        self.setFixedHeight(80)
+        self.setFixedWidth(140)
+
 
 class OptionsButton(QPushButton, BaseUI):
     """
     A button to be used in the options bar for a plot.
     """
+
+    def init_ui(self):
+        self.setFixedWidth(50)
 
     def set_onclick(self, onclick):
         self.clicked.connect(onclick)
@@ -57,8 +63,6 @@ class ResetButton(OptionsButton):
     def init_ui(self):
         super().init_ui()
         self.setText("Reset")
-        self.setFixedWidth(50)
-        self.setFixedHeight(32)
 
 
 class BackButton(OptionsButton):
@@ -66,5 +70,3 @@ class BackButton(OptionsButton):
     def init_ui(self):
         super().init_ui()
         self.setText("Back")
-        self.setFixedWidth(50)
-        self.setFixedHeight(32)

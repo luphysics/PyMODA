@@ -16,6 +16,7 @@
 from typing import List
 
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QPalette
 from PyQt5.QtWidgets import QVBoxLayout, QApplication
 from matplotlib import patches
 from matplotlib.backend_bases import MouseButton
@@ -65,6 +66,10 @@ class PlotComponent(BaseComponent):
         self.axes = self.canvas.figure.subplots()
         self.axes.set_xlabel(self.get_xlabel())
         self.axes.set_ylabel(self.get_ylabel())
+
+        self.fig = self.axes.get_figure()
+        background = self.palette().color(QPalette.Background)
+        self.fig.patch.set_facecolor(background.name())
 
     def get_xlabel(self):
         """Returns the label for the x-axis. Should be overridden in subclasses."""

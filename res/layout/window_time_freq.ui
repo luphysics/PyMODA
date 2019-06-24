@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>874</width>
-    <height>660</height>
+    <width>1319</width>
+    <height>976</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,18 +16,103 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout">
+     <layout class="QHBoxLayout" name="main_layout" stretch="3,1">
       <item>
-       <layout class="QHBoxLayout" name="hor_top_plot">
+       <layout class="QHBoxLayout" name="left_pane" stretch="0">
         <item>
-         <widget class="SignalPlot" name="plot_top" native="true"/>
+         <layout class="QVBoxLayout" name="verticalLayout" stretch="5,12,2">
+          <item>
+           <layout class="QHBoxLayout" name="signal_section" stretch="20,4,4">
+            <item>
+             <widget class="SignalPlot" name="plot_top" native="true"/>
+            </item>
+            <item>
+             <layout class="QVBoxLayout" name="limits_section">
+              <item>
+               <widget class="QLabel" name="label">
+                <property name="text">
+                 <string>Limits section</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QVBoxLayout" name="select_data_section">
+              <item>
+               <widget class="QLabel" name="label_2">
+                <property name="text">
+                 <string>Select data section</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="main_section" stretch="5,1">
+            <item>
+             <widget class="PlotComponent" name="plot_main" native="true"/>
+            </item>
+            <item>
+             <widget class="PlotComponent" name="plot_mini" native="true"/>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="intervals_section" stretch="5,2">
+            <item>
+             <layout class="QHBoxLayout" name="intervals_status_section"/>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="transform_section">
+              <item>
+               <widget class="QPushButton" name="btn_transform_all">
+                <property name="text">
+                 <string>Transform all</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btn_transform_single">
+                <property name="text">
+                 <string>Transform Single</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </item>
+         </layout>
         </item>
        </layout>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="hor_main_plot">
+       <layout class="QVBoxLayout" name="right_pane" stretch="1,4,4,6">
         <item>
-         <widget class="PlotComponent" name="plot_main" native="true"/>
+         <layout class="QHBoxLayout" name="data_section"/>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="type_transform_section">
+          <item>
+           <layout class="QVBoxLayout" name="transform_options_section"/>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="plot_type_transform_section"/>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="statistics_section"/>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="advanced_options_section">
+          <item>
+           <widget class="QWidget" name="plot_preproc" native="true"/>
+          </item>
+         </layout>
         </item>
        </layout>
       </item>
@@ -41,8 +126,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>874</width>
-     <height>29</height>
+     <width>1319</width>
+     <height>26</height>
     </rect>
    </property>
   </widget>
