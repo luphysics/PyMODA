@@ -41,7 +41,7 @@ class TimeFreqWindow(MaximisedWindow):
         self.application = application
 
     def maximise_on_start(self):
-        return False
+        return True  # Just here for testing purposes.
 
     def init_ui(self):
         uic.loadUi(resources.get("layout:window_time_freq.ui"), self)

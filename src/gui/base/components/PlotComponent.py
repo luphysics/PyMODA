@@ -62,6 +62,16 @@ class PlotComponent(BaseComponent):
         self.layout.addWidget(options)
 
         self.axes = self.canvas.figure.subplots()
+        self.axes.set_xlabel(self.get_xlabel())
+        self.axes.set_ylabel(self.get_ylabel())
+
+    def get_xlabel(self):
+        """Returns the label for the x-axis. Should be overridden in subclasses."""
+        pass
+
+    def get_ylabel(self):
+        """Returns the label for the y-axis. Should be overridden in subclasses."""
+        pass
 
     def init_callbacks(self):
         """

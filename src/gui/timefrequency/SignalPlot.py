@@ -25,3 +25,9 @@ class SignalPlot(PlotComponent):
         self.axes.plot(x, y)
         self.axes.autoscale(False)
         self.on_initial_plot_complete()
+
+    def get_xlabel(self):
+        return "Time (s)"
+
+    def get_ylabel(self):
+        return "Signal"
