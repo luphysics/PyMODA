@@ -58,10 +58,10 @@ class PlotComponent(BaseComponent):
         self.canvas = FigureCanvas(Figure())
         self.init_callbacks()
 
-        options = PlotOptionsBar(self.callbacks)
+        self.options = PlotOptionsBar(self.callbacks)
 
         self.layout.addWidget(self.canvas)
-        self.layout.addWidget(options)
+        self.layout.addWidget(self.options)
 
         self.axes = self.canvas.figure.subplots()
         self.axes.set_xlabel(self.get_xlabel())

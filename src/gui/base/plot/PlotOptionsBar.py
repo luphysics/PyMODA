@@ -13,7 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QPushButton
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QPushButton, QProgressBar
 
 from gui.base.BaseUI import BaseUI
 from gui.base.plot.Callbacks import Callbacks
@@ -44,6 +44,18 @@ class PlotOptionsBar(QWidget, BaseUI):
 
         self.setFixedHeight(80)
         self.setFixedWidth(140)
+
+        self.progress = QProgressBar()
+        self.progress.setFixedWidth(100)
+
+        self.progress.setMinimum(0)
+        self.progress.setMaximum(0)
+        self.progress.setValue(0)
+        self.layout.addWidget(self.progress)
+
+    def set_in_progress(self, boolean):
+        if not boolean:
+            self.progress.hide()
 
 
 class OptionsButton(QPushButton, BaseUI):

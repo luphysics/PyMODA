@@ -13,9 +13,12 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from multiprocessing import Queue, Process
+
 import windowFT
 import matlab
 import numpy as np
+from PyQt5.QtCore import QTimer
 from scipy import signal
 import matplotlib.pyplot as plt
 
@@ -28,8 +31,6 @@ class WFTPlot(PlotComponent):
 
     def plot(self, data: TimeSeries):
         self.wft_plot(data)
-        self.axes.autoscale(False)
-        self.on_initial_plot_complete()
 
     def get_xlabel(self):
         return "Time (s)"
@@ -38,21 +39,42 @@ class WFTPlot(PlotComponent):
         return "Frequency (Hz)"
 
     def wft_plot(self, data: TimeSeries):
-        package = windowFT.initialize()
-
         fs = data.frequency
-        t = data.times
+        self.t = data.times
         # sig = np.cos(2 * np.pi * 3 * t + 0.75 * np.sin(2 * np.pi * t / 5))
         sig = data.data
         sig_matlab = sig.tolist()
 
-        A = matlab.double([sig_matlab])
-        fs_matlab = matlab.double([fs])
+        self.queue = Queue()
 
-        w, l = package.windowFT(A, fs_matlab, nargout=2)
+        self.proc = Process(target=generate_solutions, args=(self.queue, sig_matlab, fs))
+        self.proc.start()
+        QTimer.singleShot(5000, self.check_result)
+
+    def check_result(self):
+        if self.queue.empty():
+            QTimer.singleShot(5000, self.check_result)
+            return
+
+        w, l = self.queue.get()
 
         a = np.asarray(w)
         gh = np.asarray(l)
 
-        self.axes.pcolormesh(t, gh, np.abs(a))
+        self.axes.pcolormesh(self.t, gh, np.abs(a))
         self.axes.set_title('STFT Magnitude')
+
+        self.axes.autoscale(False)
+        self.on_initial_plot_complete()
+
+        self.options.set_in_progress(False)
+
+
+def generate_solutions(queue, signal, freq):
+    package = windowFT.initialize()
+
+    A = matlab.double([signal])
+    fs_matlab = matlab.double([freq])
+
+    w, l = package.windowFT(A, fs_matlab, nargout=2)
+    queue.put((w, l,))
