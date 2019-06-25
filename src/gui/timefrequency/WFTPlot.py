@@ -27,7 +27,7 @@ from packages.wft.for_redistribution_files_only import windowFT
 class WFTPlot(PlotComponent):
 
     def plot(self, data: TimeSeries):
-        self.WFTplot()
+        self.wft_plot(data)
         self.axes.autoscale(False)
         self.on_initial_plot_complete()
 
@@ -35,31 +35,24 @@ class WFTPlot(PlotComponent):
         return "Time (s)"
 
     def get_ylabel(self):
-        return "Value"
+        return "Frequency (Hz)"
 
-    def WFTplot(self):
+    def wft_plot(self, data: TimeSeries):
         package = windowFT.initialize()
 
-        fs = 20
+        fs = data.frequency
+        t = data.times
+        # sig = np.cos(2 * np.pi * 3 * t + 0.75 * np.sin(2 * np.pi * t / 5))
+        sig = data.data
+        sig_matlab = sig.tolist()
 
-        t = np.arange(0, 50, 1 / fs)
-        sig = np.cos(2 * np.pi * 3 * t + 0.75 * np.sin(2 * np.pi * t / 5))
-        sigMat = sig.tolist()
+        A = matlab.double([sig_matlab])
+        fs_matlab = matlab.double([fs])
 
-        A = matlab.double([sigMat])
-        fsMat = matlab.double([fs])
-
-        w, l = package.windowFT(A, fsMat, nargout=2)
-
-        # freq = np.asarray(frq)
-        # trans = np.asarray(trns)
+        w, l = package.windowFT(A, fs_matlab, nargout=2)
 
         a = np.asarray(w)
         gh = np.asarray(l)
 
-        pyA = np.asarray(A)
-
         self.axes.pcolormesh(t, gh, np.abs(a))
-        self.axes.title('STFT Magnitude')
-        self.axes.ylabel('Frequency [Hz]')
-        self.axes.xlabel('Time [sec]')
+        self.axes.set_title('STFT Magnitude')

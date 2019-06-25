@@ -23,6 +23,7 @@ from gui.base.SelectFileDialog import SelectFileDialog
 from gui.base.windows.MaximisedWindow import MaximisedWindow
 from gui.timefrequency.FrequencyDialog import FrequencyDialog
 from gui.timefrequency.SignalPlot import SignalPlot
+from gui.timefrequency.WFTPlot import WFTPlot
 from maths.TimeSeries import TimeSeries
 
 
@@ -48,8 +49,6 @@ class TimeFreqWindow(MaximisedWindow):
         self.set_title()
         self.setup_menu_bar()
         self.select_file()
-
-        self.plot_main.plot(None)
 
     def set_title(self, name=""):
         super(TimeFreqWindow, self).set_title(self.get_window_name())
@@ -94,6 +93,7 @@ class TimeFreqWindow(MaximisedWindow):
     def on_data_loaded(self):
         """Called when the time-series data has been loaded."""
         self.plot_signal()
+        self.plot_transform()
 
     def on_freq_changed(self, freq):
         """Called when the frequency is changed."""
@@ -107,3 +107,8 @@ class TimeFreqWindow(MaximisedWindow):
         """Plots the signal on the SignalPlot."""
         signal_plot: SignalPlot = self.plot_top
         signal_plot.plot(self.time_series)
+
+    def plot_transform(self):
+        """Plots the transform on the WFTPlot."""
+        wft_plot: WFTPlot = self.plot_main
+        wft_plot.plot(self.time_series)
