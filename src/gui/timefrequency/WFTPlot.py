@@ -40,10 +40,9 @@ class WFTPlot(PlotComponent):
 
     def wft_plot(self, data: TimeSeries):
         fs = data.frequency
-        self.t = data.times
-        # sig = np.cos(2 * np.pi * 3 * t + 0.75 * np.sin(2 * np.pi * t / 5))
-        sig = data.data
-        sig_matlab = sig.tolist()
+
+        self.times = data.times
+        sig_matlab = data.data.tolist()
 
         self.queue = Queue()
 
@@ -61,13 +60,15 @@ class WFTPlot(PlotComponent):
         a = np.asarray(w)
         gh = np.asarray(l)
 
-        self.axes.pcolormesh(self.t, gh, np.abs(a))
+        self.axes.pcolormesh(self.times, gh, np.abs(a))
         self.axes.set_title('STFT Magnitude')
 
         self.axes.autoscale(False)
         self.on_initial_plot_complete()
 
-        self.options.set_in_progress(False)
+    def on_initial_plot_complete(self):
+        super().on_initial_plot_complete()
+        self.set_in_progress(False)
 
 
 def generate_solutions(queue, signal, freq):
