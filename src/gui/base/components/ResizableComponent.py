@@ -24,6 +24,8 @@ class ResizableComponent(BaseComponent):
     """
     A component which can be resized by dragging
     the sides or corners.
+
+    IMPORTANT: Not fully implemented. Not functioning correctly.
     """
 
     drag_area_size = 4

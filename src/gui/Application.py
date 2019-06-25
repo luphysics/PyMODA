@@ -21,6 +21,7 @@ from gui.launcher.LauncherWindow import LauncherWindow
 
 
 class Application(QApplication):
+    """The base application."""
     launcher_window = None
     windows = []
 
@@ -29,10 +30,12 @@ class Application(QApplication):
         self.start_launcher()
 
     def start_launcher(self):
+        """Opens the launcher window."""
         self.launcher_window = LauncherWindow(self)
         self.launcher_window.show()
 
     def start_time_frequency(self):
+        """Opens the time-frequency analysis window."""
         window = TimeFreqWindow(self)
         self.windows.append(window)
         window.show()

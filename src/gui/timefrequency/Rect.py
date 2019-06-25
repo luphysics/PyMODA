@@ -1,5 +1,5 @@
 #  PyMODA, a Python implementation of MODA (Multiscale Oscillatory Dynamics Analysis).
-#  Copyright (C) 2019  Lancaster University
+#  Copyright (C) 2019 Lancaster University
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -14,19 +14,26 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import sys
 
-import args
-from gui.Application import Application
+class Rect:
+    """
+    A simple class representing the coordinates of a rectangle
+    that is drawn in matplotlib. (x1,y1) refer to the upper left
+    corner, while (x2,y2) are the lower right corner.
+    """
 
+    x2, y2 = None, None
 
-def main():
-    """Starts the application."""
-    app = Application(sys.argv)
-    app.exec_()
+    def __init__(self, x1, y1):
+        self.x1 = x1
+        self.y1 = y1
 
+    def set_corner(self, x2, y2):
+        self.x2 = x2
+        self.y2 = y2
 
-# The entry-point of the program.
-if __name__ == "__main__":
-    args.parse_args()
-    main()
+    def get_width(self):
+        return self.x2 - self.x1
+
+    def get_height(self):
+        return self.y2 - self.y1

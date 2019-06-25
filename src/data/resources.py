@@ -18,6 +18,15 @@ import string
 from data.parsing.CSVParser import CSVParser
 from data.parsing.parsing import extension
 
+"""
+Helper file for getting resources related to the application.
+The path to a resource should be accessed by calling the get()
+function with the filename prefixed by the resource type and a 
+colon. 
+
+For example, get("layout:my_window.ui") or get("img:my_image.png").
+"""
+
 
 def get_base_path():
     """Returns the path to the resources folder."""
@@ -61,7 +70,8 @@ def get_ui(name):
 def get(resource: string) -> string:
     """
     Gets the path to a resource from the appropriate folder,
-    when given a name beginning with the resource type.
+    when given a name beginning with the resource type and
+    a colon. For example, get("layout:my_window.ui").
     """
     split = resource.split(":")
     if len(split) != 2:
@@ -81,11 +91,12 @@ def get_test_path():
     return get_base_path() + "test/"
 
 
+# Used to select the correct path for a given resource type.
 resources = {
     "layout": get_layout_path(),
     "img": get_img_path(),
     "image": get_img_path(),
-    "test": get_test_path()
+    "test": get_test_path(),
 }
 
 

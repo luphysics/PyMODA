@@ -22,4 +22,12 @@ class SignalPlot(PlotComponent):
     def plot(self, data: TimeSeries):
         x = data.times
         y = data.data
-        self.axis.plot(x, y)
+        self.axes.plot(x, y)
+        self.axes.autoscale(False)
+        self.on_initial_plot_complete()
+
+    def get_xlabel(self):
+        return "Time (s)"
+
+    def get_ylabel(self):
+        return "Signal"

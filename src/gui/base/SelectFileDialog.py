@@ -14,8 +14,10 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from PyQt5 import uic
+from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QDialog, QFileDialog
 
+import args
 from data import resources
 from gui.base.BaseUI import BaseUI
 
@@ -33,6 +35,17 @@ class SelectFileDialog(QDialog, BaseUI):
         uic.loadUi(resources.get_ui("dialog_select_file"), self)
         self.setup_drops()
         self.btn_browse.clicked.connect(self.browse_for_file)
+        QTimer.singleShot(500, self.check_args)
+
+    def check_args(self):
+        """
+        Check the commandline arguments in case there is
+        a pre-selected file.
+        """
+        file = args.args_file()
+        if file:
+            self.file = resources.get(file[0])
+            self.accept()  # Close dialog.
 
     def setup_drops(self):
         """Sets up the label to accept drag-and-drop."""

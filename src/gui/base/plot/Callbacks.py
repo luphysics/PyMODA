@@ -1,5 +1,5 @@
 #  PyMODA, a Python implementation of MODA (Multiscale Oscillatory Dynamics Analysis).
-#  Copyright (C) 2019  Lancaster University
+#  Copyright (C) 2019 Lancaster University
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -14,19 +14,14 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import sys
 
-import args
-from gui.Application import Application
+class Callbacks:
 
-
-def main():
-    """Starts the application."""
-    app = Application(sys.argv)
-    app.exec_()
-
-
-# The entry-point of the program.
-if __name__ == "__main__":
-    args.parse_args()
-    main()
+    def __init__(self, move, click, release, axes_leave, figure_leave, reset, back):
+        self.move = move
+        self.click = click
+        self.release = release
+        self.axes_leave = axes_leave
+        self.figure_leave = figure_leave
+        self.reset = reset
+        self.back = back
