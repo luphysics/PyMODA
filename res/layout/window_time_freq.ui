@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1319</width>
-    <height>976</height>
+    <width>464</width>
+    <height>304</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -53,7 +53,7 @@
           <item>
            <layout class="QHBoxLayout" name="main_section" stretch="5,1">
             <item>
-             <widget class="PlotComponent" name="plot_main" native="true"/>
+             <widget class="WFTPlot" name="plot_main" native="true"/>
             </item>
             <item>
              <widget class="PlotComponent" name="plot_mini" native="true"/>
@@ -126,8 +126,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1319</width>
-     <height>26</height>
+     <width>464</width>
+     <height>18</height>
     </rect>
    </property>
   </widget>
@@ -143,6 +143,12 @@
    <class>SignalPlot</class>
    <extends>QWidget</extends>
    <header>gui.timefrequency.SignalPlot</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>WFTPlot</class>
+   <extends>QWidget</extends>
+   <header>gui.timefrequency.WFTPlot</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
