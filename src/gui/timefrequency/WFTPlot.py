@@ -13,13 +13,15 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import windowFT
+import matlab
 import numpy as np
-from scipy.io import matlab
+from scipy import signal
+import matplotlib.pyplot as plt
 
 from gui.base.components.PlotComponent import PlotComponent
 from maths.TimeSeries import TimeSeries
 from packages.wft.for_redistribution_files_only import windowFT
-
 
 
 class WFTPlot(PlotComponent):
@@ -36,7 +38,6 @@ class WFTPlot(PlotComponent):
         return "Value"
 
     def WFTplot(self):
-
         package = windowFT.initialize()
 
         fs = 20
@@ -62,4 +63,3 @@ class WFTPlot(PlotComponent):
         self.axes.title('STFT Magnitude')
         self.axes.ylabel('Frequency [Hz]')
         self.axes.xlabel('Time [sec]')
-
