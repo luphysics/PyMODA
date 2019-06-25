@@ -49,6 +49,8 @@ class TimeFreqWindow(MaximisedWindow):
         self.setup_menu_bar()
         self.select_file()
 
+        self.plot_main.plot(None)
+
     def set_title(self, name=""):
         super(TimeFreqWindow, self).set_title(self.get_window_name())
 
