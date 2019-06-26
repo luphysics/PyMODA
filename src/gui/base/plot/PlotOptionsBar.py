@@ -43,11 +43,13 @@ class PlotOptionsBar(QWidget, BaseUI):
         self.layout.addWidget(self.back_button)
 
         self.setFixedHeight(80)
-        # self.setFixedWidth(140)
+        self.setFixedWidth(340)
+
+        self.create_progressbar()
 
     def create_progressbar(self):
         self.progress = QProgressBar()
-        self.progress.setFixedWidth(400)
+        self.progress.setFixedWidth(200)
 
         self.progress.setMinimum(0)
         self.progress.setMaximum(0)
