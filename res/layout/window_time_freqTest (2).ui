@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1496</width>
-    <height>766</height>
+    <width>1075</width>
+    <height>742</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <layout class="QHBoxLayout" name="main_layout" stretch="9,0">
+     <layout class="QHBoxLayout" name="main_layout" stretch="9,3">
       <item>
        <layout class="QGridLayout" name="gridLayout" rowstretch="3,7" columnstretch="7,2">
         <item row="1" column="0">
@@ -37,45 +37,38 @@
          </layout>
         </item>
         <item row="0" column="1">
-         <layout class="QGridLayout" name="gridLayout_4" rowstretch="2,2,2">
-          <item row="0" column="0">
-           <layout class="QGridLayout" name="gridLayout_7" rowstretch="0,0" columnstretch="0,0">
-            <item row="1" column="0">
-             <widget class="QLineEdit" name="start_limits_window"/>
-            </item>
-            <item row="1" column="1">
-             <widget class="QLineEdit" name="end_limits_window"/>
-            </item>
-            <item row="0" column="0" colspan="2" alignment="Qt::AlignHCenter">
-             <widget class="QComboBox" name="comboBox_2">
-              <item>
-               <property name="text">
-                <string>X Limits</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Y Limits</string>
-               </property>
-              </item>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item row="1" column="0" rowspan="2">
-           <layout class="QVBoxLayout" name="verticalLayout">
-            <item>
+         <layout class="QGridLayout" name="gridLayout_4" rowstretch="2,2">
+          <item row="1" column="0">
+           <layout class="QGridLayout" name="gridLayout_6">
+            <item row="0" column="0">
              <widget class="QLabel" name="label_2">
               <property name="text">
                <string>Select data (scroll area)</string>
               </property>
              </widget>
             </item>
-            <item>
+            <item row="1" column="0">
              <widget class="QListView" name="listView"/>
             </item>
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_2"/>
+           </layout>
+          </item>
+          <item row="0" column="0">
+           <layout class="QGridLayout" name="gridLayout_7" rowstretch="3,3" columnstretch="3,3">
+            <item row="1" column="0">
+             <widget class="QLineEdit" name="lineedit_xstart"/>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLineEdit" name="lineedit_xend"/>
+            </item>
+            <item row="0" column="0" colspan="2">
+             <widget class="QLabel" name="label">
+              <property name="layoutDirection">
+               <enum>Qt::LeftToRight</enum>
+              </property>
+              <property name="text">
+               <string>Select X or Y limits (dropdown)</string>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
@@ -91,19 +84,8 @@
        </layout>
       </item>
       <item>
-       <layout class="QGridLayout" name="gridLayout_6">
+       <layout class="QGridLayout" name="gridLayout_14" rowstretch="2,8,10">
         <item row="0" column="0">
-         <layout class="QVBoxLayout" name="verticalLayout_2">
-          <item>
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item row="1" column="0">
          <layout class="QHBoxLayout" name="data_section">
           <item alignment="Qt::AlignHCenter">
            <widget class="QLabel" name="label_6">
@@ -120,40 +102,212 @@
           </item>
          </layout>
         </item>
-        <item row="3" column="0">
-         <layout class="QVBoxLayout" name="advanced_options_section" stretch="1,4,4">
+        <item row="1" column="0">
+         <layout class="QHBoxLayout" name="type_transform_section">
           <item>
-           <layout class="QGridLayout" name="window_options">
-            <item row="1" column="0">
-             <widget class="QComboBox" name="comboBox">
-              <item>
-               <property name="text">
-                <string>Gaussian</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Exp</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Hann</string>
-               </property>
-              </item>
-             </widget>
-            </item>
+           <layout class="QGridLayout" name="gridLayout_16" rowstretch="2,2" columnstretch="2,2">
             <item row="0" column="0">
-             <widget class="QLabel" name="label_11">
-              <property name="text">
-               <string>Dropdown to select window options</string>
-              </property>
-             </widget>
+             <layout class="QGridLayout" name="gridLayout_15">
+              <item row="0" column="0" alignment="Qt::AlignHCenter">
+               <widget class="QLabel" name="label_8">
+                <property name="text">
+                 <string>Plot type</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QRadioButton" name="radioButton">
+                <property name="text">
+                 <string>Power</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QRadioButton" name="radioButton_2">
+                <property name="text">
+                 <string>Amplitude</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="1" column="0">
+             <layout class="QGridLayout" name="gridLayout_13">
+              <item row="0" column="0" alignment="Qt::AlignHCenter">
+               <widget class="QLabel" name="label_7">
+                <property name="text">
+                 <string>Transform</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QRadioButton" name="radioButton_3">
+                <property name="text">
+                 <string>WT</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QRadioButton" name="radioButton_4">
+                <property name="text">
+                 <string>WFT</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="0" column="1">
+             <layout class="QGridLayout" name="gridLayout_17">
+              <item row="2" column="0">
+               <widget class="QRadioButton" name="radioButton_11">
+                <property name="text">
+                 <string>Off</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_9">
+                <property name="text">
+                 <string>Cut Edge </string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QRadioButton" name="radioButton_12">
+                <property name="text">
+                 <string>On</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="1" column="1">
+             <layout class="QGridLayout" name="gridLayout_18">
+              <item row="1" column="0">
+               <widget class="QRadioButton" name="radioButton_13">
+                <property name="text">
+                 <string>On</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_10">
+                <property name="text">
+                 <string>Preprocess</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QRadioButton" name="radioButton_14">
+                <property name="text">
+                 <string>Off</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
            </layout>
           </item>
           <item>
-           <layout class="QGridLayout" name="original_preprocessed_sig" columnstretch="0"/>
+           <widget class="QWidget" name="freqOptions" native="true">
+            <layout class="QVBoxLayout" name="plot_type_transform_section" stretch="0,0,0">
+             <item>
+              <layout class="QVBoxLayout" name="verticalLayout_6">
+               <item alignment="Qt::AlignHCenter">
+                <widget class="QLabel" name="label_3">
+                 <property name="frameShape">
+                  <enum>QFrame::Box</enum>
+                 </property>
+                 <property name="text">
+                  <string>MxFreq</string>
+                 </property>
+                </widget>
+               </item>
+               <item alignment="Qt::AlignHCenter">
+                <widget class="QLineEdit" name="lineEdit">
+                 <property name="minimumSize">
+                  <size>
+                   <width>70</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>70</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QVBoxLayout" name="verticalLayout_4">
+               <item alignment="Qt::AlignHCenter">
+                <widget class="QLabel" name="label_4">
+                 <property name="frameShape">
+                  <enum>QFrame::Box</enum>
+                 </property>
+                 <property name="text">
+                  <string>MinFreq</string>
+                 </property>
+                </widget>
+               </item>
+               <item alignment="Qt::AlignHCenter">
+                <widget class="QLineEdit" name="lineEdit_2">
+                 <property name="maximumSize">
+                  <size>
+                   <width>76</width>
+                   <height>22</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QVBoxLayout" name="verticalLayout_5">
+               <item alignment="Qt::AlignHCenter">
+                <widget class="QLabel" name="label_5">
+                 <property name="frameShape">
+                  <enum>QFrame::Box</enum>
+                 </property>
+                 <property name="text">
+                  <string>Res(fr)</string>
+                 </property>
+                </widget>
+               </item>
+               <item alignment="Qt::AlignHCenter">
+                <widget class="QLineEdit" name="lineEdit_3">
+                 <property name="maximumSize">
+                  <size>
+                   <width>70</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="2" column="0">
+         <layout class="QVBoxLayout" name="advanced_options_section" stretch="1,4,4">
+          <item>
+           <layout class="QGridLayout" name="window_options"/>
+          </item>
+          <item>
+           <layout class="QGridLayout" name="statistics_options">
+            <item row="0" column="0">
+             <layout class="QGridLayout" name="gridLayout_12"/>
+            </item>
+            <item row="0" column="1">
+             <layout class="QGridLayout" name="gridLayout_19"/>
+            </item>
+           </layout>
           </item>
           <item>
            <layout class="QHBoxLayout" name="statistics_section" stretch="0,2">
@@ -181,7 +335,7 @@
               <item row="2" column="1">
                <widget class="QRadioButton" name="radioButton_5">
                 <property name="text">
-                 <string>Pow</string>
+                 <string>Power</string>
                 </property>
                </widget>
               </item>
@@ -238,210 +392,6 @@
           </item>
          </layout>
         </item>
-        <item row="2" column="0">
-         <layout class="QFormLayout" name="formLayout_3">
-          <property name="labelAlignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-          <property name="formAlignment">
-           <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
-          </property>
-          <item row="0" column="0">
-           <layout class="QFormLayout" name="formLayout">
-            <item row="0" column="0">
-             <layout class="QGridLayout" name="gridLayout_15" rowstretch="3,0,0">
-              <item row="2" column="0">
-               <widget class="QRadioButton" name="radioButton_2">
-                <property name="text">
-                 <string>Power</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QRadioButton" name="radioButton">
-                <property name="text">
-                 <string>Amplitude</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="0">
-               <widget class="QLabel" name="label_8">
-                <property name="text">
-                 <string>Plot</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item row="0" column="1">
-             <layout class="QGridLayout" name="gridLayout_17">
-              <item row="2" column="0">
-               <widget class="QRadioButton" name="radioButton_11">
-                <property name="text">
-                 <string>WT</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="0">
-               <widget class="QLabel" name="label_9">
-                <property name="text">
-                 <string>Transfom</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QRadioButton" name="radioButton_12">
-                <property name="text">
-                 <string>WFT</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item row="1" column="0">
-             <layout class="QGridLayout" name="gridLayout_13">
-              <item row="0" column="0" alignment="Qt::AlignHCenter">
-               <widget class="QLabel" name="label_7">
-                <property name="text">
-                 <string>Preprocessing</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QRadioButton" name="radioButton_3">
-                <property name="text">
-                 <string>On</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QRadioButton" name="radioButton_4">
-                <property name="text">
-                 <string>Off</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item row="1" column="1">
-             <layout class="QGridLayout" name="gridLayout_18">
-              <item row="1" column="0">
-               <widget class="QRadioButton" name="radioButton_13">
-                <property name="text">
-                 <string>On</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="0">
-               <widget class="QLabel" name="label_10">
-                <property name="text">
-                 <string>Cut Edges</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QRadioButton" name="radioButton_14">
-                <property name="text">
-                 <string>Off</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-           </layout>
-          </item>
-          <item row="0" column="1">
-           <widget class="QWidget" name="freqOptions" native="true">
-            <layout class="QFormLayout" name="formLayout_2">
-             <property name="labelAlignment">
-              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-             </property>
-             <property name="formAlignment">
-              <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
-             </property>
-             <item row="1" column="1">
-              <layout class="QVBoxLayout" name="verticalLayout_6" stretch="0,0">
-               <item alignment="Qt::AlignHCenter">
-                <widget class="QLabel" name="label_3">
-                 <property name="frameShape">
-                  <enum>QFrame::NoFrame</enum>
-                 </property>
-                 <property name="text">
-                  <string>Max Fr</string>
-                 </property>
-                </widget>
-               </item>
-               <item alignment="Qt::AlignHCenter">
-                <widget class="QLineEdit" name="lineEdit">
-                 <property name="minimumSize">
-                  <size>
-                   <width>70</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>70</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item row="2" column="1">
-              <layout class="QVBoxLayout" name="verticalLayout_4">
-               <item alignment="Qt::AlignHCenter">
-                <widget class="QLabel" name="label_4">
-                 <property name="frameShape">
-                  <enum>QFrame::NoFrame</enum>
-                 </property>
-                 <property name="text">
-                  <string>Min Fr</string>
-                 </property>
-                </widget>
-               </item>
-               <item alignment="Qt::AlignHCenter">
-                <widget class="QLineEdit" name="lineEdit_2">
-                 <property name="maximumSize">
-                  <size>
-                   <width>76</width>
-                   <height>22</height>
-                  </size>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item row="3" column="1">
-              <layout class="QVBoxLayout" name="verticalLayout_5">
-               <item alignment="Qt::AlignHCenter">
-                <widget class="QLabel" name="label_5">
-                 <property name="frameShape">
-                  <enum>QFrame::NoFrame</enum>
-                 </property>
-                 <property name="text">
-                  <string>Res</string>
-                 </property>
-                </widget>
-               </item>
-               <item alignment="Qt::AlignHCenter">
-                <widget class="QLineEdit" name="lineEdit_3">
-                 <property name="maximumSize">
-                  <size>
-                   <width>70</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-            </layout>
-           </widget>
-          </item>
-         </layout>
-        </item>
        </layout>
       </item>
      </layout>
@@ -454,7 +404,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1496</width>
+     <width>1075</width>
      <height>26</height>
     </rect>
    </property>
