@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>time_freq_window</class>
+ <widget class="QMainWindow" name="time_freq_window">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1109</width>
+    <height>908</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <layout class="QHBoxLayout" name="main_layout" stretch="5,1">
+      <item>
+       <layout class="QHBoxLayout" name="left_pane" stretch="12,4">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_7" stretch="3,10">
+            <item>
+             <layout class="QVBoxLayout" name="verticalLayout_9">
+              <item>
+               <widget class="SignalPlot" name="plot_top" native="true"/>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QVBoxLayout" name="verticalLayout_8">
+              <item>
+               <widget class="WFTPlot" name="plot_main" native="true"/>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout" stretch="12,38,0">
+          <item>
+           <layout class="QHBoxLayout" name="signal_section" stretch="5,5">
+            <property name="spacing">
+             <number>7</number>
+            </property>
+            <item>
+             <layout class="QVBoxLayout" name="limits_section">
+              <item>
+               <widget class="QLabel" name="label">
+                <property name="text">
+                 <string>Lim sec</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QVBoxLayout" name="select_data_section">
+              <item>
+               <widget class="QLabel" name="label_2">
+                <property name="text">
+                 <string>Sel d sec</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="main_section" stretch="1">
+            <item>
+             <widget class="PlotComponent" name="plot_mini" native="true"/>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="intervals_section" stretch="5,2">
+            <item>
+             <layout class="QHBoxLayout" name="intervals_status_section"/>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="transform_section">
+              <item>
+               <widget class="QPushButton" name="btn_transform_all">
+                <property name="text">
+                 <string>Transform all</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btn_transform_single">
+                <property name="text">
+                 <string>Transform Single</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="right_pane" stretch="1,4,4,6">
+        <item>
+         <layout class="QHBoxLayout" name="data_section"/>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="type_transform_section">
+          <item>
+           <layout class="QVBoxLayout" name="transform_options_section">
+            <item>
+             <layout class="QVBoxLayout" name="verticalLayout_2">
+              <item>
+               <widget class="QRadioButton" name="radioButton">
+                <property name="text">
+                 <string>Power</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="radioButton_2">
+                <property name="text">
+                 <string>Amplitude</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QVBoxLayout" name="verticalLayout_3">
+              <item>
+               <widget class="QRadioButton" name="radioButton_3">
+                <property name="text">
+                 <string>WT</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="radioButton_4">
+                <property name="text">
+                 <string>WFT</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="plot_type_transform_section" stretch="0,0,0">
+            <item>
+             <layout class="QVBoxLayout" name="verticalLayout_6">
+              <item>
+               <widget class="QLabel" name="label_3">
+                <property name="text">
+                 <string>MxFreq</string>
+                </property>
+               </widget>
+              </item>
+              <item alignment="Qt::AlignHCenter">
+               <widget class="QLineEdit" name="lineEdit">
+                <property name="minimumSize">
+                 <size>
+                  <width>70</width>
+                  <height>20</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>70</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QVBoxLayout" name="verticalLayout_4">
+              <item>
+               <widget class="QLabel" name="label_4">
+                <property name="text">
+                 <string>MinFreq</string>
+                </property>
+               </widget>
+              </item>
+              <item alignment="Qt::AlignHCenter">
+               <widget class="QLineEdit" name="lineEdit_2">
+                <property name="maximumSize">
+                 <size>
+                  <width>76</width>
+                  <height>22</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QVBoxLayout" name="verticalLayout_5">
+              <item>
+               <widget class="QLabel" name="label_5">
+                <property name="text">
+                 <string>Res(fr)</string>
+                </property>
+               </widget>
+              </item>
+              <item alignment="Qt::AlignHCenter">
+               <widget class="QLineEdit" name="lineEdit_3">
+                <property name="maximumSize">
+                 <size>
+                  <width>70</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="statistics_section"/>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="advanced_options_section">
+          <item>
+           <widget class="QWidget" name="plot_preproc" native="true"/>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1109</width>
+     <height>26</height>
+    </rect>
+   </property>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PlotComponent</class>
+   <extends>QWidget</extends>
+   <header>gui.base.components.PlotComponent</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>SignalPlot</class>
+   <extends>QWidget</extends>
+   <header>gui.timefrequency.SignalPlot</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>WFTPlot</class>
+   <extends>QWidget</extends>
+   <header>gui.timefrequency.WFTPlot</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

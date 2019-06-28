@@ -16,8 +16,10 @@
 from typing import List
 
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QPalette
 from PyQt5.QtWidgets import QVBoxLayout, QApplication
 from matplotlib import patches
+from matplotlib.backend_bases import MouseButton
 from matplotlib.backends.backend_qt5agg import (FigureCanvas)
 from matplotlib.figure import Figure
 
@@ -56,12 +58,26 @@ class PlotComponent(BaseComponent):
         self.canvas = FigureCanvas(Figure())
         self.init_callbacks()
 
-        options = PlotOptionsBar(self.callbacks)
+        self.options = PlotOptionsBar(self.callbacks)
 
         self.layout.addWidget(self.canvas)
-        self.layout.addWidget(options)
+        self.layout.addWidget(self.options)
 
         self.axes = self.canvas.figure.subplots()
+        self.axes.set_xlabel(self.get_xlabel())
+        self.axes.set_ylabel(self.get_ylabel())
+
+        self.fig = self.axes.get_figure()
+        background = self.palette().color(QPalette.Background)
+        self.fig.patch.set_facecolor(background.name())
+
+    def get_xlabel(self):
+        """Returns the label for the x-axis. Should be overridden in subclasses."""
+        pass
+
+    def get_ylabel(self):
+        """Returns the label for the y-axis. Should be overridden in subclasses."""
+        pass
 
     def init_callbacks(self):
         """
@@ -87,6 +103,7 @@ class PlotComponent(BaseComponent):
         so that the reset button can work.
         """
         self.add_rect_state(self.current_rect())
+        self.options.set_in_progress(False)
 
     def cross_cursor(self, cross=True):
         """Sets the cursor to a cross, or resets it to the normal arrow style."""
@@ -144,7 +161,6 @@ class PlotComponent(BaseComponent):
         x, y = self.xy(event)
         if x and y:
             self.pre_update()
-            # self.draw_lines(x, y)
             if self.rect:
                 self.rect.set_corner(x, y)
                 self.draw_rect()
@@ -153,26 +169,28 @@ class PlotComponent(BaseComponent):
 
     def on_click(self, event):
         """Called when the mouse clicks down on the plot, but before the click is released."""
-        x, y = self.xy(event)
-        if x and y:
-            self.rect = Rect(x, y)
-            self.pre_update()
-            self.update()
+        if event.button == MouseButton.LEFT:
+            x, y = self.xy(event)
+            if x and y:
+                self.rect = Rect(x, y)
+                self.pre_update()
+                self.update()
 
     def on_release(self, event):
         """Called when the mouse releases a click on the plot."""
-        x, y = self.xy(event)
-        if x and y:
-            if self.rect:
-                self.zoom_to(self.rect)
-                self.rect = None
+        if event.button == MouseButton.LEFT:
+            x, y = self.xy(event)
+            if x and y:
+                if self.rect:
+                    self.zoom_to(self.rect)
+                    self.rect = None
 
-            if self.show_crosshair:
-                if len(self.selected_plots) >= 2:
-                    self.show_crosshair = False
+                if self.show_crosshair:
+                    if len(self.selected_plots) >= 2:
+                        self.show_crosshair = False
 
-            self.pre_update()
-            self.update()
+                self.pre_update()
+                self.update()
 
     def zoom_to(self, rect):
         """
@@ -264,6 +282,10 @@ class PlotComponent(BaseComponent):
     def clear(self):
         """Clears the contents of the plot."""
         self.axes.clear()
+
+    def set_in_progress(self, in_progress=True):
+        """Sets the progress bar to display whether the plotting is in progress."""
+        self.options.set_in_progress(in_progress)
 
 
 class Bounds:

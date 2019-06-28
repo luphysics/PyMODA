@@ -15,7 +15,10 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 from PyQt5 import uic
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QPixmap
 
+from data import resources
 from gui.base.windows.CentredWindow import CentredWindow
 from data.resources import get_ui
 
@@ -33,6 +36,12 @@ class LauncherWindow(CentredWindow):
     def init_ui(self):
         uic.loadUi(get_ui("window_launcher"), self)
         self.btn_time_freq.clicked.connect(self.onclick_time_freq)
+        self.load_banner_images()
+
+    def load_banner_images(self):
+        physics_label = self.lbl_physics
+        image = QPixmap(resources.get("image:physicslogo.png"))
+        physics_label.setPixmap(image.scaled(600, 300, Qt.KeepAspectRatio))
 
     def onclick_time_freq(self):
         """
