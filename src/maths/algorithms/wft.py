@@ -115,6 +115,62 @@ def wft(signal,
             print("Estimating window parameters.")
             parcalc(rel_to_l, L, wp, fwt, twf, disp_mode)
 
+    coib1 = np.ceil(abs(wp.t1e * fs))
+    coib2 = np.ceil(abs(wp.t2e * fs))
+
+    if wp.t2e - wp.t1e > L / fs:
+        print("No WFT coefficients in cone of influence")
+        cut_edges = False
+
+    freq = (np.ceil(fmin / fstep) * np.arange(fstep, np.floor(fmax / fstep) * fstep, fstep)).transpose()
+    SN = len(freq)
+
+    """Skipped some code (mostly unnecessary?)"""
+
+    WFT = np.zeros(SN, L) * np.NaN
+    ouflag = 0
+    if wp.t2e - wp.t1e > L / fs:
+        coib1 = 0
+        coib2 = 0
+
+    for sn in range(0, SN):
+        freqwf = freq[sn] - ff  # TODO: add later
+        ii = None
+
+        if not isempty(fwt):
+            fw = fwt(twopi * freqwf[ii])
+            nid = find(fw, lambda x: isnan(x) or not np.isfinite(x))
+            if not isempty(nid):
+                fw[nid] = fwt(twopi * freqwf[ii[nid]] + 10 ** -14)
+                nid = find(fw, lambda x: isnan(x) or not np.isfinite(x))
+                fw[nid] = 0
+                if not isempty(nid):
+                    ouflag = 1
+                    ouval = twopi * freqwf(nid[0])
+
+        else:
+            timewf = 1 / fs * np.asarray(-np.arange(1, np.ceil((NL - 1) / 2)),
+                                         np.arange(NL + 1 - (np.ceil((NL - 1) / 2) + 1, NL)))
+            jj = None  # TODO
+            tw = np.zeros(NL, 1)
+            tw[jj] = twf(timewf(jj)) * np.exp(np.complex(0, -1 * twopi * freq[sn] * timewf[jj]))
+            nid = find(fw, lambda x: isnan(x) or not np.isfinite(x))
+            if not isempty(nid):
+                tw[nid] = twf(timewf(nid) + 10 ** -14)
+                nid = find(fw, lambda x: isnan(x) or not np.isfinite(x))
+                if not isempty(nid):
+                    ouflag = 1
+                    ouval = timewf(nid[0])
+            fw = 1 / fs * np.fft.fft(tw)
+            fw = fw[ii]
+
+        cc = np.zeros(NL, 1)
+        cc[ii] = fx[ii] * fw
+        out = np.fft.ifft(cc, NL)
+        WFT[sn, np.arange(1, L)] = out[1 + n1, NL - n2]
+
+        # Code for plotting.
+
 
 def parcalc(racc, L, wp, fwt, twf, disp_mode):
     racc = min(racc, 0.5 - 10 ** -10)
@@ -128,7 +184,7 @@ def parcalc(racc, L, wp, fwt, twf, disp_mode):
     nxi = 2 * np.pi * 4 * fs / (16 * L - 1) * np.arange(-8 * L + 1, 8 * L).transpose()
     nxi = nxi[nxi > wp.xi1][nxi < wp.xi2]
 
-    if fwt:
+    if not isempty(fwt):
         wp.fwt = fwt
         if isempty(wp.ompeak):
             values = np.abs(fwt(nxi))
@@ -136,7 +192,7 @@ def parcalc(racc, L, wp, fwt, twf, disp_mode):
             wp.ompeak = np.mean(nxi[ipeak])
             wp.ompeak = scipy.optimize.fmin(func=lambda x: -np.abs(fwt(x)), x0=wp.ompeak)  # level1
 
-        if not wp.fwtmax:
+        if isempty(wp.fwtmax):
             wp.fwtmax = fwt(wp.ompeak)
             if np.isnan(wp.fwtmax):
                 wp.twfmax = fwt[wp.ompeak + 10 ** -14]
@@ -144,7 +200,7 @@ def parcalc(racc, L, wp, fwt, twf, disp_mode):
         if np.abs(wp.ompeak) > 10 ** -12:
             print("Warning")
             fwt = lambda xi: fwt[xi + wp.ompeak]
-            if twf:
+            if not isempty(twf):
                 twf = lambda t: twf[t] * np.exp(-1 * np.complex(0, -1) * wp.ompeak * t)
             wp.xi1 = wp.xi1 - wp.ompeak
             wp.xi2 = wp.xi2 - wp.ompeak
