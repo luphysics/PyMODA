@@ -21,6 +21,8 @@ import scipy.optimize
 import scipy.integrate
 from scipy.optimize import fsolve
 
+from maths.algorithms.matalb_utils import isempty
+
 fwtmax = "fwtmax"
 twfmax = "twfmax"
 C = "C"
@@ -444,6 +446,21 @@ def sqeps(vfun, xp, lim1, lim2, racc, MIC, nlims):
 
     return QQ, wflag, xx, ss
 
+
+def fcast(sig, fs, NP, fint, **kwargs):  # line1145
+    MaxOrder = len(sig)
+    if len(kwargs) > 3:
+        MaxOrder = kwargs.get("maxorder") or MaxOrder
+    w = []
+    if len(kwargs) > 4:
+        w = kwargs.get("w") or w
+    rw = np.sqrt(w)
+    # ignore DispMode
+
+    WTol = 10 ** -8  # tolerance for cutting weighting.
+    Y = sig[:]
+    if isempty(rw):
+        pass
 
 if __name__ == "__main__":
     """Test the function if this file is run directly."""
