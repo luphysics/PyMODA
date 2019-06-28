@@ -15,8 +15,7 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from multiprocessing import Queue, Process
 
-import windowFT
-import matlab
+# import windowFT
 import numpy as np
 from PyQt5.QtCore import QTimer
 from scipy import signal
@@ -24,7 +23,9 @@ import matplotlib.pyplot as plt
 
 from gui.base.components.PlotComponent import PlotComponent
 from maths.TimeSeries import TimeSeries
-from packages.wft.for_redistribution_files_only import windowFT
+
+
+# from packages.wft.for_redistribution_files_only import windowFT
 
 
 class WFTPlot(PlotComponent):
@@ -48,11 +49,11 @@ class WFTPlot(PlotComponent):
 
         self.proc = Process(target=generate_solutions, args=(self.queue, sig_matlab, fs))
         self.proc.start()
-        QTimer.singleShot(5000, self.check_result)
+        QTimer.singleShot(500, self.check_result)
 
     def check_result(self):
         if self.queue.empty():
-            QTimer.singleShot(5000, self.check_result)
+            QTimer.singleShot(500, self.check_result)
             return
 
         w, l = self.queue.get()
@@ -60,7 +61,8 @@ class WFTPlot(PlotComponent):
         a = np.asarray(w)
         gh = np.asarray(l)
 
-        self.axes.pcolormesh(self.times, gh, np.abs(a))
+        # self.axes.pcolormesh(self.times, gh, np.abs(a))
+        self.axes.plot(self.times, [np.sin(t) for t in self.times])
         self.axes.set_title('STFT Magnitude')
 
         self.axes.autoscale(False)
@@ -72,10 +74,11 @@ class WFTPlot(PlotComponent):
 
 
 def generate_solutions(queue, signal, freq):
-    package = windowFT.initialize()
+    # package = windowFT.initialize()
 
-    A = matlab.double([signal])
-    fs_matlab = matlab.double([freq])
+    # A = matlab.double([signal])
+    # fs_matlab = matlab.double([freq])
 
-    w, l = package.windowFT(A, fs_matlab, nargout=2)
-    queue.put((w, l,))
+    # w, l = package.windowFT(A, fs_matlab, nargout=2)
+    # queue.put((w, l,))
+    queue.put((0, 0,))
