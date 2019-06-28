@@ -103,6 +103,7 @@ class PlotComponent(BaseComponent):
         so that the reset button can work.
         """
         self.add_rect_state(self.current_rect())
+        self.options.set_in_progress(False)
 
     def cross_cursor(self, cross=True):
         """Sets the cursor to a cross, or resets it to the normal arrow style."""
