@@ -37,3 +37,6 @@ def isfinite(value):
 def backslash(x, y):
     """Imitates the MATLAB backslash operator."""
     return np.linalg.lstsq(x, y)
+
+
+twopi = 2 * np.pi

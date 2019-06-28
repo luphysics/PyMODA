@@ -19,10 +19,9 @@ import numpy as np
 import scipy
 import scipy.optimize
 import scipy.integrate
-from scipy.optimize import fsolve
 from scipy.sparse.linalg.isolve.lsqr import eps
 
-from maths.algorithms.matlab_utils import isempty, backslash
+from maths.algorithms.matlab_utils import isempty, backslash, twopi
 
 fwtmax = "fwtmax"
 twfmax = "twfmax"
@@ -695,8 +694,45 @@ def fcast(sig, fs, NP, fint, **kwargs):  # line1145
             else:
                 fsig = fsig + amp(k) * np.cos(twopi * frq(k) * (T - 1 / fs) + phi(k))
 
+        return fsig
 
-twopi = 2 * np.pi
+
+def aminterp(X, Y, Z, XI, YI, method):
+    ZI = np.zeros(np.size(Z, 1), len(XI)) * np.NaN
+    xstep = np.mean(np.diff(XI))
+    xind = 1 + np.floor((1 / 2) + (X - XI(1)) / xstep)
+    xpnt = np.asarray([0], [0], [0])  # level3 TODO: add later
+
+    if method == "max":
+        for xn in range(1, len(xpnt)):
+            xid1 = xpnt[xn - 1] + 1
+            xid2 = xpnt[xn]
+            ZI[xind[xid1]] = np.max(Z[xid1:xid2], 2)
+    else:
+        for xn in range(1, len(xpnt)):
+            xid1 = xpnt[xn - 1] + 1
+            xid2 = xpnt[xn + 1]
+            ZI[xind[xid1]] = np.mean(Z[xid1:xid2], 2)
+    Z = ZI
+
+    ZI = np.zeros(len(YI), np.size(Z, 2)) * np.NaN
+    ystep = np.mean(np.diff(YI))
+    yind = 1 + np.floor((1 / 2) + (Y - YI(1)) / ystep)
+    ypnt = [[0], [0], [0]]  # level3 TODO: add later
+
+    if method == "max":
+        for yn in range(1, len(ypnt)):
+            yid1 = ypnt[yn - 1] + 1
+            yid2 = ypnt[yn]
+            ZI[yind[yid1]] = np.max(Z[yid1:yid2], 2)
+    else:
+        for yn in range(1, len(ypnt)):
+            yid1 = xpnt[yn - 1] + 1
+            yid2 = xpnt[yn + 1]
+            ZI[yind[yid1]] = np.mean(Z[yid1:yid2], 2)
+
+    return ZI
+
 
 if __name__ == "__main__":
     """Test the function if this file is run directly."""
