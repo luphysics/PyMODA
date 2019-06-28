@@ -18,6 +18,7 @@ import numpy as np
 # Names of window parameters.
 import scipy
 import scipy.optimize
+import scipy.integrate
 from scipy.optimize import fsolve
 
 fwtmax = "fwtmax"
@@ -290,8 +291,158 @@ def sqeps(vfun, xp, lim1, lim2, racc, MIC, nlims):
     Q1 = 0  # line1003
     Q2 = 0
 
-    # TODO: add impl
-    return np.array([[2, 2], [2, 2]]), 0, np.array([[2, 2, 3], [2, 2, 3]]), np.array([[2, 2], [2, 2]])
+    qv, eb, _, _, _ = scipy.integrate.quad(vfun, xp, x1e, MIC, 0, 0.1 * ctol)
+
+    x1m = x1e
+    q1m = qv
+
+    if abs(eb / (Q1 + qv)) > ctol:
+        wflag = 1
+        qv, eb, _, _, _ = scipy.integrate.quad(vfun, xp, x1e, MIC, 0, 0.1 * ctol)
+        qv, eb, _, _, _ = scipy.integrate.quad(vfun, xp, x1e, MIC, 0.1 * abs(ctol * (Q1 + qv)), 0)
+        x1m = x1h
+        q1m = qv
+        if abs(eb / (Q1 + qv)) <= ctol:
+            while True:
+                qv, eb, _, _, _ = scipy.integrate.quad(vfun, xp, max([xp + (x1m - xp) * 2, x1e]), MIC, 0, 0.1 * ctol)
+                qv, eb, _, _, _ = scipy.integrate.quad(vfun, xp, max([xp + (x1m - xp) * 2, x1e]), MIC,
+                                                       0.1 * abs(ctol * (Q1 + qv)), 0)
+                if abs(eb / (Q1 + qv)) > ctol:
+                    break
+                x1m = max([xp + (x1m - xp) * 2, x1e])
+                q1m = qv
+        else:
+            while abs(eb / (Q1 + qv)) > ctol:
+                x1m = xp + (x1m - xp) / 2
+                qv, eb, _, _, _ = scipy.integrate.quad(vfun, xp, x1m, MIC, 0, 0.1 * ctol)
+                qv, eb, _, _, _ = scipy.integrate.quad(vfun, xp, x1m, MIC, 0.1 * abs(ctol * (Q1 + qv)), 0)
+                q1m = qv
+        qv, eb, _, _, _ = scipy.integrate.quad(vfun, xp, x1e, MIC, 0.1 * abs(ctol * (Q1 + qv)), 0)
+        if abs(eb) < 0.5 * abs(qv):
+            Q1 = Q1 + qv
+
+    Q1 = Q1 + q1m
+    if wflag == 0:
+        qv, eb, _, _, _ = scipy.integrate.quad(vfun, x1e, lim1, MIC, 0.1 * abs(ctol * Q1), 0)
+        if not np.isfinite(lim1) and np.isnan(qv):
+            lim1 = x1e
+            while not np.isnan(vfun(2 * lim1)):
+                lim1 = 2 * lim1
+            qv, eb, _, _, _ = scipy.integrate.quad(vfun, x1e, lim1, MIC, 0.1 * abs(ctol * Q1), 0)
+        if abs(eb / Q1) > ctol:
+            wflag = 1
+            qv, eb, _, _, _ = scipy.integrate.quad(vfun, x1e, max([min([8 * x1e, nlim1]), lim1]), MIC,
+                                                   0.1 * abs(ctol * Q1), 0)
+        if abs(eb) < 0.5 * abs(qv):
+            Q1 = Q1 + qv
+
+    Q1 = -Q1
+    qv, eb, _, _, _ = scipy.integrate.quad(vfun, xp, x2e, MIC, 0, 0.1 * ctol)
+    qv, eb, _, _, _ = scipy.integrate.quad(vfun, xp, x2e, MIC, 0.1 * abs(ctol * (Q2 + qv)), 0)
+    x2m = x2e
+    q2m = qv
+    if abs(eb / (Q2 + qv)) > ctol:
+        wflag = 1
+        qv, eb, _, _, _ = scipy.integrate.quad(vfun, xp, x2e, MIC, 0, 0.1 * ctol)
+        qv, eb, _, _, _ = scipy.integrate.quad(vfun, xp, x2e, MIC, 0.1 * abs(ctol * (Q2 + qv)), 0)
+
+        x2m = x2h
+        q2m = qv
+        if abs(eb / (Q2 + qv)) <= ctol:
+            while True:
+                qv, eb, _, _, _ = scipy.integrate.quad(vfun, xp, min([xp + (x2m - xp) * 2, x2e]), MIC, 0, 0.1 * ctol)
+                qv, eb, _, _, _ = scipy.integrate.quad(vfun, xp, min([xp + (x2m - xp) * 2, x2e]), MIC,
+                                                       0.1 * abs(ctol * (Q2 + qv)), 0)
+                if abs(eb / (Q2 + qv)) > ctol:
+                    break
+                x2m = min([xp + (x2m - xp) * 2, x2e])
+                q2m = qv
+
+        else:
+            while abs(eb / (Q2 + qv)) > ctol:
+                x2m = xp + (x2m - xp) / 2
+                qv, eb, _, _, _ = scipy.integrate.quad(vfun, xp, x2m, MIC, 0, 0.1 * ctol)
+                qv, eb, _, _, _ = scipy.integrate.quad(vfun, xp, x2m, MIC, 0.1 * abs(ctol * (Q2 + qv)), 0)
+                q2m = qv
+        qv, eb, _, _, _ = scipy.integrate.quad(vfun, x2m, x2e, MIC, 0.1 * abs(ctol * (Q2 + qv)), 0)
+        if abs(eb) < 0.5 * abs(qv):
+            Q2 += qv
+
+    Q2 += q2m
+    if wflag == 0:
+        qv, eb, _, _, _ = scipy.integrate.quad(vfun, x2e, lim2, MIC, 0.1 * abs(ctol * Q2), 0)
+        if not np.isfinite(lim2) and np.isnan(qv):
+            lim2 = x2e
+            while not np.isnan(vfun(2 * lim2)):
+                lim2 = 2 * lim2
+            qv, eb, _, _, _ = scipy.integrate.quad(vfun, x2e, lim2, MIC, 0.1 * abs(ctol * Q2), 0)
+        if abs(eb / Q2) > ctol:
+            wflag = 1
+            qv, eb, _, _, _ = scipy.integrate.quad(vfun, x2e, min([max([8 * x2e, nlim2]), lim2]), MIC,
+                                                   0.1 * abs(ctol * Q2), 0)
+        if abs(eb) < 0.5 * abs(qv):
+            Q2 = Q2 + qv
+
+    QQ = np.asarray([Q1, Q2], [-q1m, q2m])
+    xx = np.asarray([x1e, x2e],
+                    [x1h, x2h],
+                    [x1m, x2m],
+                    [lim1, lim2])
+
+    Q = Q1 + Q2
+
+    def fz(zv):
+        if zv < abs(Q1 / Q):
+            cx1 = x1m
+            cq1 = Q1 + q1m
+            ra = np.exp(-1 / 2)
+            rb = np.exp(1 / 2)
+        else:
+            cx1 = x2m
+            cq1 = Q1 + q2m
+            ra = np.exp(1 / 2)
+            rb = np.exp(-1 / 2)
+
+        if abs(1 - abs((Q - cq1) / Q)) < zv:
+            while True:
+                nx = xp + ra * (cx1 - xp)
+                if nx < lim1: nx = (cx1 + lim1) / 2
+                if nx > lim2: nx = (cx1 + lim2) / 2
+                [pv, _] = scipy.integrate.quad(vfun, cx1, nx, MIC, 0.1 * abs(ctol * Q), 0)
+                if abs(1 - abs((Q - cq1 - pv) / Q)) >= zv:
+                    cx2 = nx
+                    cq2 = cq1 + pv
+                    break
+                cx1 = nx
+                cq1 = cq1 + pv
+        else:
+            while True:
+                nx = xp + rb * (cx1 - xp)
+                if nx < lim1: nx = (cx1 + lim1) / 2
+                if nx > lim2: nx = (cx1 + lim2) / 2
+                [pv, _] = scipy.integrate.quad(vfun, cx1, nx, MIC, 0.1 * abs(ctol * Q), 0)
+                if abs(1 - abs((Q - cq1 - pv) / Q)) >= zv:
+                    cx2 = nx
+                    cq2 = cq1 + pv
+                    break
+                cx1 = nx
+                cq1 = cq1 + pv
+
+        [pv, _] = scipy.integrate.quad(vfun, cx1, (cx1 + cx2) / 2, MIC, 0.1 * abs(ctol * Q), 0)
+        qfun = lambda x: 1 - abs((Q - (cq1 + pv +
+                                       scipy.integrate.quad(vfun, (cx1 + cx2) / 2, x, MIC, 0.1 * abs(ctol * Q), 0)[0])
+                                  ) / Q)
+        x0 = scipy.optimize.fsolve(lambda x: abs(qfun(x)) - zv, x0=[cx1, cx2])
+        return x0
+
+    s1e = fz(racc / 2)
+    s2e = fz(1 - racc / 2)
+    s1h = fz(0.5 / 2)
+    s2h = fz(1 - 0.5 / 2)
+    ss = np.asarray([s1e, s2e],
+                    [s1h, s2h])
+
+    return QQ, wflag, xx, ss
 
 
 if __name__ == "__main__":
