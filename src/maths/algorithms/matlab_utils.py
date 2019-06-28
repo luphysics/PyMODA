@@ -39,4 +39,18 @@ def backslash(x, y):
     return np.linalg.lstsq(x, y)
 
 
+def nextpow2(x):
+    return np.ceil(np.log2(abs(x)))
+
+
 twopi = 2 * np.pi
+
+
+def find(arr, condition):
+    l = len(arr)
+    indices = []
+    for i in range(l):
+        if condition(arr[i]):
+            indices.append(i)
+
+    return indices

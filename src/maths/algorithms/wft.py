@@ -21,7 +21,7 @@ import scipy.optimize
 import scipy.integrate
 from scipy.sparse.linalg.isolve.lsqr import eps
 
-from maths.algorithms.matlab_utils import isempty, backslash, twopi
+from maths.algorithms.matlab_utils import isempty, backslash, twopi, nextpow2, isnan, find
 
 fwtmax = "fwtmax"
 twfmax = "twfmax"
@@ -130,7 +130,7 @@ def parcalc(racc, L, wp, fwt, twf, disp_mode):
 
     if fwt:
         wp.fwt = fwt
-        if not wp.ompeak:
+        if isempty(wp.ompeak):
             values = np.abs(fwt(nxi))
             ipeak = values.argmax()  # level2
             wp.ompeak = np.mean(nxi[ipeak])
@@ -181,13 +181,218 @@ def parcalc(racc, L, wp, fwt, twf, disp_mode):
             # Don't even think about it...
             pass
 
-    if twf:
+    if not isempty(twf):
         wp.twf = twf
-        if not wp.tpeak:
+        if isempty(wp.tpeak):
             values = np.abs(twf(nt))
             ipeak = values.argmax()  # level2
             wp.tpeak = np.mean(nt[ipeak])
             wp.tpeak = scipy.optimize.fmin(lambda x: -np.abs(twf(x)), wp.tpeak)
+
+        if isempty(fwt):
+            PP, wflag, xx, ss = sqeps(lambda x: abs(twf(x)) ** 2, wp.tpeak, wp.t1, wp.t2, racc, MIC,
+                                      np.array([-1, 1]) * 8 * (2 * np.pi * fs))
+            Etot = np.sum(PP[1])
+
+            CL = 2 ** nextpow2(MIC / 8)
+            CT = 2 * abs(ss[1, 2] - ss[1, 1])
+
+            CNq = np.ceil((CL + 1) / 2)
+            ct = (CT / CL) * np.arange(CNq - CL, CNq).transpose()
+            idm = find(ct, lambda x: x <= wp.t1)
+            idc = find(ct, lambda x: wp.t1 < x < wp.t2)
+            idp = find(ct, lambda x: x >= wp.t2)
+
+            Ctwf = [np.zeros(len(idm), 1), twf(ct(idc)), np.zeros(len(idp), 1)]
+            idnan = find(Ctwf, lambda i: np.isnan(i))
+
+            if not isempty(idnan):
+                idnorm = find(Ctwf, lambda x: not isnan(x))
+                Ctwf[idnan] = scipy.interpolate.interp1d(idnorm, Ctwf(idnorm), idnan, 'spline', 'extrap')
+
+            Cfwt = (CT / CL) * np.fft.fft(Ctwf([np.arange(CL - CNq + 1, CL - CNq, CL, 1)]))
+            Cfwt = Cfwt(np.arange(CNq + 1, CNq, CL, 1))
+
+            Etwf = abs(Ctwf) ** 2
+            Efwt = abs(Ctwf) ** 2
+
+            Iest1 = (CT / CL) * sum(abs(Etwf[3:] - 2 * Etwf[2: -1] + Etwf[1: -2])) / 24
+            Iest2 = (1 / CL) * sum(abs(Etwf[3:] - 2 * Etwf[2: -1] + Etwf[1: -2])) / 24
+
+            Eest = (1 / CT) * sum(Efwt)
+            perr = np.inf
+
+            while (abs(Etot - Eest) + Iest1 + Iest2) / Etot <= perr:
+                CT = CT * 2
+                perr = (abs(Etot - Eest) + Iest1 + Iest2) / Etot
+
+                CNq = np.ceil((CL + 1) / 2)
+                ct = ((CT / CL) * (CNq - np.arange(CL, CNq))).transpose()
+                idm = find(ct <= wp.t1)
+                idc = find(ct > wp.t1 & ct < wp.t2)
+                idp = find(ct >= wp.t2)
+
+                Ctwf = [np.zeros(len(idm), 1), twf(ct(idc)), np.zeros(len(idp), 1)]
+                idnan = find(Ctwf, lambda x: isnan(x))
+
+                if not isempty(idnan):
+                    idnorm = find(Ctwf, lambda x: not isnan(x))
+                    Ctwf[idnan] = scipy.interpolate.interp1d(idnorm, Ctwf(idnorm), idnan, 'spline', 'extrap')
+
+                Cfwt = (CT / CL) * np.fft.fft(Ctwf(np.arange(CL - CNq + 1, CL - CNq, CL, 1)))
+                Cfwt = Cfwt(np.arange(CNq + 1, CNq, CL, 1))
+
+                Etwf = abs(Ctwf) ** 2
+                Efwt = abs(Ctwf) ** 2
+
+                Iest1 = (CT / CL) * sum(abs(Etwf[3:] - 2 * Etwf[2: -1] + Etwf[1: -2])) / 24
+                Iest2 = (1 / CL) * sum(abs(Etwf[3:] - 2 * Etwf[2: -1] + Etwf[1: -2])) / 24
+                Eest = (1 / CT) * sum(Efwt)
+
+            CL = 16 * CL
+            CT = CT * 2
+
+            CNq = np.ceil((CL + 1) / 2)
+            ct = ((CT / CL) * (CNq - np.arange(CL, CNq))).transpose()
+            idm = find(ct <= wp.t1)
+            idc = find(ct > wp.t1 & ct < wp.t2)
+            idp = find(ct >= wp.t2)
+
+            Ctwf = [np.zeros(len(idm), 1), twf(ct(idc)), np.zeros(len(idp), 1)]
+            idnan = find(Ctwf, lambda x: isnan(x))
+
+            if not isempty(idnan):
+                idnorm = find(Ctwf, lambda x: not isnan(x))
+                Ctwf[idnan] = scipy.interpolate.interp1d(idnorm, Ctwf(idnorm), idnan, 'spline', 'extrap')
+
+            Cfwt = (CT / CL) * np.fft.fft(Ctwf(np.arange(CL - CNq + 1, CL - CNq, CL, 1)))
+            Cfwt = Cfwt(np.arange(CNq + 1, CNq, CL, 1))
+
+            Etwf = abs(Ctwf) ** 2
+            Efwt = abs(Ctwf) ** 2
+
+            Iest1 = (CT / CL) * sum(abs(Etwf[3:] - 2 * Etwf[2: -1] + Etwf[1: -2])) / 24
+            Iest2 = (1 / CL) * sum(abs(Etwf[3:] - 2 * Etwf[2: -1] + Etwf[1: -2])) / 24
+            Eest = (1 / CT) * sum(Efwt)
+
+            if (abs(Etot - Eest) + Iest1 + Iest2) / Etot > 0.01:
+                print("Cannot accurately ...")
+
+            Cfwt = Cfwt[1:2 * CNq - 3]
+            cxi = ((twopi / CT) * -np.arange(CNq - 2, CNq - 2)).transpose()
+            wp.fwt = np.asarray(Cfwt, cxi)
+
+            if isempty(wp.ompeak):
+                values = np.abs(fwt(nxi))
+                ipeak = values.argmax()  # level2
+                if len(ipeak) == 1:
+                    a1 = abs(Cfwt[ipeak - 1])
+                    a2 = abs(Cfwt[ipeak])
+                    a3 = abs(Cfwt[ipeak + 1])
+
+                    wp.ompeak = cxi[ipeak]
+                    if abs(a1 - 2 * a2 + a3) > 2 * eps:  # quadratic interp
+                        wp.ompeak = wp.ompeak + 1 / 2 * (a1 - a3) / (a1 - 2 * a2 + a3) * (twopi / CT)
+
+                else:
+                    wp.ompeak = np.mean(cxi[ipeak])
+
+            if isempty(wp.fwtmax):
+                _, ipeak = min(abs(cxi - wp.ompeak))
+                wp.fwtmax = scipy.interpolate.interp1d(cxi[ipeak - 1:ipeak + 1], abs(Cfwt[ipeak - 1:ipeak + 1]),
+                                                       wp.ompeak, "spline")
+
+            if isempty(wp.C):
+                wp.C = twopi / 2 * twf(0)
+                if isnan(wp.C):
+                    wp.C = twopi / 2 * twf(10 ** -14)
+            if isempty(wp.omg):
+                wp.omg = sum((twopi / CT) * cxi * Cfwt / (2 * wp.C))
+
+            cxi = np.arange(cxi - np.pi, cxi[-1] + np.pi / CT, cxi[-1])
+            CS = (twopi / CT) * np.cumsum(Cfwt)
+            CS = np.asarray([0], CS) / abs(CS[-1])
+            CS = abs(CS)
+
+            ICS = (twopi / CT) * np.cumsum(Cfwt[::-1])  # level3
+            ICS = ICS[::-1]
+            ICS = np.asarray(ICS, []) / ICS[0]
+            ICS = abs(ICS)
+
+            xid = np.asarray()  # TODO: add later
+            if isempty(xid):
+                wp.x1e = cxi[0]
+            else:
+                a1 = CS[xid] - racc / 2
+                a2 = CS[xid + 1] - racc / 2
+                wp.x1e = cxi[xid] - a1 * (cxi[xid + 1] - cxi[xid]) / (a2 - a1)
+
+            xid = np.asarray()  # TODO: add later
+            if isempty(xid):
+                wp.xi2e = cxi[-1]
+            else:
+                a1 = ICS[xid] - racc / 2
+                a2 = ICS[xid + 1] - racc / 2
+                wp.xi1e = cxi[xid] - a1 * (cxi[xid + 1] - cxi[xid]) / (a2 - a1)
+
+            xid = np.asarray()  # TODO: add later
+            if isempty(xid):
+                wp.xi1h = cxi[0]
+            else:
+                a1 = CS[xid] - 0.25
+                a2 = CS[xid + 1] - 0.25
+                wp.xi1h = cxi[xid] - a1 * (cxi[xid + 1] - cxi[xid]) / (a2 - a1)
+
+            xid = np.asarray()  # TODO: add later
+            if isempty(xid):
+                wp.xi2h = cxi[-1]
+            else:
+                a1 = ICS[xid] - 0.25
+                a2 = ICS[xid + 1] - 0.25
+                wp.xi2h = cxi[xid] - a1 * (cxi[xid + 1] - cxi[xid]) / (a2 - a1)
+
+            if abs(wp.ompeak) > 10 ** -12:
+                wp.xi1 = wp.xi1 - wp.ompeak
+                wp.xi2 = wp.xi2 - wp.ompeak
+                wp.xi1e = wp.xi1e - wp.ompeak
+                wp.xi2e = wp.xi2e - wp.ompeak
+                wp.xi1h = wp.xi1h - wp.ompeak
+                wp.xi2h = wp.xi2h - wp.ompeak
+                wp.omg = wp.omg - wp.ompeak
+
+                twf = lambda t: twf(t) * np.exp(np.complex(-1 * wp.ompeak * t))
+                wp.twf = twf
+
+                Ctwf = [np.zeros(len(idm), 1), twf(ct(idc)), np.zeros(len(idp), 1)]
+                idnan = find(Ctwf, lambda x: isnan(x))
+
+                if not isempty(idnan):
+                    idnorm = find(Ctwf, lambda x: not isnan(x))
+                    Ctwf[idnan] = scipy.interpolate.interp1d(idnorm, Ctwf(idnorm), idnan, 'spline', 'extrap')
+
+                Cfwt = (CT / CL) * np.fft.fft(Ctwf(np.arange(CL - CNq + 1, CL - CNq, CL, 1)))
+                Cfwt = Cfwt(np.arange(CNq + 1, CNq, CL, 1))
+
+                wp.fwt = np.asarray(Cfwt, cxi)
+                wp.ompeak = 0
+
+        if isempty(wp.twfmax):
+            wp.twfmax = twf(wp.tpeak)
+            if isnan(wp.twfmax):
+                wp.twfmax = twf(wp.tpeak + 10 ** -14)
+
+        vfun = twf
+        xp = wp.tpeak
+        lim1 = wp.t1
+        lim2 = wp.t2
+
+        QQ, wflag, xx, ss = sqeps(vfun, xp, lim1, lim2, racc, MIC, np.array([-1, 1]) * 8 * (2 * np.pi * fs))
+        wp.t1e = ss[0, 0]
+        wp.t2e = ss[0, 1]
+        wp.t1h = ss[1, 0]
+        wp.t2h = ss[1, 1]
+        if wflag == 1:
+            print("Time domain window not well behaved...")
 
 
 def sqeps(vfun, xp, lim1, lim2, racc, MIC, nlims):
@@ -240,7 +445,8 @@ def sqeps(vfun, xp, lim1, lim2, racc, MIC, nlims):
 
     if np.isfinite(lim1):
         tx1 = lim1 - 0.01 * (lim1 - xp)
-        qv1 = (np.abs(vfun(tx1)) + np.abs(vfun((tx1 + lim1) / 2)) + np.abs(vfun((tx1 + 3 * lim1) / 4))) / np.abs(vmax)
+        qv1 = (np.abs(vfun(tx1)) + np.abs(vfun((tx1 + lim1) / 2)) + np.abs(vfun((tx1 + 3 * lim1) / 4))) / np.abs(
+            vmax)
     else:
         qv1 = np.NaN
 
@@ -259,7 +465,7 @@ def sqeps(vfun, xp, lim1, lim2, racc, MIC, nlims):
         x1e = xp + (lim1 - xp) / 2
 
     if np.isfinite(lim2):
-        tx2 = lim2 - 0.01 * (lim2 - xp);
+        tx2 = lim2 - 0.01 * (lim2 - xp)
         qv2 = (abs(vfun(tx2)) + abs(vfun((tx2 + lim2) / 2)) + abs(vfun((tx2 + 3 * lim2) / 4))) / abs(vmax)
     else:
         qv2 = np.NaN
@@ -306,7 +512,8 @@ def sqeps(vfun, xp, lim1, lim2, racc, MIC, nlims):
         q1m = qv
         if abs(eb / (Q1 + qv)) <= ctol:
             while True:
-                qv, eb, _, _, _ = scipy.integrate.quad(vfun, xp, max([xp + (x1m - xp) * 2, x1e]), MIC, 0, 0.1 * ctol)
+                qv, eb, _, _, _ = scipy.integrate.quad(vfun, xp, max([xp + (x1m - xp) * 2, x1e]), MIC, 0,
+                                                       0.1 * ctol)
                 qv, eb, _, _, _ = scipy.integrate.quad(vfun, xp, max([xp + (x1m - xp) * 2, x1e]), MIC,
                                                        0.1 * abs(ctol * (Q1 + qv)), 0)
                 if abs(eb / (Q1 + qv)) > ctol:
@@ -352,7 +559,8 @@ def sqeps(vfun, xp, lim1, lim2, racc, MIC, nlims):
         q2m = qv
         if abs(eb / (Q2 + qv)) <= ctol:
             while True:
-                qv, eb, _, _, _ = scipy.integrate.quad(vfun, xp, min([xp + (x2m - xp) * 2, x2e]), MIC, 0, 0.1 * ctol)
+                qv, eb, _, _, _ = scipy.integrate.quad(vfun, xp, min([xp + (x2m - xp) * 2, x2e]), MIC, 0,
+                                                       0.1 * ctol)
                 qv, eb, _, _, _ = scipy.integrate.quad(vfun, xp, min([xp + (x2m - xp) * 2, x2e]), MIC,
                                                        0.1 * abs(ctol * (Q2 + qv)), 0)
                 if abs(eb / (Q2 + qv)) > ctol:
@@ -432,7 +640,8 @@ def sqeps(vfun, xp, lim1, lim2, racc, MIC, nlims):
 
         [pv, _] = scipy.integrate.quad(vfun, cx1, (cx1 + cx2) / 2, MIC, 0.1 * abs(ctol * Q), 0)
         qfun = lambda x: 1 - abs((Q - (cq1 + pv +
-                                       scipy.integrate.quad(vfun, (cx1 + cx2) / 2, x, MIC, 0.1 * abs(ctol * Q), 0)[0])
+                                       scipy.integrate.quad(vfun, (cx1 + cx2) / 2, x, MIC, 0.1 * abs(ctol * Q), 0)[
+                                           0])
                                   ) / Q)
         x0 = scipy.optimize.fsolve(lambda x: abs(qfun(x)) - zv, x0=[cx1, cx2])
         return x0
