@@ -13,6 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import numpy as np
 
 
 def isempty(value):
@@ -23,3 +24,16 @@ def isempty(value):
     if hasattr(value, "__len__"):
         return len(value) == 0
     return value is None
+
+
+def isnan(value):
+    return np.isnan(value)
+
+
+def isfinite(value):
+    return np.isfinite(value)
+
+
+def backslash(x, y):
+    """Imitates the MATLAB backslash operator."""
+    return np.linalg.lstsq(x, y)

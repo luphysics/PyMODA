@@ -20,8 +20,9 @@ import scipy
 import scipy.optimize
 import scipy.integrate
 from scipy.optimize import fsolve
+from scipy.sparse.linalg.isolve.lsqr import eps
 
-from maths.algorithms.matalb_utils import isempty
+from maths.algorithms.matlab_utils import isempty, backslash
 
 fwtmax = "fwtmax"
 twfmax = "twfmax"
@@ -459,8 +460,243 @@ def fcast(sig, fs, NP, fint, **kwargs):  # line1145
 
     WTol = 10 ** -8  # tolerance for cutting weighting.
     Y = sig[:]
-    if isempty(rw):
-        pass
+    if not isempty(rw):
+        Y = rw * Y
+
+    L = 200  # TODO: add this. line1153
+    T = L / fs
+    t = np.arange(0, L - 2) / fs
+
+    w = w[-L:]  # level3
+    rw = rw[-L:]  # level3
+    Y = Y[-L:]  # level3
+
+    MaxOrder = min([MaxOrder, np.floor(L / 3)])
+
+    FTol = 1 / T / 100
+    rr = (1 + np.sqrt(5)) / 2
+    Nq = np.ceil((L + 1) / 2)
+    ftfr = [np.arange(0, Nq), -np.fliplr(np.arange(1, L - Nq + 1))] * fs / L
+    orstd = np.std(Y)
+
+    v = np.zeros(L, 1)
+    ic = v
+    frq = v
+    amp = v
+    phi = v
+    itn = 0
+
+    # Skipped if DispMode
+
+    while itn < MaxOrder:
+        itn += 1
+        aftsig = abs(np.fft.fft(Y))
+        _, imax = max(aftsig[2:Nq])
+        imax += 1
+
+        # Forward search
+        nf = ftfr[imax]
+        FM = np.asarray(np.ones(L, 1), np.cos(2 * np.pi * nf * t), np.sin(2 * np.pi * nf * t))
+        if not isempty(rw):
+            FM = FM * (rw * np.ones(1, 3))
+        nb = np.linalg.lstsq(FM, Y)  # level3
+        nerr = np.std(Y - FM * nb)
+
+        df = FTol
+        perr = np.inf
+        while nerr < perr:
+            if abs(nf - fs / 2 + FTol) < eps:  # level3 eps
+                break
+            pf = nf
+            perr = nerr
+            pb = nb
+            nf = min([pf + df, fs / 2 - FTol])
+            FM = [np.ones(L, 1), np.cos(2 * np.pi * nf * t), np.sin(2 * np.pi * nf * t)]
+            if ~isempty(rw):
+                FM = FM * (rw * np.ones(1, 3))
+            nb = np.linalg.lstsq(FM, Y)
+            nerr = np.std(Y - FM * nb)
+            df = df * rr
+
+        # Use golden section search to find exact minimum
+        if nerr < perr:
+            cf = [nf, nf, nf]
+            cerr = [nerr, nerr, nerr]
+            cb = [nb, nb, nb]
+
+        elif abs(nf - pf - FTol) < eps:
+            cf = [pf, pf, pf]
+            cerr = [perr, perr, perr]
+            cb = [pb, pb, pb]
+
+        else:
+            cf = [0, pf, nf]
+            cerr = [0, perr, nerr]
+            cb = [np.zeros(len(pb), 1), pb, nb]
+            cf[1] = pf - df / rr / rr
+            FM = [np.ones(L, 1), np.cos(2 * np.pi * cf[1] * t), np.sin(2 * np.pi * cf[1] * t)]
+            if not isempty(rw):
+                FM = FM * (rw * np.ones(1, 3))
+            cb[1] = np.linalg.lstsq(FM, Y)  # level3
+            cerr[1] = np.std(Y - FM * cb[1])
+
+        while (cf[2] - cf[1] > FTol and cf[3] - cf[2] > FTol):
+            tf = cf[1] + cf[3] - cf[2]
+            FM = [np.ones(L, 1), np.cos(2 * np.pi * tf * t), np.sin(2 * np.pi * tf * t)]
+            if not isempty(rw):
+                FM = FM * (rw * np.ones(1, 3))
+            tb = np.linalg.lstsq(FM, Y)
+            terr = np.std(Y - FM * tb)
+
+            if terr < cerr[2] and tf < cf[2]:  # TODO: fix all indices
+                cf = [cf(1), tf, cf(2)]
+                cerr = [cerr(1), terr, cerr(2)]
+                cb = [cb[1], tb[:], cb[:2]]
+            if terr < cerr[2] and tf > cf[2]:
+                cf = [cf[2], tf, cf[3]]
+                cerr = [cerr[2], terr, cerr[3]]
+                cb = [cb[2], tb[:], cb[:3]]
+            if terr > cerr[2] and tf < cf[2]:
+                cf = [tf, cf(2), cf(3)]
+                cerr = [terr, cerr[2], cerr[3]]
+                cb = [tb[:], cb[2], cb[3]]
+            if terr > cerr[2] and tf > cf[2]:
+                cf = [cf[1], cf[2], tf]
+                cerr = [cerr[1], cerr[2], terr]
+                cb = [cb[1], cb[2], tb[:]]
+
+        # Forward values.
+        fcf = cf[1]
+        fcb = cb[1]  # level2
+        fcerr = cerr[1]
+
+        # Backward search
+
+        vf = ftfr[imax]
+        FM = [np.ones(L, 1), np.cos(twopi * nf * t), np.sin(twopi * nf * t)]
+        if not isempty(rw):
+            FM = FM * np.ones(1, 3)
+
+        nb = backslash(FM, Y)
+        nerr = np.std(Y - FM * nb)
+
+        df = FTol
+        perr = np.inf
+        while nerr < perr:
+            if abs(nf - FTol) < eps:
+                break
+            pf = nf
+            perr = nerr
+            pb = nb
+            nf = max([pf - df, FTol])
+            FM = [np.ones(L, 1), np.cos(twopi * nf * t), np.sin(twopi * nf * t)]
+            if not isempty(rw):
+                FM = FM * np.ones(1, 3)
+            nb = backslash(FM, Y)
+            nerr = np.std(Y - FM * nb)
+            df = df * rr
+
+        # TODO: fix repeating code
+        # Use golden section search to find exact minimum
+        if nerr < perr:
+            cf = [nf, nf, nf]
+            cerr = [nerr, nerr, nerr]
+            cb = [nb, nb, nb]
+
+        elif abs(nf - pf - FTol) < eps:
+            cf = [pf, pf, pf]
+            cerr = [perr, perr, perr]
+            cb = [pb, pb, pb]
+
+        else:
+            cf = [0, pf, nf]
+            cerr = [0, perr, nerr]
+            cb = [np.zeros(len(pb), 1), pb, nb]
+            cf[1] = pf - df / rr / rr
+            FM = [np.ones(L, 1), np.cos(2 * np.pi * cf[1] * t), np.sin(2 * np.pi * cf[1] * t)]
+            if not isempty(rw):
+                FM = FM * (rw * np.ones(1, 3))
+            cb[1] = np.linalg.lstsq(FM, Y)  # level3
+            cerr[1] = np.std(Y - FM * cb[1])
+
+        while (cf[2] - cf[1] > FTol and cf[3] - cf[2] > FTol):
+            tf = cf[1] + cf[3] - cf[2]
+            FM = [np.ones(L, 1), np.cos(2 * np.pi * tf * t), np.sin(2 * np.pi * tf * t)]
+            if not isempty(rw):
+                FM = FM * (rw * np.ones(1, 3))
+            tb = np.linalg.lstsq(FM, Y)
+            terr = np.std(Y - FM * tb)
+
+            if terr < cerr[2] and tf < cf[2]:  # TODO: fix all indices
+                cf = [cf(1), tf, cf(2)]
+                cerr = [cerr(1), terr, cerr(2)]
+                cb = [cb[1], tb[:], cb[:2]]
+            if terr < cerr[2] and tf > cf[2]:
+                cf = [cf[2], tf, cf[3]]
+                cerr = [cerr[2], terr, cerr[3]]
+                cb = [cb[2], tb[:], cb[:3]]
+            if terr > cerr[2] and tf < cf[2]:
+                cf = [tf, cf(2), cf(3)]
+                cerr = [terr, cerr[2], cerr[3]]
+                cb = [tb[:], cb[2], cb[3]]
+            if terr > cerr[2] and tf > cf[2]:
+                cf = [cf[1], cf[2], tf]
+                cerr = [cerr[1], cerr[2], terr]
+                cb = [cb[1], cb[2], tb[:]]
+        bcf = cf[2]
+        bcb = cb[2]
+        bcerr = cerr[2]
+
+        # Assign values and subtract
+        if fcerr < bcerr:
+            cf = fcf
+            cb = fcb
+            cerr = fcerr
+        else:
+            cf = bcf
+            cb = bcb
+            cerr = bcerr
+
+        frq[itn + 1] = cf
+        amp[itn + 1] = np.sqrt(cb(2) ^ 2 + cb(3) ^ 2)
+        phi[itn + 1] = np.atan2(-cb(3), cb(2))
+        amp[1] = amp[0] + cb[0]
+        v[itn] = cerr
+
+        FM = [np.ones(L, 1), np.cos(twopi * nf * t), np.sin(twopi * nf * t)]
+        if not isempty(rw):
+            FM = FM * (rw * np.ones(1, 3))
+            Y -= FM * cb
+
+        CK = 3 * itn + 1
+        cic = L * np.log(cerr) + CK * np.log(L)
+
+        ic[itn] = cic
+        if v[itn] / orstd < 2 * eps:
+            break
+        if itn > 2 and cic > ic[itn - 1] and ic[itn - 1] > ic[itn - 2]:
+            break
+
+        frq = frq[1:itn + 1]
+        amp = amp[1:itn + 1]
+        phi = phi[1:itn + 1]
+        v = v[1:itn]
+        ic = ic[1:itn]
+
+        fsig = np.zeros(NP, 1)
+        nt = (np.arange(T, T + (NP - 1), 1 / fs) / fs).transpose()
+
+        if np.size(sig, 2) > np.size(sig, 1):
+            fsig = fsig.transpose()
+            nt = nt.transpose()
+        for k in range(1, len(frq)):
+            if frq[k] > fint(1) and frq(k) < fint(2):
+                fsig = fsig + amp(k) * np.cos(twopi * frq(k) * nt + phi(k))
+            else:
+                fsig = fsig + amp(k) * np.cos(twopi * frq(k) * (T - 1 / fs) + phi(k))
+
+
+twopi = 2 * np.pi
 
 if __name__ == "__main__":
     """Test the function if this file is run directly."""
