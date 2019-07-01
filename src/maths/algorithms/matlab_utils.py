@@ -14,11 +14,13 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import numpy as np
+import scipy
+import scipy.integrate
 
 
 def isempty(value):
     """
-    Copies MATLAB's `isempty` function by returning whether the object
+    Imitates MATLAB's `isempty` function by returning whether the object
     is empty - if it has a length - or whether it is None.
     """
     if hasattr(value, "__len__"):
@@ -43,7 +45,15 @@ def nextpow2(x):
     return np.ceil(np.log2(abs(x)))
 
 
+def quadgk(func, x0, x1, limit, epsabs, epsrel):
+    if epsrel <= 0:
+        epsrel = np.max([50 * eps, 5e-29])
+    return scipy.integrate.quad(func, x0, x1, limit=limit, epsabs=epsabs, epsrel=epsrel)
+
+
 twopi = 2 * np.pi
+pi = np.pi
+eps = np.finfo(np.float64).eps
 
 
 def find(arr, condition):
