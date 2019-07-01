@@ -122,11 +122,49 @@ def wft(signal,
         print("No WFT coefficients in cone of influence")
         cut_edges = False
 
+    fstepsim = fstep
+    wp.fstep = fstep
+    if fstep == "auto":
+        Nb = 10
+        wp.fstep = (wp.xi2h - wp.xi1h) / (twopi * Nb)
+        c10 = np.floor(np.log10(wp.fstep))
+        fdig = np.floor(wp.fstep / 10 ** c10)
+        fstep = np.floor(wp.fstep / 10 ** c10) * 10 ** c10
+
     freq = (np.ceil(fmin / fstep) * np.arange(fstep, np.floor(fmax / fstep) * fstep, fstep)).transpose()
     SN = len(freq)
 
     """Skipped some code (mostly unnecessary?)"""
 
+    if preprocess:
+        X = np.arange(1, len(signal) + 1).transpose() / fs
+        XM = np.ones((len(X), len(X)), dtype=np.float64)
+        for pn in range(1, 4):
+            CX = X ** pn
+            XM[pn] = (CX - np.mean(CX)) / np.std(CX)
+            signal -= XM * (np.linalg.pinv(XM) * signal)
+
+            fx = np.fft.fft(signal, L)
+            Nq = np.ceil((L + 1) / 2)
+            ff = np.asarray(
+                np.arange(0, Nq),
+                -np.fliplr(np.arange(1, L - Nq + 1))
+
+            ) * fs / L
+            # Filter signal
+            fx[find(ff, lambda i: np.abs(i) <= max(fmin, fs / L))] = 0
+            fx[find(ff, lambda i: abs(i) >= fmax)] = 0
+            signal = np.fft.ifft(fx)
+
+    NL = 2 * nextpow2(L + coib1[0] + coib2[0])
+    if coib1[0] == 0 and coib2[0] == 0:
+        n1 = np.floor((NL - L) / 2)
+        n2 = np.ceil((NL - L) / 2)
+    else:
+        n1 = np.floor((NL - L) * coib1[0] / (coib1[0] + coib2[0]))
+        n1 = np.ceil((NL - L) * coib1[0] / (coib1[0] + coib2[0]))
+
+    # Windowed Fourier Transform by itself
     WFT = np.zeros(SN, L) * np.NaN
     ouflag = 0
     if wp.t2e - wp.t1e > L / fs:
@@ -135,7 +173,7 @@ def wft(signal,
 
     for sn in range(0, SN):
         freqwf = freq[sn] - ff  # TODO: add later
-        ii = None
+        ii = find(freqwf, lambda i: wp.xi1 / twopi < i < wp.xi2 / twopi)
 
         if not isempty(fwt):
             fw = fwt(twopi * freqwf[ii])
@@ -170,6 +208,8 @@ def wft(signal,
         WFT[sn, np.arange(1, L)] = out[1 + n1, NL - n2]
 
         # Code for plotting.
+
+        return WFT,
 
 
 def parcalc(racc, L, wp, fwt, twf, disp_mode):
