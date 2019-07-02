@@ -72,7 +72,7 @@ def wft(signal,
         fstep="auto",
         padmode="predictive",
         rel_to_l=0.01,
-        preprocess=True,
+        preprocess=False,
         disp_mode=True,
         plot_mode=False,
         cut_edges=False):
@@ -138,19 +138,19 @@ def wft(signal,
 
     if preprocess:
         X = np.arange(1, len(signal) + 1).transpose() / fs
-        XM = np.ones((len(X), len(X)), dtype=np.float64)
-        for pn in range(1, 4):
+        XM = np.ones((len(X), 1), dtype=np.float64)
+        for pn in range(0, 4):
             CX = X ** pn
-            XM[pn] = (CX - np.mean(CX)) / np.std(CX)
-            signal -= XM * (np.linalg.pinv(XM) * signal)
+            XM[:, pn] = (CX - np.mean(CX)) / np.std(CX)
+            signal = signal - XM * (np.linalg.pinv(XM) * signal)
 
             fx = np.fft.fft(signal, L)
             Nq = np.ceil((L + 1) / 2)
             ff = np.asarray(
                 np.arange(0, Nq),
                 -np.fliplr(np.arange(1, L - Nq + 1))
-
             ) * fs / L
+
             # Filter signal
             fx[find(ff, lambda i: np.abs(i) <= max(fmin, fs / L))] = 0
             fx[find(ff, lambda i: abs(i) >= fmax)] = 0
@@ -164,8 +164,15 @@ def wft(signal,
         n1 = np.floor((NL - L) * coib1[0] / (coib1[0] + coib2[0]))
         n1 = np.ceil((NL - L) * coib1[0] / (coib1[0] + coib2[0]))
 
+    Nq = np.ceil((NL + 1) / 2)
+    ff = np.asarray((np.arange(0, Nq), -(np.arange(1, NL - Nq + 1)[::-1]))) * fs / NL
+    ff = ff[:]
+    fx = np.fft.fft(signal, np.int(NL))
+    if preprocess:
+        fx = fx.where(ff >= fmin or ff <= fmax)
+
     # Windowed Fourier Transform by itself
-    WFT = np.zeros(SN, L) * np.NaN
+    WFT = np.zeros((SN, L), dtype=np.float64) * np.NaN
     ouflag = 0
     if wp.t2e - wp.t1e > L / fs:
         coib1 = 0
