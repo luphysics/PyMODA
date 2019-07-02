@@ -131,7 +131,7 @@ def wft(signal,
         fdig = np.floor(wp.fstep / 10 ** c10)
         fstep = np.floor(wp.fstep / 10 ** c10) * 10 ** c10
 
-    freq = (np.ceil(fmin / fstep) * np.arange(fstep, np.floor(fmax / fstep) * fstep, fstep)).transpose()
+    freq = np.arange(np.ceil(fmin / fstep) * fstep, np.floor(fmax / fstep) * fstep + 1, fstep).transpose()
     SN = len(freq)
 
     """Skipped some code (mostly unnecessary?)"""
@@ -156,23 +156,26 @@ def wft(signal,
             fx[find(ff, lambda i: abs(i) >= fmax)] = 0
             signal = np.fft.ifft(fx)
 
-    NL = 2 * nextpow2(L + coib1[0] + coib2[0])
+    NL = 2 ** nextpow2(L + coib1[0] + coib2[0])
     if coib1[0] == 0 and coib2[0] == 0:
         n1 = np.floor((NL - L) / 2)
         n2 = np.ceil((NL - L) / 2)
     else:
         n1 = np.floor((NL - L) * coib1[0] / (coib1[0] + coib2[0]))
-        n1 = np.ceil((NL - L) * coib1[0] / (coib1[0] + coib2[0]))
+        n2 = np.ceil((NL - L) * coib1[0] / (coib1[0] + coib2[0]))
 
     Nq = np.ceil((NL + 1) / 2)
-    ff = np.asarray((np.arange(0, Nq), -(np.arange(1, NL - Nq + 1)[::-1]))) * fs / NL
-    ff = ff[:]
+
+    f1 = np.arange(0, Nq)
+    f2 = -np.arange(1, NL - Nq + 1)
+    ff = np.concatenate((f1, f2)) * fs / NL
+    # ff = ff[:]
     fx = np.fft.fft(signal, np.int(NL))
     if preprocess:
         fx = fx.where(ff >= fmin or ff <= fmax)
 
     # Windowed Fourier Transform by itself
-    WFT = np.zeros((SN, L), dtype=np.float64) * np.NaN
+    WFT = np.zeros((SN, L), dtype=np.complex64) * np.NaN
     ouflag = 0
     if wp.t2e - wp.t1e > L / fs:
         coib1 = 0
@@ -209,14 +212,21 @@ def wft(signal,
             fw = 1 / fs * np.fft.fft(tw)
             fw = fw[ii]
 
-        cc = np.zeros(NL, 1)
-        cc[ii] = fx[ii] * fw
+        cc = np.zeros((np.int(NL), 1), dtype=np.complex64)
+        fxii = fx[ii]
+        cc = cc.reshape(fxii.shape)
+        cc[ii] = fxii * fw
+
         out = np.fft.ifft(cc, NL)
-        WFT[sn, np.arange(1, L)] = out[1 + n1, NL - n2]
+        n1 = np.int(n1)
+        n2 = np.int(n2)
+        NL = np.int(NL)
+
+        WFT[sn, np.arange(0, L)] = out[1 + n1: NL - n2 + 1]
 
         # Code for plotting.
 
-        return WFT,
+        return WFT, freq
 
 
 def parcalc(racc, L, wp, fwt, twf, disp_mode):
