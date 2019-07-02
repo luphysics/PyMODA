@@ -164,8 +164,18 @@ def wft(signal,
         n1 = np.floor((NL - L) * coib1[0] / (coib1[0] + coib2[0]))
         n2 = np.ceil((NL - L) * coib1[0] / (coib1[0] + coib2[0]))
 
-    Nq = np.ceil((NL + 1) / 2)
+    if padmode == "predictive":
+        w = 2 ** (-(L / fs - np.arange(1, L + 1) / fs)) / (wp.t2h - wp.t1h)
+        padleft = fcast(np.flipud(signal), fs, n1, [max(fmin, fs / L), fmax],
+                        min(np.ceil(SN / 2) + 5, np.round(L / 3)), w)
+        padleft = np.flipud(padleft)
 
+        padright = fcast(signal, fs, n2, [max(fmin, fs / L), fmax], min(np.ceil(SN / 2) + 5, np.round(L / 3)), w)
+        dflag = 1
+
+    signal = np.concatenate(padleft, signal, padright)
+
+    Nq = np.ceil((NL + 1) / 2)
     f1 = np.arange(0, Nq)
     f2 = -np.arange(1, NL - Nq + 1)
     ff = np.concatenate((f1, f2)) * fs / NL
@@ -893,290 +903,335 @@ def sqeps(vfun, xp, lim1, lim2, racc, MIC, nlims):
 
         return QQ, wflag, xx, ss
 
-    def fcast(sig, fs, NP, fint, **kwargs):  # line1145
-        MaxOrder = len(sig)
-        if len(kwargs) > 3:
-            MaxOrder = kwargs.get("maxorder") or MaxOrder
-        w = []
-        if len(kwargs) > 4:
-            w = kwargs.get("w") or w
-        rw = np.sqrt(w)
-        # ignore DispMode
 
-        WTol = 10 ** -8  # tolerance for cutting weighting.
-        Y = sig[:]
+def fcast(sig, fs, NP, fint, *args):  # line1145
+    MaxOrder = len(sig)
+    if len(args) > 0:
+        MaxOrder = args[0] or MaxOrder
+    w = []
+    if len(args) > 1:
+        w = np.asarray(args[1], dtype=np.float64)
+    rw = np.sqrt(w)
+    # ignore DispMode
+
+    WTol = 10 ** -8  # tolerance for cutting weighting.
+    Y = sig[:]
+    if not isempty(rw):
+        Y = rw * Y
+
+    max = np.max(rw)
+    L = find(rw, lambda i: i / max >= WTol)[-1]
+    T = L / fs
+    t = np.arange(0, L + 1) / fs
+
+    w = w[-L - 1:]  # level3
+    rw = rw[-L - 1:]  # level3
+    Y = Y[-L - 1:]  # level3
+
+    MaxOrder = np.min([MaxOrder, np.floor(L / 3)])
+
+    FTol = 1 / T / 100
+    rr = (1 + np.sqrt(5)) / 2
+    Nq = np.ceil((L + 1) / 2)
+    ftfr = np.concatenate([np.arange(0, Nq), -np.flip(np.arange(1, L - Nq + 1))]) * fs / L
+    orstd = np.std(Y)
+
+    v = np.zeros(L, dtype=np.float64)
+    ic = v
+    frq = v
+    amp = v
+    phi = v
+    itn = 0
+
+    # Skipped if DispMode
+
+    while itn < MaxOrder:
+        itn += 1
+        aftsig = abs(np.fft.fft(Y))
+        imax = np.int(np.max(aftsig[2:np.int(Nq)]))
+        imax += 1
+
+        # Forward search
+        nf = ftfr[imax]
+
+        FM1 = np.ones(L + 1, dtype=np.float64)
+        FM2 = np.cos(2 * np.pi * nf * t)
+        FM3 = np.sin(2 * np.pi * nf * t)
+        FM = np.asarray([FM1, FM2, FM3], dtype=np.float64)
+
         if not isempty(rw):
-            Y = rw * Y
+            temp = rw.reshape(len(rw), 1) * np.ones((1, 3), dtype=np.float64)
+            FM = FM.transpose() * temp
 
-        L = 200  # TODO: add this. line1153
-        T = L / fs
-        t = np.arange(0, L - 2) / fs
+        nb = backslash(FM, Y)  # level3
 
-        w = w[-L:]  # level3
-        rw = rw[-L:]  # level3
-        Y = Y[-L:]  # level3
+        s = FM @ nb
+        nerr = np.std(Y - s)
 
-        MaxOrder = min([MaxOrder, np.floor(L / 3)])
+        df = FTol
+        perr = np.inf
+        while nerr < perr:
+            if abs(nf - fs / 2 + FTol) < eps:  # level3 eps
+                break
+            pf = nf
+            perr = nerr
+            pb = nb
+            nf = min([pf + df, fs / 2 - FTol])
 
-        FTol = 1 / T / 100
-        rr = (1 + np.sqrt(5)) / 2
-        Nq = np.ceil((L + 1) / 2)
-        ftfr = [np.arange(0, Nq), -np.fliplr(np.arange(1, L - Nq + 1))] * fs / L
-        orstd = np.std(Y)
+            FM1 = np.ones(L + 1, dtype=np.float64)
+            FM2 = np.cos(2 * np.pi * nf * t)
+            FM3 = np.sin(2 * np.pi * nf * t)
+            FM = np.asarray([FM1, FM2, FM3], dtype=np.float64)
 
-        v = np.zeros(L, 1)
-        ic = v
-        frq = v
-        amp = v
-        phi = v
-        itn = 0
+            if not isempty(rw):
+                temp = rw.reshape(len(rw), 1) * np.ones((1, 3), dtype=np.float64)
+                FM = FM.transpose() * temp
 
-        # Skipped if DispMode
+            nb = backslash(FM, Y)  # level3
+            nerr = np.std(Y - s)
+            df = df * rr
 
-        while itn < MaxOrder:
-            itn += 1
-            aftsig = abs(np.fft.fft(Y))
-            _, imax = max(aftsig[2:Nq])
-            imax += 1
+        # Use golden section search to find exact minimum
+        if nerr < perr:
+            cf = [nf, nf, nf]
+            cerr = [nerr, nerr, nerr]
+            cb = [nb, nb, nb]
 
-            # Forward search
-            nf = ftfr[imax]
-            FM = np.asarray(np.ones(L, 1), np.cos(2 * np.pi * nf * t), np.sin(2 * np.pi * nf * t))
+        elif abs(nf - pf - FTol) < eps:
+            cf = [pf, pf, pf]
+            cerr = [perr, perr, perr]
+            cb = [pb, pb, pb]
+
+        else:
+            cf = [0, pf, nf]
+            cerr = [0, perr, nerr]
+            cb = [np.zeros(len(pb), 1), pb, nb]
+            cf[1] = pf - df / rr / rr
+            FM = [np.ones(L, 1), np.cos(2 * np.pi * cf[1] * t), np.sin(2 * np.pi * cf[1] * t)]
             if not isempty(rw):
                 FM = FM * (rw * np.ones(1, 3))
-            nb = np.linalg.lstsq(FM, Y)  # level3
-            nerr = np.std(Y - FM * nb)
+            cb[1] = np.linalg.lstsq(FM, Y)  # level3
+            cerr[1] = np.std(Y - FM * cb[1])
 
-            df = FTol
-            perr = np.inf
-            while nerr < perr:
-                if abs(nf - fs / 2 + FTol) < eps:  # level3 eps
-                    break
-                pf = nf
-                perr = nerr
-                pb = nb
-                nf = min([pf + df, fs / 2 - FTol])
-                FM = [np.ones(L, 1), np.cos(2 * np.pi * nf * t), np.sin(2 * np.pi * nf * t)]
-                if ~isempty(rw):
-                    FM = FM * (rw * np.ones(1, 3))
-                nb = np.linalg.lstsq(FM, Y)
-                nerr = np.std(Y - FM * nb)
-                df = df * rr
-
-            # Use golden section search to find exact minimum
-            if nerr < perr:
-                cf = [nf, nf, nf]
-                cerr = [nerr, nerr, nerr]
-                cb = [nb, nb, nb]
-
-            elif abs(nf - pf - FTol) < eps:
-                cf = [pf, pf, pf]
-                cerr = [perr, perr, perr]
-                cb = [pb, pb, pb]
-
-            else:
-                cf = [0, pf, nf]
-                cerr = [0, perr, nerr]
-                cb = [np.zeros(len(pb), 1), pb, nb]
-                cf[1] = pf - df / rr / rr
-                FM = [np.ones(L, 1), np.cos(2 * np.pi * cf[1] * t), np.sin(2 * np.pi * cf[1] * t)]
-                if not isempty(rw):
-                    FM = FM * (rw * np.ones(1, 3))
-                cb[1] = np.linalg.lstsq(FM, Y)  # level3
-                cerr[1] = np.std(Y - FM * cb[1])
-
-            while (cf[2] - cf[1] > FTol and cf[3] - cf[2] > FTol):
-                tf = cf[1] + cf[3] - cf[2]
-                FM = [np.ones(L, 1), np.cos(2 * np.pi * tf * t), np.sin(2 * np.pi * tf * t)]
-                if not isempty(rw):
-                    FM = FM * (rw * np.ones(1, 3))
-                tb = np.linalg.lstsq(FM, Y)
-                terr = np.std(Y - FM * tb)
-
-                if terr < cerr[2] and tf < cf[2]:  # TODO: fix all indices
-                    cf = [cf(1), tf, cf(2)]
-                    cerr = [cerr(1), terr, cerr(2)]
-                    cb = [cb[1], tb[:], cb[:2]]
-                if terr < cerr[2] and tf > cf[2]:
-                    cf = [cf[2], tf, cf[3]]
-                    cerr = [cerr[2], terr, cerr[3]]
-                    cb = [cb[2], tb[:], cb[:3]]
-                if terr > cerr[2] and tf < cf[2]:
-                    cf = [tf, cf(2), cf(3)]
-                    cerr = [terr, cerr[2], cerr[3]]
-                    cb = [tb[:], cb[2], cb[3]]
-                if terr > cerr[2] and tf > cf[2]:
-                    cf = [cf[1], cf[2], tf]
-                    cerr = [cerr[1], cerr[2], terr]
-                    cb = [cb[1], cb[2], tb[:]]
-
-            # Forward values.
-            fcf = cf[1]
-            fcb = cb[1]  # level2
-            fcerr = cerr[1]
-
-            # Backward search
-
-            vf = ftfr[imax]
-            FM = [np.ones(L, 1), np.cos(twopi * nf * t), np.sin(twopi * nf * t)]
+        while (cf[2] - cf[1] > FTol and cf[3] - cf[2] > FTol):
+            tf = cf[1] + cf[3] - cf[2]
+            FM = [np.ones(L, 1), np.cos(2 * np.pi * tf * t), np.sin(2 * np.pi * tf * t)]
             if not isempty(rw):
-                FM = FM * np.ones(1, 3)
+                FM = FM * (rw * np.ones(1, 3))
+            tb = np.linalg.lstsq(FM, Y)
+            terr = np.std(Y - FM * tb)
+
+            if terr < cerr[2] and tf < cf[2]:  # TODO: fix all indices
+                cf = [cf(1), tf, cf(2)]
+                cerr = [cerr(1), terr, cerr(2)]
+                cb = [cb[1], tb[:], cb[:2]]
+            if terr < cerr[2] and tf > cf[2]:
+                cf = [cf[2], tf, cf[3]]
+                cerr = [cerr[2], terr, cerr[3]]
+                cb = [cb[2], tb[:], cb[:3]]
+            if terr > cerr[2] and tf < cf[2]:
+                cf = [tf, cf(2), cf(3)]
+                cerr = [terr, cerr[2], cerr[3]]
+                cb = [tb[:], cb[2], cb[3]]
+            if terr > cerr[2] and tf > cf[2]:
+                cf = [cf[1], cf[2], tf]
+                cerr = [cerr[1], cerr[2], terr]
+                cb = [cb[1], cb[2], tb[:]]
+
+        # Forward values.
+        fcf = cf[1]
+        fcb = cb[1]  # level2
+        fcerr = cerr[1]
+
+        # Backward search
+
+        vf = ftfr[imax]
+
+        if not isempty(rw):
+            FM = FM * np.ones((1, 3))
+
+        nb = backslash(FM, Y)  # level3
+
+        s = FM @ nb
+        nerr = np.std(Y - s)
+
+        df = FTol
+        perr = np.inf
+        while nerr < perr:
+            if abs(nf - FTol) < eps:
+                break
+            pf = nf
+            perr = nerr
+            pb = nb
+            nf = np.max([pf - df, FTol])
+
+            FM1 = np.ones(L + 1, dtype=np.float64)
+            FM2 = np.cos(2 * np.pi * nf * t)
+            FM3 = np.sin(2 * np.pi * nf * t)
+            FM = np.asarray([FM1, FM2, FM3], dtype=np.float64)
+
+            if not isempty(rw):
+                temp = rw.reshape(len(rw), 1) * np.ones((1, 3), dtype=np.float64)
+                FM = FM.transpose() * temp
 
             nb = backslash(FM, Y)
-            nerr = np.std(Y - FM * nb)
+            nerr = np.std(Y - FM @ nb)
+            df = df * rr
 
-            df = FTol
-            perr = np.inf
-            while nerr < perr:
-                if abs(nf - FTol) < eps:
-                    break
-                pf = nf
-                perr = nerr
-                pb = nb
-                nf = max([pf - df, FTol])
-                FM = [np.ones(L, 1), np.cos(twopi * nf * t), np.sin(twopi * nf * t)]
-                if not isempty(rw):
-                    FM = FM * np.ones(1, 3)
-                nb = backslash(FM, Y)
-                nerr = np.std(Y - FM * nb)
-                df = df * rr
+        # TODO: fix repeating code
+        # Use golden section search to find exact minimum
+        if nerr < perr:
+            cf = [nf, nf, nf]
+            cerr = [nerr, nerr, nerr]
+            cb = [nb, nb, nb]
 
-            # TODO: fix repeating code
-            # Use golden section search to find exact minimum
-            if nerr < perr:
-                cf = [nf, nf, nf]
-                cerr = [nerr, nerr, nerr]
-                cb = [nb, nb, nb]
+        elif abs(nf - pf - FTol) < eps:
+            cf = [pf, pf, pf]
+            cerr = [perr, perr, perr]
+            cb = [pb, pb, pb]
 
-            elif abs(nf - pf - FTol) < eps:
-                cf = [pf, pf, pf]
-                cerr = [perr, perr, perr]
-                cb = [pb, pb, pb]
+        else:
+            cf = [0, pf, nf]
+            cerr = [0, perr, nerr]
+            cb = [np.zeros((len(pb), 1)), pb, nb]
+            cf[1] = pf - df / rr / rr
 
-            else:
-                cf = [0, pf, nf]
-                cerr = [0, perr, nerr]
-                cb = [np.zeros(len(pb), 1), pb, nb]
-                cf[1] = pf - df / rr / rr
-                FM = [np.ones(L, 1), np.cos(2 * np.pi * cf[1] * t), np.sin(2 * np.pi * cf[1] * t)]
-                if not isempty(rw):
-                    FM = FM * (rw * np.ones(1, 3))
-                cb[1] = np.linalg.lstsq(FM, Y)  # level3
-                cerr[1] = np.std(Y - FM * cb[1])
+            FM1 = np.ones(L + 1, dtype=np.float64)
+            FM2 = np.cos(2 * np.pi * nf * t)
+            FM3 = np.sin(2 * np.pi * nf * t)
+            FM = np.asarray([FM1, FM2, FM3], dtype=np.float64)
 
-            while (cf[2] - cf[1] > FTol and cf[3] - cf[2] > FTol):
-                tf = cf[1] + cf[3] - cf[2]
-                FM = [np.ones(L, 1), np.cos(2 * np.pi * tf * t), np.sin(2 * np.pi * tf * t)]
-                if not isempty(rw):
-                    FM = FM * (rw * np.ones(1, 3))
-                tb = np.linalg.lstsq(FM, Y)
-                terr = np.std(Y - FM * tb)
+            if not isempty(rw):
+                temp = rw.reshape(len(rw), 1) * np.ones((1, 3), dtype=np.float64)
+                FM = FM.transpose() * temp
 
-                if terr < cerr[2] and tf < cf[2]:  # TODO: fix all indices
-                    cf = [cf(1), tf, cf(2)]
-                    cerr = [cerr(1), terr, cerr(2)]
-                    cb = [cb[1], tb[:], cb[:2]]
-                if terr < cerr[2] and tf > cf[2]:
-                    cf = [cf[2], tf, cf[3]]
-                    cerr = [cerr[2], terr, cerr[3]]
-                    cb = [cb[2], tb[:], cb[:3]]
-                if terr > cerr[2] and tf < cf[2]:
-                    cf = [tf, cf(2), cf(3)]
-                    cerr = [terr, cerr[2], cerr[3]]
-                    cb = [tb[:], cb[2], cb[3]]
-                if terr > cerr[2] and tf > cf[2]:
-                    cf = [cf[1], cf[2], tf]
-                    cerr = [cerr[1], cerr[2], terr]
-                    cb = [cb[1], cb[2], tb[:]]
-            bcf = cf[2]
-            bcb = cb[2]
-            bcerr = cerr[2]
+            cb[1] = backslash(FM, Y)  # level3
+            cerr[1] = np.std(Y - FM @ cb[1])
 
-            # Assign values and subtract
-            if fcerr < bcerr:
-                cf = fcf
-                cb = fcb
-                cerr = fcerr
-            else:
-                cf = bcf
-                cb = bcb
-                cerr = bcerr
-
-            frq[itn + 1] = cf
-            amp[itn + 1] = np.sqrt(cb(2) ^ 2 + cb(3) ^ 2)
-            phi[itn + 1] = np.atan2(-cb(3), cb(2))
-            amp[1] = amp[0] + cb[0]
-            v[itn] = cerr
-
-            FM = [np.ones(L, 1), np.cos(twopi * nf * t), np.sin(twopi * nf * t)]
+        while (cf[2] - cf[1] > FTol and cf[3] - cf[2] > FTol):
+            tf = cf[1] + cf[3] - cf[2]
+            FM = [np.ones(L, 1), np.cos(2 * np.pi * tf * t), np.sin(2 * np.pi * tf * t)]
             if not isempty(rw):
                 FM = FM * (rw * np.ones(1, 3))
-                Y -= FM * cb
+            tb = np.linalg.lstsq(FM, Y)
+            terr = np.std(Y - FM * tb)
 
-            CK = 3 * itn + 1
-            cic = L * np.log(cerr) + CK * np.log(L)
+            if terr < cerr[2] and tf < cf[2]:  # TODO: fix all indices
+                cf = [cf(1), tf, cf(2)]
+                cerr = [cerr(1), terr, cerr(2)]
+                cb = [cb[1], tb[:], cb[:2]]
+            if terr < cerr[2] and tf > cf[2]:
+                cf = [cf[2], tf, cf[3]]
+                cerr = [cerr[2], terr, cerr[3]]
+                cb = [cb[2], tb[:], cb[:3]]
+            if terr > cerr[2] and tf < cf[2]:
+                cf = [tf, cf(2), cf(3)]
+                cerr = [terr, cerr[2], cerr[3]]
+                cb = [tb[:], cb[2], cb[3]]
+            if terr > cerr[2] and tf > cf[2]:
+                cf = [cf[1], cf[2], tf]
+                cerr = [cerr[1], cerr[2], terr]
+                cb = [cb[1], cb[2], tb[:]]
+        bcf = cf[2]
+        bcb = cb[2]
+        bcerr = cerr[2]
 
-            ic[itn] = cic
-            if v[itn] / orstd < 2 * eps:
-                break
-            if itn > 2 and cic > ic[itn - 1] > ic[itn - 2]:
-                break
-
-            frq = frq[1:itn + 1]
-            amp = amp[1:itn + 1]
-            phi = phi[1:itn + 1]
-            v = v[1:itn]
-            ic = ic[1:itn]
-
-            fsig = np.zeros(NP, 1)
-            nt = (np.arange(T, T + (NP - 1), 1 / fs) / fs).transpose()
-
-            if np.size(sig, 2) > np.size(sig, 1):
-                fsig = fsig.transpose()
-                nt = nt.transpose()
-            for k in range(1, len(frq)):
-                if frq[k] > fint(1) and frq(k) < fint(2):
-                    fsig = fsig + amp(k) * np.cos(twopi * frq(k) * nt + phi(k))
-                else:
-                    fsig = fsig + amp(k) * np.cos(twopi * frq(k) * (T - 1 / fs) + phi(k))
-
-            return fsig
-
-    def aminterp(X, Y, Z, XI, YI, method):
-        ZI = np.zeros(np.size(Z, 1), len(XI)) * np.NaN
-        xstep = np.mean(np.diff(XI))
-        xind = 1 + np.floor((1 / 2) + (X - XI(1)) / xstep)
-        xpnt = np.asarray([0], [0], [0])  # level3 TODO: add later
-
-        if method == "max":
-            for xn in range(1, len(xpnt)):
-                xid1 = xpnt[xn - 1] + 1
-                xid2 = xpnt[xn]
-                ZI[xind[xid1]] = np.max(Z[xid1:xid2], 2)
+        # Assign values and subtract
+        if fcerr < bcerr:
+            cf = fcf
+            cb = fcb
+            cerr = fcerr
         else:
-            for xn in range(1, len(xpnt)):
-                xid1 = xpnt[xn - 1] + 1
-                xid2 = xpnt[xn + 1]
-                ZI[xind[xid1]] = np.mean(Z[xid1:xid2], 2)
-        Z = ZI
+            cf = bcf
+            cb = bcb
+            cerr = bcerr
 
-        ZI = np.zeros(len(YI), np.size(Z, 2)) * np.NaN
-        ystep = np.mean(np.diff(YI))
-        yind = 1 + np.floor((1 / 2) + (Y - YI(1)) / ystep)
-        ypnt = [[0], [0], [0]]  # level3 TODO: add later
+        frq[itn + 1] = cf
+        amp[itn + 1] = np.sqrt(cb[1] ** 2 + cb[2] ** 2)
+        phi[itn + 1] = np.arctan2(-cb[2], cb[1])
+        amp[1] = amp[0] + cb[0]
+        v[itn] = cerr
 
-        if method == "max":
-            for yn in range(1, len(ypnt)):
-                yid1 = ypnt[yn - 1] + 1
-                yid2 = ypnt[yn]
-                ZI[yind[yid1]] = np.max(Z[yid1:yid2], 2)
-        else:
-            for yn in range(1, len(ypnt)):
-                yid1 = xpnt[yn - 1] + 1
-                yid2 = xpnt[yn + 1]
-                ZI[yind[yid1]] = np.mean(Z[yid1:yid2], 2)
+        FM1 = np.ones(L + 1, dtype=np.float64)
+        FM2 = np.cos(2 * np.pi * nf * t)
+        FM3 = np.sin(2 * np.pi * nf * t)
+        FM = np.asarray([FM1, FM2, FM3], dtype=np.float64)
 
-        return ZI
+        # if not isempty(rw):
+        #     temp = rw.reshape(len(rw), 1) * np.ones((1, 3), dtype=np.float64)
+        #     FM = FM.transpose() * temp
+
+        if not isempty(rw):
+            temp = rw.reshape(len(rw), 1) * np.ones((1, 3), dtype=np.float64)
+            FM = FM.transpose() * temp
+            # FM = FM * (rw @ np.ones((1, 3)))
+            Y = Y - FM @ cb
+
+        CK = 3 * itn + 1
+        cic = L * np.log(cerr) + CK * np.log(L)
+
+        ic[itn] = cic
+        if v[itn] / orstd < 2 * eps:
+            break
+        if itn > 2 and cic > ic[itn - 1] > ic[itn - 2]:
+            break
+
+        frq = frq[1:itn + 1]
+        amp = amp[1:itn + 1]
+        phi = phi[1:itn + 1]
+        v = v[1:itn]
+        ic = ic[1:itn]
+
+        fsig = np.zeros(NP, 1)
+        nt = (np.arange(T, T + (NP - 1), 1 / fs) / fs).transpose()
+
+        if np.size(sig, 2) > np.size(sig, 1):
+            fsig = fsig.transpose()
+            nt = nt.transpose()
+        for k in range(1, len(frq)):
+            if frq[k] > fint(1) and frq(k) < fint(2):
+                fsig = fsig + amp(k) * np.cos(twopi * frq(k) * nt + phi(k))
+            else:
+                fsig = fsig + amp(k) * np.cos(twopi * frq(k) * (T - 1 / fs) + phi(k))
+
+        return fsig
+
+
+def aminterp(X, Y, Z, XI, YI, method):
+    ZI = np.zeros(np.size(Z, 1), len(XI)) * np.NaN
+    xstep = np.mean(np.diff(XI))
+    xind = 1 + np.floor((1 / 2) + (X - XI(1)) / xstep)
+    xpnt = np.asarray([0], [0], [0])  # level3 TODO: add later
+
+    if method == "max":
+        for xn in range(1, len(xpnt)):
+            xid1 = xpnt[xn - 1] + 1
+            xid2 = xpnt[xn]
+            ZI[xind[xid1]] = np.max(Z[xid1:xid2], 2)
+    else:
+        for xn in range(1, len(xpnt)):
+            xid1 = xpnt[xn - 1] + 1
+            xid2 = xpnt[xn + 1]
+            ZI[xind[xid1]] = np.mean(Z[xid1:xid2], 2)
+    Z = ZI
+
+    ZI = np.zeros(len(YI), np.size(Z, 2)) * np.NaN
+    ystep = np.mean(np.diff(YI))
+    yind = 1 + np.floor((1 / 2) + (Y - YI(1)) / ystep)
+    ypnt = [[0], [0], [0]]  # level3 TODO: add later
+
+    if method == "max":
+        for yn in range(1, len(ypnt)):
+            yid1 = ypnt[yn - 1] + 1
+            yid2 = ypnt[yn]
+            ZI[yind[yid1]] = np.max(Z[yid1:yid2], 2)
+    else:
+        for yn in range(1, len(ypnt)):
+            yid1 = xpnt[yn - 1] + 1
+            yid2 = xpnt[yn + 1]
+            ZI[yind[yid1]] = np.mean(Z[yid1:yid2], 2)
+
+    return ZI
 
 
 if __name__ == "__main__":

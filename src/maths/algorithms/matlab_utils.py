@@ -38,7 +38,7 @@ def isfinite(value):
 
 def backslash(x, y):
     """Imitates the MATLAB backslash operator."""
-    return np.linalg.lstsq(x, y)
+    return np.linalg.lstsq(x, y)[0] # TODO: check this
 
 
 def nextpow2(x):
