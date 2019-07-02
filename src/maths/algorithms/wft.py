@@ -20,6 +20,7 @@ import scipy
 import scipy.optimize
 import scipy.integrate
 from scipy.sparse.linalg.isolve.lsqr import eps
+import matplotlib.pyplot as plt
 
 from maths.algorithms.matlab_utils import isempty, backslash, twopi, nextpow2, isnan, find, quadgk
 
@@ -1241,5 +1242,8 @@ if __name__ == "__main__":
     signal = np.cos(twopi * 3 * t + 0.75 * np.sin(twopi * t / 5))
 
     w, f = wft(signal, fs)
+
+    plt.pcolormesh(t, f, np.abs(w))
+    plt.show()
 
 
