@@ -166,14 +166,14 @@ def wft(signal,
 
     if padmode == "predictive":
         w = 2 ** (-(L / fs - np.arange(1, L + 1) / fs)) / (wp.t2h - wp.t1h)
-        padleft = fcast(np.flipud(signal), fs, n1, [max(fmin, fs / L), fmax],
+        padleft = fcast(np.flip(signal), fs, n1, [max(fmin, fs / L), fmax],
                         min(np.ceil(SN / 2) + 5, np.round(L / 3)), w)
-        padleft = np.flipud(padleft)
+        padleft = np.flip(padleft)
 
         padright = fcast(signal, fs, n2, [max(fmin, fs / L), fmax], min(np.ceil(SN / 2) + 5, np.round(L / 3)), w)
         dflag = 1
 
-    signal = np.concatenate(padleft, signal, padright)
+    signal = np.concatenate([padleft, signal, padright])
 
     Nq = np.ceil((NL + 1) / 2)
     f1 = np.arange(0, Nq)
@@ -1176,25 +1176,25 @@ def fcast(sig, fs, NP, fint, *args):  # line1145
         if itn > 2 and cic > ic[itn - 1] > ic[itn - 2]:
             break
 
-        frq = frq[1:itn + 1]
-        amp = amp[1:itn + 1]
-        phi = phi[1:itn + 1]
-        v = v[1:itn]
-        ic = ic[1:itn]
+    frq = frq[1:itn + 1]
+    amp = amp[1:itn + 1]
+    phi = phi[1:itn + 1]
+    v = v[1:itn]
+    ic = ic[1:itn]
 
-        fsig = np.zeros(NP, 1)
-        nt = (np.arange(T, T + (NP - 1), 1 / fs) / fs).transpose()
+    fsig = np.zeros(np.int(NP))
+    nt = (np.arange(T, T + (NP - 1), 1 / fs) / fs).transpose()
 
-        if np.size(sig, 2) > np.size(sig, 1):
-            fsig = fsig.transpose()
-            nt = nt.transpose()
-        for k in range(1, len(frq)):
-            if frq[k] > fint(1) and frq(k) < fint(2):
-                fsig = fsig + amp(k) * np.cos(twopi * frq(k) * nt + phi(k))
-            else:
-                fsig = fsig + amp(k) * np.cos(twopi * frq(k) * (T - 1 / fs) + phi(k))
+    if sig[1] > sig[0]:
+        fsig = fsig.transpose()
+        nt = nt.transpose()
+    for k in range(1, len(frq)):
+        if frq[k] > fint(1) and frq(k) < fint(2):
+            fsig = fsig + amp(k) * np.cos(twopi * frq(k) * nt + phi(k))
+        else:
+            fsig = fsig + amp(k) * np.cos(twopi * frq(k) * (T - 1 / fs) + phi(k))
 
-        return fsig
+    return fsig
 
 
 def aminterp(X, Y, Z, XI, YI, method):
@@ -1240,4 +1240,6 @@ if __name__ == "__main__":
     t = np.arange(0, 50, 1 / fs)
     signal = np.cos(twopi * 3 * t + 0.75 * np.sin(twopi * t / 5))
 
-    wft(signal, fs)
+    w, f = wft(signal, fs)
+
+
