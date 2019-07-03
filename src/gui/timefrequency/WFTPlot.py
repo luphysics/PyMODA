@@ -15,8 +15,6 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from multiprocessing import Queue, Process
 
-import windowFT
-import matlab
 import numpy as np
 from PyQt5.QtCore import QTimer
 from scipy import signal
@@ -24,7 +22,6 @@ import matplotlib.pyplot as plt
 
 from gui.base.components.PlotComponent import PlotComponent
 from maths.TimeSeries import TimeSeries
-from packages.wft.for_redistribution_files_only import windowFT
 
 
 class WFTPlot(PlotComponent):
@@ -72,10 +69,21 @@ class WFTPlot(PlotComponent):
 
 
 def generate_solutions(queue, signal, freq):
+
+    import os
+    os.environ["LD_LIBRARY_PATH"] = \
+        "/usr/local/MATLAB/MATLAB_Runtime/v96/runtime/glnxa64:/usr/local/MATLAB/MATLAB_Runtime/v96/bin/glnxa64:" \
+        "/usr/local/MATLAB/MATLAB_Runtime/v96/sys/os/glnxa64:/usr/local/MATLAB/MATLAB_Runtime/v96/extern/bin/glnxa64"
+
+    import windowFT
+    import matlab
+    from packages.wft.for_redistribution_files_only import windowFT
+
     package = windowFT.initialize()
 
     A = matlab.double([signal])
     fs_matlab = matlab.double([freq])
 
     w, l = package.windowFT(A, fs_matlab, nargout=2)
-    queue.put((w, l,))
+
+    queue.put((np.asarray(w), np.asarray(l),))
