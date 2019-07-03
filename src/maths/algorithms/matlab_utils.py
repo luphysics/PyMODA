@@ -50,6 +50,9 @@ def quadgk(func, x0, x1, limit, epsabs, epsrel):
         epsrel = np.max([50 * eps, 5e-29])
     return scipy.integrate.quad(func, x0, x1, limit=limit, epsabs=epsabs, epsrel=epsrel)
 
+def fft(x):
+    return np.fft.fft(x)
+
 
 twopi = 2 * np.pi
 pi = np.pi

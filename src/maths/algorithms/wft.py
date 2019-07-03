@@ -22,7 +22,7 @@ import scipy.integrate
 from scipy.sparse.linalg.isolve.lsqr import eps
 import matplotlib.pyplot as plt
 
-from maths.algorithms.matlab_utils import isempty, backslash, twopi, nextpow2, isnan, find, quadgk
+from maths.algorithms.matlab_utils import *
 
 fwtmax = "fwtmax"
 twfmax = "twfmax"
@@ -132,7 +132,7 @@ def wft(signal,
         fdig = np.floor(wp.fstep / 10 ** c10)
         fstep = np.floor(wp.fstep / 10 ** c10) * 10 ** c10
 
-    freq = np.arange(np.ceil(fmin / fstep) * fstep, np.floor(fmax / fstep) * fstep + 1, fstep).transpose()
+    freq = np.arange(np.ceil(fmin / fstep) * fstep, np.floor(fmax / fstep) * fstep + fstep, fstep).transpose()
     SN = len(freq)
 
     """Skipped some code (mostly unnecessary?)"""
@@ -166,7 +166,8 @@ def wft(signal,
         n2 = np.ceil((NL - L) * coib1[0] / (coib1[0] + coib2[0]))
 
     if padmode == "predictive":
-        w = 2 ** (-(L / fs - np.arange(1, L + 1) / fs)) / (wp.t2h - wp.t1h)
+        pow = (-(L / fs - np.arange(1, L + 1) / fs)) / (wp.t2h - wp.t1h)
+        w = 2 ** pow
         padleft = fcast(np.flip(signal), fs, n1, [max(fmin, fs / L), fmax],
                         min(np.ceil(SN / 2) + 5, np.round(L / 3)), w)
         padleft = np.flip(padleft)
@@ -929,9 +930,9 @@ def fcast(sig, fs, NP, fint, *args):  # line1145
     rw = rw[-L - 1:]  # level3
     Y = Y[-L - 1:]  # level3
 
-    MaxOrder = np.min([MaxOrder, np.floor(L / 3)])
+    MaxOrder = np.min([MaxOrder, np.floor(L + 1 / 3)])
 
-    FTol = 1 / T / 100
+    FTol = 0.01 / T
     rr = (1 + np.sqrt(5)) / 2
     Nq = np.ceil((L + 1) / 2)
     ftfr = np.concatenate([np.arange(0, Nq), -np.flip(np.arange(1, L - Nq + 1))]) * fs / L
@@ -948,9 +949,13 @@ def fcast(sig, fs, NP, fint, *args):  # line1145
 
     while itn < MaxOrder:
         itn += 1
-        aftsig = abs(np.fft.fft(Y))
-        imax = np.int(np.max(aftsig[2:np.int(Nq)]))
-        imax += 1
+        aftsig = abs(fft(Y))
+
+        a = aftsig[2:np.int(Nq)]
+        m = np.max(a)
+        s = find(a, lambda i: i == m)[0]
+
+        imax = np.int(s) + 1
 
         # Forward search
         nf = ftfr[imax]
@@ -1174,8 +1179,9 @@ def fcast(sig, fs, NP, fint, *args):  # line1145
         ic[itn] = cic
         if v[itn] / orstd < 2 * eps:
             break
-        if itn > 2 and cic > ic[itn - 1] > ic[itn - 2]:
+        if itn > 2 and cic > ic[itn - 1] and cic[itn - 1] > ic[itn - 2]:
             break
+
 
     frq = frq[1:itn + 1]
     amp = amp[1:itn + 1]
@@ -1186,7 +1192,7 @@ def fcast(sig, fs, NP, fint, *args):  # line1145
     fsig = np.zeros(np.int(NP))
     nt = (np.arange(T, T + (NP - 1), 1 / fs) / fs).transpose()
 
-    if sig[1] > sig[0]:
+    if (sig.shape[1] if len(sig.shape) > 1 else 1) > sig.shape[0]:
         fsig = fsig.transpose()
         nt = nt.transpose()
     for k in range(1, len(frq)):
@@ -1244,6 +1250,4 @@ if __name__ == "__main__":
     w, f = wft(signal, fs)
 
     plt.pcolormesh(t, f, np.abs(w))
-    plt.show()
-
-
+    # plt.show()
