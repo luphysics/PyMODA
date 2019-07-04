@@ -15,17 +15,14 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from multiprocessing import Queue, Process
 
-# import windowFT
 import numpy as np
 from PyQt5.QtCore import QTimer
 from scipy import signal
 import matplotlib.pyplot as plt
 
+import args
 from gui.base.components.PlotComponent import PlotComponent
 from maths.TimeSeries import TimeSeries
-
-
-# from packages.wft.for_redistribution_files_only import windowFT
 
 
 class WFTPlot(PlotComponent):
@@ -61,8 +58,8 @@ class WFTPlot(PlotComponent):
         a = np.asarray(w)
         gh = np.asarray(l)
 
-        # self.axes.pcolormesh(self.times, gh, np.abs(a))
-        self.axes.plot(self.times, [np.sin(t) for t in self.times])
+        self.axes.pcolormesh(self.times, gh, np.abs(a))
+        # self.axes.plot(self.times, [np.sin(t) for t in self.times])
         self.axes.set_title('STFT Magnitude')
 
         self.axes.autoscale(False)
@@ -74,11 +71,16 @@ class WFTPlot(PlotComponent):
 
 
 def generate_solutions(queue, signal, freq):
-    # package = windowFT.initialize()
+    args.setup_matlab_runtime()
 
-    # A = matlab.double([signal])
-    # fs_matlab = matlab.double([freq])
+    import windowFT
+    import matlab
 
-    # w, l = package.windowFT(A, fs_matlab, nargout=2)
-    # queue.put((w, l,))
-    queue.put((0, 0,))
+    package = windowFT.initialize()
+
+    A = matlab.double([signal])
+    fs_matlab = matlab.double([freq])
+
+    w, l = package.windowFT(A, fs_matlab, nargout=2)
+
+    queue.put((np.asarray(w), np.asarray(l),))
