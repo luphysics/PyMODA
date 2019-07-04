@@ -13,7 +13,6 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-import string
 
 from PyQt5 import uic
 from PyQt5.QtWidgets import QDialog
@@ -23,8 +22,8 @@ from gui.base.SelectFileDialog import SelectFileDialog
 from gui.base.windows.MaximisedWindow import MaximisedWindow
 from gui.timefrequency.FrequencyDialog import FrequencyDialog
 from gui.timefrequency.SignalPlot import SignalPlot
-from gui.timefrequency.WFTPlot import WFTPlot
 from maths.TimeSeries import TimeSeries
+from maths.algorithms import mp_wft
 
 
 class TimeFreqWindow(MaximisedWindow):
@@ -33,19 +32,26 @@ class TimeFreqWindow(MaximisedWindow):
     """
 
     name = "Time-Frequency Analysis"
-    open_file: string = None
-    freq: float = None
-    time_series: TimeSeries = None
 
     def __init__(self, application):
-        super().__init__()
         self.application = application
+        self.freq = None
+        self.time_series = None
+        self.open_file = None
+
+        super().__init__()
 
     def init_ui(self):
         uic.loadUi(resources.get("layout:window_time_freq.ui"), self)
         self.set_title()
         self.setup_menu_bar()
         self.select_file()
+        self.btn_calculate.clicked.connect(self.calculate)
+
+    def calculate(self):
+        """Calculates the desired transform(s), and plots the result."""
+        self.plot_main.clear()
+        mp_wft.mp_calculate(self.time_series, self, self.plot_transform)
 
     def set_title(self, name=""):
         super(TimeFreqWindow, self).set_title(self.get_window_name())
@@ -90,7 +96,6 @@ class TimeFreqWindow(MaximisedWindow):
     def on_data_loaded(self):
         """Called when the time-series data has been loaded."""
         self.plot_signal()
-        self.plot_transform()
 
     def on_freq_changed(self, freq):
         """Called when the frequency is changed."""
@@ -105,7 +110,6 @@ class TimeFreqWindow(MaximisedWindow):
         signal_plot: SignalPlot = self.plot_top
         signal_plot.plot(self.time_series)
 
-    def plot_transform(self):
+    def plot_transform(self, times, wft, freq):
         """Plots the transform on the WFTPlot."""
-        wft_plot: WFTPlot = self.plot_main
-        wft_plot.plot(self.time_series)
+        self.plot_main.plot(times, wft, freq)

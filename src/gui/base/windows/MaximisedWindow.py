@@ -19,7 +19,8 @@ from gui.base.windows.BaseWindow import BaseWindow
 
 class MaximisedWindow(BaseWindow):
     """
-    A window which is maximised when it opens.
+    A window which is maximised when it opens, unless overridden
+    by a command-line argument.
     """
 
     def __init__(self):

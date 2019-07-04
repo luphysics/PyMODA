@@ -18,6 +18,9 @@ from maths.TimeSeries import TimeSeries
 
 
 class SignalPlot(PlotComponent):
+    """
+    Plots the signal, which is a simple set of amplitudes against time.
+    """
 
     def plot(self, data: TimeSeries):
         x = data.times

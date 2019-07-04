@@ -103,6 +103,7 @@ class PlotComponent(BaseComponent):
         """
         self.add_rect_state(self.current_rect())
         self.options.set_in_progress(False)
+        self.canvas.draw()
 
     def cross_cursor(self, cross=True):
         """Sets the cursor to a cross, or resets it to the normal arrow style."""
@@ -281,6 +282,7 @@ class PlotComponent(BaseComponent):
     def clear(self):
         """Clears the contents of the plot."""
         self.axes.clear()
+        self.canvas.draw()
 
     def set_in_progress(self, in_progress=True):
         """Sets the progress bar to display whether the plotting is in progress."""

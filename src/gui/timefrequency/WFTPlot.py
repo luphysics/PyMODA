@@ -25,6 +25,9 @@ from maths.TimeSeries import TimeSeries
 
 
 class WFTPlot(PlotComponent):
+    """
+    Plots the windowed Fourier transform.
+    """
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -32,8 +35,17 @@ class WFTPlot(PlotComponent):
         self.times = None
         self.proc = None
 
-    def plot(self, data: TimeSeries):
-        self.wft_plot(data)
+    def plot(self, times, wft, freq):
+        self.mesh = self.axes.pcolormesh(times, freq, np.abs(wft))
+
+        self.axes.set_title('STFT Magnitude')
+        self.axes.autoscale(False)
+        self.on_initial_plot_complete()
+
+    def colorbar(self):
+        # colorbar = self.fig.colorbar(mesh)
+        pass
+
 
     def get_xlabel(self):
         return "Time (s)"
@@ -64,10 +76,9 @@ class WFTPlot(PlotComponent):
         mesh = self.axes.pcolormesh(self.times, gh, np.abs(a))
 
         # colorbar = self.fig.colorbar(mesh)
-
+        #
         self.axes.set_title('STFT Magnitude')
 
-        self.canvas.draw()
         self.axes.autoscale(False)
         self.on_initial_plot_complete()
 

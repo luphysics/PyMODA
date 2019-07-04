@@ -71,16 +71,16 @@ def get(resource: string) -> string:
     """
     Gets the path to a resource from the appropriate folder,
     when given a name beginning with the resource type and
-    a colon. For example, get("layout:my_window.ui").
+    a colon. For example, `resources.get("layout:my_window.ui")`.
     """
     split = resource.split(":")
     if len(split) != 2:
-        raise ResourceException(f"Error finding resource type for {resource}.")
+        raise ResourceException(f"Error finding resource type for '{resource}'.")
 
     res_type = split[0]
     name = split[-1]
 
-    folder = resources[res_type]
+    folder = resources.get(res_type)
     if not folder:
         raise ResourceException(f"Requested resource type has no associated folder.")
 
