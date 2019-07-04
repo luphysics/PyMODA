@@ -62,7 +62,7 @@ class WFTPlot(PlotComponent):
         gh = np.asarray(l)
 
         mesh = self.axes.pcolormesh(self.times, gh, np.abs(a))
-        colorbar = self.fig.colorbar(mesh)
+        # colorbar = self.fig.colorbar(mesh)
 
         self.axes.set_title('STFT Magnitude')
 

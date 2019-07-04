@@ -22,8 +22,11 @@ class SignalPlot(PlotComponent):
     def plot(self, data: TimeSeries):
         x = data.times
         y = data.data
-        self.axes.plot(x, y)
+
+        xlim = (x[0], x[-1])
+        self.axes.plot(x, y, linewidth=0.7)
         self.axes.autoscale(False)
+        self.axes.set_xlim(xlim)
         self.on_initial_plot_complete()
 
     def get_xlabel(self):
