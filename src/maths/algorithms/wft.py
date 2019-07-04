@@ -17,6 +17,7 @@
 """
 DO NOT import this module in the main process, or it will break Linux support.
 """
+import string
 
 import args
 
@@ -39,8 +40,28 @@ def calculate(signal,
               window="Gaussian",
               preprocess=True,
               rel_tolerance=0.01):
-    fmax = fmax or frequency / 2  # Set fmax to the Nyquist frequency if it is not specified.
+    # Set values to floats, to prevent Matlab errors.
+    fmin = float(fmin)
+    f0 = float(f0)
+    rel_tolerance = float(rel_tolerance)
+    fmax = fmax or frequency / 2.0  # Set fmax to the Nyquist frequency if it is not specified.
 
-    wft, frequency = package.wft(signal, frequency, nargout=2)
+    if not isinstance(fstep, str):
+        fstep = float(fstep)
+
+    wft, frequency = package.wft(signal,
+                                 frequency,
+                                 {
+                                     "fmin": fmin,
+                                     "fmax": fmax,
+                                     "fstep": fstep,
+                                     "f0": f0,
+                                     "Padding": padding,
+                                     "CutEdges": "on" if cut_edges else "off",
+                                     "Window": window,
+                                     "Preprocess": "on" if preprocess else "off",
+                                     "RelTol": rel_tolerance,
+                                 },
+                                 nargout=2)
 
     return wft, frequency
