@@ -61,7 +61,9 @@ class WFTPlot(PlotComponent):
         a = np.asarray(w)
         gh = np.asarray(l)
 
-        self.axes.pcolormesh(self.times, gh, np.abs(a))
+        mesh = self.axes.pcolormesh(self.times, gh, np.abs(a))
+        colorbar = self.fig.colorbar(mesh)
+
         self.axes.set_title('STFT Magnitude')
 
         self.axes.autoscale(False)
@@ -75,8 +77,6 @@ def generate_solutions(queue, signal, freq):
     A = matlab.double([signal])
     fs_matlab = freq
 
-    # w, l = package.windowFT(A, fs_matlab, nargout=2)
-
-    wft, f, wopt = wft.calculate(A, fs_matlab)
+    wft, f = wft.calculate(A, fs_matlab)
 
     queue.put((np.asarray(wft), np.asarray(f),))

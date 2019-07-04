@@ -22,10 +22,10 @@ import args
 
 args.setup_matlab_runtime()  # Don't move this.
 
-import windowFT
+import WFT
 import matlab
 
-package = windowFT.initialize()
+package = WFT.initialize()
 
 
 def calculate(signal,
@@ -39,9 +39,8 @@ def calculate(signal,
               window="Gaussian",
               preprocess=True,
               rel_tolerance=0.01):
-    # Set default value of fmax to the Nyquist frequency if it is not specified.
-    fmax = fmax or frequency / 2
+    fmax = fmax or frequency / 2  # Set fmax to the Nyquist frequency if it is not specified.
 
-    wft, frequency, window_options = windowFT.wft(signal, frequency, fmax, fmin, nargout=3)
+    wft, frequency = package.wft(signal, frequency, nargout=2)
 
-    return wft, frequency, window_options
+    return wft, frequency
