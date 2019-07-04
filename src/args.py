@@ -28,6 +28,8 @@ def parser():
                    help="Test files to load")
     p.add_argument("-freq", metavar="frequency", action="store", type=float, nargs=1, default=None,
                    help="Frequency to use")
+    p.add_argument("-runtime", metavar="ld_library_path", action="store", nargs=1, default=None,
+                   help="LD_LIBRARY_PATH used to make libraries from the Matlab Runtime")
     return p
 
 
@@ -49,3 +51,17 @@ def args_freq():
     if args and args.freq:
         return args.freq[0]
     return None
+
+
+def setup_matlab_runtime():
+    """
+    Sets the LD_LIBRARY_PATH variable to the value provided
+    in the arguments. Should NOT be executed in the main
+    process, because this will crash PyQt on Linux.
+    """
+    if args and args.runtime:
+        path = args.runtime[0]
+        if path:
+            import os
+            os.environ["LD_LIBRARY_PATH"] = path
+            print(f"Set LD_LIBRARY_PATH to {path}")

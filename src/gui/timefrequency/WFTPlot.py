@@ -20,6 +20,7 @@ from PyQt5.QtCore import QTimer
 from scipy import signal
 import matplotlib.pyplot as plt
 
+import args
 from gui.base.components.PlotComponent import PlotComponent
 from maths.TimeSeries import TimeSeries
 
@@ -69,15 +70,10 @@ class WFTPlot(PlotComponent):
 
 
 def generate_solutions(queue, signal, freq):
-
-    import os
-    os.environ["LD_LIBRARY_PATH"] = \
-        "/usr/local/MATLAB/MATLAB_Runtime/v96/runtime/glnxa64:/usr/local/MATLAB/MATLAB_Runtime/v96/bin/glnxa64:" \
-        "/usr/local/MATLAB/MATLAB_Runtime/v96/sys/os/glnxa64:/usr/local/MATLAB/MATLAB_Runtime/v96/extern/bin/glnxa64"
+    args.setup_matlab_runtime()
 
     import windowFT
     import matlab
-    from packages.wft.for_redistribution_files_only import windowFT
 
     package = windowFT.initialize()
 
