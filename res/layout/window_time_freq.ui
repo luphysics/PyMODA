@@ -121,73 +121,82 @@
          </layout>
         </item>
         <item row="3" column="0">
-         <layout class="QVBoxLayout" name="advanced_options_section" stretch="1,4,4">
+         <layout class="QVBoxLayout" name="advanced_options_section" stretch="4,0">
           <item>
-           <layout class="QGridLayout" name="window_options">
+           <layout class="QGridLayout" name="original_preprocessed_sig" rowstretch="2,9" columnstretch="0">
             <item row="1" column="0">
-             <widget class="QComboBox" name="comboBox">
-              <item>
-               <property name="text">
-                <string>Gaussian</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Exp</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Hann</string>
-               </property>
-              </item>
-             </widget>
+             <widget class="QWidget" name="preprocSig" native="true"/>
             </item>
             <item row="0" column="0">
-             <widget class="QLabel" name="label_11">
+             <widget class="QLabel" name="label_16">
               <property name="text">
-               <string>Dropdown to select window options</string>
+               <string>Preproc Sig</string>
               </property>
              </widget>
             </item>
            </layout>
           </item>
           <item>
-           <layout class="QGridLayout" name="original_preprocessed_sig" columnstretch="0"/>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="statistics_section" stretch="0,2">
-            <item>
-             <layout class="QGridLayout" name="gridLayout_8">
+           <layout class="QFormLayout" name="formLayout_6">
+            <item row="2" column="0">
+             <layout class="QFormLayout" name="formLayout_5">
               <property name="topMargin">
                <number>5</number>
               </property>
-              <item row="2" column="0">
-               <widget class="QLineEdit" name="lineEdit_6"/>
-              </item>
-              <item row="3" column="0">
-               <widget class="QLineEdit" name="lineEdit_7"/>
-              </item>
-              <item row="4" column="0">
-               <widget class="QLineEdit" name="lineEdit_8"/>
-              </item>
-              <item row="3" column="1">
-               <widget class="QRadioButton" name="radioButton_6">
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_13">
                 <property name="text">
-                 <string>Amp</string>
+                 <string>Group 2</string>
                 </property>
                </widget>
               </item>
-              <item row="2" column="1">
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_14">
+                <property name="text">
+                 <string>Alpha</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QRadioButton" name="radioButton_6">
+                <property name="text">
+                 <string>Amplitude</string>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="1">
                <widget class="QRadioButton" name="radioButton_5">
                 <property name="text">
-                 <string>Pow</string>
+                 <string>Power</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="lineEdit_4"/>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="lineEdit_5"/>
+              </item>
+              <item row="2" column="1">
+               <widget class="QLineEdit" name="lineEdit_6"/>
+              </item>
+              <item row="3" column="1">
+               <widget class="QLabel" name="label_15">
+                <property name="text">
+                 <string>Test Input</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_12">
+                <property name="text">
+                 <string>Group 1</string>
                 </property>
                </widget>
               </item>
              </layout>
             </item>
-            <item>
+            <item row="2" column="1">
              <layout class="QGridLayout" name="gridLayout_9">
               <item row="2" column="0">
                <layout class="QGridLayout" name="gridLayout_11">
@@ -209,17 +218,17 @@
               </item>
               <item row="0" column="0">
                <layout class="QGridLayout" name="gridLayout_10">
-                <item row="0" column="0">
-                 <widget class="QRadioButton" name="radioButton_7">
-                  <property name="text">
-                   <string>Median</string>
-                  </property>
-                 </widget>
-                </item>
                 <item row="1" column="0">
                  <widget class="QRadioButton" name="radioButton_8">
                   <property name="text">
                    <string>Mean</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QRadioButton" name="radioButton_7">
+                  <property name="text">
+                   <string>Median</string>
                   </property>
                  </widget>
                 </item>
@@ -233,6 +242,19 @@
                </widget>
               </item>
              </layout>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLabel" name="label_17">
+              <property name="layoutDirection">
+               <enum>Qt::LeftToRight</enum>
+              </property>
+              <property name="text">
+               <string>Statistics</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
@@ -439,6 +461,36 @@
              </item>
             </layout>
            </widget>
+          </item>
+          <item row="1" column="0" colspan="2">
+           <layout class="QFormLayout" name="formLayout_4">
+            <item row="0" column="1">
+             <widget class="QLabel" name="label_11">
+              <property name="text">
+               <string>Dropdown to select window options</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QComboBox" name="comboBox">
+              <item>
+               <property name="text">
+                <string>Gaussian</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Exp</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Hann</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
         </item>
