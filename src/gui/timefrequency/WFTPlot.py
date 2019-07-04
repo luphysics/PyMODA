@@ -14,6 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from multiprocessing import Queue, Process
+from threading import Thread
 
 import numpy as np
 from PyQt5.QtCore import QTimer
@@ -24,6 +25,12 @@ from maths.TimeSeries import TimeSeries
 
 
 class WFTPlot(PlotComponent):
+
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.queue = Queue()
+        self.times = None
+        self.proc = None
 
     def plot(self, data: TimeSeries):
         self.wft_plot(data)
@@ -40,15 +47,13 @@ class WFTPlot(PlotComponent):
         self.times = data.times
         sig_matlab = data.data.tolist()
 
-        self.queue = Queue()
-
         self.proc = Process(target=generate_solutions, args=(self.queue, sig_matlab, fs))
         self.proc.start()
-        QTimer.singleShot(500, self.check_result)
+        QTimer.singleShot(1000, self.check_result)
 
     def check_result(self):
         if self.queue.empty():
-            QTimer.singleShot(500, self.check_result)
+            QTimer.singleShot(1000, self.check_result)
             return
 
         w, l = self.queue.get()
