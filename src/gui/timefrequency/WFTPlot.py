@@ -69,16 +69,14 @@ class WFTPlot(PlotComponent):
 
 
 def generate_solutions(queue, signal, freq):
-    args.setup_matlab_runtime()
-
-    import windowFT
+    from maths.algorithms import wft
     import matlab
 
-    package = windowFT.initialize()
-
     A = matlab.double([signal])
-    fs_matlab = matlab.double([freq])
+    fs_matlab = freq
 
-    w, l = package.windowFT(A, fs_matlab, nargout=2)
+    # w, l = package.windowFT(A, fs_matlab, nargout=2)
 
-    queue.put((np.asarray(w), np.asarray(l),))
+    wft, f, wopt = wft.calculate(A, fs_matlab)
+
+    queue.put((np.asarray(wft), np.asarray(f),))

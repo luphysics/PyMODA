@@ -13,6 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import args
 from gui.base.windows.BaseWindow import BaseWindow
 
 
@@ -23,12 +24,5 @@ class MaximisedWindow(BaseWindow):
 
     def __init__(self):
         super().__init__()
-        if self.maximise_on_start():
+        if args.maximise():
             self.showMaximized()
-
-    def maximise_on_start(self):
-        """
-        Override this function to prevent the window being
-        maximised when opened.
-        """
-        return True

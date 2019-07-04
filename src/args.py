@@ -30,6 +30,8 @@ def parser():
                    help="Frequency to use")
     p.add_argument("-runtime", metavar="ld_library_path", action="store", nargs=1, default=None,
                    help="LD_LIBRARY_PATH used to make libraries from the Matlab Runtime")
+    p.add_argument("--maximise", action="store_false", default=True,
+                   help="Whether to create windows maximised or not")
     return p
 
 
@@ -51,6 +53,14 @@ def args_freq():
     if args and args.freq:
         return args.freq[0]
     return None
+
+
+def maximise():
+    """
+    Returns whether a window should be maximised, according to the
+    arguments.
+    """
+    return not args or args.maximise
 
 
 def setup_matlab_runtime():
