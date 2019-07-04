@@ -219,14 +219,14 @@
               <item row="0" column="0">
                <layout class="QGridLayout" name="gridLayout_10">
                 <item row="1" column="0">
-                 <widget class="QRadioButton" name="radioButton_8">
+                 <widget class="QRadioButton" name="radio_stat_mean">
                   <property name="text">
                    <string>Mean</string>
                   </property>
                  </widget>
                 </item>
                 <item row="0" column="0">
-                 <widget class="QRadioButton" name="radioButton_7">
+                 <widget class="QRadioButton" name="radio_stat_median">
                   <property name="text">
                    <string>Median</string>
                   </property>
@@ -273,14 +273,14 @@
             <item row="0" column="0">
              <layout class="QGridLayout" name="gridLayout_15" rowstretch="3,0,0">
               <item row="2" column="0">
-               <widget class="QRadioButton" name="radioButton_2">
+               <widget class="QRadioButton" name="radio_plot_pow">
                 <property name="text">
                  <string>Power</string>
                 </property>
                </widget>
               </item>
               <item row="1" column="0">
-               <widget class="QRadioButton" name="radioButton">
+               <widget class="QRadioButton" name="radio_plot_ampl">
                 <property name="text">
                  <string>Amplitude</string>
                 </property>
@@ -298,7 +298,7 @@
             <item row="0" column="1">
              <layout class="QGridLayout" name="gridLayout_17">
               <item row="2" column="0">
-               <widget class="QRadioButton" name="radioButton_11">
+               <widget class="QRadioButton" name="radio_transform_wt">
                 <property name="text">
                  <string>WT</string>
                 </property>
@@ -312,7 +312,7 @@
                </widget>
               </item>
               <item row="1" column="0">
-               <widget class="QRadioButton" name="radioButton_12">
+               <widget class="QRadioButton" name="radio_transform_wft">
                 <property name="text">
                  <string>WFT</string>
                 </property>
@@ -330,14 +330,14 @@
                </widget>
               </item>
               <item row="1" column="0">
-               <widget class="QRadioButton" name="radioButton_3">
+               <widget class="QRadioButton" name="radio_preproc_on">
                 <property name="text">
                  <string>On</string>
                 </property>
                </widget>
               </item>
               <item row="2" column="0">
-               <widget class="QRadioButton" name="radioButton_4">
+               <widget class="QRadioButton" name="radio_preproc_off">
                 <property name="text">
                  <string>Off</string>
                 </property>
@@ -348,7 +348,7 @@
             <item row="1" column="1">
              <layout class="QGridLayout" name="gridLayout_18">
               <item row="1" column="0">
-               <widget class="QRadioButton" name="radioButton_13">
+               <widget class="QRadioButton" name="radio_cut_on">
                 <property name="text">
                  <string>On</string>
                 </property>
@@ -362,7 +362,7 @@
                </widget>
               </item>
               <item row="2" column="0">
-               <widget class="QRadioButton" name="radioButton_14">
+               <widget class="QRadioButton" name="radio_cut_off">
                 <property name="text">
                  <string>Off</string>
                 </property>
@@ -507,7 +507,7 @@
      <x>0</x>
      <y>0</y>
      <width>1496</width>
-     <height>26</height>
+     <height>29</height>
     </rect>
    </property>
   </widget>
