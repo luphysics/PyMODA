@@ -17,8 +17,6 @@ from multiprocessing import Queue, Process
 
 import numpy as np
 from PyQt5.QtCore import QTimer
-from scipy import signal
-import matplotlib.pyplot as plt
 
 import args
 from gui.base.components.PlotComponent import PlotComponent
@@ -59,15 +57,10 @@ class WFTPlot(PlotComponent):
         gh = np.asarray(l)
 
         self.axes.pcolormesh(self.times, gh, np.abs(a))
-        # self.axes.plot(self.times, [np.sin(t) for t in self.times])
         self.axes.set_title('STFT Magnitude')
 
         self.axes.autoscale(False)
         self.on_initial_plot_complete()
-
-    def on_initial_plot_complete(self):
-        super().on_initial_plot_complete()
-        self.set_in_progress(False)
 
 
 def generate_solutions(queue, signal, freq):

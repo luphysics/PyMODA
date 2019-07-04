@@ -32,22 +32,21 @@ from gui.timefrequency.Rect import Rect
 class PlotComponent(BaseComponent):
     """A component which enables plotting via matplotlib."""
 
-    callbacks: Callbacks = None
-    canvas: FigureCanvas = None
-    layout: QVBoxLayout = None
-    axes = None
-
-    temp_plots = []  # Temporary crosshair plots which should be removed on each update.
-    selected_plots = []  # Selected crosshair plots which should be kept.
-
-    crosshair_width = 0.7
-    show_crosshair = True
-
-    temp_patch = None  # The actual rectangle being drawn on the plot.
-    rect: Rect = None  # The Rect object representing the coordinates of the rectangle.
-    rect_stack: List = []  # A List of Rect objects corresponding to a stack of previous zoom states.
-
     def __init__(self, parent):
+        self.callbacks: Callbacks = None
+        self.canvas: FigureCanvas = None
+        self.layout: QVBoxLayout = None
+        self.axes = None
+
+        self.temp_plots = []  # Temporary crosshair plots which should be removed on each update.
+        self.selected_plots = []  # Selected crosshair plots which should be kept.
+        self.crosshair_width = 0.7
+        self.show_crosshair = True
+
+        self.temp_patch = None  # The actual rectangle being drawn on the plot.
+        self.rect: Rect = None  # The Rect object representing the coordinates of the rectangle.
+        self.rect_stack: List = []  # A List of Rect objects corresponding to a stack of previous zoom states.
+
         super(PlotComponent, self).__init__(parent)
 
     def init_ui(self):

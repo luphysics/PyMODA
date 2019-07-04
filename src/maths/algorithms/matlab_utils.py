@@ -17,6 +17,9 @@ import numpy as np
 import scipy
 import scipy.integrate
 
+"""
+Contains Python replicas of oft-used Matlab functions.
+"""
 
 def isempty(value):
     """
