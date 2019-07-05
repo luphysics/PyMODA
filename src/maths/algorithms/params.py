@@ -40,6 +40,24 @@ class WFTParams:
                  window="Gaussian",
                  preprocess=True,
                  rel_tolerance=0.01):
+        """
+        Constructor which takes the desired parameters and converts
+        them into floats if necessary (to prevent Matlab errors).
+
+        :param time_series: the signal data as a time-series
+        :param fmin: the minimum frequency
+        :param fmax: the maximum frequency
+        :param fstep: the frequency step
+        :param f0: the window resolution parameter, which determines the
+        trade-off between the time and frequency resolutions
+        :param padding: the padding to use when computing the transform
+        :param cut_edges: whether the transform should be computed only in
+        the cone of influence
+        :param window: the window type to use - Gaussian, Hann, Blackman, Exp,
+        Rect or Kaiser-a.
+        :param preprocess: whether to perform preprocessing on the signal
+        :param rel_tolerance: relative tolerance, specifying the cone of influence
+        """
         self.time_series = time_series
         self.fs = float(time_series.frequency)
 
@@ -56,5 +74,5 @@ class WFTParams:
         }
 
     def get(self) -> dict:
-        """Get the parameters to supply to the wft function."""
+        """Get the parameters to supply to the wft function as a dictionary."""
         return self.data

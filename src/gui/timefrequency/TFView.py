@@ -1,5 +1,5 @@
 #  PyMODA, a Python implementation of MODA (Multiscale Oscillatory Dynamics Analysis).
-#  Copyright (C) 2019  Lancaster University
+#  Copyright (C) 2019 Lancaster University
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -13,30 +13,33 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtGui import QWindow
 
-from data import resources
-from gui.base.BaseUI import BaseUI
+from gui.timefrequency.plots.WFTPlot import WFTPlot
 
 
-class BaseWindow(QMainWindow, BaseUI):
+class TFView:
     """
-    A base window which inherits from BaseUI.
+    A View class to be subclassed by the time-frequency window.
     """
 
-    def __init__(self):
-        super(BaseWindow, self).__init__()
-        self.update_title()
-        self.set_icon()
+    name = "Time-Frequency Analysis"
 
-    def update_title(self, title=resources.get_name()):
-        """
-        Sets the title of the window. If no title is supplied,
-        the default name of the application is used.
-        """
-        self.setWindowTitle(title)
+    def __init__(self, application):
+        self.application = application
 
-    def set_icon(self, img=resources.get("image:icon.svg")):
-        icon = QIcon(img)
-        self.setWindowIcon(icon)
+    def plot_signal(self, time_series):
+        pass
+
+    def select_file(self):
+        pass
+
+    def update_title(self, title=""):
+        pass
+
+    def main_plot(self) -> WFTPlot:
+        """Returns the main plot, which is used to display the transform."""
+        pass
+
+    def get_window(self) -> QWindow:
+        pass

@@ -63,8 +63,8 @@ class MPHelper:
     A class providing a simple way to perform computations in another
     process. Another process is necessary to avoid issues related to
     LD_LIBRARY_PATH on Linux, and prevent the UI from freezing
-    while - unlike multithreading - potentially improving
-    performance when multiple tasks are running.
+    while - unlike multithreading, due to the GIL - improving
+    performance when multiple tasks are running simultaneously.
 
     IMPORTANT: you should hold a reference to each instance
     of this class to prevent it from being garbage collected before

@@ -522,13 +522,13 @@
   <customwidget>
    <class>SignalPlot</class>
    <extends>QWidget</extends>
-   <header>gui.timefrequency.SignalPlot</header>
+   <header>gui.timefrequency.plots.SignalPlot</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>WFTPlot</class>
    <extends>QWidget</extends>
-   <header>gui.timefrequency.WFTPlot</header>
+   <header>gui.timefrequency.plots.WFTPlot</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

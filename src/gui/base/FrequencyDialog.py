@@ -23,7 +23,9 @@ from gui.base.BaseUI import BaseUI
 
 
 class FrequencyDialog(QDialog, BaseUI):
-    """A dialog which allows the sampling frequency to be entered."""
+    """
+    A dialog which allows the sampling frequency to be entered.
+    """
 
     select_text = "Select item"
     current_selected = None
