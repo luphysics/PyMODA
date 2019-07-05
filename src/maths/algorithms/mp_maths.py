@@ -16,9 +16,8 @@
 from multiprocessing import Queue, Process
 
 import numpy as np
-from PyQt5.QtCore import QTimer, QRunnable
+from PyQt5.QtCore import QTimer
 
-from maths.TimeSeries import TimeSeries
 from maths.algorithms.params import WFTParams
 
 
@@ -87,7 +86,6 @@ class MPHelper:
     def __wft(queue, params: WFTParams):
         # Don't move the import statements.
         from maths.algorithms import wft
-        import matlab
 
         wft, f = wft.calculate(params)
 

@@ -40,6 +40,15 @@ class TFWindow(MaximisedWindow, TFView):
         uic.loadUi(resources.get("layout:window_time_freq.ui"), self)
         self.update_title()
         self.setup_menu_bar()
+
+        self.setup_radio_plot()
+        self.setup_radio_transform()
+        self.setup_radio_preproc()
+        self.setup_radio_cut_edges()
+        self.setup_radio_stats_avg()
+        self.setup_radio_stats_paired()
+        self.setup_radio_test()
+
         self.btn_calculate.clicked.connect(self.presenter.calculate)
         self.presenter.init()
 
@@ -53,7 +62,6 @@ class TFWindow(MaximisedWindow, TFView):
         file.triggered.connect(self.select_file)
 
     def select_file(self):
-        """Opens a dialog to select a file, and notifies the presenter."""
         dialog = SelectFileDialog()
 
         code = dialog.exec()
@@ -61,7 +69,6 @@ class TFWindow(MaximisedWindow, TFView):
             self.presenter.set_open_file(dialog.get_file())
 
     def plot_signal(self, time_series):
-        """Plots the signal on the SignalPlot."""
         signal_plot = self.plot_top
         signal_plot.plot(time_series)
 
@@ -70,3 +77,54 @@ class TFWindow(MaximisedWindow, TFView):
 
     def main_plot(self) -> WFTPlot:
         return self.plot_main
+
+    def setup_radio_plot(self):
+        self.radio_plot_ampl.setChecked(True)
+
+    def setup_radio_transform(self):
+        self.radio_transform_wft.setChecked(True)
+
+    def setup_radio_preproc(self):
+        self.radio_preproc_on.setChecked(True)
+
+    def setup_radio_cut_edges(self):
+        self.radio_cut_on.setChecked(True)
+
+    def setup_radio_stats_avg(self):
+        self.radio_stat_median.setChecked(True)
+
+    def setup_radio_stats_paired(self):
+        self.radio_unpaired.setChecked(True)
+
+    def setup_radio_test(self):
+        self.radio_test_ampl.setChecked(True)
+
+    def get_preprocessing(self):
+        return self.radio_preproc_on.isChecked()
+
+    def get_fmin(self) -> float:
+        return super().get_fmin()
+
+    def get_fmax(self) -> float:
+        return super().get_fmax()
+
+    def get_f0(self) -> float:
+        return super().get_f0()
+
+    def get_fstep(self) -> float:
+        return super().get_fstep()
+
+    def get_padding(self) -> str:
+        return super().get_padding()
+
+    def get_rel_tolerance(self) -> float:
+        return super().get_rel_tolerance()
+
+    def get_cut_edges(self) -> bool:
+        return super().get_cut_edges()
+
+    def get_preprocess(self) -> bool:
+        return super().get_preprocess()
+
+    def get_transform_window(self) -> str:
+        return super().get_transform_window()

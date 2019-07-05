@@ -58,6 +58,9 @@ class WFTParams:
         :param preprocess: whether to perform preprocessing on the signal
         :param rel_tolerance: relative tolerance, specifying the cone of influence
         """
+        # Set default values. These aren't assigned in the declaration above
+        # because it's helpful for the window to be able to supply None
+        # without requiring knowledge of the default values.
         self.time_series = time_series
         self.fs = float(time_series.frequency)
 
@@ -76,3 +79,12 @@ class WFTParams:
     def get(self) -> dict:
         """Get the parameters to supply to the wft function as a dictionary."""
         return self.data
+
+    @staticmethod
+    def create(time_series, **kwargs):
+        out = {}
+        for key, value in kwargs.items():
+            if value:
+                out[key] = value
+
+        return WFTParams(time_series, **out)

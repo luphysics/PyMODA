@@ -29,9 +29,11 @@ class TFView:
         self.application = application
 
     def plot_signal(self, time_series):
+        """Plots the signal on the SignalPlot."""
         pass
 
     def select_file(self):
+        """Opens a dialog to select a file, and notifies the presenter."""
         pass
 
     def update_title(self, title=""):
@@ -42,4 +44,56 @@ class TFView:
         pass
 
     def get_window(self) -> QWindow:
+        pass
+
+    def setup_radio_plot(self):
+        """Set up the radio buttons for plot amplitude/power."""
+        pass
+
+    def setup_radio_transform(self):
+        pass
+
+    def setup_radio_preproc(self):
+        pass
+
+    def setup_radio_cut_edges(self):
+        pass
+
+    def setup_radio_stats_avg(self):
+        pass
+
+    def setup_radio_stats_paired(self):
+        pass
+
+    def setup_radio_test(self):
+        pass
+
+    def get_preprocessing(self):
+        pass
+
+    def get_fmin(self) -> float:
+        pass
+
+    def get_fmax(self) -> float:
+        pass
+
+    def get_f0(self) -> float:
+        pass
+
+    def get_fstep(self) -> float:
+        pass
+
+    def get_padding(self) -> str:
+        pass
+
+    def get_rel_tolerance(self) -> float:
+        pass
+
+    def get_cut_edges(self) -> bool:
+        pass
+
+    def get_preprocess(self) -> bool:
+        pass
+
+    def get_transform_window(self) -> str:
         pass

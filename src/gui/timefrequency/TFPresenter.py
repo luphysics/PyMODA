@@ -53,7 +53,18 @@ class TFPresenter:
 
     def get_params(self) -> WFTParams:
         """Creates the parameters to use when performing the calculations."""
-        return WFTParams(time_series=self.time_series)
+        return WFTParams.create(
+            time_series=self.time_series,
+            fmin=self.view.get_fmin(),
+            fmax=self.view.get_fmax(),
+            f0=self.view.get_f0(),
+            fstep=self.view.get_fstep(),
+            padding=self.view.get_padding(),
+            window=self.view.get_transform_window(),
+            rel_tolerance=self.view.get_rel_tolerance(),
+            cut_edges=self.view.get_cut_edges(),
+            preprocess=self.view.get_preprocess(),
+        )
 
     def load_data(self):
         """Loads the time-series data from a file, via a dialog."""

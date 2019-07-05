@@ -23,7 +23,7 @@ from gui.Application import Application
 def main():
     """Starts the application."""
     app = Application(sys.argv)
-    app.exec_()
+    app.exec()
 
 
 # The entry-point of the program.
