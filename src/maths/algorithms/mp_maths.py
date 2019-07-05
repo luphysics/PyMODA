@@ -19,6 +19,7 @@ import numpy as np
 from PyQt5.QtCore import QTimer, QRunnable
 
 from maths.TimeSeries import TimeSeries
+from maths.algorithms.params import WFTParams
 
 
 class Watcher:
@@ -70,27 +71,28 @@ class MPHelper:
     completion.
     """
 
-    def wft(self, data: TimeSeries, window, on_result):
+    def wft(self,
+            params: WFTParams,
+            window,
+            on_result):
         self.queue = Queue()
 
-        self.proc = Process(target=self.__wft, args=(self.queue, data, data.frequency,))
+        self.proc = Process(target=self.__wft, args=(self.queue, params,))
         self.proc.start()
 
         self.watcher = Watcher(window, self.queue, 0.5, on_result)
         self.watcher.start()
 
     @staticmethod
-    def __wft(queue, data, freq):
+    def __wft(queue, params: WFTParams):
         # Don't move the import statements.
         from maths.algorithms import wft
         import matlab
 
-        signal = matlab.double([data.data.tolist()])
-
-        wft, f = wft.calculate(signal, freq)
+        wft, f = wft.calculate(params)
 
         queue.put((
-            data.times,
+            params.time_series.times,
             np.asarray(wft),
             np.asarray(f),
         ))

@@ -24,7 +24,7 @@ class SignalPlot(PlotComponent):
 
     def plot(self, data: TimeSeries):
         x = data.times
-        y = data.data
+        y = data.signal
 
         xlim = (x[0], x[-1])
         self.axes.plot(x, y, linewidth=0.7)

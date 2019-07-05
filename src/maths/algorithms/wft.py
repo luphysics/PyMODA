@@ -24,21 +24,12 @@ import args
 args.setup_matlab_runtime()
 
 import WFT
+import matlab
 
 package = WFT.initialize()
 
 
-def calculate(signal,
-              frequency,
-              fmin=0,
-              fmax=None,
-              fstep="auto",
-              f0=1,
-              padding="predictive",
-              cut_edges=False,
-              window="Gaussian",
-              preprocess=True,
-              rel_tolerance=0.01):
+def calculate(params):
     """
     Calculates the windowed Fourier transform.
 
@@ -46,28 +37,9 @@ def calculate(signal,
     Instead, use `MPHelper` to call it safely in a new process.
     """
 
-    # Set values to floats, to prevent Matlab errors.
-    fmin = float(fmin)
-    f0 = float(f0)
-    rel_tolerance = float(rel_tolerance)
-    fmax = fmax or frequency / 2.0  # Set fmax to the Nyquist frequency if it is not specified.
-
-    if not isinstance(fstep, str):
-        fstep = float(fstep)
-
-    wft, frequency = package.wft(signal,
-                                 frequency,
-                                 {
-                                     "fmin": fmin,
-                                     "fmax": fmax,
-                                     "fstep": fstep,
-                                     "f0": f0,
-                                     "Padding": padding,
-                                     "CutEdges": "on" if cut_edges else "off",
-                                     "Window": window,
-                                     "Preprocess": "on" if preprocess else "off",
-                                     "RelTol": rel_tolerance,
-                                 },
+    wft, frequency = package.wft(matlab.double([params.time_series.data.tolist()]),
+                                 params.fs,
+                                 params.get(),
                                  nargout=2)
 
     return wft, frequency

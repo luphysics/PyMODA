@@ -23,7 +23,8 @@ from gui.base.windows.MaximisedWindow import MaximisedWindow
 from gui.timefrequency.FrequencyDialog import FrequencyDialog
 from gui.timefrequency.SignalPlot import SignalPlot
 from maths.TimeSeries import TimeSeries
-from maths.algorithms.mp_wft import MPHelper
+from maths.algorithms.mp_maths import MPHelper
+from maths.algorithms.params import WFTParams
 
 
 class TimeFreqWindow(MaximisedWindow):
@@ -58,7 +59,12 @@ class TimeFreqWindow(MaximisedWindow):
         self.plot_main.set_in_progress()
 
         self.mp = MPHelper()
-        self.mp.wft(data=self.time_series, window=self, on_result=self.plot_main.plot)
+        self.mp.wft(
+            params=WFTParams(
+                time_series=self.time_series
+            ),
+            window=self,
+            on_result=self.plot_main.plot)
 
     def set_title(self, name=""):
         super(TimeFreqWindow, self).set_title(self.get_window_name())

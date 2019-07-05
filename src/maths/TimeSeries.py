@@ -30,7 +30,7 @@ class TimeSeries:
 
     def __init__(self, data, frequency=None):
         self.frequency = frequency
-        self.data = np.asarray(data, dtype="float64")
+        self.signal = np.asarray(data, dtype="float64")
 
     def has_frequency(self):
         """Returns whether a frequency has been set."""
@@ -42,15 +42,15 @@ class TimeSeries:
         of the time values.
         """
         self.frequency = freq
-        self.generate_times()
+        self.times = self.generate_times()
 
     def generate_times(self):
         """Generates the time values associated with the data."""
-        times = self.data.copy()
-        for i in range(0, len(self.data)):
+        times = self.signal.copy()
+        for i in range(0, len(self.signal)):
             times[i] = self.initial_time + i / self.frequency
 
-        self.times = times
+        return times
 
     @staticmethod
     def from_file(file):
