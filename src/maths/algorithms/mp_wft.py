@@ -16,59 +16,87 @@
 from multiprocessing import Queue, Process
 
 import numpy as np
-from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import QTimer, QRunnable
 
 from maths.TimeSeries import TimeSeries
 
 
 class Watcher:
+    """
+    A class which watches for a result from a process, using a QTimer
+    to avoid blocking the main thread.
+    """
 
-    def __init__(self, window, queue, delay, on_result):
-        self.delay = delay * 1000
+    def __init__(self, window, queue, delay_seconds, on_result):
+        super().__init__()
+
+        self.delay = delay_seconds * 1000
         self.on_result = on_result
         self.queue = queue
 
-        # self.timer = QTimer(window)
-        # self.timer.timeout.connect(self.check_result)
-        QTimer.singleShot(self.delay, self.check_result)
+        self.timer = QTimer(window)
+        self.timer.timeout.connect(self.check_result)
+        self.running = False
 
     def start(self):
+        """Starts the Watcher checking for a result."""
         self.timer.start(self.delay)
-        print("Started")
+        self.running = True
 
     def stop(self):
-        self.timer.stop()
-        self.timer.deleteLater()
-        print("Stopped")
+        """Stops the timer and deletes it. The Watcher cannot be started again."""
+        if self.running:
+            self.running = False
+            self.timer.stop()
+            self.timer.deleteLater()
 
     def check_result(self):
+        """Check for a result from the other process."""
         if not self.queue.empty():
-            self.on_result(*self.queue.get())
             self.stop()
-        else:
-            QTimer.singleShot(self.delay, self.check_result)
+            self.on_result(*self.queue.get())
 
 
-def mp_calculate(data: TimeSeries, window, on_result):
-    queue = Queue()
-    watcher = Watcher(window, queue, 2, on_result)
+class MPHelper:
+    """
+    A class providing a simple way to perform computations in another
+    process. Another process is necessary to avoid issues related to
+    LD_LIBRARY_PATH on Linux, and prevent the UI from freezing
+    while - unlike multithreading - potentially improving
+    performance when multiple tasks are running.
 
-    proc = Process(target=_calculate, args=(queue, data, data.frequency,))
-    # watcher.start()
-    proc.start()
+    IMPORTANT: you should hold a reference to each instance
+    of this class to prevent it from being garbage collected before
+    completion.
+    """
 
+    def wft(self, data: TimeSeries, window, on_result):
+        self.queue = Queue()
 
-def _calculate(queue, data, freq):
-    from maths.algorithms import wft
-    import matlab
+        self.proc = Process(target=self.__wft, args=(self.queue, data, data.frequency,))
+        self.proc.start()
 
-    signal = matlab.double([data.data.tolist()])
-    freq = freq
+        self.watcher = Watcher(window, self.queue, 0.5, on_result)
+        self.watcher.start()
 
-    wft, f = wft.calculate(signal, freq)
+    @staticmethod
+    def __wft(queue, data, freq):
+        # Don't move the import statements.
+        from maths.algorithms import wft
+        import matlab
 
-    queue.put((
-        data.times,
-        np.asarray(wft),
-        np.asarray(f),
-    ))
+        signal = matlab.double([data.data.tolist()])
+
+        wft, f = wft.calculate(signal, freq)
+
+        queue.put((
+            data.times,
+            np.asarray(wft),
+            np.asarray(f),
+        ))
+
+    def stop(self):
+        """Stops the tasks in progress."""
+        self.proc.terminate()
+        self.watcher.stop()
+        self.queue.close()

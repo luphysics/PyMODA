@@ -52,12 +52,13 @@ class PlotComponent(BaseComponent):
     def init_ui(self):
         super().init_ui()
 
-        self.setMouseTracking(True)
-        self.layout = QVBoxLayout(self)
         self.canvas = FigureCanvas(Figure())
         self.init_callbacks()
-
         self.options = PlotOptionsBar(self.callbacks)
+
+        self.setMouseTracking(True)
+        self.layout = QVBoxLayout(self)
+        self.set_in_progress(False)
 
         self.layout.addWidget(self.canvas)
         self.layout.addWidget(self.options)

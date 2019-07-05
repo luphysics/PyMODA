@@ -17,14 +17,13 @@
 """
 DO NOT import this module in the main process, or it will break Linux support.
 """
-import string
 
 import args
 
-args.setup_matlab_runtime()  # Don't move this.
+# This must be above the WFT and matlab imports.
+args.setup_matlab_runtime()
 
 import WFT
-import matlab
 
 package = WFT.initialize()
 
@@ -40,6 +39,13 @@ def calculate(signal,
               window="Gaussian",
               preprocess=True,
               rel_tolerance=0.01):
+    """
+    Calculates the windowed Fourier transform.
+
+    IMPORTANT: this function should not be called directly.
+    Instead, use `MPHelper` to call it safely in a new process.
+    """
+
     # Set values to floats, to prevent Matlab errors.
     fmin = float(fmin)
     f0 = float(f0)

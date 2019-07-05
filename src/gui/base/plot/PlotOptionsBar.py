@@ -56,8 +56,10 @@ class PlotOptionsBar(QWidget, BaseUI):
         self.progress.setValue(0)
         self.layout.addWidget(self.progress)
 
-    def set_in_progress(self, boolean):
-        if not boolean:
+    def set_in_progress(self, loading):
+        if loading:
+            self.progress.show()
+        else:
             self.progress.hide()
 
 

@@ -13,15 +13,11 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from multiprocessing import Queue, Process
-from threading import Thread
+from multiprocessing import Queue
 
 import numpy as np
-from PyQt5.QtCore import QTimer
 
-import args
 from gui.base.components.PlotComponent import PlotComponent
-from maths.TimeSeries import TimeSeries
 
 
 class WFTPlot(PlotComponent):
@@ -37,59 +33,17 @@ class WFTPlot(PlotComponent):
 
     def plot(self, times, wft, freq):
         self.mesh = self.axes.pcolormesh(times, freq, np.abs(wft))
-
         self.axes.set_title('STFT Magnitude')
         self.axes.autoscale(False)
         self.on_initial_plot_complete()
 
     def colorbar(self):
+        """Create the colorbar. Needs to be refactored to avoid breaking alignment with the signal plot."""
         # colorbar = self.fig.colorbar(mesh)
         pass
-
 
     def get_xlabel(self):
         return "Time (s)"
 
     def get_ylabel(self):
         return "Frequency (Hz)"
-
-    def wft_plot(self, data: TimeSeries):
-        fs = data.frequency
-
-        self.times = data.times
-        sig_matlab = data.data.tolist()
-
-        self.proc = Process(target=generate_solutions, args=(self.queue, sig_matlab, fs))
-        self.proc.start()
-        QTimer.singleShot(1000, self.check_result)
-
-    def check_result(self):
-        if self.queue.empty():
-            QTimer.singleShot(1000, self.check_result)
-            return
-
-        w, l = self.queue.get()
-
-        a = np.asarray(w)
-        gh = np.asarray(l)
-
-        mesh = self.axes.pcolormesh(self.times, gh, np.abs(a))
-
-        # colorbar = self.fig.colorbar(mesh)
-        #
-        self.axes.set_title('STFT Magnitude')
-
-        self.axes.autoscale(False)
-        self.on_initial_plot_complete()
-
-
-def generate_solutions(queue, signal, freq):
-    from maths.algorithms import wft
-    import matlab
-
-    A = matlab.double([signal])
-    fs_matlab = freq
-
-    wft, f = wft.calculate(A, fs_matlab)
-
-    queue.put((np.asarray(wft), np.asarray(f),))

@@ -23,7 +23,7 @@ from gui.base.windows.MaximisedWindow import MaximisedWindow
 from gui.timefrequency.FrequencyDialog import FrequencyDialog
 from gui.timefrequency.SignalPlot import SignalPlot
 from maths.TimeSeries import TimeSeries
-from maths.algorithms import mp_wft
+from maths.algorithms.mp_wft import MPHelper
 
 
 class TimeFreqWindow(MaximisedWindow):
@@ -38,6 +38,7 @@ class TimeFreqWindow(MaximisedWindow):
         self.freq = None
         self.time_series = None
         self.open_file = None
+        self.mp = None
 
         super().__init__()
 
@@ -50,8 +51,14 @@ class TimeFreqWindow(MaximisedWindow):
 
     def calculate(self):
         """Calculates the desired transform(s), and plots the result."""
+        if self.mp:
+            self.mp.stop()
+
         self.plot_main.clear()
-        mp_wft.mp_calculate(self.time_series, self, self.plot_transform)
+        self.plot_main.set_in_progress()
+
+        self.mp = MPHelper()
+        self.mp.wft(data=self.time_series, window=self, on_result=self.plot_main.plot)
 
     def set_title(self, name=""):
         super(TimeFreqWindow, self).set_title(self.get_window_name())
@@ -109,7 +116,3 @@ class TimeFreqWindow(MaximisedWindow):
         """Plots the signal on the SignalPlot."""
         signal_plot: SignalPlot = self.plot_top
         signal_plot.plot(self.time_series)
-
-    def plot_transform(self, times, wft, freq):
-        """Plots the transform on the WFTPlot."""
-        self.plot_main.plot(times, wft, freq)
