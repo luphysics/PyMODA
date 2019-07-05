@@ -37,7 +37,7 @@ def calculate(params):
     Instead, use `MPHelper` to call it safely in a new process.
     """
 
-    wft, frequency = package.wft(matlab.double([params.time_series.data.tolist()]),
+    wft, frequency = package.wft(matlab.double([params.time_series.signal.tolist()]),
                                  params.fs,
                                  params.get(),
                                  nargout=2)
