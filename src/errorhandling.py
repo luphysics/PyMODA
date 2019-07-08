@@ -45,7 +45,11 @@ def unsubscribe(subscriber):
 def notify_subscribers(exc_type, value, traceback):
     """Notifies all subscribers with the current exception."""
     for s in subscribers:
-        s.notify(exc_type, value, traceback)
+        if isinstance(s, ExceptionSubscriber):
+            s.notify(exc_type, value, traceback)
+        else:
+            s(exc_type, value, traceback)
+
     print(f"\n\nEXCEPTION: {value}\n{exc_type}\n{traceback}")
 
 

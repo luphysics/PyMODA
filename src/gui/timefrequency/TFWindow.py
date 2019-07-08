@@ -76,19 +76,23 @@ class TFWindow(MaximisedWindow, TFView):
         signal_plot.plot(time_series)
 
     def on_calculate_started(self):
+        self.main_plot().set_in_progress(True)
         btn = self.btn_calculate
+
         btn.setText("Cancel")
         btn.setStyleSheet("color: red;")
+
         btn.clicked.disconnect()
-        self.main_plot().set_in_progress(True)
         btn.clicked.connect(self.presenter.cancel_calculate)
 
     def on_calculate_stopped(self):
+        self.main_plot().set_in_progress(False)
         btn = self.btn_calculate
+
         btn.setText("Calculate")
         btn.setStyleSheet("color: black;")
+
         btn.clicked.disconnect()
-        self.main_plot().set_in_progress(False)
         btn.clicked.connect(self.presenter.calculate)
 
     def get_window(self) -> QWindow:

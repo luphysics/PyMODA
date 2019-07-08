@@ -15,6 +15,8 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from PyQt5.QtWidgets import QDialog
 
+import errorhandling
+from gui.base.ErrorBox import ErrorBox
 from gui.base.FrequencyDialog import FrequencyDialog
 from gui.timefrequency.TFView import TFView
 from maths.TimeSeries import TimeSeries
@@ -34,8 +36,14 @@ class TFPresenter:
         self.open_file = None
         self.mp = None
 
+        errorhandling.subscribe(self.on_error)
+
     def init(self):
         self.view.select_file()
+
+    def on_error(self, exc_type, value, traceback):
+        self.cancel_calculate()
+        ErrorBox(exc_type, value, traceback)
 
     def calculate(self):
         """Calculates the desired transform(s), and plots the result."""
