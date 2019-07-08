@@ -102,6 +102,7 @@ class PlotComponent(BaseComponent):
         Should be called after the first plot is complete. It will then set the initial state
         so that the reset button can work.
         """
+        self.clear_rect_states()
         self.add_rect_state(self.current_rect())
         self.options.set_in_progress(False)
         self.canvas.draw()
@@ -204,6 +205,9 @@ class PlotComponent(BaseComponent):
         self.axes.set_ylim(y1, y2)
 
         self.add_rect_state(rect)
+
+    def clear_rect_states(self):
+        self.rect_stack.clear()
 
     def add_rect_state(self, rect: Rect):
         """Adds a rect state to the stack of states."""
