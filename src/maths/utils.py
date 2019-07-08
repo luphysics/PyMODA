@@ -17,7 +17,7 @@
 
 def float_or_none(var):
     """
-    If the variable can be converted to a float, return the float value.
+    If the variable can be represented as a float, return the float value.
     Otherwise, return None.
 
     Note: if a boolean is passed, the function will return None.

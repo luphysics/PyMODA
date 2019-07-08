@@ -13,37 +13,12 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from multiprocess import Queue
-
-import numpy as np
-
 from gui.base.components.PlotComponent import PlotComponent
 
 
-class WFTPlot(PlotComponent):
-    """
-    Plots the windowed Fourier transform.
-    """
+class AmplitudePlot(PlotComponent):
 
-    def __init__(self, parent):
-        super().__init__(parent)
-        self.queue = Queue()
-        self.times = None
-        self.proc = None
-
-    def plot(self, times, values, freq):
-        self.mesh = self.axes.pcolormesh(times, freq, values)  # Can use: shading="gouraud"
-        self.axes.set_title('STFT Magnitude')
+    def plot(self, amplitude, freq):
+        self.axes.plot(amplitude, freq)
         self.axes.autoscale(False)
         self.on_initial_plot_complete()
-
-    def colorbar(self):
-        """Create the colorbar. Needs to be refactored to avoid breaking alignment with the signal plot."""
-        # colorbar = self.fig.colorbar(mesh)
-        pass
-
-    def get_xlabel(self):
-        return "Time (s)"
-
-    def get_ylabel(self):
-        return "Frequency (Hz)"

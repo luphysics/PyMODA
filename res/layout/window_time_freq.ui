@@ -84,7 +84,7 @@
         <item row="1" column="1">
          <layout class="QGridLayout" name="gridLayout_5">
           <item row="0" column="0">
-           <widget class="PlotComponent" name="widget_3" native="true"/>
+           <widget class="AmplitudePlot" name="plot_right" native="true"/>
           </item>
          </layout>
         </item>
@@ -528,12 +528,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>PlotComponent</class>
-   <extends>QWidget</extends>
-   <header>gui.base.components.PlotComponent</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>SignalPlot</class>
    <extends>QWidget</extends>
    <header>gui.timefrequency.plots.SignalPlot</header>
@@ -543,6 +537,12 @@
    <class>WFTPlot</class>
    <extends>QWidget</extends>
    <header>gui.timefrequency.plots.WFTPlot</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>AmplitudePlot</class>
+   <extends>QWidget</extends>
+   <header>gui.timefrequency.plots.AmplitudePlot</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

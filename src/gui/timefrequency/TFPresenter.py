@@ -61,9 +61,10 @@ class TFPresenter:
 
         self.view.on_calculate_started()
 
-    def on_calculation_completed(self, times, wft, freq):
+    def on_calculation_completed(self, times, ampl, freq, pow, avg_ampl, avg_pow):
         self.view.on_calculate_stopped()
-        self.view.main_plot().plot(times, wft, freq)
+        self.view.main_plot().plot(times, ampl, freq)
+        self.view.amplitude_plot().plot(avg_ampl, freq)
 
     def cancel_calculate(self):
         if self.mp:

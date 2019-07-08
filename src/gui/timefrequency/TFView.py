@@ -15,6 +15,8 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from PyQt5.QtGui import QWindow
 
+from gui.base.components.PlotComponent import PlotComponent
+from gui.timefrequency.plots.AmplitudePlot import AmplitudePlot
 from gui.timefrequency.plots.WFTPlot import WFTPlot
 
 
@@ -41,6 +43,9 @@ class TFView:
 
     def main_plot(self) -> WFTPlot:
         """Returns the main plot, which is used to display the transform."""
+        pass
+
+    def amplitude_plot(self) -> AmplitudePlot:
         pass
 
     def get_window(self) -> QWindow:

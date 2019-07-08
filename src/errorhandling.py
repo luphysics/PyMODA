@@ -30,8 +30,14 @@ def init():
 
 
 def hook(exc_type, value, traceback):
-    """Notifies all subscribers of an exception."""
-    notify_subscribers(exc_type, value, traceback)
+    """
+    Exception hook. KeyboardInterrupts are allowed to stop the program,
+    but for other exceptions all subscribers are notified.
+    """
+    if exc_type is not KeyboardInterrupt:
+        notify_subscribers(exc_type, value, traceback)
+    else:
+        system_exception(exc_type, value, traceback)
 
 
 def subscribe(subscriber):

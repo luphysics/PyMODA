@@ -20,9 +20,11 @@ from PyQt5.QtWidgets import QDialog
 
 from data import resources
 from gui.base.SelectFileDialog import SelectFileDialog
+from gui.base.components.PlotComponent import PlotComponent
 from gui.base.windows.MaximisedWindow import MaximisedWindow
 from gui.timefrequency.TFPresenter import TFPresenter
 from gui.timefrequency.TFView import TFView
+from gui.timefrequency.plots.AmplitudePlot import AmplitudePlot
 from gui.timefrequency.plots.WFTPlot import WFTPlot
 from maths.utils import float_or_none
 
@@ -100,6 +102,9 @@ class TFWindow(MaximisedWindow, TFView):
 
     def main_plot(self) -> WFTPlot:
         return self.plot_main
+
+    def amplitude_plot(self) -> AmplitudePlot:
+        return self.plot_right
 
     def setup_radio_plot(self):
         self.radio_plot_ampl.setChecked(True)

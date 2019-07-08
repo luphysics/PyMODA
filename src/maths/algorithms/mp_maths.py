@@ -109,10 +109,29 @@ class MPHelper:
 
         wft, f = wft.calculate(params)
 
+        amplitude = np.abs(wft)
+        power = np.square(amplitude)
+
+        avg_ampl = np.zeros((len(amplitude)), dtype=np.float64)
+        avg_pow = np.zeros((len(amplitude)), dtype=np.float64)
+
+        for i in range(len(amplitude)):
+            arr = amplitude[i]
+            row = []
+            for item in arr:
+                if not np.isnan(item):
+                    row.append(item)
+
+            avg_ampl[i] = np.mean(row)
+            avg_pow[i] = np.mean(row)
+
         queue.put((
             params.time_series.times,
-            np.asarray(wft),
+            amplitude,
             np.asarray(f),
+            power,
+            avg_ampl,
+            avg_pow,
         ))
 
     def stop(self):
