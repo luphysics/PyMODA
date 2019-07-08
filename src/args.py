@@ -31,7 +31,9 @@ def parser():
     p.add_argument("-runtime", metavar="ld_library_path", action="store", nargs=1, default=None,
                    help="LD_LIBRARY_PATH used to make libraries from the Matlab Runtime")
     p.add_argument("--no-maximise", action="store_false", default=True,
-                   help="Use this flag to prevent windows from opening in a maximised state")
+                   help="Use this argument to prevent windows from opening in a maximised state")
+    p.add_argument("--debug", action="store_true", default=False,
+                   help="Use this argument to disable error handling and throw hard exceptions")
     return p
 
 
@@ -61,6 +63,11 @@ def maximise():
     arguments.
     """
     return not args or args.no_maximise
+
+
+def debug():
+    """Returns whether error handling should be disabled."""
+    return args and args.debug
 
 
 def setup_matlab_runtime():

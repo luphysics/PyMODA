@@ -17,6 +17,7 @@
 import sys
 
 import args
+import errorhandling
 from gui.Application import Application
 
 
@@ -29,4 +30,5 @@ def main():
 # The entry-point of the program.
 if __name__ == "__main__":
     args.parse_args()
+    errorhandling.init()
     main()

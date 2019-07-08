@@ -113,7 +113,7 @@ class TFWindow(MaximisedWindow, TFView):
         return float_or_none(text)
 
     def get_f0(self) -> float:
-        text = "" # Placeholder.
+        text = self.line_res.text()
         return float_or_none(text)
 
     def get_fstep(self) -> float:
@@ -121,7 +121,8 @@ class TFWindow(MaximisedWindow, TFView):
         return float_or_none(text)
 
     def get_padding(self) -> str:
-        return super().get_padding()
+        # return super().get_padding()
+        return self.not_a_variable # Just testing error handling
 
     def get_rel_tolerance(self) -> float:
         return super().get_rel_tolerance()
