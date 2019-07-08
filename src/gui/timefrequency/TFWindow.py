@@ -34,6 +34,7 @@ class TFWindow(MaximisedWindow, TFView):
 
     def __init__(self, application):
         self.presenter = TFPresenter(self)
+
         TFView.__init__(self, application)
         MaximisedWindow.__init__(self)
 
@@ -42,6 +43,7 @@ class TFWindow(MaximisedWindow, TFView):
         self.update_title()
         self.setup_menu_bar()
 
+        # Setup radio buttons.
         self.setup_radio_plot()
         self.setup_radio_transform()
         self.setup_radio_preproc()
@@ -76,6 +78,7 @@ class TFWindow(MaximisedWindow, TFView):
     def on_calculate_started(self):
         btn = self.btn_calculate
         btn.setText("Cancel")
+        btn.setStyleSheet("color: red;")
         btn.clicked.disconnect()
         self.main_plot().set_in_progress(True)
         btn.clicked.connect(self.presenter.cancel_calculate)
@@ -83,6 +86,7 @@ class TFWindow(MaximisedWindow, TFView):
     def on_calculate_stopped(self):
         btn = self.btn_calculate
         btn.setText("Calculate")
+        btn.setStyleSheet("color: black;")
         btn.clicked.disconnect()
         self.main_plot().set_in_progress(False)
         btn.clicked.connect(self.presenter.calculate)
