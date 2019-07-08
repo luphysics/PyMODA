@@ -32,7 +32,7 @@ class WFTPlot(PlotComponent):
         self.proc = None
 
     def plot(self, times, wft, freq):
-        self.mesh = self.axes.pcolormesh(times, freq, np.abs(wft))
+        self.mesh = self.axes.pcolormesh(times, freq, np.abs(wft))  # Can use: shading="gouraud"
         self.axes.set_title('STFT Magnitude')
         self.axes.autoscale(False)
         self.on_initial_plot_complete()

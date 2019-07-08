@@ -73,6 +73,20 @@ class TFWindow(MaximisedWindow, TFView):
         signal_plot = self.plot_top
         signal_plot.plot(time_series)
 
+    def on_calculate_started(self):
+        btn = self.btn_calculate
+        btn.setText("Cancel")
+        btn.clicked.disconnect()
+        self.main_plot().set_in_progress(True)
+        btn.clicked.connect(self.presenter.cancel_calculate)
+
+    def on_calculate_stopped(self):
+        btn = self.btn_calculate
+        btn.setText("Calculate")
+        btn.clicked.disconnect()
+        self.main_plot().set_in_progress(False)
+        btn.clicked.connect(self.presenter.calculate)
+
     def get_window(self) -> QWindow:
         return self
 
@@ -117,7 +131,7 @@ class TFWindow(MaximisedWindow, TFView):
         return float_or_none(text)
 
     def get_fstep(self) -> float:
-        text = "" # Placeholder.
+        text = ""  # Placeholder.
         return float_or_none(text)
 
     def get_padding(self) -> str:

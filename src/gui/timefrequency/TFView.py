@@ -97,3 +97,9 @@ class TFView:
 
     def get_transform_window(self) -> str:
         pass
+
+    def on_calculate_started(self):
+        pass
+
+    def on_calculate_stopped(self):
+        pass

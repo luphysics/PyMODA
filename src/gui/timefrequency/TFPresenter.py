@@ -51,6 +51,13 @@ class TFPresenter:
             window=self.view.get_window(),
             on_result=self.view.main_plot().plot)
 
+        self.view.on_calculate_started()
+
+    def cancel_calculate(self):
+        if self.mp:
+            self.mp.stop()
+        self.view.on_calculate_stopped()
+
     def get_params(self) -> WFTParams:
         """Creates the parameters to use when performing the calculations."""
         return WFTParams.create(
