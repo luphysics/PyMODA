@@ -13,7 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from multiprocessing import Queue, Process
+from multiprocess import Queue, Process
 
 import numpy as np
 from PyQt5.QtCore import QTimer
