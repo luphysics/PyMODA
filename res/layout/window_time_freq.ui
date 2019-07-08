@@ -139,7 +139,7 @@
           <item>
            <layout class="QFormLayout" name="formLayout_6">
             <item row="1" column="0">
-             <widget class="QGroupBox" name="">
+             <widget class="QGroupBox" name="groupBox">
               <property name="title">
                <string>Statistics</string>
               </property>
@@ -213,7 +213,7 @@
                </widget>
               </item>
               <item row="0" column="0">
-               <widget class="QGroupBox" name="">
+               <widget class="QGroupBox" name="groupBox">
                 <property name="title">
                  <string>Average</string>
                 </property>
@@ -236,7 +236,7 @@
                </widget>
               </item>
               <item row="2" column="0">
-               <widget class="QGroupBox" name="">
+               <widget class="QGroupBox" name="groupBox">
                 <property name="title">
                  <string>Pairing</string>
                 </property>
@@ -275,7 +275,7 @@
           <item row="0" column="0">
            <layout class="QFormLayout" name="formLayout">
             <item row="0" column="0">
-             <widget class="QGroupBox" name="">
+             <widget class="QGroupBox" name="groupBox">
               <property name="title">
                <string>Plot</string>
               </property>
@@ -298,7 +298,7 @@
              </widget>
             </item>
             <item row="1" column="0">
-             <widget class="QGroupBox" name="">
+             <widget class="QGroupBox" name="groupBox">
               <property name="title">
                <string>Preprocessing</string>
               </property>
@@ -321,7 +321,7 @@
              </widget>
             </item>
             <item row="1" column="1">
-             <widget class="QGroupBox" name="">
+             <widget class="QGroupBox" name="groupBox">
               <property name="title">
                <string>Cut Edges</string>
               </property>
@@ -344,7 +344,7 @@
              </widget>
             </item>
             <item row="0" column="1">
-             <widget class="QGroupBox" name="">
+             <widget class="QGroupBox" name="groupBox">
               <property name="title">
                <string>Transform</string>
               </property>
@@ -386,12 +386,27 @@
               </item>
               <item>
                <property name="text">
+                <string>Hann</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Blackman</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
                 <string>Exp</string>
                </property>
               </item>
               <item>
                <property name="text">
-                <string>Hann</string>
+                <string>Rect</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Kaiser-a</string>
                </property>
               </item>
              </widget>

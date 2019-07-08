@@ -127,10 +127,11 @@ class TFWindow(MaximisedWindow, TFView):
         return super().get_rel_tolerance()
 
     def get_cut_edges(self) -> bool:
-        return super().get_cut_edges()
+        return self.radio_cut_on.isChecked()
 
     def get_preprocess(self) -> bool:
-        return super().get_preprocess()
+        return self.radio_preproc_on.isChecked()
 
     def get_transform_window(self) -> str:
-        return super().get_transform_window()
+        combo = self.combo_window
+        return combo.currentText()

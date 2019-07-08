@@ -16,6 +16,12 @@
 
 
 def float_or_none(var):
+    """
+    If the variable can be converted to a float, return the float value.
+    Otherwise, return None.
+
+    Note: if a boolean is passed, the function will return None.
+    """
     result = None
     try:
         if not isinstance(var, bool):  # We don't want unexpected boolean conversions.
@@ -26,4 +32,8 @@ def float_or_none(var):
 
 
 def isfloat(var):
+    """
+    Returns whether a variable can be represented as a float.
+    Returns False for any boolean variable.
+    """
     return float_or_none(var) is not None

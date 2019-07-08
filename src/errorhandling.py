@@ -46,7 +46,7 @@ def notify_subscribers(exc_type, value, traceback):
     """Notifies all subscribers with the current exception."""
     for s in subscribers:
         s.notify(exc_type, value, traceback)
-    print(f"\n\nerrorhandling.py caught exception:\n****HANDLED EXCEPTION****\n{exc_type}\n{value}\n{traceback}")
+    print(f"\n\nEXCEPTION: {value}\n{exc_type}\n{traceback}")
 
 
 def system_exception(exc_type, value, traceback):
