@@ -24,6 +24,7 @@ from gui.base.windows.MaximisedWindow import MaximisedWindow
 from gui.timefrequency.TFPresenter import TFPresenter
 from gui.timefrequency.TFView import TFView
 from gui.timefrequency.plots.WFTPlot import WFTPlot
+from maths.utils import float_or_none
 
 
 class TFWindow(MaximisedWindow, TFView):
@@ -103,16 +104,21 @@ class TFWindow(MaximisedWindow, TFView):
         return self.radio_preproc_on.isChecked()
 
     def get_fmin(self) -> float:
-        return super().get_fmin()
+        edit = self.line_fmin
+        text = edit.text()
+        return float_or_none(text)
 
     def get_fmax(self) -> float:
-        return super().get_fmax()
+        text = self.line_fmax.text()
+        return float_or_none(text)
 
     def get_f0(self) -> float:
-        return super().get_f0()
+        text = "" # Placeholder.
+        return float_or_none(text)
 
     def get_fstep(self) -> float:
-        return super().get_fstep()
+        text = "" # Placeholder.
+        return float_or_none(text)
 
     def get_padding(self) -> str:
         return super().get_padding()

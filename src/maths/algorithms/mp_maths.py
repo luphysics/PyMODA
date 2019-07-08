@@ -28,7 +28,13 @@ class Watcher:
     """
 
     def __init__(self, window, queue, delay_seconds, on_result):
-        super().__init__()
+        """
+        :param window: the QWindow from which the operation is being performed
+        :param queue: the queue which will be used to get the result from the other process
+        :param delay_seconds: the time between each consecutive check for a result
+        :param on_result: a callback which should run on the main process/thread, taking
+        the result of the operation
+        """
 
         self.delay = delay_seconds * 1000
         self.on_result = on_result
@@ -74,6 +80,16 @@ class MPHelper:
             params: WFTParams,
             window,
             on_result):
+        """
+        Performs the windowed Fourier transform in another process, returning a result
+        in the main process.
+
+        :param params: the parameters for the WFT
+        :param window: the QWindow from which the WFT is being calculated
+        :param on_result: a callback which takes the result of the calculations
+        on the main process/thread
+        :return:
+        """
         self.queue = Queue()
 
         self.proc = Process(target=self.__wft, args=(self.queue, params,))
