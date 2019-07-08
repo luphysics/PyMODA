@@ -76,6 +76,11 @@ class MPHelper:
     completion.
     """
 
+    def __init__(self):
+        self.queue = None
+        self.proc = None
+        self.watcher = None
+
     def wft(self,
             params: WFTParams,
             window,
@@ -91,7 +96,6 @@ class MPHelper:
         :return:
         """
         self.queue = Queue()
-
         self.proc = Process(target=self.__wft, args=(self.queue, params,))
         self.proc.start()
 
@@ -112,7 +116,8 @@ class MPHelper:
         ))
 
     def stop(self):
-        """Stops the tasks in progress."""
-        self.proc.terminate()
-        self.watcher.stop()
-        self.queue.close()
+        """Stops the tasks in progress. The MPHelper can be reused."""
+        if self.proc and self.watcher and self.queue:
+            self.proc.terminate()
+            self.watcher.stop()
+            self.queue.close()
