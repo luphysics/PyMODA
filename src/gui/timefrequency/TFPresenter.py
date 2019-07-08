@@ -49,9 +49,13 @@ class TFPresenter:
         self.mp.wft(
             params=self.get_params(),
             window=self.view.get_window(),
-            on_result=self.view.main_plot().plot)
+            on_result=self.on_calculation_completed)
 
         self.view.on_calculate_started()
+
+    def on_calculation_completed(self, times, wft, freq):
+        self.view.on_calculate_stopped()
+        self.view.main_plot().plot(times, wft, freq)
 
     def cancel_calculate(self):
         if self.mp:
