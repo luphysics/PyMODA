@@ -2,6 +2,8 @@
 matplotlib>=3.0.2
 multiprocess>=0.70.8
 numpy>=1.16.3
+PyOpenGL>=3.1.0
 PyQt5==5.12.1
 PyQt5-stubs==5.12.1
+PyQtGraph>=0.10.0
 scipy>=1.1.0

@@ -74,14 +74,13 @@ class MPHelper:
         amplitude = np.abs(wft)
         power = np.square(amplitude)
 
-        # `f` contains many arrays with only one item, so reshape to a 1D array.
-        freq = np.asarray(f).reshape(len(f))
+        freq = np.asarray(f)
         length = len(amplitude)
 
         avg_ampl = np.zeros((length,), dtype=np.float64)
         avg_pow = np.zeros((length,), dtype=np.float64)
 
-        for i in range(len(amplitude)):
+        for i in range(length):
             arr = amplitude[i]
             row = arr[np.isfinite(arr)]
 

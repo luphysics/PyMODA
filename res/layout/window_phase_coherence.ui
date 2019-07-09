@@ -84,7 +84,7 @@
         <item row="1" column="1">
          <layout class="QGridLayout" name="gridLayout_5">
           <item row="0" column="0">
-           <widget class="PlotComponent" name="widget_3" native="true"/>
+           <widget class="MatplotlibComponent" name="widget_3" native="true"/>
           </item>
          </layout>
         </item>
@@ -454,9 +454,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>PlotComponent</class>
+   <class>MatplotlibComponent</class>
    <extends>QWidget</extends>
-   <header>gui.base.components.PlotComponent</header>
+   <header>gui.base.components.MatplotlibComponent</header>
    <container>1</container>
   </customwidget>
   <customwidget>

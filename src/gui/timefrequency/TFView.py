@@ -15,7 +15,7 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from PyQt5.QtGui import QWindow
 
-from gui.base.components.PlotComponent import PlotComponent
+from gui.base.components.MatplotlibComponent import MatplotlibComponent
 from gui.timefrequency.plots.AmplitudePlot import AmplitudePlot
 from gui.timefrequency.plots.WFTPlot import WFTPlot
 

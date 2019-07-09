@@ -13,11 +13,11 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from gui.base.components.PlotComponent import PlotComponent
+from gui.base.components.MatplotlibComponent import MatplotlibComponent
 from maths.TimeSeries import TimeSeries
 
 
-class SignalPlot(PlotComponent):
+class SignalPlot(MatplotlibComponent):
     """
     Plots the signal, which is a simple set of amplitudes against time.
     """

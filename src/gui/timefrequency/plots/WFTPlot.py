@@ -13,36 +13,34 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from multiprocess import Queue
-
 import numpy as np
+from matplotlib.colors import LinearSegmentedColormap
+from pyqtgraph.opengl import GLSurfacePlotItem
 
 from data import resources
-from gui.base.components.PlotComponent import PlotComponent
-from matplotlib.colors import LinearSegmentedColormap
+from gui.base.components.PyQtGraphComponent import PyQtGraphComponent
 
 
-class WFTPlot(PlotComponent):
+class WFTPlot(PyQtGraphComponent):
     """
     Plots the windowed Fourier transform.
     """
 
-    def __init__(self, parent):
-        super().__init__(parent)
-        self.queue = Queue()
-        self.times = None
-
     def plot(self, times, values, freq):
-        self.clear()
+        # self.clear()
 
         finite = values[np.isfinite(values)]  # Remove the 'NaN' items.
-        mesh1, mesh2 = np.meshgrid(times, freq)
-        self.mesh = self.axes.contourf(mesh1, mesh2, values, 256,
-                                         vmin=np.min(finite), vmax=np.max(finite),
-                                         cmap=self.colormap())  # Can use: shading="gouraud"
-        self.axes.set_title('STFT Magnitude')
-        self.axes.autoscale(False)
-        self.on_initial_plot_complete()
+
+        self.surface = GLSurfacePlotItem()
+
+
+        # mesh1, mesh2 = np.meshgrid(times, freq)
+        # self.mesh = self.axes.contourf(mesh1, mesh2, values, 256,
+        #                                vmin=np.min(finite), vmax=np.max(finite),
+        #                                cmap=self.colormap())  # Can use: shading="gouraud"
+        # self.axes.set_title('STFT Magnitude')
+        # self.axes.autoscale(False)
+        # self.on_initial_plot_complete()
         # self.colorbar()
 
     def colormap(self):
