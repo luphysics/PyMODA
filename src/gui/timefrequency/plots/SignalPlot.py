@@ -23,6 +23,7 @@ class SignalPlot(PlotComponent):
     """
 
     def plot(self, data: TimeSeries):
+        self.clear()
         x = data.times
         y = data.signal
 

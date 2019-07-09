@@ -19,6 +19,12 @@ from gui.base.components.PlotComponent import PlotComponent
 class AmplitudePlot(PlotComponent):
 
     def plot(self, amplitude, freq):
+        self.clear()
+
+        y = freq
+        ylim = sorted([y[0], y[-1]])
+        self.axes.set_ylim(ylim)
+
         self.axes.plot(amplitude, freq)
         self.axes.autoscale(False)
         self.on_initial_plot_complete()

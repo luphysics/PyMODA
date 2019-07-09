@@ -117,13 +117,10 @@ class MPHelper:
 
         for i in range(len(amplitude)):
             arr = amplitude[i]
-            row = []
-            for item in arr:
-                if not np.isnan(item):
-                    row.append(item)
+            row = arr[np.isfinite(arr)]
 
             avg_ampl[i] = np.mean(row)
-            avg_pow[i] = np.mean(row)
+            avg_pow[i] = np.mean(np.square(row))
 
         queue.put((
             params.time_series.times,

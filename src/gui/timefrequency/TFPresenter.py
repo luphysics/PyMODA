@@ -31,10 +31,13 @@ class TFPresenter:
 
     def __init__(self, view: TFView):
         self.view = view
-        self.freq = None
+        self.is_plotted = False
+        self.plot_ampl = True
+
         self.time_series = None
         self.open_file = None
-        self.mp = None
+        self.freq = None
+        self.mp_handler = None
 
         errorhandling.subscribe(self.on_error)
 
@@ -47,29 +50,76 @@ class TFPresenter:
 
     def calculate(self):
         """Calculates the desired transform(s), and plots the result."""
-        if self.mp:
-            self.mp.stop()
+        if self.mp_handler:
+            self.mp_handler.stop()
 
+        self.is_plotted = False
         self.view.main_plot().clear()
         self.view.main_plot().set_in_progress()
 
-        self.mp = MPHelper()
-        self.mp.wft(
+        self.mp_handler = MPHelper()
+        self.mp_handler.wft(
             params=self.get_params(),
             window=self.view.get_window(),
             on_result=self.on_calculation_completed)
 
         self.view.on_calculate_started()
 
-    def on_calculation_completed(self, times, ampl, freq, pow, avg_ampl, avg_pow):
+    def on_calculation_completed(self, times, ampl, freq, powers, avg_ampl, avg_pow):
+        """Called when the calculation of the desired transform(s) is completed."""
         self.view.on_calculate_stopped()
-        self.view.main_plot().plot(times, ampl, freq)
-        self.view.amplitude_plot().plot(avg_ampl, freq)
+
+        self.times = times
+        self.ampl = ampl
+        self.frequencies = freq
+        self.powers = powers
+        self.avg_ampl = avg_ampl
+        self.avg_pow = avg_pow
+
+        values, avg_values = self.get_values_to_plot()
+
+        self.plot(times, freq, values, avg_values)
+        self.is_plotted = True
+
+    def get_values_to_plot(self, amplitude=None):
+        amp = self.plot_ampl
+        if amplitude is not None:
+            amp = amplitude
+
+        if amp:
+            values = self.ampl
+            avg_values = self.avg_ampl
+        else:
+            values = self.powers
+            avg_values = self.avg_pow
+
+        return values, avg_values
 
     def cancel_calculate(self):
-        if self.mp:
-            self.mp.stop()
+        """
+        Cancels the calculation of the desired transform(s),
+        killing their processes immediately.
+        """
+        if self.mp_handler:
+            self.mp_handler.stop()
         self.view.on_calculate_stopped()
+        self.is_plotted = False
+
+    def set_plot_type(self, amplitude_selected):
+        """
+        Set the type of plot to display (power or amplitude). This affects
+        the main plot and the amplitude plot.
+
+        :param amplitude_selected: whether to set the plot type as amplitude (not power)
+        """
+        self.plot_ampl = amplitude_selected
+        if self.is_plotted:
+            values, avg_values = self.get_values_to_plot()
+            self.plot(self.times, self.frequencies, values, avg_values)
+
+    def plot(self, times, freq, values, avg_values):
+        self.view.main_plot().plot(times, values, freq)
+        self.view.amplitude_plot().plot(avg_values, freq)
 
     def get_params(self) -> WFTParams:
         """Creates the parameters to use when performing the calculations."""
@@ -87,7 +137,10 @@ class TFPresenter:
         )
 
     def load_data(self):
-        """Loads the time-series data from a file, via a dialog."""
+        """
+        Loads the time-series data from the currently
+        selected file, via a dialog.
+        """
         self.time_series = TimeSeries.from_file(self.open_file)
         if not self.time_series.has_frequency():
             dialog = FrequencyDialog(self.on_freq_changed)

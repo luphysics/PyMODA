@@ -27,8 +27,9 @@ class TFView:
 
     name = "Time-Frequency Analysis"
 
-    def __init__(self, application):
+    def __init__(self, application, presenter):
         self.application = application
+        self.presenter = presenter
 
     def plot_signal(self, time_series):
         """Plots the signal on the SignalPlot."""
@@ -54,6 +55,13 @@ class TFView:
     def setup_radio_plot(self):
         """Set up the radio buttons for plot amplitude/power."""
         pass
+
+    def on_plot_type_toggled(self, ampl_selected):
+        """
+        Triggered when plot type is changed from amplitude to power, or vice versa.
+        :param ampl_selected: whether the plot type is amplitude, not power
+        """
+        self.presenter.set_plot_type(ampl_selected)
 
     def setup_radio_transform(self):
         pass

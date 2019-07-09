@@ -20,7 +20,6 @@ from PyQt5.QtWidgets import QDialog
 
 from data import resources
 from gui.base.SelectFileDialog import SelectFileDialog
-from gui.base.components.PlotComponent import PlotComponent
 from gui.base.windows.MaximisedWindow import MaximisedWindow
 from gui.timefrequency.TFPresenter import TFPresenter
 from gui.timefrequency.TFView import TFView
@@ -35,9 +34,7 @@ class TFWindow(MaximisedWindow, TFView):
     """
 
     def __init__(self, application):
-        self.presenter = TFPresenter(self)
-
-        TFView.__init__(self, application)
+        TFView.__init__(self, application, TFPresenter(self))
         MaximisedWindow.__init__(self)
 
     def init_ui(self):
@@ -79,6 +76,8 @@ class TFWindow(MaximisedWindow, TFView):
 
     def on_calculate_started(self):
         self.main_plot().set_in_progress(True)
+        self.amplitude_plot().clear()
+        self.amplitude_plot().set_in_progress(True)
         btn = self.btn_calculate
 
         btn.setText("Cancel")
@@ -89,6 +88,7 @@ class TFWindow(MaximisedWindow, TFView):
 
     def on_calculate_stopped(self):
         self.main_plot().set_in_progress(False)
+        self.amplitude_plot().set_in_progress(False)
         btn = self.btn_calculate
 
         btn.setText("Calculate")
@@ -108,6 +108,7 @@ class TFWindow(MaximisedWindow, TFView):
 
     def setup_radio_plot(self):
         self.radio_plot_ampl.setChecked(True)
+        self.radio_plot_ampl.toggled.connect(self.on_plot_type_toggled)
 
     def setup_radio_transform(self):
         self.radio_transform_wft.setChecked(True)
