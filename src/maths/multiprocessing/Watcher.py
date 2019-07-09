@@ -14,6 +14,8 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+import time
+
 from PyQt5.QtCore import QTimer
 
 
@@ -55,7 +57,6 @@ class Watcher:
     def check_result(self):
         """Check for a result from the other process."""
         if not self.queue.empty():
+            print(f"Received items from queue at time: {time.time()} seconds.")
             self.stop()
             self.on_result(*self.queue.get())
-
-

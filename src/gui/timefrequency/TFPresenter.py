@@ -55,7 +55,7 @@ class TFPresenter:
 
         self.is_plotted = False
         self.view.main_plot().clear()
-        self.view.main_plot().set_in_progress()
+        self.view.main_plot().set_in_progress(True)
 
         self.mp_handler = MPHelper()
         self.mp_handler.wft(

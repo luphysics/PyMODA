@@ -14,11 +14,15 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+import time
+
 import numpy as np
+from PyQt5.QtGui import QWindow
 from multiprocess import Queue, Process
 
 from maths.algorithms.params import WFTParams
 from maths.multiprocessing.Watcher import Watcher
+from maths.multiprocessing.mp_utils import convert_to_ctypes
 
 
 class MPHelper:
@@ -41,7 +45,7 @@ class MPHelper:
 
     def wft(self,
             params: WFTParams,
-            window,
+            window: QWindow,
             on_result):
         """
         Performs the windowed Fourier transform in another process, returning a result
@@ -54,14 +58,14 @@ class MPHelper:
         :return:
         """
         self.queue = Queue()
-        self.proc = Process(target=self.__wft, args=(self.queue, params,))
+        self.proc = Process(target=self._wft, args=(self.queue, params,))
         self.proc.start()
 
         self.watcher = Watcher(window, self.queue, 0.5, on_result)
         self.watcher.start()
 
     @staticmethod
-    def __wft(queue, params: WFTParams):
+    def _wft(queue, params: WFTParams):
         # Don't move the import statements.
         from maths.algorithms import wft
 
@@ -70,8 +74,12 @@ class MPHelper:
         amplitude = np.abs(wft)
         power = np.square(amplitude)
 
-        avg_ampl = np.zeros((len(amplitude)), dtype=np.float64)
-        avg_pow = np.zeros((len(amplitude)), dtype=np.float64)
+        # `f` contains many arrays with only one item, so reshape to a 1D array.
+        freq = np.asarray(f).reshape(len(f))
+        length = len(amplitude)
+
+        avg_ampl = np.zeros((length,), dtype=np.float64)
+        avg_pow = np.zeros((length,), dtype=np.float64)
 
         for i in range(len(amplitude)):
             arr = amplitude[i]
@@ -80,10 +88,12 @@ class MPHelper:
             avg_ampl[i] = np.mean(row)
             avg_pow[i] = np.mean(np.square(row))
 
+        print(f"Started putting items in queue at time: {time.time()} seconds.")
+
         queue.put((
             params.time_series.times,
             amplitude,
-            np.asarray(f),
+            freq,
             power,
             avg_ampl,
             avg_pow,
