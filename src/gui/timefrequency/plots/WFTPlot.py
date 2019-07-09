@@ -37,12 +37,14 @@ class WFTPlot(PlotComponent):
         self.clear()
 
         finite = values[np.isfinite(values)]  # Remove the 'NaN' items.
-        self.mesh = self.axes.pcolormesh(times, freq, values,
+        mesh1, mesh2 = np.meshgrid(times, freq)
+        self.mesh = self.axes.contourf(mesh1, mesh2, values, 256,
                                          vmin=np.min(finite), vmax=np.max(finite),
                                          cmap=self.colormap())  # Can use: shading="gouraud"
         self.axes.set_title('STFT Magnitude')
         self.axes.autoscale(False)
         self.on_initial_plot_complete()
+        # self.colorbar()
 
     def colormap(self):
         file = resources.get("colours:colormap.csv")
@@ -52,7 +54,7 @@ class WFTPlot(PlotComponent):
 
     def colorbar(self):
         """Create the colorbar. Needs to be refactored to avoid breaking alignment with the signal plot."""
-        # colorbar = self.fig.colorbar(mesh)
+        colorbar = self.fig.colorbar(self.mesh)
         pass
 
     def get_xlabel(self):
