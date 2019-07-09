@@ -14,7 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from PyQt5 import uic
+from PyQt5 import uic, QtGui
 from PyQt5.QtGui import QWindow
 from PyQt5.QtWidgets import QDialog
 
@@ -96,6 +96,10 @@ class TFWindow(MaximisedWindow, TFView):
 
         btn.clicked.disconnect()
         btn.clicked.connect(self.presenter.calculate)
+
+    def closeEvent(self, e: QtGui.QCloseEvent) -> None:
+        self.presenter.cancel_calculate()
+        super().closeEvent(e)
 
     def get_window(self) -> QWindow:
         return self

@@ -31,7 +31,6 @@ class WFTPlot(PlotComponent):
         super().__init__(parent)
         self.queue = Queue()
         self.times = None
-        self.proc = None
 
     def plot(self, times, values, freq):
         self.clear()
