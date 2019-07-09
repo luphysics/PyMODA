@@ -30,7 +30,9 @@ from maths.utils import float_or_none
 
 class TFWindow(MaximisedWindow, TFView):
     """
-    The window which is used to perform time-frequency analysis.
+    The time-frequency analysis window. This class is the "View" in MVP,
+    meaning that it should defer responsibility for tasks to the
+    presenter.
     """
 
     def __init__(self, application):

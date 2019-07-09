@@ -20,7 +20,7 @@ from gui.base.ErrorBox import ErrorBox
 from gui.base.FrequencyDialog import FrequencyDialog
 from gui.timefrequency.TFView import TFView
 from maths.TimeSeries import TimeSeries
-from maths.algorithms.mp_maths import MPHelper
+from maths.multiprocessing.MPHelper import MPHelper
 from maths.algorithms.params import WFTParams
 
 

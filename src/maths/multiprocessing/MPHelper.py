@@ -13,54 +13,12 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from multiprocess import Queue, Process
 
 import numpy as np
-from PyQt5.QtCore import QTimer
+from multiprocess import Queue, Process
 
 from maths.algorithms.params import WFTParams
-
-
-class Watcher:
-    """
-    A class which watches for a result from a process, using a QTimer
-    to avoid blocking the main thread.
-    """
-
-    def __init__(self, window, queue, delay_seconds, on_result):
-        """
-        :param window: the QWindow from which the operation is being performed
-        :param queue: the queue which will be used to get the result from the other process
-        :param delay_seconds: the time between each consecutive check for a result
-        :param on_result: a callback which should run on the main process/thread, taking
-        the result of the operation
-        """
-
-        self.delay = delay_seconds * 1000
-        self.on_result = on_result
-        self.queue = queue
-
-        self.timer = QTimer(window)
-        self.timer.timeout.connect(self.check_result)
-        self.running = False
-
-    def start(self):
-        """Starts the Watcher checking for a result."""
-        self.timer.start(self.delay)
-        self.running = True
-
-    def stop(self):
-        """Stops the timer and deletes it. The Watcher cannot be started again."""
-        if self.running:
-            self.running = False
-            self.timer.stop()
-            self.timer.deleteLater()
-
-    def check_result(self):
-        """Check for a result from the other process."""
-        if not self.queue.empty():
-            self.stop()
-            self.on_result(*self.queue.get())
+from maths.multiprocessing.Watcher import Watcher
 
 
 class MPHelper:
