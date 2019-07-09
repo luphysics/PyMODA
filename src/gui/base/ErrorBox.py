@@ -21,7 +21,7 @@ class ErrorBox(QMessageBox):
     def __init__(self, exc_type, value, traceback):
         super().__init__()
         self.setIcon(QMessageBox.Warning)
-        self.setWindowTitle("Exception occurred!")
+        self.setWindowTitle("Error!")
         self.setText(f"An error has occurred:\n{value}")
 
         self.setDetailedText(f"{value}\n{exc_type}\n{traceback}")

@@ -61,9 +61,9 @@ def get_ui(name):
     Gets a .ui file from the resources folder. You may
     specify the name with or without the .ui extension.
     """
-    extension = ".ui"
-    if extension not in name:
-        name += extension
+    ext = ".ui"
+    if ext not in name:
+        name += ext
     return get_layout_path() + name
 
 
@@ -75,15 +75,14 @@ def get(resource: string) -> string:
     """
     split = resource.split(":")
     if len(split) != 2:
-        raise ResourceException(f"Error finding resource type for '{resource}'.")
+        raise ResourceException(f"Error finding resource type for '{resource}'. Wrong number of colon separators.")
 
     res_type = split[0]
     name = split[-1]
 
-    folder = resources.get(res_type)
+    folder = resources_dict.get(res_type)
     if not folder:
-        raise ResourceException(f"Requested resource type has no associated folder.")
-
+        raise ResourceException(f"Requested resource type '{res_type}' has no associated folder.")
     return folder + name
 
 
@@ -91,12 +90,17 @@ def get_test_path():
     return get_base_path() + "test/"
 
 
+def get_colour_path():
+    return get_base_path() + "colours/"
+
+
 # Used to select the correct path for a given resource type.
-resources = {
+resources_dict = {
     "layout": get_layout_path(),
     "img": get_img_path(),
     "image": get_img_path(),
     "test": get_test_path(),
+    "colours": get_colour_path(),
 }
 
 

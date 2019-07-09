@@ -17,7 +17,9 @@ from multiprocess import Queue
 
 import numpy as np
 
+from data import resources
 from gui.base.components.PlotComponent import PlotComponent
+from matplotlib.colors import LinearSegmentedColormap
 
 
 class WFTPlot(PlotComponent):
@@ -32,18 +34,21 @@ class WFTPlot(PlotComponent):
         self.proc = None
 
     def plot(self, times, values, freq):
-
-
-        from matplotlib.colors \
-        import LinearSegmentedColormap
-        colours = np.loadtxt(r'C:\Users\valys\Desktop\INTERNSHIP 2019\PyMODA\res\colours\colormap.csv', dtype=float, delimiter=',')
-        clrs = LinearSegmentedColormap.from_list("colours", colours, N=len(colours), gamma=1.0)
-
         self.clear()
-        self.mesh = self.axes.pcolormesh(times, freq, values, vmin=0, vmax=0.55, cmap=clrs)  # Can use: shading="gouraud"
+
+        finite = values[np.isfinite(values)]  # Remove the 'NaN' items.
+        self.mesh = self.axes.pcolormesh(times, freq, values,
+                                         vmin=np.min(finite), vmax=np.max(finite),
+                                         cmap=self.colormap())  # Can use: shading="gouraud"
         self.axes.set_title('STFT Magnitude')
         self.axes.autoscale(False)
         self.on_initial_plot_complete()
+
+    def colormap(self):
+        file = resources.get("colours:colormap.csv")
+        colours = np.loadtxt(file, dtype=float, delimiter=',')
+        cmap = LinearSegmentedColormap.from_list("colours", colours, N=len(colours), gamma=1.0)
+        return cmap
 
     def colorbar(self):
         """Create the colorbar. Needs to be refactored to avoid breaking alignment with the signal plot."""
