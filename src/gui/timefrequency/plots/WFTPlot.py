@@ -32,7 +32,15 @@ class WFTPlot(PlotComponent):
         self.proc = None
 
     def plot(self, times, values, freq):
-        self.mesh = self.axes.pcolormesh(times, freq, values)  # Can use: shading="gouraud"
+
+
+        from matplotlib.colors \
+        import LinearSegmentedColormap
+        colours = np.loadtxt(r'C:\Users\valys\Desktop\INTERNSHIP 2019\PyMODA\res\colours\colormap.csv', dtype=float, delimiter=',')
+        clrs = LinearSegmentedColormap.from_list("colours", colours, N=len(colours), gamma=1.0)
+
+
+        self.mesh = self.axes.pcolormesh(times, freq, values, vmin=0, vmax=0.55, cmap=clrs)  # Can use: shading="gouraud"
         self.axes.set_title('STFT Magnitude')
         self.axes.autoscale(False)
         self.on_initial_plot_complete()
