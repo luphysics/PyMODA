@@ -53,7 +53,10 @@ def path_from_file_string(str):
     Returns the file path from a file string which is
     retrieved from a drag-and-drop event.
     """
-    return str.replace("file://", "")
+    result = str.replace("file://", "")
+    if ":" == result[2]: # This is a Windows path; remove initial forward-slash.
+        result = result[1:]
+    return result
 
 
 def get_ui(name):
