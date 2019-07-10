@@ -29,7 +29,9 @@ class SelectFileDialog(QDialog, BaseUI):
     explorer.
     """
 
-    file = None
+    def __init__(self):
+        self.file = None
+        super().__init__()
 
     def init_ui(self):
         uic.loadUi(resources.get_ui("dialog_select_file"), self)
@@ -58,7 +60,7 @@ class SelectFileDialog(QDialog, BaseUI):
         dialog = QFileDialog()
         dialog.setFileMode(QFileDialog.AnyFile)
 
-        if dialog.exec_():
+        if dialog.exec():
             filenames = dialog.selectedFiles()
             self.file = filenames[0]
             self.lbl_drag_drop.show_selected_file(self.file)

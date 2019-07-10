@@ -24,7 +24,12 @@ class DragDropLabel(QLabel):
     succeeds, the filename is shown in the label. The label changes
     colour while a drag event is in progress.
     """
-    callback = None  # Callback will be used to send the file name.
+
+    def __init__(self, parent):
+        super().__init__(parent)
+
+        # Callback will be used to send the file name.
+        self.callback = None
 
     def dropEvent(self, event: QDropEvent) -> None:
         """Called when a drop event occurs."""
