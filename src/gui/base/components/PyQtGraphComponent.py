@@ -15,7 +15,7 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from PyQt5.QtWidgets import QVBoxLayout
 from pyqtgraph import PlotWidget
-from pyqtgraph.opengl import GLSurfacePlotItem
+from pyqtgraph.opengl import GLSurfacePlotItem, GLViewWidget
 
 from gui.base.components.PlotComponent import PlotComponent
 
@@ -26,8 +26,5 @@ class PyQtGraphComponent(PlotComponent):
     def init_ui(self):
         self.layout = QVBoxLayout(self)
 
-        self.plot = PlotWidget()
-        self.layout.addWidget(self.plot)
-
-        # self.surface = GLSurfacePlotItem()
-        # self.plot.addItem(self.surface)
+        self.plot_widget = GLViewWidget()
+        self.layout.addWidget(self.plot_widget)

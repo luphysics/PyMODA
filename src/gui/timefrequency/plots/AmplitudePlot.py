@@ -27,4 +27,4 @@ class AmplitudePlot(MatplotlibComponent):
 
         self.axes.plot(amplitude, freq)
         self.axes.autoscale(False)
-        self.on_initial_plot_complete()
+        self.on_plot_complete()

@@ -42,11 +42,19 @@ class TFPresenter:
         errorhandling.subscribe(self.on_error)
 
     def init(self):
+        # Add zoom listener to the signal plot, which is displayed in the top left.
+        self.view.signal_plot().add_zoom_listener(self.on_signal_zoomed)
+
+        # Open dialog to select a data file.
         self.view.select_file()
 
     def on_error(self, exc_type, value, traceback):
         self.cancel_calculate()
         ErrorBox(exc_type, value, traceback)
+
+    def on_signal_zoomed(self, rect):
+        if rect.is_valid():
+            self.view.set_xlimits(rect.x1, rect.x2)
 
     def calculate(self):
         """Calculates the desired transform(s), and plots the result."""

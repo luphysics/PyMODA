@@ -24,6 +24,7 @@ from gui.base.windows.MaximisedWindow import MaximisedWindow
 from gui.timefrequency.TFPresenter import TFPresenter
 from gui.timefrequency.TFView import TFView
 from gui.timefrequency.plots.AmplitudePlot import AmplitudePlot
+from gui.timefrequency.plots.SignalPlot import SignalPlot
 from gui.timefrequency.plots.WFTPlot import WFTPlot
 from maths.utils import float_or_none
 
@@ -52,6 +53,7 @@ class TFWindow(MaximisedWindow, TFView):
         self.setup_radio_stats_avg()
         self.setup_radio_stats_paired()
         self.setup_radio_test()
+        self.setup_xlim_edits()
 
         self.btn_calculate.clicked.connect(self.presenter.calculate)
         self.presenter.init()
@@ -109,8 +111,23 @@ class TFWindow(MaximisedWindow, TFView):
     def main_plot(self) -> WFTPlot:
         return self.plot_main
 
+    def signal_plot(self) -> SignalPlot:
+        return self.plot_top
+
     def amplitude_plot(self) -> AmplitudePlot:
         return self.plot_right
+
+    def set_xlimits(self, x1, x2):
+        self.line_xlim1.setText(str(x1))
+        self.line_xlim2.setText(str(x2))
+
+    def setup_xlim_edits(self):
+        self.btn_refresh.clicked.connect(self.on_xlim_edited)
+
+    def on_xlim_edited(self):
+        x1 = self.line_xlim1.text()
+        x2 = self.line_xlim2.text()
+        self.signal_plot().set_xrange(x1=float_or_none(x1), x2=float_or_none(x2), save_state=True)
 
     def setup_radio_plot(self):
         self.radio_plot_ampl.setChecked(True)

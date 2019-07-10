@@ -31,7 +31,7 @@ class SignalPlot(MatplotlibComponent):
         self.axes.plot(x, y, linewidth=0.7)
         self.axes.autoscale(False)
         self.axes.set_xlim(xlim)
-        self.on_initial_plot_complete()
+        self.on_plot_complete()
 
     def get_xlabel(self):
         return "Time (s)"

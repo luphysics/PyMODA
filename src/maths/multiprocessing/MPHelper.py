@@ -69,16 +69,17 @@ class MPHelper:
         # Don't move the import statements.
         from maths.algorithms import wft
 
-        wft, f = wft.calculate(params)
+        wft, freq = wft.calculate(params)
+        wft = np.asarray(wft)
+        freq = np.asarray(freq)
 
         amplitude = np.abs(wft)
-        power = np.square(amplitude)
 
-        freq = np.asarray(f)
+        power = np.square(amplitude)
         length = len(amplitude)
 
-        avg_ampl = np.zeros((length,), dtype=np.float64)
-        avg_pow = np.zeros((length,), dtype=np.float64)
+        avg_ampl = np.empty(length, dtype=np.float64)
+        avg_pow = np.empty(length, dtype=np.float64)
 
         for i in range(length):
             arr = amplitude[i]

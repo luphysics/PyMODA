@@ -22,18 +22,41 @@ class Rect:
     corner, while (x2,y2) are the lower right corner.
     """
 
-    x2, y2 = None, None
-
-    def __init__(self, x1, y1):
+    def __init__(self, x1, y1, x2=None, y2=None):
         self.x1 = x1
+        self.x2 = x2
         self.y1 = y1
+        self.y2 = y2
 
     def set_corner(self, x2, y2):
         self.x2 = x2
         self.y2 = y2
+
+    def sorted(self):
+        if not self.is_valid():
+            return self
+
+        x1 = self.x1
+        x2 = self.x2
+        y1 = self.y1
+        y2 = self.y2
+
+        if x2 < x1:
+            x1, x2 = x2, x1  # Swap values.
+
+        if y2 < y1:
+            y1, y2 = y2, y1  # Swap values.
+
+        return Rect(x1, y1, x2, y2)
 
     def get_width(self):
         return self.x2 - self.x1
 
     def get_height(self):
         return self.y2 - self.y1
+
+    def is_valid(self):
+        return self.x2 is not None and self.y2 is not None
+
+    def __str__(self) -> str:
+        return f"{self.x1}, {self.y1}; {self.x2}, {self.y2}"

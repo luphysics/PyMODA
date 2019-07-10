@@ -45,8 +45,9 @@ class MatplotlibComponent(PlotComponent):
 
         self.temp_patch = None  # The actual rectangle being drawn on the plot.
         self.rect: Rect = None  # The Rect object representing the coordinates of the rectangle.
-        self.rect_stack: List = []  # A List of Rect objects corresponding to a stack of previous zoom states.
+        self.rect_stack = []  # A List of Rect objects corresponding to a stack of previous zoom states.
 
+        self.zoom_listeners = []  # A list of listeners which are notified of zoom events.
         super(MatplotlibComponent, self).__init__(parent)
 
     def init_ui(self):
@@ -71,14 +72,6 @@ class MatplotlibComponent(PlotComponent):
         background = self.palette().color(QPalette.Background)
         self.fig.patch.set_facecolor(background.name())
 
-    def get_xlabel(self):
-        """Returns the label for the x-axis. Should be overridden in subclasses."""
-        pass
-
-    def get_ylabel(self):
-        """Returns the label for the y-axis. Should be overridden in subclasses."""
-        pass
-
     def init_callbacks(self):
         """
         Creates the callbacks for interacting with the plot.
@@ -97,7 +90,7 @@ class MatplotlibComponent(PlotComponent):
                                    axes_leave, figure_leave,
                                    self.on_reset, self.on_go_back)
 
-    def on_initial_plot_complete(self):
+    def on_plot_complete(self):
         """
         Should be called after the first plot is complete. It will then set the initial state
         so that the reset button can work.
@@ -194,17 +187,35 @@ class MatplotlibComponent(PlotComponent):
                 self.pre_update()
                 self.update()
 
-    def zoom_to(self, rect):
+    def zoom_to(self, rect, save_state=True, trigger_listeners=True):
         """
         Zooms the plot to the region designated by the rectangle.
         Adds the new state to the stack of states.
         """
-        x1, x2 = rect.x1, rect.x2
-        y1, y2 = rect.y1, rect.y2
-        self.axes.set_xlim(x1, x2)
-        self.axes.set_ylim(y1, y2)
+        rect = rect.sorted()
+        if save_state:
+            self.add_rect_state(rect)
 
-        self.add_rect_state(rect)
+        self.axes.set_xlim(rect.x1, rect.x2)
+        self.axes.set_ylim(rect.y1, rect.y2)
+
+        if trigger_listeners:
+            for l in self.zoom_listeners:
+                l(rect)
+
+    def set_xrange(self, x1=None, x2=None, **kwargs):
+        rect = self.current_rect()
+        if x1 is not None:
+            rect.x1 = x1
+        if x2 is not None:
+            rect.x2 = x2
+        self.zoom_to(rect, **kwargs)
+
+    def add_zoom_listener(self, func):
+        self.zoom_listeners.append(func)
+
+    def remove_zoom_listener(self, func):
+        self.zoom_listeners.remove(func)
 
     def clear_rect_states(self):
         self.rect_stack.clear()

@@ -15,8 +15,8 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from PyQt5.QtGui import QWindow
 
-from gui.base.components.MatplotlibComponent import MatplotlibComponent
 from gui.timefrequency.plots.AmplitudePlot import AmplitudePlot
+from gui.timefrequency.plots.SignalPlot import SignalPlot
 from gui.timefrequency.plots.WFTPlot import WFTPlot
 
 
@@ -46,6 +46,9 @@ class TFView:
         """Returns the main plot, which is used to display the transform."""
         pass
 
+    def signal_plot(self) -> SignalPlot:
+        pass
+
     def amplitude_plot(self) -> AmplitudePlot:
         pass
 
@@ -62,6 +65,12 @@ class TFView:
         :param ampl_selected: whether the plot type is amplitude, not power
         """
         self.presenter.set_plot_type(ampl_selected)
+
+    def set_xlimits(self, x1, x2):
+        pass
+
+    def setup_xlim_edits(self):
+        pass
 
     def setup_radio_transform(self):
         pass

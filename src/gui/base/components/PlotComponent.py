@@ -31,9 +31,12 @@ class PlotComponent(BaseComponent):
         """Sets the progress bar to display whether the plotting is in progress."""
         pass
 
-    def on_initial_plot_complete(self):
+    def on_plot_complete(self):
         """
         Should be called after the first plot is complete. It will then set the initial state
         so that the reset button can work.
         """
+        pass
+
+    def clear(self):
         pass
