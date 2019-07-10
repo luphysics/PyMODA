@@ -127,7 +127,8 @@ class TFWindow(MaximisedWindow, TFView):
     def on_xlim_edited(self):
         x1 = self.line_xlim1.text()
         x2 = self.line_xlim2.text()
-        self.signal_plot().set_xrange(x1=float_or_none(x1), x2=float_or_none(x2), save_state=True)
+        self.signal_plot().set_xrange(x1=float_or_none(x1), x2=float_or_none(x2),
+                                      save_state=True, trigger_listeners=False)
 
     def setup_radio_plot(self):
         self.radio_plot_ampl.setChecked(True)

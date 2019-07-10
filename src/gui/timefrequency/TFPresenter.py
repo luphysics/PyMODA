@@ -55,6 +55,7 @@ class TFPresenter:
     def on_signal_zoomed(self, rect):
         if rect.is_valid():
             self.view.set_xlimits(rect.x1, rect.x2)
+            self.time_series.set_xlimits(rect.x1, rect.x2)
 
     def calculate(self):
         """Calculates the desired transform(s), and plots the result."""
