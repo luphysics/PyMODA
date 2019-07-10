@@ -29,10 +29,22 @@ class Rect:
         self.y2 = y2
 
     def set_corner(self, x2, y2):
+        """
+        Sets the coordinates of the "bottom right" corner;
+        however, note that the corner can be in any location.
+        """
         self.x2 = x2
         self.y2 = y2
 
     def sorted(self):
+        """
+        Returns a new Rect instance which is sorted so that the
+        corner (x1, y1) is in the upper left and the corner
+        (x2, y2) is in the lower right.
+
+        If the current instance does not contain all four coordinates,
+        returns the current instance. Does not affect the current instance.
+        """
         if not self.is_valid():
             return self
 
@@ -56,6 +68,10 @@ class Rect:
         return self.y2 - self.y1
 
     def is_valid(self):
+        """
+        Returns whether this is a Rect with both corners defined.
+        Not affected by whether the corners are correctly sorted or not.
+        """
         return self.x2 is not None and self.y2 is not None
 
     def __str__(self) -> str:

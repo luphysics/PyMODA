@@ -118,13 +118,25 @@ class TFWindow(MaximisedWindow, TFView):
         return self.plot_right
 
     def set_xlimits(self, x1, x2):
-        self.line_xlim1.setText(str(x1))
-        self.line_xlim2.setText(str(x2))
+        """
+        Sets the x-limits on the signal plot, restricting the values to
+        a certain range of times.
+
+        :param x1: the lower limit
+        :param x2: the upper limit
+        """
+        # Format to 4 decimal places.
+        format = lambda x: f"{x:.4f}"
+
+        self.line_xlim1.setText(format(x1))
+        self.line_xlim2.setText(format(x2))
 
     def setup_xlim_edits(self):
+        """Sets up the refresh button to trigger x-limit changes."""
         self.btn_refresh.clicked.connect(self.on_xlim_edited)
 
     def on_xlim_edited(self):
+        """Called when the x-limits have been changed."""
         x1 = self.line_xlim1.text()
         x2 = self.line_xlim2.text()
         self.signal_plot().set_xrange(x1=float_or_none(x1), x2=float_or_none(x2),

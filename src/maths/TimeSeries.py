@@ -56,6 +56,13 @@ class TimeSeries:
         return times
 
     def set_xlimits(self, x1, x2):
+        """
+        Sets the x-limits of the data (restricting the values to a certain
+        range of times).
+
+        :param x1: the lower limit
+        :param x2: the upper limit
+        """
         if self.times is None:
             return
 
@@ -71,15 +78,21 @@ class TimeSeries:
         self.signal = self.signal[indices]
 
     def reset_xlimits(self):
+        """Resets the x-limits by restoring the original data."""
         if self.contains_original_data():
             self.signal = self.original_signal.copy()
             self.times = self.original_times.copy()
 
     def save_original_data(self):
+        """
+        Saves the original data,so that it can be restored later
+        even if the x-limits are changed.
+        """
         self.original_signal = self.signal.copy()
         self.original_times = self.times.copy()
 
     def contains_original_data(self):
+        """Returns whether the original data has been saved."""
         return self.original_signal is not None and self.original_times is not None
 
     @staticmethod
