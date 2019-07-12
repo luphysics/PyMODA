@@ -13,6 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import datetime
 import sys
 
 
@@ -21,7 +22,10 @@ class StdOut:
     def write(self, text):
         sys_out.write(text)  # Output text as normal.
         for s in subscribers:  # Notify subscribers.
-            s(text)
+            if isinstance(s, WindowLogger):
+                s.update(text)
+            else:
+                s(text)
 
     def flush(self):
         return
@@ -43,3 +47,28 @@ def subscribe(subscriber):
 
 def unsubscribe(subscriber):
     subscribers.remove(subscriber)
+
+
+class WindowLogger:
+
+    def __init__(self, func, max_lines=200):
+        self.func = func
+        self.lines = []
+        self.max_lines = max_lines
+
+    def update(self, text):
+        if text == "\n":
+            return
+
+        self.lines.append(f"{self.get_time()} - {text}")
+        count = len(self.lines)
+
+        if count > self.max_lines:
+            # Remove the first half of the lines to save memory.
+            self.lines = self.lines[count // 2:]
+
+        self.func("\n".join(self.lines))
+
+    def get_time(self) -> str:
+        time = datetime.datetime.now()
+        return f"{time:%H:%M:%S}"

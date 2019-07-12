@@ -16,6 +16,7 @@
 from PyQt5.QtWidgets import QDialog
 
 import errorhandling
+import stdout_redirect
 from gui.base.ErrorBox import ErrorBox
 from gui.base.FrequencyDialog import FrequencyDialog
 from gui.timefrequency.TFView import TFView
@@ -38,8 +39,10 @@ class TFPresenter:
         self.open_file = None
         self.freq = None
         self.mp_handler = None
+        self.logger = stdout_redirect.WindowLogger(self.on_log)
 
         errorhandling.subscribe(self.on_error)
+        stdout_redirect.subscribe(self.logger)
 
     def init(self):
         # Add zoom listener to the signal plot, which is displayed in the top left.
@@ -51,6 +54,9 @@ class TFPresenter:
     def on_error(self, exc_type, value, traceback):
         self.cancel_calculate()
         ErrorBox(exc_type, value, traceback)
+
+    def on_log(self, text):
+        self.view.set_log_text(text)
 
     def on_signal_zoomed(self, rect):
         if rect.is_valid():
@@ -76,6 +82,7 @@ class TFPresenter:
 
         self.view.main_plot().set_log_scale(logarithmic=(params.transform == _wt))
         self.view.on_calculate_started()
+        print("Started calculation...")
 
     def on_calculation_completed(self, times, ampl, freq, powers, avg_ampl, avg_pow):
         """Called when the calculation of the desired transform(s) is completed."""
@@ -92,6 +99,7 @@ class TFPresenter:
 
         self.plot(times, freq, values, avg_values)
         self.is_plotted = True
+        print("Completed calculation.")
 
     def get_values_to_plot(self, amplitude=None):
         amp = self.plot_ampl
@@ -116,6 +124,7 @@ class TFPresenter:
             self.mp_handler.stop()
         self.view.on_calculate_stopped()
         self.is_plotted = False
+        print("Calculation terminated.")
 
     def set_plot_type(self, amplitude_selected):
         """

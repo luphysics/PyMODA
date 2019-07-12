@@ -135,3 +135,6 @@ class TFView:
 
     def get_transform_type(self):
         pass
+
+    def set_log_text(self, text):
+        pass

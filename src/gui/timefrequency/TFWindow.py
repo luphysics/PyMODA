@@ -226,3 +226,8 @@ class TFWindow(MaximisedWindow, TFView):
         else:
             transform = "wt"
         return transform
+
+    def set_log_text(self, text):
+        if text != "\n":
+            self.text_log.setPlainText(text.rstrip())
+            self.text_log.moveCursor(QtGui.QTextCursor.End)
