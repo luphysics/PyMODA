@@ -25,7 +25,14 @@ class TFView:
     A View class to be subclassed by the time-frequency window.
     """
 
-    name = "Time-Frequency Analysis"
+    # The title of the window.
+    _name = "Time-Frequency Analysis"
+
+    # The items to be shown in the "WT / WFT Type" combobox.
+    _window_items = (
+        ["Lognorm", "Morlet", "Bump", "Morse-a"],  # Wavelet transform.
+        ["Gaussian", "Hann", "Blackman", "Exp", "Rect", "Kaiser-a"],  # Windowed Fourier transform.
+    )
 
     def __init__(self, application, presenter):
         self.application = application
@@ -117,11 +124,14 @@ class TFView:
     def get_preprocess(self) -> bool:
         pass
 
-    def get_transform_window(self) -> str:
+    def get_wt_wft_type(self) -> str:
         pass
 
     def on_calculate_started(self):
         pass
 
     def on_calculate_stopped(self):
+        pass
+
+    def get_transform_type(self):
         pass

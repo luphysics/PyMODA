@@ -25,9 +25,24 @@ _cut_edges = "CutEdges"
 _window = "Window"
 _preprocess = "Preprocess"
 _rel_tolerance = "RelTol"
+_wavelet = "Wavelet"
+
+_wft = "wft"
+_wt = "wt"
 
 
-class WFTParams:
+class TFParams:
+    """
+    A class which is used to hold the parameters for the WT and WFT functions in
+    the time-frequency window. When the calculation begins, an instance of this
+    parameters object should be created using the current settings (and therefore
+    not susceptible to issues when settings are edited in the window
+    during the calculation).
+
+    The params object holds a dictionary of data params which are passed to the
+    Matlab functions as **kwargs. It also contains the time series and sampling
+    frequency.
+    """
 
     def __init__(self,
                  time_series: TimeSeries,
@@ -37,9 +52,11 @@ class WFTParams:
                  f0=1,
                  padding="predictive",
                  cut_edges=False,
-                 window="Gaussian",
+                 window="Gaussian",  # Just for WFT.
+                 wavelet="Lognorm",  # Just for WT.
                  preprocess=True,
-                 rel_tolerance=0.01):
+                 rel_tolerance=0.01,
+                 transform=_wft):
         """
         Constructor which takes the desired parameters and converts
         them into floats if necessary (to prevent Matlab errors).
@@ -53,16 +70,21 @@ class WFTParams:
         :param padding: the padding to use when computing the transform
         :param cut_edges: whether the transform should be computed only in
         the cone of influence
-        :param window: the window type to use - Gaussian, Hann, Blackman, Exp,
+        :param window: the window type to use in the WFT - Gaussian, Hann, Blackman, Exp,
         Rect or Kaiser-a.
+        :param wavelet: the wavelet type to use in the WT - Lognorm, Morlet, Bump or Morse-a.
         :param preprocess: whether to perform preprocessing on the signal
         :param rel_tolerance: relative tolerance, specifying the cone of influence
         """
+        if transform == _wt and fmin == 0:
+            raise ParamsException("Minimum frequency cannot be zero for wavelet transform.")
+
         self.time_series = time_series
         self.fs = float(time_series.frequency)
+        self.transform = transform
 
         self.data = {
-            _fmin: float(fmin),
+            _fmin: float(fmin) if fmin is not None else None,
             _fmax: float(fmax) if fmax else self.fs / 2.0,
             _f0: float(f0),
             _rel_tolerance: float(rel_tolerance),
@@ -70,6 +92,7 @@ class WFTParams:
             _padding: padding,
             _cut_edges: "on" if cut_edges else "off",
             _window: window,
+            _wavelet: wavelet,
             _preprocess: "on" if preprocess else "off",
         }
 
@@ -80,14 +103,18 @@ class WFTParams:
     @staticmethod
     def create(time_series, **kwargs):
         """
-        Creates a WFTParams object, taking the same arguments as
+        Creates a TFParams object, taking the same arguments as
         the constructor. Any argument that is set to None - or not
-        supplied at all - will cause the WFTParams object to use the default
+        supplied at all - will cause the TFParams object to use the default
         value for that argument.
         """
         out = {}
         for key, value in kwargs.items():
-            if value:
+            if value is not None:
                 out[key] = value
 
-        return WFTParams(time_series, **out)
+        return TFParams(time_series, **out)
+
+
+class ParamsException(Exception):
+    pass

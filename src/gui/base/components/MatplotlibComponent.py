@@ -13,7 +13,6 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from typing import List
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPalette
@@ -37,6 +36,7 @@ class MatplotlibComponent(PlotComponent):
         self.canvas: FigureCanvas = None
         self.layout: QVBoxLayout = None
         self.axes = None
+        self.log = False  # Whether the axes should be logarithmic.
 
         self.temp_plots = []  # Temporary crosshair plots which should be removed on each update.
         self.selected_plots = []  # Selected crosshair plots which should be kept.
@@ -124,6 +124,20 @@ class MatplotlibComponent(PlotComponent):
         """Updates the plot by redrawing the canvas."""
         super().update()
         self.canvas.draw()
+
+    def set_log_scale(self, logarithmic=False):
+        """
+        Set whether the plot should use a logarithmic y-scale.
+        Note that the `_apply_scale()` function must be called (usually in a subclass)
+        for this function to have any effect.
+        """
+        self.log = logarithmic
+
+    def _apply_scale(self):
+        """
+        Applies the scale (either logarithmic or linear) according to `self.log`.
+        """
+        self.axes.set_yscale("log" if self.log else "linear")
 
     def remove_temp_crosshairs(self):
         """
@@ -251,12 +265,6 @@ class MatplotlibComponent(PlotComponent):
         """Returns the xy-coordinates from an event as a tuple."""
         return event.xdata, event.ydata
 
-    def get_bounds(self):  # Not currently in use?
-        """Gets the bounds of the plot; i.e. the points corresponding to maximum and minimum x and y."""
-        x1, x2 = self.xlim()
-        y1, y2 = self.ylim()
-        return Bounds(x1, x2, y1, y2)
-
     def xlim(self):
         return self.axes.get_xlim()
 
@@ -305,16 +313,3 @@ class MatplotlibComponent(PlotComponent):
     def set_in_progress(self, in_progress=True):
         """Sets the progress bar to display whether the plotting is in progress."""
         self.options.set_in_progress(in_progress)
-
-
-class Bounds:
-    """
-    An object representing the bounds of a plot. It contains the minimum and
-    maximum x and y values.
-    """
-
-    def __init__(self, x1, x2, y1, y2):
-        self.x1 = x1
-        self.x2 = x2
-        self.y1 = y1
-        self.y2 = y2

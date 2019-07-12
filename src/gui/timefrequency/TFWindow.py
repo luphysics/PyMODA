@@ -26,6 +26,7 @@ from gui.timefrequency.TFView import TFView
 from gui.timefrequency.plots.AmplitudePlot import AmplitudePlot
 from gui.timefrequency.plots.SignalPlot import SignalPlot
 from gui.timefrequency.plots.WFTPlot import WFTPlot
+from maths.algorithms import params
 from maths.utils import float_or_none
 
 
@@ -54,6 +55,7 @@ class TFWindow(MaximisedWindow, TFView):
         self.setup_radio_stats_paired()
         self.setup_radio_test()
         self.setup_xlim_edits()
+        self.setup_combo_wt()
 
         self.btn_calculate.clicked.connect(self.presenter.calculate)
         self.presenter.init()
@@ -142,12 +144,30 @@ class TFWindow(MaximisedWindow, TFView):
         x2 = self.line_xlim2.text()
         self.signal_plot().set_xrange(x1=float_or_none(x1), x2=float_or_none(x2))
 
+    def on_transform_toggled(self, is_wft):
+        """Called when the type of transform (WT or WFT) is toggled."""
+        self.setup_combo_wt(is_wft)
+
+    def setup_combo_wt(self, is_wft=True):
+        """
+        Sets up the "WT / WFT Type" combobox according to the current transform type.
+        :param is_wft: whether the current transform is WFT (not WT)
+        """
+        combo = self.combo_window
+        combo.clear()
+
+        # Gets the list of items from the tuple, since the bool evaluates to 0 or 1.
+        items = self._window_items[is_wft]
+        for i in items:
+            combo.addItem(i)
+
     def setup_radio_plot(self):
         self.radio_plot_ampl.setChecked(True)
         self.radio_plot_ampl.toggled.connect(self.on_plot_type_toggled)
 
     def setup_radio_transform(self):
         self.radio_transform_wft.setChecked(True)
+        self.radio_transform_wft.toggled.connect(self.on_transform_toggled)
 
     def setup_radio_preproc(self):
         self.radio_preproc_on.setChecked(True)
@@ -196,6 +216,13 @@ class TFWindow(MaximisedWindow, TFView):
     def get_preprocess(self) -> bool:
         return self.radio_preproc_on.isChecked()
 
-    def get_transform_window(self) -> str:
+    def get_wt_wft_type(self) -> str:
         combo = self.combo_window
         return combo.currentText()
+
+    def get_transform_type(self) -> str:
+        if self.radio_transform_wft.isChecked():
+            transform = "wft"
+        else:
+            transform = "wt"
+        return transform

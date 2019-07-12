@@ -20,9 +20,8 @@ import numpy as np
 from PyQt5.QtGui import QWindow
 from multiprocess import Queue, Process
 
-from maths.algorithms.params import WFTParams
+from maths.algorithms.params import TFParams, _wft
 from maths.multiprocessing.Watcher import Watcher
-from maths.multiprocessing.mp_utils import convert_to_ctypes
 
 
 class MPHelper:
@@ -44,7 +43,7 @@ class MPHelper:
         self.watcher = None
 
     def wft(self,
-            params: WFTParams,
+            params: TFParams,
             window: QWindow,
             on_result):
         """
@@ -58,18 +57,58 @@ class MPHelper:
         :return:
         """
         self.queue = Queue()
-        self.proc = Process(target=self._wft, args=(self.queue, params,))
+        if params.transform == _wft:
+            func = self._wft
+        else:
+            func = self._wt
+
+        self.proc = Process(target=func, args=(self.queue, params,))
         self.proc.start()
 
         self.watcher = Watcher(window, self.queue, 0.5, on_result)
         self.watcher.start()
 
     @staticmethod
-    def _wft(queue, params: WFTParams):
+    def _wft(queue, params: TFParams):
         # Don't move the import statements.
         from maths.algorithms import wft
 
         wft, freq = wft.calculate(params)
+        wft = np.asarray(wft)
+        freq = np.asarray(freq)
+
+        amplitude = np.abs(wft)
+
+        power = np.square(amplitude)
+        length = len(amplitude)
+
+        avg_ampl = np.empty(length, dtype=np.float64)
+        avg_pow = np.empty(length, dtype=np.float64)
+
+        for i in range(length):
+            arr = amplitude[i]
+            row = arr[np.isfinite(arr)]
+
+            avg_ampl[i] = np.mean(row)
+            avg_pow[i] = np.mean(np.square(row))
+
+        print(f"Started putting items in queue at time: {time.time()} seconds.")
+
+        queue.put((
+            params.time_series.times,
+            amplitude,
+            freq,
+            power,
+            avg_ampl,
+            avg_pow,
+        ))
+
+    @staticmethod
+    def _wt(queue, params: TFParams):  # TODO: refactor this
+        # Don't move the import statements.
+        from maths.algorithms import wt
+
+        wft, freq = wt.calculate(params)
         wft = np.asarray(wft)
         freq = np.asarray(freq)
 

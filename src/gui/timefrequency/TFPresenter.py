@@ -21,7 +21,7 @@ from gui.base.FrequencyDialog import FrequencyDialog
 from gui.timefrequency.TFView import TFView
 from maths.TimeSeries import TimeSeries
 from maths.multiprocessing.MPHelper import MPHelper
-from maths.algorithms.params import WFTParams
+from maths.algorithms.params import TFParams, _wft, _wt
 
 
 class TFPresenter:
@@ -66,12 +66,15 @@ class TFPresenter:
         self.view.main_plot().clear()
         self.view.main_plot().set_in_progress(True)
 
+        params = self.get_params()
+
         self.mp_handler = MPHelper()
         self.mp_handler.wft(
-            params=self.get_params(),
+            params=params,
             window=self.view.get_window(),
             on_result=self.on_calculation_completed)
 
+        self.view.main_plot().set_log_scale(logarithmic=(params.transform == _wt))
         self.view.on_calculate_started()
 
     def on_calculation_completed(self, times, ampl, freq, powers, avg_ampl, avg_pow):
@@ -130,19 +133,26 @@ class TFPresenter:
         self.view.main_plot().plot(times, values, freq)
         self.view.amplitude_plot().plot(avg_values, freq)
 
-    def get_params(self) -> WFTParams:
-        """Creates the parameters to use when performing the calculations."""
-        return WFTParams.create(
+    def get_params(self) -> TFParams:
+        """
+        Creates the parameters to use when performing the calculations.
+        """
+        return TFParams.create(
             time_series=self.time_series,
             fmin=self.view.get_fmin(),
             fmax=self.view.get_fmax(),
             f0=self.view.get_f0(),
             fstep=self.view.get_fstep(),
             padding=self.view.get_padding(),
-            window=self.view.get_transform_window(),
+
+            # Only one of these two will be used, depending on the selected transform.
+            window=self.view.get_wt_wft_type(),
+            wavelet=self.view.get_wt_wft_type(),
+
             rel_tolerance=self.view.get_rel_tolerance(),
             cut_edges=self.view.get_cut_edges(),
             preprocess=self.view.get_preprocess(),
+            transform=self.view.get_transform_type(),
         )
 
     def load_data(self):
@@ -179,7 +189,7 @@ class TFPresenter:
         Gets the name of this window, adding the currently open file
         if applicable.
         """
-        title = self.view.name
+        title = self.view._name
         if self.open_file:
             title += f" - {self.open_file}"
         return title
