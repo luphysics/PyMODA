@@ -18,6 +18,7 @@ import sys
 
 import args
 import errorhandling
+import stdout_redirect
 from gui.Application import Application
 
 
@@ -31,4 +32,5 @@ def main():
 if __name__ == "__main__":
     args.parse_args()
     errorhandling.init()
+    stdout_redirect.init()
     main()

@@ -13,20 +13,33 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from contextlib import redirect_stdout
-from io import StringIO
+import sys
+
+
+class StdOut:
+
+    def write(self, text):
+        sys_out.write(text)  # Output text as normal.
+        for s in subscribers:  # Notify subscribers.
+            s(text)
+
+    def flush(self):
+        return
+
 
 subscribers = []
 
+out = StdOut()
+sys_out = sys.__stdout__
+
 
 def init():
-    with StringIO() as buffer, redirect_stdout(buffer):
-        on_update(buffer.getvalue())
+    sys.stdout = out
 
 
-def on_update(value):
-    print(f"Received value: {value}")
+def subscribe(subscriber):
+    subscribers.append(subscriber)
 
 
-def subscribe():
-    pass
+def unsubscribe(subscriber):
+    subscribers.remove(subscriber)
