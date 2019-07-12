@@ -57,62 +57,27 @@ class MPHelper:
         :return:
         """
         self.queue = Queue()
-        if params.transform == _wft:
-            func = self._wft
-        else:
-            func = self._wt
-
-        self.proc = Process(target=func, args=(self.queue, params,))
+        self.proc = Process(target=self._timefrequency, args=(self.queue, params,))
         self.proc.start()
 
         self.watcher = Watcher(window, self.queue, 0.5, on_result)
         self.watcher.start()
 
     @staticmethod
-    def _wft(queue, params: TFParams):
+    def _timefrequency(queue, params: TFParams):
         # Don't move the import statements.
-        from maths.algorithms import wft
+        from maths.algorithms import wt, wft
 
-        wft, freq = wft.calculate(params)
-        wft = np.asarray(wft)
+        if params.transform == _wft:
+            func = wft
+        else:
+            func = wt
+
+        transform, freq = func.calculate(params)
+        transform = np.asarray(transform)
         freq = np.asarray(freq)
 
-        amplitude = np.abs(wft)
-
-        power = np.square(amplitude)
-        length = len(amplitude)
-
-        avg_ampl = np.empty(length, dtype=np.float64)
-        avg_pow = np.empty(length, dtype=np.float64)
-
-        for i in range(length):
-            arr = amplitude[i]
-            row = arr[np.isfinite(arr)]
-
-            avg_ampl[i] = np.mean(row)
-            avg_pow[i] = np.mean(np.square(row))
-
-        print(f"Started putting items in queue at time: {time.time()} seconds.")
-
-        queue.put((
-            params.time_series.times,
-            amplitude,
-            freq,
-            power,
-            avg_ampl,
-            avg_pow,
-        ))
-
-    @staticmethod
-    def _wt(queue, params: TFParams):  # TODO: refactor this
-        # Don't move the import statements.
-        from maths.algorithms import wt
-
-        wft, freq = wt.calculate(params)
-        wft = np.asarray(wft)
-        freq = np.asarray(freq)
-
-        amplitude = np.abs(wft)
+        amplitude = np.abs(transform)
 
         power = np.square(amplitude)
         length = len(amplitude)
