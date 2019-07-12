@@ -198,12 +198,14 @@ class MatplotlibComponent(PlotComponent):
 
         self.axes.set_xlim(rect.x1, rect.x2)
         self.axes.set_ylim(rect.y1, rect.y2)
+        self.update()
 
         if trigger_listeners:
             for l in self.zoom_listeners:
                 l(rect)
 
     def set_xrange(self, x1=None, x2=None, **kwargs):
+        """Set the range of x-values shown by the plot."""
         rect = self.current_rect()
         if x1 is not None:
             rect.x1 = x1

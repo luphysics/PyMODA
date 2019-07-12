@@ -125,11 +125,12 @@ class TFWindow(MaximisedWindow, TFView):
         :param x1: the lower limit
         :param x2: the upper limit
         """
-        # Format to 4 decimal places.
-        format = lambda x: f"{x:.4f}"
 
-        self.line_xlim1.setText(format(x1))
-        self.line_xlim2.setText(format(x2))
+        # Format to 4 decimal places.
+        def format_4dp(x): return f"{x:.4f}"
+
+        self.line_xlim1.setText(format_4dp(x1))
+        self.line_xlim2.setText(format_4dp(x2))
 
     def setup_xlim_edits(self):
         """Sets up the refresh button to trigger x-limit changes."""
@@ -139,8 +140,7 @@ class TFWindow(MaximisedWindow, TFView):
         """Called when the x-limits have been changed."""
         x1 = self.line_xlim1.text()
         x2 = self.line_xlim2.text()
-        self.signal_plot().set_xrange(x1=float_or_none(x1), x2=float_or_none(x2),
-                                      save_state=True, trigger_listeners=False)
+        self.signal_plot().set_xrange(x1=float_or_none(x1), x2=float_or_none(x2))
 
     def setup_radio_plot(self):
         self.radio_plot_ampl.setChecked(True)
