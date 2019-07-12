@@ -13,16 +13,20 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from PyQt5.QtWidgets import QMessageBox
+from contextlib import redirect_stdout
+from io import StringIO
+
+subscribers = []
 
 
-class ErrorBox(QMessageBox):
+def init():
+    with StringIO() as buffer, redirect_stdout(buffer):
+        on_update(buffer.getvalue())
 
-    def __init__(self, exc_type, value, traceback):
-        super().__init__()
-        self.setIcon(QMessageBox.Warning)
-        self.setWindowTitle("Error!")
-        self.setText(f"{value}")
 
-        self.setDetailedText(f"{value}\n{exc_type}\n{traceback}")
-        self.exec()
+def on_update(value):
+    print(f"Received value: {value}")
+
+
+def subscribe():
+    pass

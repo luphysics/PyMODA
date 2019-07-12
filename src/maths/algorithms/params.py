@@ -77,7 +77,7 @@ class TFParams:
         :param rel_tolerance: relative tolerance, specifying the cone of influence
         """
         if transform == _wt and fmin == 0:
-            raise ParamsException("Minimum frequency cannot be zero for wavelet transform.")
+            fmin = None
 
         self.time_series = time_series
         self.fs = float(time_series.frequency)
@@ -95,6 +95,16 @@ class TFParams:
             _wavelet: wavelet,
             _preprocess: "on" if preprocess else "off",
         }
+
+        # Remove values which are None, because they cannot be passed to Matlab.
+        temp_keys = []
+
+        for key, value in self.data.items():
+            if value is None:
+                temp_keys.append(key)
+
+        for k in temp_keys:
+            del self.data[k]
 
     def get(self) -> dict:
         """Gets the parameters to supply to the wft function as a dictionary."""
