@@ -24,11 +24,24 @@ class CSVParser(BaseParser):
     def __init__(self, filename):
         super().__init__(filename)
 
-    def parse(self):
+    def parse(self):  # TODO: implement column-wise functionality.
         lines = parsing.get_lines(self.filename)
-        data = []
+
+        # If each line has more values than the number of lines,
+        # then each line corresponds to a separate signal.
+        row_wise = len(lines) < len(lines[0].split(","))
+        signal_count = len(lines) if row_wise else len(lines[0].split(","))
+
+        data = []  # List containing a list of data for each signal.
+        for i in range(signal_count):
+            data.append([])
+
+        index = 0
         for l in lines:
             for item in l.split(","):
-                data.append(float(item))
+                if row_wise:
+                    data[index].append(float(item))
+            if row_wise:
+                index += 1
 
         return data

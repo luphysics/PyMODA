@@ -31,10 +31,10 @@ class StdOut:
         return
 
 
-subscribers = []
+subscribers = []  # List of subscribers to be notified when stdout is used.
 
-out = StdOut()
-sys_out = sys.__stdout__
+out = StdOut()  # The redirected stdout.
+sys_out = sys.__stdout__  # The original system stdout.
 
 
 def init():
@@ -50,6 +50,12 @@ def unsubscribe(subscriber):
 
 
 class WindowLogger:
+    """
+    A class which handles logging to a log pane safely,
+    without excessive memory usage. When the number of
+    logged lines exceeds the max size, the first half
+    of the lines are deleted.
+    """
 
     def __init__(self, func, max_lines=200):
         self.func = func
@@ -69,6 +75,7 @@ class WindowLogger:
 
         self.func("\n".join(self.lines))
 
-    def get_time(self) -> str:
+    @staticmethod
+    def get_time() -> str:
         time = datetime.datetime.now()
         return f"{time:%H:%M:%S}"

@@ -53,7 +53,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QListView" name="list_select_data"/>
+               <widget class="QListWidget" name="list_select_data"/>
               </item>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_2"/>

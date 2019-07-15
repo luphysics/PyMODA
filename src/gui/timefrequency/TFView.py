@@ -138,3 +138,9 @@ class TFView:
 
     def set_log_text(self, text):
         pass
+
+    def setup_signal_listview(self):
+        pass
+
+    def update_signal_listview(self, items):
+        pass

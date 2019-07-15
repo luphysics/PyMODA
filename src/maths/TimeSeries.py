@@ -15,8 +15,6 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import numpy as np
 
-from data.parsing.CSVParser import CSVParser
-
 
 class TimeSeries:
     """
@@ -25,7 +23,8 @@ class TimeSeries:
     to calculate the time for each datum point in the series.
     """
 
-    def __init__(self, data, frequency=None):
+    def __init__(self, data, frequency=None, name=None):
+        self.name = name
         self.frequency = frequency
         self.signal = np.asarray(data, dtype=np.float64)
 
@@ -46,6 +45,9 @@ class TimeSeries:
         """
         self.frequency = freq
         self.times = self.generate_times()
+
+    def has_name(self):
+        return self.name is not None
 
     def generate_times(self):
         """Generates the time values associated with the data."""
@@ -103,12 +105,7 @@ class TimeSeries:
         """
         return [i for (i, value) in enumerate(array) if func(value)]
 
-    @staticmethod
-    def from_file(file):
-        """Returns a time-series from a file."""
-        return TimeSeries(get_parser(file).parse())
-
-
-def get_parser(filename):
-    """Gets the appropriate parser for a given file."""
-    return CSVParser(filename)  # Test implementation.
+    # @staticmethod
+    # def from_file(file):
+    #     """Returns a time-series from a file."""
+    #     return TimeSeries(get_parser(file).parse())

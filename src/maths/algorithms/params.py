@@ -96,18 +96,17 @@ class TFParams:
             _preprocess: "on" if preprocess else "off",
         }
 
-        # Remove values which are None, because they cannot be passed to Matlab.
         temp_keys = []
-
         for key, value in self.data.items():
             if value is None:
                 temp_keys.append(key)
 
+        # Remove values which are None, because they cannot be passed to Matlab.
         for k in temp_keys:
             del self.data[k]
 
     def get(self) -> dict:
-        """Gets the parameters to supply to the wft function as a dictionary."""
+        """Gets the parameters to supply to the wt/wft function as a dictionary."""
         return self.data
 
     @staticmethod

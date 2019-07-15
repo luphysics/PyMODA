@@ -13,13 +13,14 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from PyQt5.QtWidgets import QDialog
+from PyQt5.QtWidgets import QDialog, QListWidgetItem
 
 import errorhandling
 import stdout_redirect
 from gui.base.ErrorBox import ErrorBox
 from gui.base.FrequencyDialog import FrequencyDialog
 from gui.timefrequency.TFView import TFView
+from maths.Signals import Signals
 from maths.TimeSeries import TimeSeries
 from maths.multiprocessing.MPHelper import MPHelper
 from maths.algorithms.params import TFParams, _wft, _wt
@@ -35,7 +36,9 @@ class TFPresenter:
         self.is_plotted = False
         self.plot_ampl = True
 
-        self.time_series = None
+        self.signals = None
+        self.selected_signal_name = None
+        # self.time_series = None
         self.open_file = None
         self.freq = None
         self.mp_handler = None
@@ -61,7 +64,7 @@ class TFPresenter:
     def on_signal_zoomed(self, rect):
         if rect.is_valid():
             self.view.set_xlimits(rect.x1, rect.x2)
-            self.time_series.set_xlimits(rect.x1, rect.x2)
+            self.get_selected_signal().set_xlimits(rect.x1, rect.x2)
 
     def calculate(self):
         """Calculates the desired transform(s), and plots the result."""
@@ -126,7 +129,7 @@ class TFPresenter:
         self.is_plotted = False
         print("Calculation terminated.")
 
-    def set_plot_type(self, amplitude_selected):
+    def set_plot_type(self, amplitude_selected=True):
         """
         Set the type of plot to display (power or amplitude). This affects
         the main plot and the amplitude plot.
@@ -147,7 +150,7 @@ class TFPresenter:
         Creates the parameters to use when performing the calculations.
         """
         return TFParams.create(
-            time_series=self.time_series,
+            time_series=self.get_selected_signal(),
             fmin=self.view.get_fmin(),
             fmax=self.view.get_fmax(),
             f0=self.view.get_f0(),
@@ -167,10 +170,11 @@ class TFPresenter:
     def load_data(self):
         """
         Loads the time-series data from the currently
-        selected file, via a dialog.
+        selected file, and allows the frequency to be set
+        via a dialog.
         """
-        self.time_series = TimeSeries.from_file(self.open_file)
-        if not self.time_series.has_frequency():
+        self.signals = Signals.from_file(self.open_file)
+        if not self.signals.has_frequency():
             dialog = FrequencyDialog(self.on_freq_changed)
             code = dialog.exec()
             if code == QDialog.Accepted:
@@ -183,15 +187,23 @@ class TFPresenter:
 
     def set_frequency(self, freq: float):
         """Sets the frequency of the time-series."""
-        self.time_series.set_frequency(freq)
+        self.signals.set_frequency(freq)
 
     def plot_signal(self):
         """Plots the signal on the SignalPlot."""
-        self.view.plot_signal(self.time_series)
+        self.view.plot_signal(self.get_selected_signal())
 
     def on_data_loaded(self):
         """Called when the time-series data has been loaded."""
+        self.view.update_signal_listview(self.signals.names())
         self.plot_signal()
+
+    def on_signal_selected(self, item: QListWidgetItem):
+        name = item.text()
+        if name != self.selected_signal_name:
+            self.selected_signal_name = name
+            print(f"Selected signal: '{name}'")
+            self.plot_signal()
 
     def get_window_name(self) -> str:
         """
@@ -208,3 +220,6 @@ class TFPresenter:
         print(f"Opening {self.open_file}...")
         self.view.update_title()
         self.load_data()
+
+    def get_selected_signal(self):
+        return self.signals.get(self.selected_signal_name)

@@ -16,7 +16,7 @@
 
 from PyQt5 import uic, QtGui
 from PyQt5.QtGui import QWindow
-from PyQt5.QtWidgets import QDialog
+from PyQt5.QtWidgets import QDialog, QListView, QListWidget
 
 from data import resources
 from gui.base.SelectFileDialog import SelectFileDialog
@@ -54,6 +54,7 @@ class TFWindow(MaximisedWindow, TFView):
         self.setup_radio_stats_avg()
         self.setup_radio_stats_paired()
         self.setup_radio_test()
+        self.setup_signal_listview()
         self.setup_xlim_edits()
         self.setup_combo_wt()
 
@@ -219,6 +220,15 @@ class TFWindow(MaximisedWindow, TFView):
     def get_wt_wft_type(self) -> str:
         combo = self.combo_window
         return combo.currentText()
+
+    def setup_signal_listview(self):
+        self.list_select_data.itemClicked.connect(self.presenter.on_signal_selected)
+
+    def update_signal_listview(self, items):
+        list_widget: QListWidget = self.list_select_data
+        list_widget.clear()
+        list_widget.addItems(items)
+        list_widget.setCurrentRow(0)
 
     def get_transform_type(self) -> str:
         if self.radio_transform_wft.isChecked():

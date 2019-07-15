@@ -92,7 +92,7 @@ class MPHelper:
             avg_ampl[i] = np.mean(row)
             avg_pow[i] = np.mean(np.square(row))
 
-        print(f"Started putting items in queue at time: {time.time()} seconds.")
+        print(f"Started putting items in queue at time: {time.time():.1f} seconds.")
 
         queue.put((
             params.time_series.times,
