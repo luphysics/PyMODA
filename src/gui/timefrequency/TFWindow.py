@@ -78,6 +78,7 @@ class TFWindow(MaximisedWindow, TFView):
             self.presenter.set_open_file(dialog.get_file())
 
     def plot_signal(self, time_series):
+        """Plots the signal in the top-left plot."""
         self.signal_plot().plot(time_series)
 
     def on_calculate_started(self):
@@ -104,6 +105,7 @@ class TFWindow(MaximisedWindow, TFView):
         btn.clicked.connect(self.presenter.calculate)
 
     def closeEvent(self, e: QtGui.QCloseEvent) -> None:
+        """Called when the window closes. Cancels any calculations that are in progress."""
         self.presenter.cancel_calculate()
         super().closeEvent(e)
 
@@ -238,6 +240,7 @@ class TFWindow(MaximisedWindow, TFView):
         return transform
 
     def set_log_text(self, text):
+        """Sets the text displayed in the log pane, and scrolls to the bottom."""
         if text != "\n":
             self.text_log.setPlainText(text.rstrip())
             self.text_log.moveCursor(QtGui.QTextCursor.End)

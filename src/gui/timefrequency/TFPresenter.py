@@ -56,18 +56,25 @@ class TFPresenter:
         self.view.select_file()
 
     def on_error(self, exc_type, value, traceback):
+        """Called when an error occurs, provided that the debug argument is not in use."""
         self.cancel_calculate()
         ErrorBox(exc_type, value, traceback)
 
     def on_log(self, text):
+        """Called when a log should occur; tells view to display message in log pane."""
         self.view.set_log_text(text)
 
     def on_signal_zoomed(self, rect):
+        """Called when the signal plot (top left) is zoomed, and sets the x-limits."""
         if rect.is_valid():
             self.view.set_xlimits(rect.x1, rect.x2)
             self.signals.set_xlimits(rect.x1, rect.x2)
 
     def invalidate_data(self):
+        """
+        Sets the current data as invalid, so that it is not plotted
+        while a calculation is in progress.
+        """
         for d in self.signals:
             d.output_data.invalidate()
 
@@ -114,7 +121,12 @@ class TFPresenter:
             self.plot_output()
             print("Completed calculation.")
 
-    def get_values_to_plot(self, amplitude=None):
+    def get_values_to_plot(self, amplitude=None) -> tuple:
+        """
+        Returns the data needed to plot the transform.
+        :param amplitude: overrides the normal value of whether to plot amplitude instead of power
+        :return: the times, frequencies, amplitudes/powers, and average amplitudes/powers
+        """
         amp: bool = self.plot_ampl
         if amplitude is not None:
             amp = amplitude
@@ -160,6 +172,9 @@ class TFPresenter:
         self.view.amplitude_plot().plot(avg_values, freq)
 
     def plot_output(self):
+        """
+        Plots the output of the WT/WFT calculations for the currently selected signal.
+        """
         t, f, values, avg_values = self.get_values_to_plot()
 
         if t is not None and f is not None:
@@ -220,6 +235,12 @@ class TFPresenter:
         self.plot_signal()
 
     def on_signal_selected(self, item):
+        """
+        Called when a signal is selected in the QListWidget.
+        Plots the new signal in the top-left plot and, if
+        transform data is available, plots the transform and
+        amplitude/power in the main plots.
+        """
         if isinstance(item, QListWidgetItem):
             name = item.text()
         else:
@@ -244,10 +265,12 @@ class TFPresenter:
         return title
 
     def set_open_file(self, file: str):
+        """Sets the name of the data file in use, and loads its data."""
         self.open_file = file
         print(f"Opening {self.open_file}...")
         self.view.update_title()
         self.load_data()
 
-    def get_selected_signal(self):
+    def get_selected_signal(self) -> TimeSeries:
+        """Returns the currently selected signal as a TimeSeries."""
         return self.signals.get(self.selected_signal_name)

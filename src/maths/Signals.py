@@ -20,6 +20,11 @@ from maths.TimeSeries import TimeSeries
 
 
 class Signals(list):
+    """
+    A class inheriting from `list`, which contains a collection of
+    TimeSeries instances. Each Signals instance should have a frequency
+    which is shared across all contained TimeSeries instances.
+    """
 
     def __init__(self, *args: TimeSeries):
         super().__init__()
@@ -85,7 +90,7 @@ class Signals(list):
         """Returns whether the frequency has been set."""
         return self.frequency is not None
 
-    def get(self, name: str):
+    def get(self, name: str) -> TimeSeries:
         """
         Gets the TimeSeries with a given name. If no TimeSeries
         has the provided name, the first TimeSeries is returned.

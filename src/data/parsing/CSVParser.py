@@ -20,17 +20,25 @@ from data.parsing.BaseParser import BaseParser
 
 
 class CSVParser(BaseParser):
-
-    def __init__(self, filename):
-        super().__init__(filename)
+    """
+    A class which can parse CSV data (comma-separated-values),
+    either row-wise or column-wise.
+    """
 
     def parse(self):
+        """
+        Parses the file, returning a list whose items are a list of
+        the values in every signal respectively.
+        """
         lines = parsing.get_lines(self.filename)
 
         # If each line has more values than the number of lines,
         # then each line corresponds to a separate signal.
         row_wise = len(lines) < len(lines[0].split(","))
-        signal_count = len(lines) if row_wise else len(lines[0].split(","))
+        if row_wise:
+            signal_count = len(lines)
+        else:
+            signal_count = len(lines[0].split(","))
 
         # List containing a list of data for each signal.
         data = [[] for _ in range(signal_count)]
