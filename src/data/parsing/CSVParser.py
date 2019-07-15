@@ -24,7 +24,7 @@ class CSVParser(BaseParser):
     def __init__(self, filename):
         super().__init__(filename)
 
-    def parse(self):  # TODO: implement column-wise parsing.
+    def parse(self):
         lines = parsing.get_lines(self.filename)
 
         # If each line has more values than the number of lines,
@@ -32,13 +32,20 @@ class CSVParser(BaseParser):
         row_wise = len(lines) < len(lines[0].split(","))
         signal_count = len(lines) if row_wise else len(lines[0].split(","))
 
-        data = [[] for _ in range(signal_count)]  # List containing a list of data for each signal.
+        # List containing a list of data for each signal.
+        data = [[] for _ in range(signal_count)]
 
         index = 0
         for l in lines:
-            for item in l.split(","):
+            split = l.split(",")
+
+            for i in range(len(split)):
+                value = float(split[i])
                 if row_wise:
-                    data[index].append(float(item))
+                    data[index].append(value)
+                else:
+                    data[i].append(value)
+
             if row_wise:
                 index += 1
 
