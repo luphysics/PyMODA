@@ -99,6 +99,17 @@ class Signals(list):
         for t in self:
             t.reset_xlimits()
 
+    def set_xlimits(self, x1, x2):
+        """
+        Sets the x-limits of all data (restricting the values to a certain
+        range of times).
+
+        :param x1: the lower limit
+        :param x2: the upper limit
+        """
+        for t in self:
+            t.set_xlimits(x1, x2)
+
     @staticmethod
     def from_file(file: str):
         """Creates a Signals instance from a provided file."""

@@ -228,6 +228,7 @@ class TFWindow(MaximisedWindow, TFView):
         list_widget.clear()
         list_widget.addItems(items)
         list_widget.setCurrentRow(0)
+        self.presenter.on_signal_selected(list_widget.selectedIndexes()[0].data())
 
     def get_transform_type(self) -> str:
         if self.radio_transform_wft.isChecked():

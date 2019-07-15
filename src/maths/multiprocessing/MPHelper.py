@@ -20,6 +20,8 @@ import numpy as np
 from PyQt5.QtGui import QWindow
 from multiprocess import Queue, Process
 
+from maths.Signals import Signals
+from maths.TimeSeries import TimeSeries
 from maths.algorithms.params import TFParams, _wft
 from maths.multiprocessing.Watcher import Watcher
 
@@ -38,9 +40,9 @@ class MPHelper:
     """
 
     def __init__(self):
-        self.queue = None
-        self.proc = None
-        self.watcher = None
+        self.queue = []
+        self.processes = []
+        self.watchers = []
 
     def wft(self,
             params: TFParams,
@@ -56,15 +58,23 @@ class MPHelper:
         on the main process/thread
         :return:
         """
-        self.queue = Queue()
-        self.proc = Process(target=self._timefrequency, args=(self.queue, params,))
-        self.proc.start()
+        signals: Signals = params.signals
+        params.remove_signals()  # Don't want to pass large unneeded object to other process.
 
-        self.watcher = Watcher(window, self.queue, 0.5, on_result)
-        self.watcher.start()
+        for time_series in signals:
+            q = Queue()
+            self.queue.append(q)
+            self.processes.append(Process(target=self._timefrequency, args=(q, time_series, params,)))
+            self.watchers.append(Watcher(window, q, 0.5, on_result))
+
+        for proc in self.processes:
+            proc.start()
+
+        for watcher in self.watchers:
+            watcher.start()
 
     @staticmethod
-    def _timefrequency(queue, params: TFParams):
+    def _timefrequency(queue, time_series: TimeSeries, params: TFParams):
         # Don't move the import statements.
         from maths.algorithms import wt, wft
 
@@ -73,7 +83,7 @@ class MPHelper:
         else:
             func = wt
 
-        transform, freq = func.calculate(params)
+        transform, freq = func.calculate(time_series, params)
         transform = np.asarray(transform)
         freq = np.asarray(freq)
 
@@ -95,9 +105,10 @@ class MPHelper:
         print(f"Started putting items in queue at time: {time.time():.1f} seconds.")
 
         queue.put((
-            params.time_series.times,
-            amplitude,
+            time_series.name,
+            time_series.times,
             freq,
+            amplitude,
             power,
             avg_ampl,
             avg_pow,
@@ -105,7 +116,7 @@ class MPHelper:
 
     def stop(self):
         """Stops the tasks in progress. The MPHelper can be reused."""
-        if self.proc and self.watcher and self.queue:
-            self.proc.terminate()
-            self.watcher.stop()
-            self.queue.close()
+        for i in range(len(self.processes)):
+            self.processes[i].terminate()
+            self.watchers[i].stop()
+            self.queue[i].close()

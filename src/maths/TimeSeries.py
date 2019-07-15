@@ -15,6 +15,8 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import numpy as np
 
+from maths.TFOutputData import TFOutputData
+
 
 class TimeSeries:
     """
@@ -33,6 +35,8 @@ class TimeSeries:
 
         self.original_signal = None
         self.original_times = None
+
+        self.output_data = TFOutputData(*[[] for _ in range(6)])  # Create instance with no data.
 
     def has_frequency(self):
         """Returns whether a frequency has been set."""
@@ -97,6 +101,9 @@ class TimeSeries:
         """Returns whether the original data has been saved."""
         return self.original_signal is not None and self.original_times is not None
 
+    def has_output_data(self):
+        return self.output_data is not None
+
     @staticmethod
     def find(array, func):
         """
@@ -104,8 +111,3 @@ class TimeSeries:
         which satisfy a particular condition.
         """
         return [i for (i, value) in enumerate(array) if func(value)]
-
-    # @staticmethod
-    # def from_file(file):
-    #     """Returns a time-series from a file."""
-    #     return TimeSeries(get_parser(file).parse())

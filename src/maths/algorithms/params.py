@@ -13,6 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from maths.Signals import Signals
 from maths.TimeSeries import TimeSeries
 
 # Keys for the dictionary that is supplied to the Matlab function.
@@ -45,7 +46,7 @@ class TFParams:
     """
 
     def __init__(self,
-                 time_series: TimeSeries,
+                 signals: Signals,
                  fmin=0,
                  fmax=None,
                  fstep="auto",
@@ -79,8 +80,8 @@ class TFParams:
         if transform == _wt and fmin == 0:
             fmin = None
 
-        self.time_series = time_series
-        self.fs = float(time_series.frequency)
+        self.signals = signals
+        self.fs = float(signals.frequency)
         self.transform = transform
 
         self.data = {
@@ -109,10 +110,17 @@ class TFParams:
         """Gets the parameters to supply to the wt/wft function as a dictionary."""
         return self.data
 
-    @staticmethod
-    def create(time_series, **kwargs):
+    def remove_signals(self):
         """
-        Creates a TFParams object, taking the same arguments as
+        Remove the signals parameter, since it is expensive to
+        pass through a multiprocessing Queue unnecessarily.
+        """
+        self.signals = None
+
+    @staticmethod
+    def create(signals, **kwargs):
+        """
+        Creates a TFParams object, taking the same **kwargs as
         the constructor. Any argument that is set to None - or not
         supplied at all - will cause the TFParams object to use the default
         value for that argument.
@@ -122,7 +130,7 @@ class TFParams:
             if value is not None:
                 out[key] = value
 
-        return TFParams(time_series, **out)
+        return TFParams(signals, **out)
 
 
 class ParamsException(Exception):

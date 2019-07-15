@@ -21,6 +21,7 @@ from gui.base.ErrorBox import ErrorBox
 from gui.base.FrequencyDialog import FrequencyDialog
 from gui.timefrequency.TFView import TFView
 from maths.Signals import Signals
+from maths.TFOutputData import TFOutputData
 from maths.TimeSeries import TimeSeries
 from maths.multiprocessing.MPHelper import MPHelper
 from maths.algorithms.params import TFParams, _wft, _wt
@@ -64,7 +65,7 @@ class TFPresenter:
     def on_signal_zoomed(self, rect):
         if rect.is_valid():
             self.view.set_xlimits(rect.x1, rect.x2)
-            self.get_selected_signal().set_xlimits(rect.x1, rect.x2)
+            self.signals.set_xlimits(rect.x1, rect.x2)
 
     def calculate(self):
         """Calculates the desired transform(s), and plots the result."""
@@ -87,36 +88,42 @@ class TFPresenter:
         self.view.on_calculate_started()
         print("Started calculation...")
 
-    def on_calculation_completed(self, times, ampl, freq, powers, avg_ampl, avg_pow):
+    def on_calculation_completed(self, name, times, freq, ampl, powers, avg_ampl, avg_pow):
         """Called when the calculation of the desired transform(s) is completed."""
         self.view.on_calculate_stopped()
 
-        self.times = times
-        self.ampl = ampl
-        self.frequencies = freq
-        self.powers = powers
-        self.avg_ampl = avg_ampl
-        self.avg_pow = avg_pow
+        t = self.signals.get(name)
 
-        values, avg_values = self.get_values_to_plot()
+        t.output_data = TFOutputData(
+            times,
+            ampl,
+            freq,
+            powers,
+            avg_ampl,
+            avg_pow
+        )
 
-        self.plot(times, freq, values, avg_values)
-        self.is_plotted = True
-        print("Completed calculation.")
+        if self.selected_signal_name == t.name:
+            self.plot_output()
+            print("Completed calculation.")
 
     def get_values_to_plot(self, amplitude=None):
-        amp = self.plot_ampl
+        amp: bool = self.plot_ampl
         if amplitude is not None:
             amp = amplitude
 
-        if amp:
-            values = self.ampl
-            avg_values = self.avg_ampl
-        else:
-            values = self.powers
-            avg_values = self.avg_pow
+        tf_data = self.get_selected_signal().output_data
+        if not tf_data.exists():
+            return None, None, None, None
 
-        return values, avg_values
+        if amp:
+            values = tf_data.ampl
+            avg_values = tf_data.avg_ampl
+        else:
+            values = tf_data.powers
+            avg_values = tf_data.avg_pow
+
+        return tf_data.times, tf_data.freq, values, avg_values
 
     def cancel_calculate(self):
         """
@@ -138,19 +145,26 @@ class TFPresenter:
         """
         self.plot_ampl = amplitude_selected
         if self.is_plotted:
-            values, avg_values = self.get_values_to_plot()
-            self.plot(self.times, self.frequencies, values, avg_values)
+            t, f, values, avg_values = self.get_values_to_plot()
+            self.plot(t, f, values, avg_values)
 
     def plot(self, times, freq, values, avg_values):
         self.view.main_plot().plot(times, values, freq)
         self.view.amplitude_plot().plot(avg_values, freq)
+
+    def plot_output(self):
+        t, f, values, avg_values = self.get_values_to_plot()
+
+        if t is not None and f is not None:
+            self.plot(t, f, values, avg_values)
+            self.is_plotted = True
 
     def get_params(self) -> TFParams:
         """
         Creates the parameters to use when performing the calculations.
         """
         return TFParams.create(
-            time_series=self.get_selected_signal(),
+            signals=self.signals,
             fmin=self.view.get_fmin(),
             fmax=self.view.get_fmax(),
             f0=self.view.get_f0(),
@@ -198,14 +212,19 @@ class TFPresenter:
         self.view.update_signal_listview(self.signals.names())
         self.plot_signal()
 
-    def on_signal_selected(self, item: QListWidgetItem):
-        name = item.text()
+    def on_signal_selected(self, item):
+        if isinstance(item, QListWidgetItem):
+            name = item.text()
+        else:
+            name = item
+
         self.signals.reset()
         if name != self.selected_signal_name:
-            self.selected_signal_name = name
             print(f"Selected signal: '{name}'")
+            self.selected_signal_name = name
             self.plot_signal()
             self.view.on_xlim_edited()
+            self.plot_output()
 
     def get_window_name(self) -> str:
         """

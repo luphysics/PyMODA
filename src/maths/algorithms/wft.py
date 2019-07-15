@@ -29,7 +29,7 @@ import matlab
 package = WFT.initialize()
 
 
-def calculate(params):
+def calculate(time_series, params):
     """
     Calculates the windowed Fourier transform.
 
@@ -37,7 +37,7 @@ def calculate(params):
     Instead, use `MPHelper` to call it safely in a new process.
     """
 
-    wft, frequency = package.wft(matlab.double([params.time_series.signal.tolist()]),
+    wft, frequency = package.wft(matlab.double([time_series.signal.tolist()]),
                                  params.fs,
                                  params.get(),
                                  nargout=2)

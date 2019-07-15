@@ -14,32 +14,23 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-"""
-DO NOT import this module in the main process, or it will break Linux support.
-"""
 
-import args
+class TFOutputData:
 
-# This must be above the WT and matlab imports.
-args.setup_matlab_runtime()
+    def __init__(self,
+                 times,
+                 ampl,
+                 freq,
+                 powers,
+                 avg_ampl,
+                 avg_pow,
+                 ):
+        self.times = times
+        self.ampl = ampl
+        self.freq = freq
+        self.powers = powers
+        self.avg_ampl = avg_ampl
+        self.avg_pow = avg_pow
 
-import WT
-import matlab
-
-package = WT.initialize()
-
-
-def calculate(time_series, params):
-    """
-    Calculates the windowed Fourier transform.
-
-    IMPORTANT: this function should not be called directly.
-    Instead, use `MPHelper` to call it safely in a new process.
-    """
-
-    wt, frequency = package.wt(matlab.double([time_series.signal.tolist()]),
-                               params.fs,
-                               params.get(),
-                               nargout=2)
-
-    return wt, frequency
+    def exists(self):
+        return len(self.times) > 0 and len(self.freq) > 0 and len(self.ampl) > 0
