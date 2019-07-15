@@ -95,6 +95,10 @@ class Signals(list):
                 return t
         return self[0]
 
+    def reset(self):
+        for t in self:
+            t.reset_xlimits()
+
     @staticmethod
     def from_file(file: str):
         """Creates a Signals instance from a provided file."""

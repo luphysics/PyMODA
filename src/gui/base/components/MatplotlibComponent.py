@@ -248,8 +248,7 @@ class MatplotlibComponent(PlotComponent):
 
     def on_reset(self):
         """Called when the reset button is pressed."""
-        stack = self.rect_stack
-        normal = stack[0]
+        normal = self.rect_stack[0]
         self.zoom_to(normal)
         self.update()
 

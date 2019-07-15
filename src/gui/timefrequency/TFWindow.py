@@ -78,8 +78,7 @@ class TFWindow(MaximisedWindow, TFView):
             self.presenter.set_open_file(dialog.get_file())
 
     def plot_signal(self, time_series):
-        signal_plot = self.plot_top
-        signal_plot.plot(time_series)
+        self.signal_plot().plot(time_series)
 
     def on_calculate_started(self):
         self.main_plot().set_in_progress(True)

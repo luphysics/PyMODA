@@ -24,6 +24,9 @@ class SignalPlot(MatplotlibComponent):
 
     def plot(self, data: TimeSeries):
         self.clear()
+        self.rect_stack.clear()
+        self.axes.autoscale(True)
+
         x = data.times
         y = data.signal
 
@@ -38,3 +41,8 @@ class SignalPlot(MatplotlibComponent):
 
     def get_ylabel(self):
         return "Value"
+
+    def on_reset(self):
+        super(SignalPlot, self).on_reset()
+
+

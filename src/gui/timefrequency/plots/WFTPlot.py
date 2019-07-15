@@ -40,7 +40,7 @@ class WFTPlot(MatplotlibComponent):
 
         self.mesh = self.axes.contourf(mesh1, mesh2, values, 256,
                                        vmin=np.min(finite), vmax=np.max(finite),
-                                       cmap=self.colormap())  # Can use: shading="gouraud"
+                                       cmap=self.colormap())
 
         self._apply_scale()
         self.axes.set_title('STFT Magnitude')

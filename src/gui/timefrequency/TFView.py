@@ -79,6 +79,9 @@ class TFView:
     def setup_xlim_edits(self):
         pass
 
+    def on_xlim_edited(self):
+        pass
+
     def setup_radio_transform(self):
         pass
 

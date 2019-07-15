@@ -200,10 +200,12 @@ class TFPresenter:
 
     def on_signal_selected(self, item: QListWidgetItem):
         name = item.text()
+        self.signals.reset()
         if name != self.selected_signal_name:
             self.selected_signal_name = name
             print(f"Selected signal: '{name}'")
             self.plot_signal()
+            self.view.on_xlim_edited()
 
     def get_window_name(self) -> str:
         """
