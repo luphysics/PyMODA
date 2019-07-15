@@ -16,6 +16,10 @@
 
 
 class TFOutputData:
+    """
+    A class which contains the time-frequency output data required
+    for plotting the appropriate transform.
+    """
 
     def __init__(self,
                  times,
@@ -32,5 +36,17 @@ class TFOutputData:
         self.avg_ampl = avg_ampl
         self.avg_pow = avg_pow
 
-    def exists(self):
-        return len(self.times) > 0 and len(self.freq) > 0 and len(self.ampl) > 0
+        self.valid = True
+
+    def is_valid(self):
+        """Returns whether the data is valid and should be plotted."""
+        return self.valid and len(self.times) > 0 and len(self.freq) > 0 and len(self.ampl) > 0
+
+    def invalidate(self):
+        """Sets the data as invalid."""
+        self.valid = False
+        self.ampl = None
+        self.freq = None
+        self.powers = None
+        self.avg_ampl = None
+        self.avg_pow = None

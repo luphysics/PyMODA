@@ -67,6 +67,10 @@ class TFPresenter:
             self.view.set_xlimits(rect.x1, rect.x2)
             self.signals.set_xlimits(rect.x1, rect.x2)
 
+    def invalidate_data(self):
+        for d in self.signals:
+            d.output_data.invalidate()
+
     def calculate(self):
         """Calculates the desired transform(s), and plots the result."""
         if self.mp_handler:
@@ -75,6 +79,7 @@ class TFPresenter:
         self.is_plotted = False
         self.view.main_plot().clear()
         self.view.main_plot().set_in_progress(True)
+        self.invalidate_data()
 
         params = self.get_params()
 
@@ -84,7 +89,10 @@ class TFPresenter:
             window=self.view.get_window(),
             on_result=self.on_calculation_completed)
 
-        self.view.main_plot().set_log_scale(logarithmic=(params.transform == _wt))
+        log: bool = (params.transform == _wt)
+        self.view.main_plot().set_log_scale(logarithmic=log)
+        self.view.amplitude_plot().set_log_scale(logarithmic=log)
+
         self.view.on_calculate_started()
         print("Started calculation...")
 
@@ -93,7 +101,6 @@ class TFPresenter:
         self.view.on_calculate_stopped()
 
         t = self.signals.get(name)
-
         t.output_data = TFOutputData(
             times,
             ampl,
@@ -113,7 +120,7 @@ class TFPresenter:
             amp = amplitude
 
         tf_data = self.get_selected_signal().output_data
-        if not tf_data.exists():
+        if not tf_data.is_valid():
             return None, None, None, None
 
         if amp:

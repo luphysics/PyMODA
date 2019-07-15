@@ -26,5 +26,6 @@ class AmplitudePlot(MatplotlibComponent):
         self.axes.set_ylim(ylim)
 
         self.axes.plot(amplitude, freq)
+        self._apply_scale()
         self.axes.autoscale(False)
         self.on_plot_complete()
