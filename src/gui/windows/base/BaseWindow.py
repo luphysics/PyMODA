@@ -17,7 +17,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMainWindow
 
 from data import resources
-from gui.base.BaseUI import BaseUI
+from gui.BaseUI import BaseUI
 
 
 class BaseWindow(QMainWindow, BaseUI):

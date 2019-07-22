@@ -43,10 +43,20 @@ class TFOutputData:
         return self.valid and len(self.times) > 0 and len(self.freq) > 0 and len(self.ampl) > 0
 
     def invalidate(self):
-        """Sets the data as invalid."""
+        """
+        Sets the data to None, which should free up memory when the
+        garbage collector runs.
+        """
         self.valid = False
         self.ampl = None
         self.freq = None
         self.powers = None
         self.avg_ampl = None
         self.avg_pow = None
+
+    @staticmethod
+    def empty():
+        """
+        Creates an instance of this class with only empty lists as data.
+        """
+        return TFOutputData(*[[] for _ in range(6)])

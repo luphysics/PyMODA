@@ -1,5 +1,5 @@
 #  PyMODA, a Python implementation of MODA (Multiscale Oscillatory Dynamics Analysis).
-#  Copyright (C) 2019  Lancaster University
+#  Copyright (C) 2019 Lancaster University
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -13,22 +13,19 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-import sys
-
-from utils import errorhandling, stdout_redirect, args
-from gui.Application import Application
+from gui.plotting.MatplotlibComponent import MatplotlibComponent
 
 
-def main():
-    """Starts the application."""
-    app = Application(sys.argv)
-    app.exec()
+class AmplitudePlot(MatplotlibComponent):
 
+    def plot(self, amplitude, freq):
+        self.clear()
 
-# The entry-point of the program.
-if __name__ == "__main__":
-    args.parse_args()
-    errorhandling.init()
-    stdout_redirect.init()
-    main()
+        y = freq
+        ylim = sorted([y[0], y[-1]])
+        self.axes.set_ylim(ylim)
+
+        self.axes.plot(amplitude, freq)
+        self.apply_scale()
+        self.axes.autoscale(False)
+        self.on_plot_complete()

@@ -1,5 +1,5 @@
 #  PyMODA, a Python implementation of MODA (Multiscale Oscillatory Dynamics Analysis).
-#  Copyright (C) 2019 Lancaster University
+#  Copyright (C) 2019  Lancaster University
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -13,18 +13,24 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from PyQt5.QtWidgets import QVBoxLayout
-from pyqtgraph import PlotWidget
-from pyqtgraph.opengl import GLSurfacePlotItem, GLViewWidget
 
-from gui.base.components.PlotComponent import PlotComponent
+from PyQt5.QtWidgets import QDesktopWidget
+
+from gui.windows.base.BaseWindow import BaseWindow
 
 
-class PyQtGraphComponent(PlotComponent):
-    """A component which enables plotting via PyQtGraph."""
+class CentredWindow(BaseWindow):
+    """
+    A window which opens at the centre of the screen.
+    """
 
-    def init_ui(self):
-        self.layout = QVBoxLayout(self)
+    def __init__(self):
+        super(CentredWindow, self).__init__()
+        self.centre()
 
-        self.plot_widget = GLViewWidget()
-        self.layout.addWidget(self.plot_widget)
+    def centre(self):
+        """Moves the window to the centre of the screen."""
+        geometry = self.frameGeometry()
+        centre = QDesktopWidget().availableGeometry().center()
+        geometry.moveCenter(centre)
+        self.move(geometry.topLeft())

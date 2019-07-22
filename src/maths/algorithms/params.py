@@ -14,7 +14,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from maths.Signals import Signals
-from maths.TimeSeries import TimeSeries
 
 # Keys for the dictionary that is supplied to the Matlab function.
 _fmin = "fmin"
@@ -62,7 +61,7 @@ class TFParams:
         Constructor which takes the desired parameters and converts
         them into floats if necessary (to prevent Matlab errors).
 
-        :param time_series: the signal data as a time-series
+        :param signals: the signal data
         :param fmin: the minimum frequency
         :param fmax: the maximum frequency
         :param fstep: the frequency step

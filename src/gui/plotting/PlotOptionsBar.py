@@ -15,8 +15,8 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QPushButton, QProgressBar
 
-from gui.base.BaseUI import BaseUI
-from gui.base.plot.Callbacks import Callbacks
+from gui.BaseUI import BaseUI
+from gui.plotting.Callbacks import Callbacks
 
 
 class PlotOptionsBar(QWidget, BaseUI):
@@ -65,7 +65,7 @@ class PlotOptionsBar(QWidget, BaseUI):
 
 class OptionsButton(QPushButton, BaseUI):
     """
-    A button to be used in the options bar for a plot.
+    A button to be used in the options bar for a plotting.
     """
 
     def init_ui(self):

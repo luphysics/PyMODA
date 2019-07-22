@@ -14,29 +14,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from gui.base.components.BaseComponent import BaseComponent
 
-
-class PlotComponent(BaseComponent):
-
-    def get_xlabel(self):
-        """Returns the label for the x-axis. Should be overridden in subclasses."""
-        pass
-
-    def get_ylabel(self):
-        """Returns the label for the y-axis. Should be overridden in subclasses."""
-        pass
-
-    def set_in_progress(self, in_progress):
-        """Sets the progress bar to display whether the plotting is in progress."""
-        pass
-
-    def on_plot_complete(self):
-        """
-        Should be called after the first plot is complete. It will then set the initial state
-        so that the reset button can work.
-        """
-        pass
-
-    def clear(self):
-        pass
+class BaseTFWindow:
+    pass

@@ -17,7 +17,7 @@ import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
 
 from data import resources
-from gui.base.components.MatplotlibComponent import MatplotlibComponent
+from gui.plotting.MatplotlibComponent import MatplotlibComponent
 from maths.utils import subset2d, calc_subset_count
 
 
@@ -56,7 +56,7 @@ class WFTPlot(MatplotlibComponent):
         return cmap
 
     def colorbar(self):
-        """Create the colorbar. Needs to be refactored to avoid breaking alignment with the signal plot."""
+        """Create the colorbar. Needs to be refactored to avoid breaking alignment with the signal plotting."""
         colorbar = self.fig.colorbar(self.mesh)
         pass
 

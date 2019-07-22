@@ -13,35 +13,36 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-"""
-DO NOT import this module in the main process, or it will break Linux support
-due to issues with the LD_LIBRARY_PATH.
-"""
-
-from utils import args
-
-# This must be above the WT and matlab imports.
-args.setup_matlab_runtime()
-
-import WT
-import matlab
-
-package = WT.initialize()
+from gui.plotting.MatplotlibComponent import MatplotlibComponent
+from maths.TimeSeries import TimeSeries
 
 
-def calculate(time_series, params):
+class SignalPlot(MatplotlibComponent):
     """
-    Calculates the windowed Fourier transform.
-
-    IMPORTANT: this function should not be called directly due to issues
-    with the LD_LIBRARY_PATH on Linux. Instead, use `MPHelper` to call it
-    safely in a new process.
+    Plots the signal, which is a simple set of amplitudes against time.
     """
 
-    wt, frequency = package.wt(matlab.double([time_series.signal.tolist()]),
-                               params.fs,
-                               params.get(),
-                               nargout=2)
+    def plot(self, data: TimeSeries):
+        self.clear()
+        self.rect_stack.clear()
+        self.axes.autoscale(True)
 
-    return wt, frequency
+        x = data.times
+        y = data.signal
+
+        xlim = (x[0], x[-1])
+        self.axes.plot(x, y, linewidth=0.7)
+        self.axes.autoscale(False)
+        self.axes.set_xlim(xlim)
+        self.on_plot_complete()
+
+    def get_xlabel(self):
+        return "Time (s)"
+
+    def get_ylabel(self):
+        return "Value"
+
+    def on_reset(self):
+        super(SignalPlot, self).on_reset()
+
+

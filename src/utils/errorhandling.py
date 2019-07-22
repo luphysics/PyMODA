@@ -14,7 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import sys
-import args
+from utils import args
 
 # List of subscribers, all of which can handle every exception.
 subscribers = []

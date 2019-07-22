@@ -14,34 +14,29 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-"""
-DO NOT import this module in the main process, or it will break Linux support
-due to issues with the LD_LIBRARY_PATH.
-"""
-
-from utils import args
-
-# This must be above the WT and matlab imports.
-args.setup_matlab_runtime()
-
-import WT
-import matlab
-
-package = WT.initialize()
+from gui.plotting.BaseComponent import BaseComponent
 
 
-def calculate(time_series, params):
-    """
-    Calculates the windowed Fourier transform.
+class PlotComponent(BaseComponent):
 
-    IMPORTANT: this function should not be called directly due to issues
-    with the LD_LIBRARY_PATH on Linux. Instead, use `MPHelper` to call it
-    safely in a new process.
-    """
+    def get_xlabel(self):
+        """Returns the label for the x-axis. Should be overridden in subclasses."""
+        pass
 
-    wt, frequency = package.wt(matlab.double([time_series.signal.tolist()]),
-                               params.fs,
-                               params.get(),
-                               nargout=2)
+    def get_ylabel(self):
+        """Returns the label for the y-axis. Should be overridden in subclasses."""
+        pass
 
-    return wt, frequency
+    def set_in_progress(self, in_progress):
+        """Sets the progress bar to display whether the plotting is in progress."""
+        pass
+
+    def on_plot_complete(self):
+        """
+        Should be called after the first plotting is complete. It will then set the initial state
+        so that the reset button can work.
+        """
+        pass
+
+    def clear(self):
+        pass

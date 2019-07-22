@@ -19,19 +19,19 @@ from PyQt5.QtGui import QWindow
 from PyQt5.QtWidgets import QDialog, QListWidget
 
 from data import resources
-from gui.base.SelectFileDialog import SelectFileDialog
-from gui.base.windows.MaximisedWindow import MaximisedWindow
-from gui.timefrequency.TFPresenter import TFPresenter
-from gui.timefrequency.TFView import TFView
-from gui.timefrequency.plots.AmplitudePlot import AmplitudePlot
-from gui.timefrequency.plots.SignalPlot import SignalPlot
-from gui.timefrequency.plots.WFTPlot import WFTPlot
+from gui.dialogs.files.SelectFileDialog import SelectFileDialog
+from gui.windows.base.MaximisedWindow import MaximisedWindow
+from gui.windows.timefrequency.TFPresenter import TFPresenter
+from gui.windows.timefrequency.TFView import TFView
+from gui.windows.timefrequency.plots.AmplitudePlot import AmplitudePlot
+from gui.windows.timefrequency.plots.SignalPlot import SignalPlot
+from gui.windows.timefrequency.plots.WFTPlot import WFTPlot
 from maths.utils import float_or_none
 
 
 class TFWindow(MaximisedWindow, TFView):
     """
-    The time-frequency analysis window. This class is the "View" in MVP,
+    The time-frequency base window. This class is the "View" in MVP,
     meaning that it should defer responsibility for tasks to the
     presenter.
     """
@@ -77,7 +77,7 @@ class TFWindow(MaximisedWindow, TFView):
             self.presenter.set_open_file(dialog.get_file())
 
     def plot_signal(self, time_series):
-        """Plots the signal in the top-left plot."""
+        """Plots the signal in the top-left plotting."""
         self.signal_plot().plot(time_series)
 
     def on_calculate_started(self):
@@ -122,7 +122,7 @@ class TFWindow(MaximisedWindow, TFView):
 
     def set_xlimits(self, x1, x2):
         """
-        Sets the x-limits on the signal plot, restricting the values to
+        Sets the x-limits on the signal plotting, restricting the values to
         a certain range of times.
 
         :param x1: the lower limit

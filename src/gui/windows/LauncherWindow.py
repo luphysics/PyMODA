@@ -19,14 +19,14 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 
 from data import resources
-from gui.base.windows.CentredWindow import CentredWindow
+from gui.windows.base.CentredWindow import CentredWindow
 from data.resources import get_ui
 
 
 class LauncherWindow(CentredWindow):
     """
     The first window that opens, providing options to perform different
-    types of analysis.
+    types of base.
     """
 
     def __init__(self, application):

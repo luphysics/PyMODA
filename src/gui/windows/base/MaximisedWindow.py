@@ -13,29 +13,17 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-from PyQt5.QtWidgets import QApplication
-
-from gui.windows.timefrequency.TFWindow import TFWindow
-from gui.windows.LauncherWindow import LauncherWindow
+from utils import args
+from gui.windows.base.BaseWindow import BaseWindow
 
 
-class Application(QApplication):
-    """The base application."""
-    launcher_window = None
-    windows = []
+class MaximisedWindow(BaseWindow):
+    """
+    A window which is maximised when it opens, unless overridden
+    by a command-line argument.
+    """
 
-    def __init__(self, args):
-        super(Application, self).__init__(args)
-        self.start_launcher()
-
-    def start_launcher(self):
-        """Opens the launcher window."""
-        self.launcher_window = LauncherWindow(self)
-        self.launcher_window.show()
-
-    def start_time_frequency(self):
-        """Opens the time-frequency base window."""
-        window = TFWindow(self)
-        self.windows.append(window)
-        window.show()
+    def __init__(self):
+        super().__init__()
+        if args.maximise():
+            self.showMaximized()

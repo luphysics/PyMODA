@@ -15,19 +15,19 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from PyQt5.QtWidgets import QDialog, QListWidgetItem
 
-import errorhandling
-import stdout_redirect
-from gui.base.ErrorBox import ErrorBox
-from gui.base.FrequencyDialog import FrequencyDialog
-from gui.timefrequency.TFView import TFView
+from utils import errorhandling, stdout_redirect
+from gui.windows.base.analysis.BaseTFPresenter import BaseTFPresenter
+from gui.dialogs.ErrorBox import ErrorBox
+from gui.dialogs.FrequencyDialog import FrequencyDialog
+from gui.windows.timefrequency.TFView import TFView
 from maths.Signals import Signals
 from maths.TFOutputData import TFOutputData
 from maths.TimeSeries import TimeSeries
 from maths.multiprocessing.MPHelper import MPHelper
-from maths.algorithms.params import TFParams, _wft, _wt
+from maths.algorithms.params import TFParams, _wt
 
 
-class TFPresenter:
+class TFPresenter(BaseTFPresenter):
     """
     The Presenter in control of the time-frequency window.
     """
@@ -49,7 +49,7 @@ class TFPresenter:
         stdout_redirect.subscribe(self.logger)
 
     def init(self):
-        # Add zoom listener to the signal plot, which is displayed in the top left.
+        # Add zoom listener to the signal plotting, which is displayed in the top left.
         self.view.signal_plot().add_zoom_listener(self.on_signal_zoomed)
 
         # Open dialog to select a data file.
@@ -65,7 +65,7 @@ class TFPresenter:
         self.view.set_log_text(text)
 
     def on_signal_zoomed(self, rect):
-        """Called when the signal plot (top left) is zoomed, and sets the x-limits."""
+        """Called when the signal plotting (top left) is zoomed, and sets the x-limits."""
         if rect.is_valid():
             self.view.set_xlimits(rect.x1, rect.x2)
             self.signals.set_xlimits(rect.x1, rect.x2)
@@ -124,8 +124,8 @@ class TFPresenter:
 
     def get_values_to_plot(self, amplitude=None) -> tuple:
         """
-        Returns the data needed to plot the transform.
-        :param amplitude: overrides the normal value of whether to plot amplitude instead of power
+        Returns the data needed to plotting the transform.
+        :param amplitude: overrides the normal value of whether to plotting amplitude instead of power
         :return: the times, frequencies, amplitudes/powers, and average amplitudes/powers
         """
         amp: bool = self.plot_ampl
@@ -158,10 +158,10 @@ class TFPresenter:
 
     def set_plot_type(self, amplitude_selected=True):
         """
-        Set the type of plot to display (power or amplitude). This affects
-        the main plot and the amplitude plot.
+        Set the type of plotting to display (power or amplitude). This affects
+        the main plotting and the amplitude plotting.
 
-        :param amplitude_selected: whether to set the plot type as amplitude (not power)
+        :param amplitude_selected: whether to set the plotting type as amplitude (not power)
         """
         self.plot_ampl = amplitude_selected
         if self.is_plotted:
@@ -238,7 +238,7 @@ class TFPresenter:
     def on_signal_selected(self, item):
         """
         Called when a signal is selected in the QListWidget.
-        Plots the new signal in the top-left plot and, if
+        Plots the new signal in the top-left plotting and, if
         transform data is available, plots the transform and
         amplitude/power in the main plots.
         """

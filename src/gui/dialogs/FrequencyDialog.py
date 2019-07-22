@@ -17,9 +17,9 @@ from PyQt5 import uic
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QDialog, QComboBox
 
-import args
+from utils import args
 from data import resources
-from gui.base.BaseUI import BaseUI
+from gui.BaseUI import BaseUI
 
 
 class FrequencyDialog(QDialog, BaseUI):

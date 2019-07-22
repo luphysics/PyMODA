@@ -22,10 +22,10 @@ from matplotlib.backend_bases import MouseButton
 from matplotlib.backends.backend_qt5agg import (FigureCanvas)
 from matplotlib.figure import Figure
 
-from gui.base.components.PlotComponent import PlotComponent
-from gui.base.plot.Callbacks import Callbacks
-from gui.base.plot.PlotOptionsBar import PlotOptionsBar
-from gui.timefrequency.Rect import Rect
+from gui.plotting.PlotComponent import PlotComponent
+from gui.plotting.Callbacks import Callbacks
+from gui.plotting.PlotOptionsBar import PlotOptionsBar
+from gui.windows.timefrequency.Rect import Rect
 
 
 class MatplotlibComponent(PlotComponent):
@@ -43,7 +43,7 @@ class MatplotlibComponent(PlotComponent):
         self.crosshair_width = 0.7
         self.show_crosshair = True
 
-        self.temp_patch = None  # The actual rectangle being drawn on the plot.
+        self.temp_patch = None  # The actual rectangle being drawn on the plotting.
         self.rect: Rect = None  # The Rect object representing the coordinates of the rectangle.
         self.rect_stack = []  # A List of Rect objects corresponding to a stack of previous zoom states.
 
@@ -74,7 +74,7 @@ class MatplotlibComponent(PlotComponent):
 
     def init_callbacks(self):
         """
-        Creates the callbacks for interacting with the plot.
+        Creates the callbacks for interacting with the plotting.
         """
         move = self.canvas.mpl_connect("motion_notify_event", self.on_move)
         click = self.canvas.mpl_connect("button_press_event", self.on_click)
@@ -92,7 +92,7 @@ class MatplotlibComponent(PlotComponent):
 
     def on_plot_complete(self):
         """
-        Should be called after the first plot is complete. It will then set the initial state
+        Should be called after the first plotting is complete. It will then set the initial state
         so that the reset button can work.
         """
         self.clear_rect_states()
@@ -121,13 +121,13 @@ class MatplotlibComponent(PlotComponent):
         self.remove_temp()
 
     def update(self):
-        """Updates the plot by redrawing the canvas."""
+        """Updates the plotting by redrawing the canvas."""
         super().update()
         self.canvas.draw()
 
     def set_log_scale(self, logarithmic=False):
         """
-        Set whether the plot should use a logarithmic y-scale.
+        Set whether the plotting should use a logarithmic y-scale.
         IMPORTANT: Note that the `apply_scale()` function must be called (usually in a subclass)
         for this function to have any effect.
         """
@@ -147,7 +147,7 @@ class MatplotlibComponent(PlotComponent):
         num = len(self.temp_plots)
         for i in range(num):
             item = self.temp_plots.pop()  # Take last item and remove from list.
-            item.remove()  # Remove from plot.
+            item.remove()  # Remove from plotting.
 
     def remove_temp_rectangle(self):
         """
@@ -160,12 +160,12 @@ class MatplotlibComponent(PlotComponent):
             self.temp_patch = None
 
     def remove_temp(self):
-        """Removes all temporary items on the plot."""
+        """Removes all temporary items on the plotting."""
         self.remove_temp_crosshairs()
         self.remove_temp_rectangle()
 
     def on_move(self, event):
-        """Called when the mouse moves over the plot."""
+        """Called when the mouse moves over the plotting."""
         self.cross_cursor(True)
         x, y = self.xy(event)
         if x and y:
@@ -177,7 +177,7 @@ class MatplotlibComponent(PlotComponent):
             self.update()
 
     def on_click(self, event):
-        """Called when the mouse clicks down on the plot, but before the click is released."""
+        """Called when the mouse clicks down on the plotting, but before the click is released."""
         if event.button == MouseButton.LEFT:
             x, y = self.xy(event)
             if x and y:
@@ -186,7 +186,7 @@ class MatplotlibComponent(PlotComponent):
                 self.update()
 
     def on_release(self, event):
-        """Called when the mouse releases a click on the plot."""
+        """Called when the mouse releases a click on the plotting."""
         if event.button == MouseButton.LEFT:
             x, y = self.xy(event)
             if x and y:
@@ -203,7 +203,7 @@ class MatplotlibComponent(PlotComponent):
 
     def zoom_to(self, rect, save_state=True, trigger_listeners=True):
         """
-        Zooms the plot to the region designated by the rectangle.
+        Zooms the plotting to the region designated by the rectangle.
         Adds the new state to the stack of states.
         """
         rect = rect.sorted()
@@ -219,7 +219,7 @@ class MatplotlibComponent(PlotComponent):
                 l(rect)
 
     def set_xrange(self, x1=None, x2=None, **kwargs):
-        """Set the range of x-values shown by the plot."""
+        """Set the range of x-values shown by the plotting."""
         rect = self.current_rect()
         if x1 is not None:
             rect.x1 = x1
@@ -305,7 +305,7 @@ class MatplotlibComponent(PlotComponent):
         return self.axes.axhline(y, color="black", linewidth=self.crosshair_width)
 
     def clear(self):
-        """Clears the contents of the plot."""
+        """Clears the contents of the plotting."""
         self.axes.clear()
         self.canvas.draw()
 

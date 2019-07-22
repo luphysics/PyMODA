@@ -121,7 +121,7 @@
   <customwidget>
    <class>DragDropLabel</class>
    <extends>QLabel</extends>
-   <header>gui.base.DragDropLabel</header>
+   <header>gui.dialogs.files.DragDropLabel</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -1,5 +1,5 @@
 #  PyMODA, a Python implementation of MODA (Multiscale Oscillatory Dynamics Analysis).
-#  Copyright (C) 2019  Lancaster University
+#  Copyright (C) 2019 Lancaster University
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -13,17 +13,8 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-import args
-from gui.base.windows.BaseWindow import BaseWindow
 
-
-class MaximisedWindow(BaseWindow):
-    """
-    A window which is maximised when it opens, unless overridden
-    by a command-line argument.
-    """
+class BaseTFPresenter:
 
     def __init__(self):
-        super().__init__()
-        if args.maximise():
-            self.showMaximized()
+        pass

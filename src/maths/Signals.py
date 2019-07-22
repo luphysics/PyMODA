@@ -56,8 +56,8 @@ class Signals(list):
     def _name_template(self, index=1) -> str:
         """
         A template for a generating a particular name.
-        If provided with the existing names, it will not
-        produce a duplicate.
+        It will not produce a name that is already in
+        use by this instance.
         """
         while True:  # Iterate until we have a unique name.
             name = f"Signal {index}"
@@ -68,6 +68,10 @@ class Signals(list):
         return name
 
     def append(self, object: TimeSeries, generate_name=True) -> None:
+        """
+        Overrides the append function, ensuring that any signal added
+        has a unique name.
+        """
         super(Signals, self).append(object)
         if generate_name:
             self.generate_names()

@@ -15,10 +15,11 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 """
-DO NOT import this module in the main process, or it will break Linux support.
+DO NOT import this module in the main process, or it will break Linux support
+due to issues with the LD_LIBRARY_PATH.
 """
 
-import args
+from utils import args
 
 # This must be above the WFT and matlab imports.
 args.setup_matlab_runtime()
@@ -33,8 +34,9 @@ def calculate(time_series, params):
     """
     Calculates the windowed Fourier transform.
 
-    IMPORTANT: this function should not be called directly.
-    Instead, use `MPHelper` to call it safely in a new process.
+    IMPORTANT: this function should not be called directly due to issues
+    with the LD_LIBRARY_PATH on Linux. Instead, use `MPHelper` to call it
+    safely in a new process.
     """
 
     wft, frequency = package.wft(matlab.double([time_series.signal.tolist()]),

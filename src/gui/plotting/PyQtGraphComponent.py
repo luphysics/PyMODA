@@ -13,19 +13,17 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from gui.base.components.MatplotlibComponent import MatplotlibComponent
+from PyQt5.QtWidgets import QVBoxLayout
+from pyqtgraph.opengl import GLViewWidget
+
+from gui.plotting.PlotComponent import PlotComponent
 
 
-class AmplitudePlot(MatplotlibComponent):
+class PyQtGraphComponent(PlotComponent):
+    """A component which enables plotting via PyQtGraph."""
 
-    def plot(self, amplitude, freq):
-        self.clear()
+    def init_ui(self):
+        self.layout = QVBoxLayout(self)
 
-        y = freq
-        ylim = sorted([y[0], y[-1]])
-        self.axes.set_ylim(ylim)
-
-        self.axes.plot(amplitude, freq)
-        self.apply_scale()
-        self.axes.autoscale(False)
-        self.on_plot_complete()
+        self.plot_widget = GLViewWidget()
+        self.layout.addWidget(self.plot_widget)

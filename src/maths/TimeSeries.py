@@ -20,7 +20,7 @@ from maths.TFOutputData import TFOutputData
 
 class TimeSeries:
     """
-    A time-series of data. A time-series is a 1-dimensional series of recorded values,
+    A time-series of data: a 1-dimensional series of recorded values,
     with a frequency at which the data were recorded. The sampling frequency can be used
     to calculate the time for each datum point in the series.
     """
@@ -36,7 +36,7 @@ class TimeSeries:
         self.original_signal = None
         self.original_times = None
 
-        self.output_data = TFOutputData(*[[] for _ in range(6)])  # Create instance with no data.
+        self.output_data = TFOutputData.empty()
 
     def has_frequency(self):
         """Returns whether a frequency has been set."""

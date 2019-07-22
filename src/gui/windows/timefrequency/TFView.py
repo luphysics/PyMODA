@@ -15,12 +15,13 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from PyQt5.QtGui import QWindow
 
-from gui.timefrequency.plots.AmplitudePlot import AmplitudePlot
-from gui.timefrequency.plots.SignalPlot import SignalPlot
-from gui.timefrequency.plots.WFTPlot import WFTPlot
+from gui.windows.base.analysis.BaseTFView import BaseTFView
+from gui.windows.timefrequency.plots.AmplitudePlot import AmplitudePlot
+from gui.windows.timefrequency.plots.SignalPlot import SignalPlot
+from gui.windows.timefrequency.plots.WFTPlot import WFTPlot
 
 
-class TFView:
+class TFView(BaseTFView):
     """
     A View class to be subclassed by the time-frequency window.
     """
@@ -50,7 +51,7 @@ class TFView:
         pass
 
     def main_plot(self) -> WFTPlot:
-        """Returns the main plot, which is used to display the transform."""
+        """Returns the main plotting, which is used to display the transform."""
         pass
 
     def signal_plot(self) -> SignalPlot:
@@ -63,13 +64,13 @@ class TFView:
         pass
 
     def setup_radio_plot(self):
-        """Set up the radio buttons for plot amplitude/power."""
+        """Set up the radio buttons for plotting amplitude/power."""
         pass
 
     def on_plot_type_toggled(self, ampl_selected):
         """
-        Triggered when plot type is changed from amplitude to power, or vice versa.
-        :param ampl_selected: whether the plot type is amplitude, not power
+        Triggered when plotting type is changed from amplitude to power, or vice versa.
+        :param ampl_selected: whether the plotting type is amplitude, not power
         """
         self.presenter.set_plot_type(ampl_selected)
 
