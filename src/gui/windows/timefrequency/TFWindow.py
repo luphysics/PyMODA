@@ -14,67 +14,39 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from PyQt5 import uic, QtGui
+from PyQt5 import QtGui
 from PyQt5.QtGui import QWindow
-from PyQt5.QtWidgets import QDialog, QListWidget
+from PyQt5.QtWidgets import QListWidget
 
 from data import resources
-from gui.dialogs.files.SelectFileDialog import SelectFileDialog
-from gui.windows.base.MaximisedWindow import MaximisedWindow
+from gui.windows.base.analysis.BaseTFWindow import BaseTFWindow
 from gui.windows.timefrequency.TFPresenter import TFPresenter
 from gui.windows.timefrequency.TFView import TFView
-from gui.windows.timefrequency.plots.AmplitudePlot import AmplitudePlot
-from gui.windows.timefrequency.plots.SignalPlot import SignalPlot
-from gui.windows.timefrequency.plots.WFTPlot import WFTPlot
 from maths.utils import float_or_none
 
 
-class TFWindow(MaximisedWindow, TFView):
+class TFWindow(BaseTFWindow, TFView):
     """
-    The time-frequency base window. This class is the "View" in MVP,
+    The time-frequency window. This class is the "View" in MVP,
     meaning that it should defer responsibility for tasks to the
     presenter.
     """
 
     def __init__(self, application):
         TFView.__init__(self, application, TFPresenter(self))
-        MaximisedWindow.__init__(self)
+        BaseTFWindow.__init__(self)
 
     def init_ui(self):
-        uic.loadUi(resources.get("layout:window_time_freq.ui"), self)
-        self.update_title()
-        self.setup_menu_bar()
-
-        # Setup radio buttons.
+        super().init_ui()
         self.setup_radio_plot()
         self.setup_radio_transform()
-        self.setup_radio_preproc()
-        self.setup_radio_cut_edges()
         self.setup_radio_stats_avg()
         self.setup_radio_stats_paired()
         self.setup_radio_test()
-        self.setup_signal_listview()
-        self.setup_xlim_edits()
         self.setup_combo_wt()
 
-        self.btn_calculate.clicked.connect(self.presenter.calculate)
-        self.presenter.init()
-
-    def update_title(self, title=""):
-        super().update_title(title if title else self.presenter.get_window_name())
-
-    def setup_menu_bar(self):
-        menu = self.menubar
-        file = menu.addMenu("File")
-        file.addAction("Load data file")
-        file.triggered.connect(self.select_file)
-
-    def select_file(self):
-        dialog = SelectFileDialog()
-
-        code = dialog.exec()
-        if code == QDialog.Accepted:
-            self.presenter.set_open_file(dialog.get_file())
+    def get_layout_file(self) -> str:
+        return resources.get("layout:window_time_freq.ui")
 
     def plot_signal(self, time_series):
         """Plots the signal in the top-left plotting."""
@@ -110,15 +82,6 @@ class TFWindow(MaximisedWindow, TFView):
 
     def get_window(self) -> QWindow:
         return self
-
-    def main_plot(self) -> WFTPlot:
-        return self.plot_main
-
-    def signal_plot(self) -> SignalPlot:
-        return self.plot_top
-
-    def amplitude_plot(self) -> AmplitudePlot:
-        return self.plot_right
 
     def set_xlimits(self, x1, x2):
         """

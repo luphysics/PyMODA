@@ -20,32 +20,32 @@ from PyQt5.QtGui import QPixmap
 
 from data import resources
 from gui.windows.base.CentredWindow import CentredWindow
-from data.resources import get_ui
+from data.resources import get_ui, get
 
 
 class LauncherWindow(CentredWindow):
     """
     The first window that opens, providing options to perform different
-    types of base.
+    types of analysis.
     """
 
     def __init__(self, application):
-        super().__init__()
         self.application = application
+        super().__init__()
 
     def init_ui(self):
-        uic.loadUi(get_ui("window_launcher"), self)
-        self.btn_time_freq.clicked.connect(self.onclick_time_freq)
+        uic.loadUi(get("layout:window_launcher.ui"), self)
         self.load_banner_images()
+
+        self.btn_time_freq.clicked.connect(self.application.start_time_frequency)
+        self.btn_wavelet_phase.clicked.connect(self.application.start_phase_coherence)
+
+        # Placeholders.
+        self.btn_ridge_extraction.clicked.connect(self.application.start_phase_coherence)
+        self.btn_wavelet_bispectrum.clicked.connect(self.application.start_phase_coherence)
+        self.btn_dynamical_bayesian.clicked.connect(self.application.start_phase_coherence)
 
     def load_banner_images(self):
         physics_label = self.lbl_physics
         image = QPixmap(resources.get("image:physicslogo.png"))
         physics_label.setPixmap(image.scaled(600, 300, Qt.KeepAspectRatio))
-
-    def onclick_time_freq(self):
-        """
-        Called when the time-frequency button is
-        clicked.
-        """
-        self.application.start_time_frequency()

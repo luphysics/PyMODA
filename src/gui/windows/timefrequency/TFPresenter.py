@@ -15,11 +15,8 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from PyQt5.QtWidgets import QDialog, QListWidgetItem
 
-from utils import errorhandling, stdout_redirect
 from gui.windows.base.analysis.BaseTFPresenter import BaseTFPresenter
-from gui.dialogs.ErrorBox import ErrorBox
 from gui.dialogs.FrequencyDialog import FrequencyDialog
-from gui.windows.timefrequency.TFView import TFView
 from maths.Signals import Signals
 from maths.TFOutputData import TFOutputData
 from maths.TimeSeries import TimeSeries
@@ -31,52 +28,6 @@ class TFPresenter(BaseTFPresenter):
     """
     The Presenter in control of the time-frequency window.
     """
-
-    def __init__(self, view: TFView):
-        self.view = view
-        self.is_plotted = False
-        self.plot_ampl = True
-
-        self.signals = None
-        self.selected_signal_name = None
-        # self.time_series = None
-        self.open_file = None
-        self.freq = None
-        self.mp_handler = None
-        self.logger = stdout_redirect.WindowLogger(self.on_log)
-
-        errorhandling.subscribe(self.on_error)
-        stdout_redirect.subscribe(self.logger)
-
-    def init(self):
-        # Add zoom listener to the signal plotting, which is displayed in the top left.
-        self.view.signal_plot().add_zoom_listener(self.on_signal_zoomed)
-
-        # Open dialog to select a data file.
-        self.view.select_file()
-
-    def on_error(self, exc_type, value, traceback):
-        """Called when an error occurs, provided that the debug argument is not in use."""
-        self.cancel_calculate()
-        ErrorBox(exc_type, value, traceback)
-
-    def on_log(self, text):
-        """Called when a log should occur; tells view to display message in log pane."""
-        self.view.set_log_text(text)
-
-    def on_signal_zoomed(self, rect):
-        """Called when the signal plotting (top left) is zoomed, and sets the x-limits."""
-        if rect.is_valid():
-            self.view.set_xlimits(rect.x1, rect.x2)
-            self.signals.set_xlimits(rect.x1, rect.x2)
-
-    def invalidate_data(self):
-        """
-        Sets the current data as invalid, so that it is not plotted
-        while a calculation is in progress.
-        """
-        for d in self.signals:
-            d.output_data.invalidate()
 
     def calculate(self):
         """Calculates the desired transform(s), and plots the result."""
@@ -145,17 +96,6 @@ class TFPresenter(BaseTFPresenter):
 
         return tf_data.times, tf_data.freq, values, avg_values
 
-    def cancel_calculate(self):
-        """
-        Cancels the calculation of the desired transform(s),
-        killing their processes immediately.
-        """
-        if self.mp_handler:
-            self.mp_handler.stop()
-        self.view.on_calculate_stopped()
-        self.is_plotted = False
-        print("Calculation terminated.")
-
     def set_plot_type(self, amplitude_selected=True):
         """
         Set the type of plotting to display (power or amplitude). This affects
@@ -218,14 +158,6 @@ class TFPresenter(BaseTFPresenter):
                 self.set_frequency(self.freq)
                 self.on_data_loaded()
 
-    def on_freq_changed(self, freq):
-        """Called when the frequency is changed."""
-        self.freq = float(freq)
-
-    def set_frequency(self, freq: float):
-        """Sets the frequency of the time-series."""
-        self.signals.set_frequency(freq)
-
     def plot_signal(self):
         """Plots the signal on the SignalPlot."""
         self.view.plot_signal(self.get_selected_signal())
@@ -254,23 +186,6 @@ class TFPresenter(BaseTFPresenter):
             self.plot_signal()
             self.view.on_xlim_edited()
             self.plot_output()
-
-    def get_window_name(self) -> str:
-        """
-        Gets the name of this window, adding the currently open file
-        if applicable.
-        """
-        title = self.view._name
-        if self.open_file:
-            title += f" - {self.open_file}"
-        return title
-
-    def set_open_file(self, file: str):
-        """Sets the name of the data file in use, and loads its data."""
-        self.open_file = file
-        print(f"Opening {self.open_file}...")
-        self.view.update_title()
-        self.load_data()
 
     def get_selected_signal(self) -> TimeSeries:
         """Returns the currently selected signal as a TimeSeries."""

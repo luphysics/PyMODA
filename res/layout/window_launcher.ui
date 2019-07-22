@@ -152,7 +152,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="btn_wavlet_bispectrum">
+         <widget class="QPushButton" name="btn_wavelet_bispectrum">
           <property name="minimumSize">
            <size>
             <width>300</width>

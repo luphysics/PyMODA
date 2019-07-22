@@ -13,4 +13,12 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from gui.windows.base.analysis.BaseTFPresenter import BaseTFPresenter
+from gui.windows.phasecoherence.PCView import PCView
+
+
+class PCPresenter(BaseTFPresenter):
+
+    def __init__(self, view: PCView):
+        super().__init__(view)
 

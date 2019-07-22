@@ -16,6 +16,7 @@
 
 from PyQt5.QtWidgets import QApplication
 
+from gui.windows.phasecoherence.PCWindow import PCWindow
 from gui.windows.timefrequency.TFWindow import TFWindow
 from gui.windows.LauncherWindow import LauncherWindow
 
@@ -35,7 +36,14 @@ class Application(QApplication):
         self.launcher_window.show()
 
     def start_time_frequency(self):
-        """Opens the time-frequency base window."""
-        window = TFWindow(self)
-        self.windows.append(window)
-        window.show()
+        """Opens the time-frequency window."""
+        self.open_window(TFWindow)
+
+    def start_phase_coherence(self):
+        """Opens the phase coherence window."""
+        self.open_window(PCWindow)
+
+    def open_window(self, WindowType):
+        w = WindowType(self)
+        self.windows.append(w)
+        w.show()

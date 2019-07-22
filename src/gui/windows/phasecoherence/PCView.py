@@ -1,5 +1,5 @@
 #  PyMODA, a Python implementation of MODA (Multiscale Oscillatory Dynamics Analysis).
-#  Copyright (C) 2019  Lancaster University
+#  Copyright (C) 2019 Lancaster University
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -13,18 +13,22 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from gui.windows.base.CentredWindow import CentredWindow
-from utils import args
-from gui.windows.base.BaseWindow import BaseWindow
+from gui.windows.base.analysis.BaseTFView import BaseTFView
+from gui.windows.timefrequency.TFView import TFView
 
 
-class MaximisedWindow(CentredWindow):
+class PCView(BaseTFView):
     """
-    A window which is maximised when it opens, unless overridden
-    by a command-line argument.
+    A View class to be subclassed by the phase coherence window.
     """
 
-    def __init__(self):
-        super().__init__()
-        if args.maximise():
-            self.showMaximized()
+    name = "Wavelet Phase Coherence"
+
+    def setup_surr_method(self):
+        pass
+
+    def setup_surr_count(self):
+        pass
+
+    def setup_surr_type(self):
+        pass
