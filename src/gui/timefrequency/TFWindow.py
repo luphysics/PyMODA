@@ -16,7 +16,7 @@
 
 from PyQt5 import uic, QtGui
 from PyQt5.QtGui import QWindow
-from PyQt5.QtWidgets import QDialog, QListView, QListWidget
+from PyQt5.QtWidgets import QDialog, QListWidget
 
 from data import resources
 from gui.base.SelectFileDialog import SelectFileDialog
@@ -26,7 +26,6 @@ from gui.timefrequency.TFView import TFView
 from gui.timefrequency.plots.AmplitudePlot import AmplitudePlot
 from gui.timefrequency.plots.SignalPlot import SignalPlot
 from gui.timefrequency.plots.WFTPlot import WFTPlot
-from maths.algorithms import params
 from maths.utils import float_or_none
 
 

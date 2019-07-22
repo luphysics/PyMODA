@@ -42,7 +42,7 @@ class WFTPlot(MatplotlibComponent):
                                        vmin=np.min(finite), vmax=np.max(finite),
                                        cmap=self.colormap())
 
-        self._apply_scale()
+        self.apply_scale()
         self.axes.set_title('STFT Magnitude')
         self.axes.autoscale(False)
         self.on_plot_complete()

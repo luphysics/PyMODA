@@ -128,12 +128,12 @@ class MatplotlibComponent(PlotComponent):
     def set_log_scale(self, logarithmic=False):
         """
         Set whether the plot should use a logarithmic y-scale.
-        Note that the `_apply_scale()` function must be called (usually in a subclass)
+        IMPORTANT: Note that the `apply_scale()` function must be called (usually in a subclass)
         for this function to have any effect.
         """
         self.log = logarithmic
 
-    def _apply_scale(self):
+    def apply_scale(self):
         """
         Applies the scale (either logarithmic or linear) according to `self.log`.
         """

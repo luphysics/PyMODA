@@ -117,9 +117,10 @@ class TFPresenter:
             avg_pow
         )
 
+        print(f"Finished calculation for '{name}'.")
+
         if self.selected_signal_name == t.name:
             self.plot_output()
-            print("Completed calculation.")
 
     def get_values_to_plot(self, amplitude=None) -> tuple:
         """
