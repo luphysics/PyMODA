@@ -373,14 +373,14 @@
                <string>Transform</string>
               </property>
               <layout class="QGridLayout" name="gridLayout_17">
-               <item row="0" column="0">
+               <item row="1" column="0">
                 <widget class="QRadioButton" name="radio_transform_wft">
                  <property name="text">
                   <string>WFT</string>
                  </property>
                 </widget>
                </item>
-               <item row="1" column="0">
+               <item row="0" column="0">
                 <widget class="QRadioButton" name="radio_transform_wt">
                  <property name="text">
                   <string>WT</string>
@@ -529,19 +529,19 @@
   <customwidget>
    <class>SignalPlot</class>
    <extends>QWidget</extends>
-   <header>gui.windows.timefrequency.plots.SignalPlot</header>
+   <header>gui.windows.base.analysis.plots.SignalPlot</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>WFTPlot</class>
    <extends>QWidget</extends>
-   <header>gui.windows.timefrequency.plots.WFTPlot</header>
+   <header>gui.windows.base.analysis.plots.WFTPlot</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>AmplitudePlot</class>
    <extends>QWidget</extends>
-   <header>gui.windows.timefrequency.plots.AmplitudePlot</header>
+   <header>gui.windows.base.analysis.plots.AmplitudePlot</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -26,8 +26,8 @@ class TFView(BaseTFView):
 
     # The items to be shown in the "WT / WFT Type" combobox.
     _window_items = (
-        ["Lognorm", "Morlet", "Bump"],  # Wavelet transform.
         ["Gaussian", "Hann", "Blackman", "Exp", "Rect", "Kaiser-a"],  # Windowed Fourier transform.
+        ["Lognorm", "Morlet", "Bump"],  # Wavelet transform.
     )
 
     def setup_radio_transform(self):

@@ -28,6 +28,7 @@ class TFOutputData:
                  powers,
                  avg_ampl,
                  avg_pow,
+                 transform="wft"
                  ):
         self.times = times
         self.ampl = ampl
@@ -35,6 +36,7 @@ class TFOutputData:
         self.powers = powers
         self.avg_ampl = avg_ampl
         self.avg_pow = avg_pow
+        self.transform = transform
 
         self.valid = True
 

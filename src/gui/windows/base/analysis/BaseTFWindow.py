@@ -19,9 +19,9 @@ from PyQt5.QtWidgets import QDialog
 from gui.dialogs.files.SelectFileDialog import SelectFileDialog
 from gui.windows.base.MaximisedWindow import MaximisedWindow
 from gui.windows.base.analysis.BaseTFView import BaseTFView
-from gui.windows.timefrequency.plots.AmplitudePlot import AmplitudePlot
-from gui.windows.timefrequency.plots.SignalPlot import SignalPlot
-from gui.windows.timefrequency.plots.WFTPlot import WFTPlot
+from gui.windows.base.analysis.plots.AmplitudePlot import AmplitudePlot
+from gui.windows.base.analysis.plots.SignalPlot import SignalPlot
+from gui.windows.base.analysis.plots.WFTPlot import WFTPlot
 
 
 class BaseTFWindow(MaximisedWindow, BaseTFView):
@@ -70,3 +70,12 @@ class BaseTFWindow(MaximisedWindow, BaseTFView):
 
     def amplitude_plot(self) -> AmplitudePlot:
         return self.plot_right
+
+    def setup_radio_preproc(self):
+        self.radio_preproc_on.setChecked(True)
+
+    def setup_radio_cut_edges(self):
+        self.radio_cut_on.setChecked(True)
+
+    def get_preprocessing(self):
+        return self.radio_preproc_on.isChecked()

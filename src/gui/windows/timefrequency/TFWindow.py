@@ -59,7 +59,7 @@ class TFWindow(BaseTFWindow, TFView):
         btn = self.btn_calculate
 
         btn.setText("Cancel")
-        btn.setStyleSheet("color: red;")
+        btn.setStyleSheet("color: blue;")
 
         btn.clicked.disconnect()
         btn.clicked.connect(self.presenter.cancel_calculate)
@@ -77,7 +77,7 @@ class TFWindow(BaseTFWindow, TFView):
 
     def closeEvent(self, e: QtGui.QCloseEvent) -> None:
         """Called when the window closes. Cancels any calculations that are in progress."""
-        self.presenter.cancel_calculate()
+        self.presenter.on_close()
         super().closeEvent(e)
 
     def get_window(self) -> QWindow:
@@ -108,20 +108,20 @@ class TFWindow(BaseTFWindow, TFView):
         x2 = self.line_xlim2.text()
         self.signal_plot().set_xrange(x1=float_or_none(x1), x2=float_or_none(x2))
 
-    def on_transform_toggled(self, is_wft):
+    def on_transform_toggled(self, is_wt):
         """Called when the type of transform (WT or WFT) is toggled."""
-        self.setup_combo_wt(is_wft)
+        self.setup_combo_wt(is_wt)
 
-    def setup_combo_wt(self, is_wft=True):
+    def setup_combo_wt(self, is_wt=True):
         """
         Sets up the "WT / WFT Type" combobox according to the current transform type.
-        :param is_wft: whether the current transform is WFT (not WT)
+        :param is_wt: whether the current transform is WFT (not WT)
         """
         combo = self.combo_window
         combo.clear()
 
         # Gets the list of items from the tuple, since the bool evaluates to 0 or 1.
-        items = self._window_items[is_wft]
+        items = self._window_items[is_wt]
         for i in items:
             combo.addItem(i)
 
@@ -130,14 +130,8 @@ class TFWindow(BaseTFWindow, TFView):
         self.radio_plot_ampl.toggled.connect(self.on_plot_type_toggled)
 
     def setup_radio_transform(self):
-        self.radio_transform_wft.setChecked(True)
-        self.radio_transform_wft.toggled.connect(self.on_transform_toggled)
-
-    def setup_radio_preproc(self):
-        self.radio_preproc_on.setChecked(True)
-
-    def setup_radio_cut_edges(self):
-        self.radio_cut_on.setChecked(True)
+        self.radio_transform_wt.setChecked(True)
+        self.radio_transform_wt.toggled.connect(self.on_transform_toggled)
 
     def setup_radio_stats_avg(self):
         self.radio_stat_median.setChecked(True)
@@ -147,9 +141,6 @@ class TFWindow(BaseTFWindow, TFView):
 
     def setup_radio_test(self):
         self.radio_test_ampl.setChecked(True)
-
-    def get_preprocessing(self):
-        return self.radio_preproc_on.isChecked()
 
     def get_fmin(self) -> float:
         edit = self.line_fmin

@@ -13,9 +13,9 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from gui.windows.timefrequency.plots.AmplitudePlot import AmplitudePlot
-from gui.windows.timefrequency.plots.SignalPlot import SignalPlot
-from gui.windows.timefrequency.plots.WFTPlot import WFTPlot
+from gui.windows.base.analysis.plots.AmplitudePlot import AmplitudePlot
+from gui.windows.base.analysis.plots.SignalPlot import SignalPlot
+from gui.windows.base.analysis.plots.WFTPlot import WFTPlot
 
 
 class BaseTFView:

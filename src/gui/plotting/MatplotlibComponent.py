@@ -25,7 +25,7 @@ from matplotlib.figure import Figure
 from gui.plotting.PlotComponent import PlotComponent
 from gui.plotting.Callbacks import Callbacks
 from gui.plotting.PlotOptionsBar import PlotOptionsBar
-from gui.windows.timefrequency.Rect import Rect
+from gui.windows.base.analysis.plots.Rect import Rect
 
 
 class MatplotlibComponent(PlotComponent):

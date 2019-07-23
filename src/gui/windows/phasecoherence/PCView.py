@@ -14,7 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from gui.windows.base.analysis.BaseTFView import BaseTFView
-from gui.windows.timefrequency.TFView import TFView
+from maths.utils import float_or_none
 
 
 class PCView(BaseTFView):
@@ -24,6 +24,9 @@ class PCView(BaseTFView):
 
     name = "Wavelet Phase Coherence"
 
+    _wavelet_types = ["Lognorm", "Morlet", "Bump"]
+    _surrogate_types = ["RandPerm", "FT", "AAFT", "IAAFT2", "IAAFT1", "WIAAFT", "tshift"]
+
     def setup_surr_method(self):
         pass
 
@@ -32,3 +35,23 @@ class PCView(BaseTFView):
 
     def setup_surr_type(self):
         pass
+
+    def get_slider_count(self):
+        pass
+
+    def get_line_count(self):
+        pass
+
+    def on_slider_change(self, value):
+        pass
+
+    def set_slider_value(self, value):
+        pass
+
+    def setup_analysis_type(self):
+        pass
+
+    def on_count_line_changed(self, value):
+        count = float_or_none(value)
+        if count is not None:
+            self.set_slider_value(count)

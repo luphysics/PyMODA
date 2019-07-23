@@ -32,6 +32,19 @@ def float_or_none(var):
     return result
 
 
+def int_or_none(var, round_int=True):
+    result = None
+    try:
+        if not isinstance(var, bool):
+            if round_int:
+                result = np.round(var)
+            else:
+                result = int(var)
+    except:
+        pass
+    return result
+
+
 def isfloat(var):
     """
     Returns whether a variable can be represented as a float.

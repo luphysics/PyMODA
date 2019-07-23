@@ -106,3 +106,8 @@ class BaseTFPresenter:
         if self.open_file:
             title += f" - {self.open_file}"
         return title
+
+    def on_close(self):
+        """Called when the window closes."""
+        self.cancel_calculate()
+        errorhandling.unsubscribe(self.on_error)

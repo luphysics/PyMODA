@@ -70,6 +70,7 @@ class TFPresenter(BaseTFPresenter):
 
         print(f"Finished calculation for '{name}'.")
 
+        # Plot result only if signal is selected.
         if self.selected_signal_name == t.name:
             self.plot_output()
 
@@ -87,10 +88,10 @@ class TFPresenter(BaseTFPresenter):
         if not tf_data.is_valid():
             return None, None, None, None
 
-        if amp:
+        if amp:  # Plot amplitudes.
             values = tf_data.ampl
             avg_values = tf_data.avg_ampl
-        else:
+        else:  # Plot powers.
             values = tf_data.powers
             avg_values = tf_data.avg_pow
 

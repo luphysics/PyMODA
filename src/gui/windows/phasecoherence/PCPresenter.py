@@ -22,3 +22,5 @@ class PCPresenter(BaseTFPresenter):
     def __init__(self, view: PCView):
         super().__init__(view)
 
+    def load_data(self):
+        self.signals = Signal
