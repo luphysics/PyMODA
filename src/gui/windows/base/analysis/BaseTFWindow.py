@@ -95,3 +95,9 @@ class BaseTFWindow(MaximisedWindow, BaseTFView):
         if text != "\n":
             self.text_log.setPlainText(text.rstrip())
             self.text_log.moveCursor(QtGui.QTextCursor.End)
+
+    def get_cut_edges(self) -> bool:
+        return self.radio_cut_on.isChecked()
+
+    def get_preprocess(self) -> bool:
+        return self.radio_preproc_on.isChecked()

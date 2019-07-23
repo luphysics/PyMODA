@@ -47,6 +47,9 @@ class SignalPairs(Signals):
         index = names.index(name)
         return pairs[index]
 
+    def get_pair_by_index(self, index: int):
+        return self.get_pairs()[index]
+
     def get_signals(self):
         return self
 

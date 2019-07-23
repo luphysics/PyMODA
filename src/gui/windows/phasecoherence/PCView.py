@@ -58,3 +58,12 @@ class PCView(BaseTFView):
 
     def plot_signal_pair(self, pair):
         pass
+
+    def get_surr_count(self) -> int:
+        pass
+
+    def get_analysis_type(self) -> str:
+        pass
+
+    def get_surr_method(self) -> str:
+        pass

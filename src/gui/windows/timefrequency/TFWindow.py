@@ -164,12 +164,6 @@ class TFWindow(BaseTFWindow, TFView):
     def get_rel_tolerance(self) -> float:
         return super().get_rel_tolerance()
 
-    def get_cut_edges(self) -> bool:
-        return self.radio_cut_on.isChecked()
-
-    def get_preprocess(self) -> bool:
-        return self.radio_preproc_on.isChecked()
-
     def get_wt_wft_type(self) -> str:
         combo = self.combo_window
         return combo.currentText()

@@ -22,6 +22,7 @@ from gui import Application
 from gui.windows.base.analysis.BaseTFWindow import BaseTFWindow
 from gui.windows.phasecoherence.PCPresenter import PCPresenter
 from gui.windows.phasecoherence.PCView import PCView
+from maths.utils import int_or_none
 
 
 class PCWindow(BaseTFWindow, PCView):
@@ -116,3 +117,17 @@ class PCWindow(BaseTFWindow, PCView):
 
     def setup_analysis_type(self):
         self.radio_analysis_max.setChecked(True)
+
+    def get_wt_wft_type(self):
+        return self.combo_wavelet_type.currentText()
+
+    def get_surr_count(self) -> int:
+        return int_or_none(self.get_line_count().text)
+
+    def get_analysis_type(self) -> str:
+        return super().get_analysis_type()
+
+    def get_surr_method(self) -> str:
+        return super().get_surr_method()
+
+

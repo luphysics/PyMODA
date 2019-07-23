@@ -19,13 +19,69 @@ from gui.dialogs.FrequencyDialog import FrequencyDialog
 from gui.windows.base.analysis.BaseTFPresenter import BaseTFPresenter
 from gui.windows.phasecoherence.PCView import PCView
 from maths.SignalPairs import SignalPairs
+from maths.TFOutputData import TFOutputData
 from maths.algorithms.params import TFParams
+from maths.algorithms.wpc import tlphcoh
+from maths.multiprocessing.MPHelper import MPHelper
 
 
 class PCPresenter(BaseTFPresenter):
 
     def __init__(self, view: PCView):
         super().__init__(view)
+
+    def calculate(self):
+        self.finished = []
+
+        if self.mp_handler:
+            self.mp_handler.stop()
+
+        self.is_plotted = False
+        self.view.main_plot().clear()
+        self.view.main_plot().set_in_progress(True)
+        self.invalidate_data()
+
+        params = self.get_params()
+
+        self.mp_handler = MPHelper()
+        self.mp_handler.wft(
+            params=params,
+            window=self.view.get_window(),
+            on_result=self.on_transform_completed)
+
+        self.view.main_plot().set_log_scale(logarithmic=True)
+        self.view.amplitude_plot().set_log_scale(logarithmic=True)
+
+        self.view.on_calculate_started()
+        print("Started calculation...")
+
+    def on_transform_completed(self, name, times, freq, ampl, powers, avg_ampl, avg_pow):
+        t = self.signals.get(name)
+        t.output_data = TFOutputData(
+            times,
+            ampl,
+            freq,
+            powers,
+            avg_ampl,
+            avg_pow,
+        )
+
+        print(f"Calculated wavelet transform for '{name}'")
+        self.finished.append(name)
+
+        if len(self.finished) == len(self.signals):
+            self.on_all_transforms_completed()
+
+    def on_all_transforms_completed(self):
+        s1, s2 = self.signals.get_pair_by_index(0)
+
+        wt1 = s1.output_data.ampl
+        wt2 = s2.output_data.ampl
+
+        freq = s2.output_data.freq
+        fs = s2.frequency
+
+        tpc = tlphcoh(wt1, wt2, freq, fs)
 
     def load_data(self):
         self.signals = SignalPairs.from_file(self.open_file)

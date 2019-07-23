@@ -32,7 +32,7 @@ def float_or_none(var):
     return result
 
 
-def int_or_none(var, round_int=True):
+def int_or_none(var, round_int=False):
     result = None
     try:
         if not isinstance(var, bool):

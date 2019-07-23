@@ -32,7 +32,7 @@ def wphcoh(wt1, wt2):
     :param wt2:
     :return:
     """
-    FN = min(wt1.shape()[0], wt2.shape()[0])
+    FN = min(wt1.shape[0], wt2.shape[0])
 
     wt1 = wt1[:FN]
     wt2 = wt1[:FN]
@@ -53,7 +53,7 @@ def wphcoh(wt1, wt2):
         wt2_i = wt2[fn]
 
         NL = 0
-        l = min(wt1.shape()[1], wt2.shape()[1])
+        l = min(wt1.shape[1], wt2.shape[1])
         for j in range(l):
             NL += (wt1_i[fn][j] == 0 == wt2_i[fn][j])
 
@@ -66,23 +66,29 @@ def wphcoh(wt1, wt2):
     return phcoh, phdiff
 
 
-def tlphcoh(tfr1, tfr2, freq, fs, wsize=10):
+def tlphcoh(wt1, wt2, freq, fs, wsize=10):
     """
     Time-localized phase coherence.
 
-    :param tfr1:
-    :param tfr2:
+    :param wt1:
+    :param wt2:
     :param freq:
     :param fs:
     :param wsize:
     :return:
     """
-    NF, L = tfr1.shape()
+    NF, L = wt1.shape
 
-    ipc = np.exp(np.complex(0, 1) * np.angle(tfr1 * np.conj(tfr2)))
+    ipc = np.exp(np.complex(0, 1) * np.angle(wt1 * np.conj(wt2)))
     zpc = ipc
     zpc[np.isnan(zpc)] = 0
-    cum_pc = np.asarray([np.zeros(NF, np.complex64), np.cumsum(zpc, 2)], np.complex64)
+
+    zeros = np.zeros(NF, np.complex64)
+    csum = np.cumsum(zpc, 1)
+    print(csum.shape)
+
+    np.hstack() # TODO: add this code
+    cum_pc = np.asarray([zeros, csum], np.complex64)
     tpc = np.zeros(NF, L) * np.NaN
 
     for fn in range(NF):
