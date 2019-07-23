@@ -13,8 +13,8 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from PyQt5 import uic
-from PyQt5.QtWidgets import QDialog
+from PyQt5 import uic, QtGui
+from PyQt5.QtWidgets import QDialog, QListWidget
 
 from gui.dialogs.files.SelectFileDialog import SelectFileDialog
 from gui.windows.base.MaximisedWindow import MaximisedWindow
@@ -79,3 +79,19 @@ class BaseTFWindow(MaximisedWindow, BaseTFView):
 
     def get_preprocessing(self):
         return self.radio_preproc_on.isChecked()
+
+    def update_signal_listview(self, items):
+        list_widget: QListWidget = self.list_select_data
+        list_widget.clear()
+        list_widget.addItems(items)
+        list_widget.setCurrentRow(0)
+        self.presenter.on_signal_selected(list_widget.selectedIndexes()[0].data())
+
+    def setup_signal_listview(self):
+        self.list_select_data.itemClicked.connect(self.presenter.on_signal_selected)
+
+    def set_log_text(self, text):
+        """Sets the text displayed in the log pane, and scrolls to the bottom."""
+        if text != "\n":
+            self.text_log.setPlainText(text.rstrip())
+            self.text_log.moveCursor(QtGui.QTextCursor.End)

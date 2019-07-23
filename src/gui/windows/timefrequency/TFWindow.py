@@ -16,7 +16,6 @@
 
 from PyQt5 import QtGui
 from PyQt5.QtGui import QWindow
-from PyQt5.QtWidgets import QListWidget
 
 from data import resources
 from gui.windows.base.analysis.BaseTFWindow import BaseTFWindow
@@ -115,7 +114,7 @@ class TFWindow(BaseTFWindow, TFView):
     def setup_combo_wt(self, is_wt=True):
         """
         Sets up the "WT / WFT Type" combobox according to the current transform type.
-        :param is_wt: whether the current transform is WFT (not WT)
+        :param is_wt: whether the current transform is WT (not WFT)
         """
         combo = self.combo_window
         combo.clear()
@@ -175,25 +174,9 @@ class TFWindow(BaseTFWindow, TFView):
         combo = self.combo_window
         return combo.currentText()
 
-    def setup_signal_listview(self):
-        self.list_select_data.itemClicked.connect(self.presenter.on_signal_selected)
-
-    def update_signal_listview(self, items):
-        list_widget: QListWidget = self.list_select_data
-        list_widget.clear()
-        list_widget.addItems(items)
-        list_widget.setCurrentRow(0)
-        self.presenter.on_signal_selected(list_widget.selectedIndexes()[0].data())
-
     def get_transform_type(self) -> str:
         if self.radio_transform_wft.isChecked():
             transform = "wft"
         else:
             transform = "wt"
         return transform
-
-    def set_log_text(self, text):
-        """Sets the text displayed in the log pane, and scrolls to the bottom."""
-        if text != "\n":
-            self.text_log.setPlainText(text.rstrip())
-            self.text_log.moveCursor(QtGui.QTextCursor.End)

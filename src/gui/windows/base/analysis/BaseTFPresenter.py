@@ -111,3 +111,12 @@ class BaseTFPresenter:
         """Called when the window closes."""
         self.cancel_calculate()
         errorhandling.unsubscribe(self.on_error)
+
+    def get_params(self):
+        pass
+
+    def on_data_loaded(self):
+        pass
+
+    def on_signal_selected(self, item):
+        pass

@@ -22,9 +22,10 @@ class SignalPlot(MatplotlibComponent):
     Plots the signal, which is a simple set of amplitudes against time.
     """
 
-    def plot(self, data: TimeSeries):
-        self.clear()
-        self.rect_stack.clear()
+    def plot(self, data: TimeSeries, clear=True):
+        if clear:
+            self.clear()
+            self.rect_stack.clear()
         self.axes.autoscale(True)
 
         x = data.times
@@ -44,5 +45,3 @@ class SignalPlot(MatplotlibComponent):
 
     def on_reset(self):
         super(SignalPlot, self).on_reset()
-
-

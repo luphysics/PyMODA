@@ -55,3 +55,6 @@ class PCView(BaseTFView):
         count = float_or_none(value)
         if count is not None:
             self.set_slider_value(count)
+
+    def plot_signal_pair(self, pair):
+        pass

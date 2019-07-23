@@ -40,6 +40,11 @@ class PCWindow(BaseTFWindow, PCView):
         self.setup_surr_type()
         self.setup_analysis_type()
 
+    def plot_signal_pair(self, pair):
+        plot = self.signal_plot()
+        plot.plot(pair[0], clear=True)
+        plot.plot(pair[1], clear=False)
+
     def get_layout_file(self) -> str:
         return resources.get("layout:window_phase_coherence.ui")
 
@@ -78,10 +83,11 @@ class PCWindow(BaseTFWindow, PCView):
 
         s.setMaximum(new_max)
 
-    def slider_maximum(self, value: int):
+    @staticmethod
+    def slider_maximum(value: int):
         return math.ceil(value / 10.0) * 15
 
-    def setup_surr_count(self): # Fix issue where value is wrong when range changes
+    def setup_surr_count(self):
         default = 19
 
         slider = self.get_slider_count()
@@ -110,4 +116,3 @@ class PCWindow(BaseTFWindow, PCView):
 
     def setup_analysis_type(self):
         self.radio_analysis_max.setChecked(True)
-
