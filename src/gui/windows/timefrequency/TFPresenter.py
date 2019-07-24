@@ -54,13 +54,14 @@ class TFPresenter(BaseTFPresenter):
         self.view.on_calculate_started()
         print("Started calculation...")
 
-    def on_calculation_completed(self, name, times, freq, ampl, powers, avg_ampl, avg_pow):
+    def on_calculation_completed(self, name, times, freq, values, ampl, powers, avg_ampl, avg_pow):
         """Called when the calculation of the desired transform(s) is completed."""
         self.view.on_calculate_stopped()
 
         t = self.signals.get(name)
         t.output_data = TFOutputData(
             times,
+            values,
             ampl,
             freq,
             powers,

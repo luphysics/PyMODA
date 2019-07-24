@@ -40,3 +40,9 @@ class PlotComponent(BaseComponent):
 
     def clear(self):
         pass
+
+    def set_xlabel(self, text):
+        pass
+
+    def set_ylabel(self, text):
+        pass

@@ -74,6 +74,7 @@ class PCPresenter(BaseTFPresenter):
             self.on_all_transforms_completed()
 
     def on_all_transforms_completed(self):
+        print("Finished calculating phase coherence.")
         s1, s2 = self.signals.get_pair_by_index(0)
 
         wt1 = s1.output_data.values
@@ -83,7 +84,9 @@ class PCPresenter(BaseTFPresenter):
         fs = s2.frequency
 
         tpc, pc, pdiff = wpc(wt1, wt2, freq, fs)
+
         self.tpc = tpc
+        self.wpc = pc
         self.plot_phase_coherence()
 
     def plot_phase_coherence(self):
@@ -94,8 +97,14 @@ class PCPresenter(BaseTFPresenter):
         times = data.times
         freq = data.freq
         values = self.tpc
-        print("Finished phase coherence.")
+
+        main.set_xlabel("Time (s)")
+        main.set_xlabel("Frequency (Hz)")
         main.plot(times, values, freq)
+
+        ampl.set_xlabel("Overall coherence")
+        ampl.set_ylabel("Frequency (Hz)")
+        ampl.plot(self.wpc, freq)
 
     def load_data(self):
         self.signals = SignalPairs.from_file(self.open_file)

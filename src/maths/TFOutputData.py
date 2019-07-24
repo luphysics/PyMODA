@@ -29,7 +29,7 @@ class TFOutputData:
                  powers,
                  avg_ampl,
                  avg_pow,
-                 transform="wft"
+                 transform="wt"
                  ):
         self.times = times
         self.values = values
