@@ -108,6 +108,7 @@ class MPHelper:
             time_series.name,
             time_series.times,
             freq,
+            transform,
             amplitude,
             power,
             avg_ampl,

@@ -20,11 +20,13 @@ Wavelet phase coherence algorithm.
 import numpy as np
 
 
-def wpc(signals, params):
-    pass
+def wpc(wt1, wt2, freq, fs, wsize=10):
+    tlpc = tlphcoh(wt1, wt2, freq, fs, wsize)
+    pc, pdiff = wphcoh(wt1, wt2)
+    return np.abs(tlpc), pc, pdiff
 
 
-def wphcoh(wt1, wt2):
+def wphcoh(wt1, wt2):  # TODO: check that indices are correctly translated from matlab version
     """
     Wavelet phase coherence.
 
@@ -34,16 +36,16 @@ def wphcoh(wt1, wt2):
     """
     FN = min(wt1.shape[0], wt2.shape[0])
 
-    wt1 = wt1[:FN]
-    wt2 = wt1[:FN]
+    wt1 = wt1[:FN + 1]
+    wt2 = wt1[:FN + 1]
 
     phi1 = np.angle(wt1)
     phi2 = np.angle(wt2)
 
     phexp = np.exp(np.complex(0, 1) * (phi1 - phi2))
 
-    phcoh = np.zeros((1, FN)) * np.NaN
-    phdiff = np.zeros((1, FN)) * np.NaN
+    phcoh = np.zeros((FN, 1,)) * np.NaN
+    phdiff = np.zeros((FN, 1,)) * np.NaN
 
     for fn in range(FN):
         cphexp = phexp[fn]
@@ -55,7 +57,7 @@ def wphcoh(wt1, wt2):
         NL = 0
         l = min(wt1.shape[1], wt2.shape[1])
         for j in range(l):
-            NL += (wt1_i[fn][j] == 0 == wt2_i[fn][j])
+            NL += (wt1_i[j] == 0 == wt2_i[j])
 
         CL = len(cphexp)
         if CL > 0:
@@ -66,7 +68,7 @@ def wphcoh(wt1, wt2):
     return phcoh, phdiff
 
 
-def tlphcoh(wt1, wt2, freq, fs, wsize=10):
+def tlphcoh(wt1, wt2, freq, fs, wsize):  # TODO: check that indices are correctly translated from matlab version
     """
     Time-localized phase coherence.
 
@@ -83,28 +85,31 @@ def tlphcoh(wt1, wt2, freq, fs, wsize=10):
     zpc = ipc
     zpc[np.isnan(zpc)] = 0
 
-    zeros = np.zeros(NF, np.complex64)
+    zeros = np.zeros((NF, 1), np.complex64)
     csum = np.cumsum(zpc, 1)
-    print(csum.shape)
 
-    np.hstack() # TODO: add this code
-    cum_pc = np.asarray([zeros, csum], np.complex64)
-    tpc = np.zeros(NF, L) * np.NaN
+    cum_pc = np.hstack((zeros, csum,))
+    tpc = np.zeros((NF, L), np.complex64) * np.NaN
 
     for fn in range(NF):
         cs = ipc[fn]
         cumcs = cum_pc[fn]
 
-        f = cs[~np.isnan(cs)]
-        tn1 = f[0]
-        tn2 = f[-1]
+        f = np.nonzero(~np.isnan(cs))[0]
 
-        window = np.round(wsize / freq[fn] * fs)
-        window = window + 1 - np.mod(window, 2)
+        window = np.round(wsize / freq[fn] * fs)[0]
+        window += 1 - np.mod(window, 2)
+
         hw = np.floor(window / 2)
 
-        if len(tn1 + tn2) > 0 and window <= tn2 - tn1:
-            locpc = np.abs(cumcs[tn1 + window:tn2 + 1] - cumcs[tn1:tn2 - window + 1]) / window
-            tpc[fn, tn1 + hw:tn2 - hw] = locpc
+        if len(f) >= 2:
+            tn1 = f[0]
+            tn2 = f[-1]
+            if window <= tn2 - tn1:
+                window = np.int(window)
+                hw = np.int(hw)
 
-    return tpc
+                locpc = np.abs(cumcs[tn1 + window:tn2 + 1] - cumcs[tn1:tn2 - window + 1]) / window
+                tpc[fn, tn1 + hw:tn2 - hw] = locpc
+
+    return tpc  # TODO: check and implement 'under_sample' from matlab version

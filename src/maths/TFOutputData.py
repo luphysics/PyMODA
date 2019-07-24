@@ -23,6 +23,7 @@ class TFOutputData:
 
     def __init__(self,
                  times,
+                 values,
                  ampl,
                  freq,
                  powers,
@@ -31,6 +32,7 @@ class TFOutputData:
                  transform="wft"
                  ):
         self.times = times
+        self.values = values
         self.ampl = ampl
         self.freq = freq
         self.powers = powers
@@ -50,6 +52,8 @@ class TFOutputData:
         garbage collector runs.
         """
         self.valid = False
+        self.times = None
+        self.values = None
         self.ampl = None
         self.freq = None
         self.powers = None
@@ -61,4 +65,4 @@ class TFOutputData:
         """
         Creates an instance of this class with only empty lists as data.
         """
-        return TFOutputData(*[[] for _ in range(6)])
+        return TFOutputData(*[[] for _ in range(7)])

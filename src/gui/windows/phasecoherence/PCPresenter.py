@@ -21,7 +21,7 @@ from gui.windows.phasecoherence.PCView import PCView
 from maths.SignalPairs import SignalPairs
 from maths.TFOutputData import TFOutputData
 from maths.algorithms.params import TFParams
-from maths.algorithms.wpc import tlphcoh
+from maths.algorithms.wpc import tlphcoh, wpc
 from maths.multiprocessing.MPHelper import MPHelper
 
 
@@ -55,10 +55,11 @@ class PCPresenter(BaseTFPresenter):
         self.view.on_calculate_started()
         print("Started calculation...")
 
-    def on_transform_completed(self, name, times, freq, ampl, powers, avg_ampl, avg_pow):
+    def on_transform_completed(self, name, times, freq, values, ampl, powers, avg_ampl, avg_pow):
         t = self.signals.get(name)
         t.output_data = TFOutputData(
             times,
+            values,
             ampl,
             freq,
             powers,
@@ -75,13 +76,26 @@ class PCPresenter(BaseTFPresenter):
     def on_all_transforms_completed(self):
         s1, s2 = self.signals.get_pair_by_index(0)
 
-        wt1 = s1.output_data.ampl
-        wt2 = s2.output_data.ampl
+        wt1 = s1.output_data.values
+        wt2 = s2.output_data.values
 
         freq = s2.output_data.freq
         fs = s2.frequency
 
-        tpc = tlphcoh(wt1, wt2, freq, fs)
+        tpc, pc, pdiff = wpc(wt1, wt2, freq, fs)
+        self.tpc = tpc
+        self.plot_phase_coherence()
+
+    def plot_phase_coherence(self):
+        main = self.view.main_plot()
+        ampl = self.view.amplitude_plot()
+
+        data = self.get_selected_signal_pair()[0].output_data
+        times = data.times
+        freq = data.freq
+        values = self.tpc
+        print("Finished phase coherence.")
+        main.plot(times, values, freq)
 
     def load_data(self):
         self.signals = SignalPairs.from_file(self.open_file)
@@ -128,4 +142,5 @@ class PCPresenter(BaseTFPresenter):
             wavelet=self.view.get_wt_wft_type(),
             cut_edges=self.view.get_cut_edges(),
             preprocess=self.view.get_preprocess(),
+            transform="wt",
         )
