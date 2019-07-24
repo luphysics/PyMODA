@@ -101,6 +101,9 @@ class TimeSeries:
         """Returns whether the original data has been saved."""
         return self.original_signal is not None and self.original_times is not None
 
+    def get_output_data(self):
+        return self.output_data
+
     def has_output_data(self):
         return self.output_data is not None
 

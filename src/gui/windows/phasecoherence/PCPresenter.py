@@ -13,6 +13,8 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from time import time
+
 from PyQt5.QtWidgets import QDialog, QListWidgetItem
 
 from gui.dialogs.FrequencyDialog import FrequencyDialog
@@ -21,7 +23,7 @@ from gui.windows.phasecoherence.PCView import PCView
 from maths.SignalPairs import SignalPairs
 from maths.TFOutputData import TFOutputData
 from maths.algorithms.params import TFParams
-from maths.algorithms.wpc import tlphcoh, wpc
+from maths.algorithms.wpc import wpc
 from maths.multiprocessing.MPHelper import MPHelper
 
 
@@ -31,15 +33,16 @@ class PCPresenter(BaseTFPresenter):
         super().__init__(view)
 
     def calculate(self):
-        self.finished = []
-
         if self.mp_handler:
             self.mp_handler.stop()
 
         self.is_plotted = False
+        self.invalidate_data()
+
         self.view.main_plot().clear()
         self.view.main_plot().set_in_progress(True)
-        self.invalidate_data()
+        self.view.amplitude_plot().clear()
+        self.view.amplitude_plot().set_in_progress(True)
 
         params = self.get_params()
 
@@ -56,6 +59,8 @@ class PCPresenter(BaseTFPresenter):
         print("Started calculation...")
 
     def on_transform_completed(self, name, times, freq, values, ampl, powers, avg_ampl, avg_pow):
+        print(f"Calculated wavelet transform for '{name}'")
+
         t = self.signals.get(name)
         t.output_data = TFOutputData(
             times,
@@ -67,15 +72,12 @@ class PCPresenter(BaseTFPresenter):
             avg_pow,
         )
 
-        print(f"Calculated wavelet transform for '{name}'")
-        self.finished.append(name)
-
-        if len(self.finished) == len(self.signals):
+        # Whether all signals have finished calculating.
+        if all([s.output_data.is_valid() for s in self.signals]):
             self.on_all_transforms_completed()
 
     def on_all_transforms_completed(self):
-        print("Finished calculating phase coherence.")
-        s1, s2 = self.signals.get_pair_by_index(0)
+        s1, s2 = self.get_selected_signal_pair()
 
         wt1 = s1.output_data.values
         wt2 = s2.output_data.values
@@ -85,18 +87,26 @@ class PCPresenter(BaseTFPresenter):
 
         tpc, pc, pdiff = wpc(wt1, wt2, freq, fs)
 
-        self.tpc = tpc
-        self.wpc = pc
+        d = s1.get_output_data()
+        d.overall_coherence = pc
+        d.phase_coherence = tpc
+
+        print("Finished calculating phase coherence.")
         self.plot_phase_coherence()
 
     def plot_phase_coherence(self):
+        data = self.get_selected_signal_pair_data()
+        times = data.times
+        freq = data.freq
+        values = data.phase_coherence
+
         main = self.view.main_plot()
         ampl = self.view.amplitude_plot()
 
-        data = self.get_selected_signal_pair()[0].output_data
-        times = data.times
-        freq = data.freq
-        values = self.tpc
+        if not data.has_phase_coherence():
+            main.clear()
+            ampl.clear()
+            return
 
         main.set_xlabel("Time (s)")
         main.set_xlabel("Frequency (Hz)")
@@ -104,7 +114,7 @@ class PCPresenter(BaseTFPresenter):
 
         ampl.set_xlabel("Overall coherence")
         ampl.set_ylabel("Frequency (Hz)")
-        ampl.plot(self.wpc, freq)
+        ampl.plot(data.overall_coherence, freq)
 
     def load_data(self):
         self.signals = SignalPairs.from_file(self.open_file)
@@ -125,6 +135,9 @@ class PCPresenter(BaseTFPresenter):
     def get_selected_signal_pair(self):
         return self.signals.get_pair_by_name(self.selected_signal_name)
 
+    def get_selected_signal_pair_data(self):
+        return self.get_selected_signal_pair()[0].output_data
+
     def on_signal_selected(self, item):
         if isinstance(item, QListWidgetItem):
             name = item.text()
@@ -137,7 +150,7 @@ class PCPresenter(BaseTFPresenter):
             self.selected_signal_name = name
             self.plot_signal_pair()
             self.view.on_xlim_edited()
-            self.plot_output()
+            self.plot_phase_coherence()
 
     def plot_output(self):
         pass  # TODO: implement

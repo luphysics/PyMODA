@@ -29,7 +29,10 @@ class TFOutputData:
                  powers,
                  avg_ampl,
                  avg_pow,
-                 transform="wt"
+                 transform="wt",
+                 overall_coherence=None,
+                 phase_coherence=None,
+                 phase_diff=None,
                  ):
         self.times = times
         self.values = values
@@ -39,6 +42,9 @@ class TFOutputData:
         self.avg_ampl = avg_ampl
         self.avg_pow = avg_pow
         self.transform = transform
+        self.overall_coherence = overall_coherence
+        self.phase_coherence = phase_coherence
+        self.phase_diff = phase_diff
 
         self.valid = True
 
@@ -59,6 +65,9 @@ class TFOutputData:
         self.powers = None
         self.avg_ampl = None
         self.avg_pow = None
+
+    def has_phase_coherence(self):
+        return self.overall_coherence is not None
 
     @staticmethod
     def empty():
