@@ -75,3 +75,17 @@ def calc_subset_count(arr):
     results.
     """
     return 1  # TODO: add implementation.
+
+
+def matlab_to_numpy(arr):
+    """
+    Converts a matlab array to a numpy array.
+    Can be much faster than simply calling "np.asarray()",
+    but does not appear to be faster for complex arrays.
+    """
+    try:
+        # Should work for real arrays, maybe not for complex arrays.
+        result = np.array(arr._data).reshape(arr.size, order="F")
+    except:
+        result = np.array(arr)
+    return result

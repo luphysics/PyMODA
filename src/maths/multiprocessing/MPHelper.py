@@ -24,6 +24,7 @@ from maths.Signals import Signals
 from maths.TimeSeries import TimeSeries
 from maths.algorithms.params import TFParams, _wft
 from maths.multiprocessing.Watcher import Watcher
+from maths.utils import matlab_to_numpy
 
 
 class MPHelper:
@@ -84,8 +85,8 @@ class MPHelper:
             func = wt
 
         transform, freq = func.calculate(time_series, params)
-        transform = np.asarray(transform)
-        freq = np.asarray(freq)
+        transform = matlab_to_numpy(transform)
+        freq = matlab_to_numpy(freq)
 
         amplitude = np.abs(transform)
 
