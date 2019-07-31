@@ -129,5 +129,3 @@ class PCWindow(BaseTFWindow, PCView):
 
     def get_surr_method(self) -> str:
         return super().get_surr_method()
-
-

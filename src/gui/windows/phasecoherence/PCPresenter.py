@@ -13,7 +13,6 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from time import time
 
 from PyQt5.QtWidgets import QDialog, QListWidgetItem
 
@@ -23,7 +22,6 @@ from gui.windows.phasecoherence.PCView import PCView
 from maths.SignalPairs import SignalPairs
 from maths.TFOutputData import TFOutputData
 from maths.algorithms.params import TFParams
-from maths.algorithms.wpc import wpc
 from maths.multiprocessing.MPHelper import MPHelper
 
 

@@ -51,29 +51,6 @@ class TFWindow(BaseTFWindow, TFView):
         """Plots the signal in the top-left plotting."""
         self.signal_plot().plot(time_series)
 
-    def on_calculate_started(self):
-        self.main_plot().set_in_progress(True)
-        self.amplitude_plot().clear()
-        self.amplitude_plot().set_in_progress(True)
-        btn = self.btn_calculate
-
-        btn.setText("Cancel")
-        btn.setStyleSheet("color: blue;")
-
-        btn.clicked.disconnect()
-        btn.clicked.connect(self.presenter.cancel_calculate)
-
-    def on_calculate_stopped(self):
-        self.main_plot().set_in_progress(False)
-        self.amplitude_plot().set_in_progress(False)
-        btn = self.btn_calculate
-
-        btn.setText("Calculate")
-        btn.setStyleSheet("color: black;")
-
-        btn.clicked.disconnect()
-        btn.clicked.connect(self.presenter.calculate)
-
     def closeEvent(self, e: QtGui.QCloseEvent) -> None:
         """Called when the window closes. Cancels any calculations that are in progress."""
         self.presenter.on_close()
