@@ -57,7 +57,7 @@ def wphcoh(wt1, wt2):  # TODO: check that indices are correctly translated from 
         NL = 0
         l = min(wt1.shape[1], wt2.shape[1])
         for j in range(l):
-            NL += (0 == wt1_i[j] and 0 == wt2_i[j])
+            NL += (0 == wt1_i[j] == wt2_i[j])
 
         CL = cphexp.shape[0]
         if CL > 0:
