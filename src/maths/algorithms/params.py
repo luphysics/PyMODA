@@ -116,6 +116,9 @@ class TFParams:
         """
         self.signals = None
 
+    def contains(self, key):
+        return key in self.data
+
     @staticmethod
     def create(signals, **kwargs):
         """

@@ -15,13 +15,13 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from PyQt5.QtWidgets import QDialog, QListWidgetItem
 
-from gui.windows.base.analysis.BaseTFPresenter import BaseTFPresenter
 from gui.dialogs.FrequencyDialog import FrequencyDialog
+from gui.windows.base.analysis.BaseTFPresenter import BaseTFPresenter
 from maths.Signals import Signals
 from maths.TFOutputData import TFOutputData
 from maths.TimeSeries import TimeSeries
+from maths.algorithms.params import TFParams, _wt, _wft
 from maths.multiprocessing.MPHelper import MPHelper
-from maths.algorithms.params import TFParams, _wt
 
 
 class TFPresenter(BaseTFPresenter):
@@ -34,12 +34,16 @@ class TFPresenter(BaseTFPresenter):
         if self.mp_handler:
             self.mp_handler.stop()
 
+        params = self.get_params()
+        if params.transform == _wft:
+            if self.view.get_fmin() is None:
+                # Will be caught by error handling and shown as a dialog.
+                raise Exception("Minimum frequency must be defined for WFT.")
+
         self.is_plotted = False
         self.view.main_plot().clear()
         self.view.main_plot().set_in_progress(True)
         self.invalidate_data()
-
-        params = self.get_params()
 
         self.mp_handler = MPHelper()
         self.mp_handler.wft(
