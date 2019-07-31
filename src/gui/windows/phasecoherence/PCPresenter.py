@@ -74,25 +74,31 @@ class PCPresenter(BaseTFPresenter):
 
         # Whether all signals have finished calculating.
         if all([s.output_data.is_valid() for s in self.signals]):
-            self.on_all_transforms_completed()
+            self.calculate_phase_coherence()
 
-    def on_all_transforms_completed(self):
-        s1, s2 = self.get_selected_signal_pair()
+    def calculate_phase_coherence(self):
+        mp = self.mp_handler
+        mp.wpc(
+            self.signals,
+            self.view.get_window(),
+            on_result=self.on_phase_coherence_completed
+        )
+        print("Finished wavelet transform. Calculating phase coherence...")
 
-        wt1 = s1.output_data.values
-        wt2 = s2.output_data.values
+    def on_phase_coherence_completed(self, signal_pair, tpc, pc, pdiff):
+        s1, s2 = signal_pair
 
-        freq = s2.output_data.freq
-        fs = s2.frequency
-
-        tpc, pc, pdiff = wpc(wt1, wt2, freq, fs)
-
-        d = s1.get_output_data()
+        d = s1.output_data
         d.overall_coherence = pc
         d.phase_coherence = tpc
 
-        print("Finished calculating phase coherence.")
-        self.plot_phase_coherence()
+        sig = self.signals.get(s1.name)
+        sig.output_data = d
+
+        # If all calculations have completed.
+        if all([s.output_data.has_phase_coherence() for s in self.signals[::2]]):
+            self.plot_phase_coherence()
+            print("Finished calculating phase coherence.")
 
     def plot_phase_coherence(self):
         data = self.get_selected_signal_pair_data()

@@ -53,6 +53,10 @@ class SignalPairs(Signals):
     def get_signals(self):
         return self
 
+    def pair_count(self):
+        """Returns the number of signal pairs."""
+        return len(self) // 2
+
     @staticmethod
     def from_file(file: str):
         parser = get_parser(file)

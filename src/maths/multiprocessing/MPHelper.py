@@ -20,9 +20,11 @@ import numpy as np
 from PyQt5.QtGui import QWindow
 from multiprocess import Queue, Process
 
+from maths.SignalPairs import SignalPairs
 from maths.Signals import Signals
 from maths.TimeSeries import TimeSeries
 from maths.algorithms.params import TFParams, _wft
+from maths.algorithms.wpc import wpc
 from maths.multiprocessing.Watcher import Watcher
 from maths.utils import matlab_to_numpy
 
@@ -59,6 +61,8 @@ class MPHelper:
         on the main process/thread
         :return:
         """
+        self.stop()
+
         signals: Signals = params.signals
         params.remove_signals()  # Don't want to pass large unneeded object to other process.
 
@@ -73,6 +77,47 @@ class MPHelper:
 
         for watcher in self.watchers:
             watcher.start()
+
+    def wpc(self,
+            signals: SignalPairs,
+            window: QWindow,
+            on_result):
+        """
+        Calculates the wavelet phase coherence for pairs of signals.
+        """
+        self.stop()
+
+        for i in range(signals.pair_count()):
+            q = Queue()
+            pair = signals.get_pair_by_index(i)
+            self.queue.append(q)
+            self.processes.append(Process(target=self._phase_coherence, args=(q, pair,)))
+            self.watchers.append(Watcher(window, q, 0.5, on_result))
+
+        for proc in self.processes:
+            proc.start()
+
+        for watcher in self.watchers:
+            watcher.start()
+
+    @staticmethod
+    def _phase_coherence(queue, signal_pair):
+        s1, s2 = signal_pair
+
+        wt1 = s1.output_data.values
+        wt2 = s2.output_data.values
+
+        freq = s1.output_data.freq
+        fs = s1.frequency
+
+        tpc, pc, pdiff = wpc(wt1, wt2, freq, fs)
+
+        queue.put((
+            signal_pair,
+            tpc,
+            pc,
+            pdiff
+        ))
 
     @staticmethod
     def _timefrequency(queue, time_series: TimeSeries, params: TFParams):
@@ -119,6 +164,6 @@ class MPHelper:
     def stop(self):
         """Stops the tasks in progress. The MPHelper can be reused."""
         for i in range(len(self.processes)):
-            self.processes[i].terminate()
-            self.watchers[i].stop()
-            self.queue[i].close()
+            self.processes.pop().terminate()
+            self.watchers.pop().stop()
+            self.queue.pop().close()
