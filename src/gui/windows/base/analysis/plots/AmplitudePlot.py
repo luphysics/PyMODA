@@ -18,7 +18,7 @@ from gui.plotting.MatplotlibComponent import MatplotlibComponent
 
 class AmplitudePlot(MatplotlibComponent):
 
-    def plot(self, amplitude, freq):
+    def plot(self, amplitude, freq, surrogates=None):
         self.clear()
 
         y = freq
@@ -26,6 +26,8 @@ class AmplitudePlot(MatplotlibComponent):
         self.axes.set_ylim(ylim)
 
         self.axes.plot(amplitude, freq)
+        self.axes.plot(surrogates, freq)
+
         self.apply_scale()
         self.axes.autoscale(False)
         self.on_plot_complete()

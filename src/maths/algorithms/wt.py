@@ -18,7 +18,7 @@
 DO NOT import this module in the main process, or it will break Linux support
 due to issues with the LD_LIBRARY_PATH.
 """
-
+from maths.TimeSeries import TimeSeries
 from utils import args
 
 # This must be above the WT and matlab imports.
@@ -30,7 +30,7 @@ import matlab
 package = WT.initialize()
 
 
-def calculate(time_series, params):
+def calculate(signal, params):
     """
     Calculates the windowed Fourier transform.
 
@@ -38,8 +38,10 @@ def calculate(time_series, params):
     with the LD_LIBRARY_PATH on Linux. Instead, use `MPHelper` to call it
     safely in a new process.
     """
+    if isinstance(signal, TimeSeries):
+        signal = signal.signal
 
-    wt, frequency = package.wt(matlab.double([time_series.signal.tolist()]),
+    wt, frequency = package.wt(matlab.double([signal.tolist()]),
                                params.fs,
                                params.get(),
                                nargout=2)

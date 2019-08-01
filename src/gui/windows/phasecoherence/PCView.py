@@ -25,7 +25,7 @@ class PCView(BaseTFView):
     name = "Wavelet Phase Coherence"
 
     _wavelet_types = ["Lognorm", "Morlet", "Bump"]
-    _surrogate_types = ["RandPerm", "FT", "AAFT", "IAAFT2", "IAAFT1", "WIAAFT", "tshift"]
+    _surrogate_types = ["RP", "FT", "AAFT", "IAAFT1", "IAAFT2", "WIAAFT", "tshift"]
 
     def setup_surr_method(self):
         pass

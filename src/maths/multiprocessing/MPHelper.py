@@ -23,8 +23,10 @@ from multiprocess import Queue, Process
 from maths.SignalPairs import SignalPairs
 from maths.Signals import Signals
 from maths.TimeSeries import TimeSeries
-from maths.algorithms.params import TFParams, _wft
-from maths.algorithms.wpc import wpc
+from maths.algorithms.PCParams import PCParams
+from maths.algorithms.TFParams import TFParams, _wft
+from maths.algorithms.surrogates import surrogate_calc
+from maths.algorithms.wpc import wpc, wphcoh
 from maths.multiprocessing.Watcher import Watcher
 from maths.utils import matlab_to_numpy
 
@@ -69,7 +71,10 @@ class MPHelper:
         for time_series in signals:
             q = Queue()
             self.queue.append(q)
-            self.processes.append(Process(target=self._timefrequency, args=(q, time_series, params,)))
+
+            self.processes.append(
+                Process(target=self._time_frequency, args=(q, time_series, params,))
+            )
             self.watchers.append(Watcher(window, q, 0.5, on_result))
 
         for proc in self.processes:
@@ -80,18 +85,22 @@ class MPHelper:
 
     def wpc(self,
             signals: SignalPairs,
+            params: PCParams,
             window: QWindow,
             on_result):
         """
         Calculates the wavelet phase coherence for pairs of signals.
         """
-        self.stop()
+        self.stop()  # Clear lists of processes, etc.
 
         for i in range(signals.pair_count()):
             q = Queue()
-            pair = signals.get_pair_by_index(i)
             self.queue.append(q)
-            self.processes.append(Process(target=self._phase_coherence, args=(q, pair,)))
+
+            pair = signals.get_pair_by_index(i)
+            self.processes.append(
+                Process(target=self._phase_coherence, args=(q, pair, params,))
+            )
             self.watchers.append(Watcher(window, q, 0.5, on_result))
 
         for proc in self.processes:
@@ -100,8 +109,8 @@ class MPHelper:
         for watcher in self.watchers:
             watcher.start()
 
-    @staticmethod
-    def _phase_coherence(queue, signal_pair):
+    def _phase_coherence(self, queue, signal_pair, params: PCParams):
+        """Should not be called in the main process."""
         s1, s2 = signal_pair
 
         wt1 = s1.output_data.values
@@ -110,17 +119,66 @@ class MPHelper:
         freq = s1.output_data.freq
         fs = s1.frequency
 
+        # Calculate phase coherence.
         tpc, pc, pdiff = wpc(wt1, wt2, freq, fs)
 
+        # Calculate surrogates.
+        surr_count = params.surr_count
+        surr_method = params.surr_method
+        surr_preproc = params.surr_preproc
+        surrogates, _ = surrogate_calc(s1, surr_count, surr_method, surr_preproc, fs)
+
+        tpc_surr = list(range(surr_count))
+        processes = []
+        queues = []
+
+        for i in range(surr_count):
+            q = Queue()
+            queues.append(q)
+
+            processes.append(
+                Process(
+                    target=self._wt_surrogate_calc, args=(q, wt2, surrogates[i], params, i)
+                )
+            )
+
+        for p in processes:
+            p.start()
+
+        # Wait for processes to calculate surrogate results.
+        # This is fine since we're not running on the main process.
+        for p in processes:
+            p.join()
+
+        # After all processes finished, get all surrogate results.
+        for q in queues:
+            index, result = q.get()
+            tpc_surr[index] = result
+
+        tpc_surr = np.mean(tpc_surr, axis=0)
+
+        # Put all results, including phase coherence and surrogates,
+        # in the queue to be returned to the GUI.
         queue.put((
             signal_pair,
             tpc,
             pc,
-            pdiff
+            pdiff,
+            tpc_surr,
         ))
 
-    @staticmethod
-    def _timefrequency(queue, time_series: TimeSeries, params: TFParams):
+    def _wt_surrogate_calc(self, queue, wt1, surrogate, params, index):
+        from maths.algorithms import wt
+
+        transform, freq = wt.calculate(surrogate, params)
+        wt_surrogate = matlab_to_numpy(transform)
+
+        surr_avg, _ = wphcoh(wt1, wt_surrogate)
+
+        queue.put((index, surr_avg,))
+
+    def _time_frequency(self, queue, time_series: TimeSeries, params: TFParams):
+        """Should not be called in the main process."""
         # Don't move the import statements.
         from maths.algorithms import wt, wft
 
@@ -162,7 +220,12 @@ class MPHelper:
         ))
 
     def stop(self):
-        """Stops the tasks in progress. The MPHelper can be reused."""
+        """
+        Stops the tasks in progress. The MPHelper can be reused.
+
+        Removes all items from the lists of processes, queues
+        and watchers.
+        """
         for i in range(len(self.processes)):
             self.processes.pop().terminate()
             self.watchers.pop().stop()

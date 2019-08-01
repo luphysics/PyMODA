@@ -21,7 +21,8 @@ from gui.windows.base.analysis.BaseTFPresenter import BaseTFPresenter
 from gui.windows.phasecoherence.PCView import PCView
 from maths.SignalPairs import SignalPairs
 from maths.TFOutputData import TFOutputData
-from maths.algorithms.params import TFParams
+from maths.algorithms.PCParams import PCParams
+from maths.algorithms.TFParams import TFParams, create
 from maths.multiprocessing.MPHelper import MPHelper
 
 
@@ -78,17 +79,19 @@ class PCPresenter(BaseTFPresenter):
         mp = self.mp_handler
         mp.wpc(
             self.signals,
-            self.view.get_window(),
+            params=self.get_params(),
+            window=self.view.get_window(),
             on_result=self.on_phase_coherence_completed
         )
         print("Finished wavelet transform. Calculating phase coherence...")
 
-    def on_phase_coherence_completed(self, signal_pair, tpc, pc, pdiff):
+    def on_phase_coherence_completed(self, signal_pair, tpc, pc, pdiff, surrogate_avg):
         s1, s2 = signal_pair
 
         d = s1.output_data
         d.overall_coherence = pc
         d.phase_coherence = tpc
+        d.surrogate_avg = surrogate_avg
 
         sig = self.signals.get(s1.name)
         sig.output_data = d
@@ -118,7 +121,7 @@ class PCPresenter(BaseTFPresenter):
 
         ampl.set_xlabel("Overall coherence")
         ampl.set_ylabel("Frequency (Hz)")
-        ampl.plot(data.overall_coherence, freq)
+        ampl.plot(data.overall_coherence, freq, surrogates=data.surrogate_avg)
 
     def load_data(self):
         self.signals = SignalPairs.from_file(self.open_file)
@@ -160,7 +163,8 @@ class PCPresenter(BaseTFPresenter):
         pass  # TODO: implement
 
     def get_params(self):
-        return TFParams.create(
+        return create(
+            params_type=PCParams,
             signals=self.signals,
             fmin=self.view.get_fmin(),
             fmax=self.view.get_fmax(),
@@ -169,4 +173,8 @@ class PCPresenter(BaseTFPresenter):
             cut_edges=self.view.get_cut_edges(),
             preprocess=self.view.get_preprocess(),
             transform="wt",
+
+            # TODO: add code to fetch from GUI
+            surr_count=19,
+            surr_method="RP"
         )

@@ -20,7 +20,7 @@ from gui.windows.base.analysis.BaseTFPresenter import BaseTFPresenter
 from maths.Signals import Signals
 from maths.TFOutputData import TFOutputData
 from maths.TimeSeries import TimeSeries
-from maths.algorithms.params import TFParams, _wt, _wft
+from maths.algorithms.TFParams import TFParams, _wt, _wft, create
 from maths.multiprocessing.MPHelper import MPHelper
 
 
@@ -132,7 +132,8 @@ class TFPresenter(BaseTFPresenter):
         """
         Creates the parameters to use when performing the calculations.
         """
-        return TFParams.create(
+        return create(
+            params_type=TFParams,
             signals=self.signals,
             fmin=self.view.get_fmin(),
             fmax=self.view.get_fmax(),

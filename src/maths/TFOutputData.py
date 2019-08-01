@@ -45,6 +45,7 @@ class TFOutputData:
         self.overall_coherence = overall_coherence
         self.phase_coherence = phase_coherence
         self.phase_diff = phase_diff
+        self.surrogate_avg = None
 
         self.valid = True
 
@@ -68,6 +69,9 @@ class TFOutputData:
 
     def has_phase_coherence(self):
         return self.overall_coherence is not None
+
+    def has_surrogates(self):
+        return self.surrogate_avg is not None
 
     @staticmethod
     def empty():

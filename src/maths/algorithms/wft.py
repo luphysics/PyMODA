@@ -18,7 +18,7 @@
 DO NOT import this module in the main process, or it will break Linux support
 due to issues with the LD_LIBRARY_PATH.
 """
-from maths.algorithms.params import TFParams, _f0, _fmin
+from maths.algorithms.TFParams import TFParams, _f0, _fmin
 from utils import args
 
 # This must be above the WFT and matlab imports.
