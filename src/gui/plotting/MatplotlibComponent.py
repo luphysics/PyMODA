@@ -248,9 +248,10 @@ class MatplotlibComponent(PlotComponent):
 
     def on_reset(self):
         """Called when the reset button is pressed."""
-        normal = self.rect_stack[0]
-        self.zoom_to(normal)
-        self.update()
+        if len(self.rect_stack) > 0:
+            normal = self.rect_stack[0]
+            self.zoom_to(normal)
+            self.update()
 
     def on_go_back(self):
         """Called when the back button is pressed."""

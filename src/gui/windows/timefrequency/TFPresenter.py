@@ -29,6 +29,9 @@ class TFPresenter(BaseTFPresenter):
     The Presenter in control of the time-frequency window.
     """
 
+    def get_total_tasks_count(self) -> int:
+        return len(self.signals)
+
     def calculate(self):
         """Calculates the desired transform(s), and plots the result."""
         if self.mp_handler:
@@ -56,6 +59,7 @@ class TFPresenter(BaseTFPresenter):
         self.view.amplitude_plot().set_log_scale(logarithmic=log)
 
         self.view.on_calculate_started()
+        self.view.update_progress(0, self.get_total_tasks_count())
         print("Started calculation...")
 
     def on_calculation_completed(self, name, times, freq, values, ampl, powers, avg_ampl, avg_pow):
@@ -74,6 +78,7 @@ class TFPresenter(BaseTFPresenter):
         )
 
         print(f"Finished calculation for '{name}'.")
+        self.on_task_completed(self.get_total_tasks_count())
 
         # Plot result only if signal is selected.
         if self.selected_signal_name == t.name:

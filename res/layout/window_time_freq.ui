@@ -98,16 +98,55 @@
           <property name="title">
            <string>Log</string>
           </property>
-          <layout class="QGridLayout" name="gridLayout_8">
+          <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="4,1">
            <property name="leftMargin">
             <number>6</number>
            </property>
-           <item row="0" column="0">
+           <item>
             <widget class="QPlainTextEdit" name="text_log">
              <property name="readOnly">
               <bool>true</bool>
              </property>
             </widget>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_8">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_4">
+               <item>
+                <widget class="QPushButton" name="btn_calculate">
+                 <property name="text">
+                  <string>Transform All</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="btn_calculate_single">
+                 <property name="text">
+                  <string>Transform Single</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <widget class="QProgressBar" name="progress">
+               <property name="value">
+                <number>24</number>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="lbl_progress">
+               <property name="text">
+                <string>TextLabel</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
           </layout>
          </widget>
@@ -230,7 +269,7 @@
             <item row="1" column="1">
              <layout class="QGridLayout" name="gridLayout_9">
               <item row="3" column="0">
-               <widget class="QPushButton" name="btn_calculate">
+               <widget class="QPushButton" name="btn_stats">
                 <property name="text">
                  <string>Calculate</string>
                 </property>

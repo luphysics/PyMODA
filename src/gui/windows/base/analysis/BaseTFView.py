@@ -65,6 +65,17 @@ class BaseTFView:
         """
         self.presenter.set_plot_type(ampl_selected)
 
+    def setup_progress(self):
+        pass
+
+    def update_progress(self, current, total):
+        pass
+
+    def progress_message(self, current=0, total=0):
+        if current < total:
+            return f"Completed task {current} of {total}."
+        return "No tasks in progress."
+
     def set_xlimits(self, x1, x2):
         pass
 

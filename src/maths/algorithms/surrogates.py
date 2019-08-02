@@ -90,7 +90,6 @@ def surrogate_calc(time_series: TimeSeries, N, method, pp, fs):
 
         params.rphases = eta
 
-    # TODO: add later
     elif method == _AAFT:
         b = 2 * np.pi
         eta = b * np.random.rand(N, L2 - 1)
@@ -121,6 +120,7 @@ def surrogate_calc(time_series: TimeSeries, N, method, pp, fs):
 
         surr = np.real(surr)
 
+    # TODO: add later
     elif method == _IAFFT1:
         pass
     elif method == _IAFFT2:

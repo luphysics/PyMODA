@@ -14,7 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from PyQt5 import uic, QtGui
-from PyQt5.QtWidgets import QDialog, QListWidget
+from PyQt5.QtWidgets import QDialog, QListWidget, QProgressBar
 
 from gui.dialogs.files.SelectFileDialog import SelectFileDialog
 from gui.windows.base.MaximisedWindow import MaximisedWindow
@@ -58,6 +58,7 @@ class BaseTFWindow(MaximisedWindow, BaseTFView):
         self.setup_radio_cut_edges()
         self.setup_signal_listview()
         self.setup_xlim_edits()
+        self.setup_progress()
 
         self.btn_calculate.clicked.connect(self.presenter.calculate)
         self.presenter.init()
@@ -124,3 +125,18 @@ class BaseTFWindow(MaximisedWindow, BaseTFView):
 
         btn.clicked.disconnect()
         btn.clicked.connect(self.presenter.calculate)
+
+    def setup_progress(self):
+        self.update_progress(0, 0)
+
+    def update_progress(self, current, total):
+        lbl = self.lbl_progress
+        progress: QProgressBar = self.progress
+
+        if current >= total:
+            progress.hide()
+        else:
+            progress.show()
+            progress.setValue(current / total * 100)
+
+        lbl.setText(self.progress_message(current, total))

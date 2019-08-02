@@ -24,6 +24,7 @@ class BaseTFPresenter:
         self.view = view
         self.is_plotted = False
         self.plot_ampl = True
+        self.tasks_completed = 0
 
         self.signals = None
         self.selected_signal_name = None
@@ -44,6 +45,10 @@ class BaseTFPresenter:
 
     def calculate(self):
         pass
+
+    def on_task_completed(self, total):
+        self.tasks_completed += 1
+        self.view.update_progress(self.tasks_completed, total)
 
     def on_error(self, exc_type, value, traceback):
         """Called when an error occurs, provided that the debug argument is not in use."""
@@ -120,3 +125,7 @@ class BaseTFPresenter:
 
     def on_signal_selected(self, item):
         pass
+
+    def get_total_tasks_count(self) -> int:
+        """Returns the total number of tasks in progress."""
+        return 0
