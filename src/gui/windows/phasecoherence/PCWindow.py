@@ -71,8 +71,9 @@ class PCWindow(BaseTFWindow, PCView):
         return self.line_surrogate
 
     def set_slider_value(self, value: int):
-        self.update_slider_maximum(value)
-        self.get_slider_count().setValue(value)
+        if value > 1:
+            self.update_slider_maximum(value)
+            self.get_slider_count().setValue(value)
 
     def update_slider_maximum(self, value: int):
         s = self.get_slider_count()
@@ -82,11 +83,11 @@ class PCWindow(BaseTFWindow, PCView):
         if value >= m or m / value > 5:
             new_max = self.slider_maximum(value)
 
-        s.setMaximum(new_max)
+        s.setMaximum(max(19, new_max))
 
     @staticmethod
     def slider_maximum(value: int):
-        return math.ceil(value / 10.0) * 15
+        return math.ceil(value / 10.0) * 10
 
     def setup_surr_count(self):
         default = 19
@@ -96,12 +97,21 @@ class PCWindow(BaseTFWindow, PCView):
         slider.setTickPosition(QSlider.TicksBelow)
         slider.setSingleStep(1)
         slider.valueChanged.connect(self.on_slider_change)
-        slider.setRange(1, self.slider_maximum(default))
+        slider.setRange(2, self.slider_maximum(default))
         slider.setValue(default)
 
         line = self.get_line_count()
         line.textEdited.connect(self.on_count_line_changed)
+        line.returnPressed.connect(self.on_count_line_edited)
+        line.editingFinished.connect(self.on_count_line_edited)
         line.setText(f"{default}")
+
+    def on_count_line_edited(self):
+        c = self.get_surr_count()
+        if c is None or c <= 1:
+            value = 2
+            self.get_line_count().setText(str(value))
+            self.on_count_line_changed(value)
 
     def on_slider_change(self, value: int):
         l = self.get_line_count()

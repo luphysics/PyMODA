@@ -157,7 +157,8 @@ class MPHelper:
             index, result = q.get()
             tpc_surr[index] = result
 
-        tpc_surr = np.mean(tpc_surr, axis=0)
+        if len(tpc_surr) > 0:
+            tpc_surr = np.mean(tpc_surr, axis=0)
 
         # Put all results, including phase coherence and surrogates,
         # in the queue to be returned to the GUI.
@@ -230,14 +231,17 @@ class MPHelper:
         """
         self.on_stop()
         for i in range(len(self.processes)):
-            # self.processes.pop().terminate()
-            self.terminate_tree(self.processes.pop())
+            terminate_tree(self.processes.pop())
             self.watchers.pop().stop()
             self.queue.pop().close()
 
-    def terminate_tree(self, process: Process):
-        pid = process.pid
-        for child in psutil.Process(pid).children(recursive=True):
-            child.terminate()
 
-        process.terminate()
+def terminate_tree(process: Process):
+    """
+    Terminates a process along with all of its child processes.
+    """
+    pid = process.pid
+    for child in psutil.Process(pid).children(recursive=True):
+        child.terminate()
+
+    process.terminate()

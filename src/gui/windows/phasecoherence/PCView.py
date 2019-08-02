@@ -53,7 +53,7 @@ class PCView(BaseTFView):
 
     def on_count_line_changed(self, value):
         count = float_or_none(value)
-        if count is not None:
+        if count is not None and count > 1:
             self.set_slider_value(count)
 
     def plot_signal_pair(self, pair):

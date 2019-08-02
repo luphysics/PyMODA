@@ -36,10 +36,13 @@ class PCParams(TFParams):
                  surr_method="RP",
                  surr_preproc=False,
                  ):
-        if surr_enabled:
-            self.surr_count = surr_count
-            self.surr_method = surr_method
-            self.surr_preproc = surr_preproc
+        if not surr_enabled:
+            surr_count = 0
+
+        self.surr_count = surr_count
+        self.surr_method = surr_method
+        self.surr_preproc = surr_preproc
+
         super().__init__(signals,
                          fmin,
                          fmax,

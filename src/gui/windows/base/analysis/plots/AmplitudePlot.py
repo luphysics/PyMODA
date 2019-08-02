@@ -26,8 +26,9 @@ class AmplitudePlot(MatplotlibComponent):
         self.axes.set_ylim(ylim)
 
         self.axes.plot(amplitude, freq)
-        self.axes.plot(surrogates, freq)
-        self.axes.legend(["Original signal", "Surrogate"])
+        if hasattr(surrogates, "__len__") and len(surrogates) == len(amplitude):
+            self.axes.plot(surrogates, freq)
+            self.axes.legend(["Original signal", "Surrogate"])
 
         self.apply_scale()
         self.axes.autoscale(False)

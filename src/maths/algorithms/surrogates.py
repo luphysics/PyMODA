@@ -33,7 +33,7 @@ def surrogate_calc(time_series: TimeSeries, N, method, pp, fs):
     """
     Calculates surrogates.
 
-    :param sig: the original signal as a TimeSeries
+    :param time_series: the original signal as a TimeSeries
     :param N: the number of surrogates
     :param method: the required surrogate type
     :param pp: whether to perform preprocessing
@@ -61,7 +61,7 @@ def surrogate_calc(time_series: TimeSeries, N, method, pp, fs):
         params.preprocessing = False
 
     L = len(sig)
-    L2 = np.ceil(L / 2)
+    L2 = np.int(np.ceil(L / 2))
 
     params.time = time
 
@@ -69,11 +69,58 @@ def surrogate_calc(time_series: TimeSeries, N, method, pp, fs):
         for k in range(0, N):
             surr[k, :] = sig[randperm(L)]
 
-    # TODO: add later
     elif method == _FT:
-        pass
+        b = 2 * np.pi
+
+        # Note: removed 'eta' parameter from function.
+        eta = b * np.random.rand(N, L2 - 1)
+
+        ftsig = np.fft.fft(sig)
+        ftrp = np.zeros((N, len(ftsig),), dtype=np.complex64)
+        ftrp[:, 0] = ftsig[0]
+
+        F = ftsig[1:L2]
+        F = np.tile(F, (N, 1,))
+
+        ftrp[:, 1:L2] = np.multiply(F, np.exp(np.complex(0, 1) * eta))
+        ftrp[:, 1 + L - L2:L] = np.conj(np.fliplr(ftrp[:, 1:L2]))
+
+        surr = np.fft.ifft(ftrp)
+        surr = np.real(surr)
+
+        params.rphases = eta
+
+    # TODO: add later
     elif method == _AAFT:
-        pass
+        b = 2 * np.pi
+        eta = b * np.random.rand(N, L2 - 1)
+
+        val = np.sort(sig)
+        ind = np.argsort(sig)
+        rankind = np.empty(ind.shape, dtype=np.int)
+        rankind[ind] = np.arange(0, L)
+
+        gn = np.sort(np.random.randn(N, len(sig)), 1)
+        for j in range(N):
+            gn[j, :] = gn[j, rankind]
+
+        ftgn = np.fft.fft(gn)
+        F = ftgn[:, 1:L2]
+
+        surr = np.zeros((N, len(sig)), dtype=np.complex)
+        surr[:, 0] = gn[:, 0]
+        surr[:, 1:L2] = np.multiply(F, np.exp(np.complex(0, 1) * eta))
+        surr[:, 1 + L - L2:L] = np.conj(np.fliplr(surr[:, 1:L2]))
+        surr = np.fft.ifft(surr)
+
+        ind2 = np.argsort(surr, axis=1)
+        rrank = np.zeros((1, L), dtype=np.int)
+        for k in range(N):
+            rrank[:, ind2[k, :]] = np.arange(0, L)
+            surr[k, :] = val[rrank]
+
+        surr = np.real(surr)
+
     elif method == _IAFFT1:
         pass
     elif method == _IAFFT2:
