@@ -17,6 +17,7 @@
 import time
 
 import numpy as np
+import psutil as psutil
 from PyQt5.QtGui import QWindow
 from multiprocess import Queue, Process
 
@@ -48,6 +49,7 @@ class MPHelper:
         self.queue = []
         self.processes = []
         self.watchers = []
+        self.on_stop = lambda: None
 
     def wft(self,
             params: TFParams,
@@ -138,7 +140,7 @@ class MPHelper:
 
             processes.append(
                 Process(
-                    target=self._wt_surrogate_calc, args=(q, wt2, surrogates[i], params, i)
+                    target=self._wt_surrogate_calc, args=(q, wt1, surrogates[i], params, i)
                 )
             )
 
@@ -226,7 +228,16 @@ class MPHelper:
         Removes all items from the lists of processes, queues
         and watchers.
         """
+        self.on_stop()
         for i in range(len(self.processes)):
-            self.processes.pop().terminate()
+            # self.processes.pop().terminate()
+            self.terminate_tree(self.processes.pop())
             self.watchers.pop().stop()
             self.queue.pop().close()
+
+    def terminate_tree(self, process: Process):
+        pid = process.pid
+        for child in psutil.Process(pid).children(recursive=True):
+            child.terminate()
+
+        process.terminate()

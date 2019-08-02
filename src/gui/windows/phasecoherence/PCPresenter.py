@@ -99,6 +99,7 @@ class PCPresenter(BaseTFPresenter):
         # If all calculations have completed.
         if all([s.output_data.has_phase_coherence() for s in self.signals[::2]]):
             self.plot_phase_coherence()
+            self.view.on_calculate_stopped()
             print("Finished calculating phase coherence.")
 
     def plot_phase_coherence(self):
@@ -173,8 +174,7 @@ class PCPresenter(BaseTFPresenter):
             cut_edges=self.view.get_cut_edges(),
             preprocess=self.view.get_preprocess(),
             transform="wt",
-
-            # TODO: add code to fetch from GUI
-            surr_count=19,
-            surr_method="RP"
+            surr_count=self.view.get_surr_count(),
+            surr_method=self.view.get_surr_method(),
+            surr_enabled=self.view.get_surr_enabled(),
         )

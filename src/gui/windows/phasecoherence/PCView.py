@@ -67,3 +67,6 @@ class PCView(BaseTFView):
 
     def get_surr_method(self) -> str:
         pass
+
+    def get_surr_enabled(self) -> bool:
+        pass

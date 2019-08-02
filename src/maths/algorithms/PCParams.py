@@ -31,13 +31,15 @@ class PCParams(TFParams):
                  preprocess=True,
                  rel_tolerance=0.01,
                  transform=_wft,
+                 surr_enabled=False,
                  surr_count=0,
                  surr_method="RP",
-                 surr_preproc=False
+                 surr_preproc=False,
                  ):
-        self.surr_count = surr_count
-        self.surr_method = surr_method
-        self.surr_preproc = surr_preproc
+        if surr_enabled:
+            self.surr_count = surr_count
+            self.surr_method = surr_method
+            self.surr_preproc = surr_preproc
         super().__init__(signals,
                          fmin,
                          fmax,

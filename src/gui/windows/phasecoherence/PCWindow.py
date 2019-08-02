@@ -15,7 +15,7 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import math
 from PyQt5 import QtGui
-from PyQt5.QtWidgets import QSlider
+from PyQt5.QtWidgets import QSlider, QComboBox
 
 from data import resources
 from gui import Application
@@ -121,11 +121,15 @@ class PCWindow(BaseTFWindow, PCView):
     def get_wt_wft_type(self):
         return self.combo_wavelet_type.currentText()
 
-    def get_surr_count(self) -> int:
-        return int_or_none(self.get_line_count().text)
-
     def get_analysis_type(self) -> str:
         return super().get_analysis_type()
 
+    def get_surr_count(self) -> int:
+        return int_or_none(self.get_line_count().text())
+
     def get_surr_method(self) -> str:
-        return super().get_surr_method()
+        combo: QComboBox = self.combo_method
+        return combo.currentText()
+
+    def get_surr_enabled(self) -> bool:
+        return self.checkbox_surr.isChecked()
