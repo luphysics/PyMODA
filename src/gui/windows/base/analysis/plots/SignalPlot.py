@@ -23,9 +23,14 @@ class SignalPlot(MatplotlibComponent):
     """
 
     def plot(self, data: TimeSeries, clear=True):
+
         if clear:
             self.clear()
             self.rect_stack.clear()
+
+        self.axes.xaxis.set_label_position("top")
+        self.update_xlabel()
+        self.update_ylabel()
         self.axes.autoscale(True)
 
         x = data.times
@@ -36,6 +41,7 @@ class SignalPlot(MatplotlibComponent):
         self.axes.autoscale(False)
         self.axes.set_xlim(xlim)
         self.on_plot_complete()
+
 
     def get_xlabel(self):
         return "Time (s)"

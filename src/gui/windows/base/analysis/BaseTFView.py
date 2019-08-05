@@ -15,7 +15,7 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from gui.windows.base.analysis.plots.AmplitudePlot import AmplitudePlot
 from gui.windows.base.analysis.plots.SignalPlot import SignalPlot
-from gui.windows.base.analysis.plots.WFTPlot import WFTPlot
+from gui.windows.base.analysis.plots.ColorMeshPlot import ColorMeshPlot
 
 
 class BaseTFView:
@@ -41,8 +41,8 @@ class BaseTFView:
     def update_title(self, title=""):
         pass
 
-    def main_plot(self) -> WFTPlot:
-        """Returns the main plotting, which is used to display the transform."""
+    def main_plot(self) -> ColorMeshPlot:
+        """Returns the main plot, which is used to display the transform."""
         pass
 
     def signal_plot(self) -> SignalPlot:
@@ -66,23 +66,29 @@ class BaseTFView:
         self.presenter.set_plot_type(ampl_selected)
 
     def setup_progress(self):
+        """Sets up the progress bar which displays tasks in progress."""
         pass
 
     def update_progress(self, current, total):
+        """Updates the progress bar with the current number of tasks completed."""
         pass
 
     def progress_message(self, current=0, total=0):
+        """Gets the text to display under the progress bar."""
         if current < total:
             return f"Completed task {current} of {total}."
         return "No tasks in progress."
 
     def set_xlimits(self, x1, x2):
+        """Sets the x-limits of the data."""
         pass
 
     def setup_xlim_edits(self):
+        """Sets up the LineEdit widgets which allow the x-limits to be set."""
         pass
 
     def on_xlim_edited(self):
+        """Called when the x-limits are edited."""
         pass
 
     def setup_radio_preproc(self):
@@ -113,16 +119,20 @@ class BaseTFView:
         pass
 
     def set_log_text(self, text):
+        """Sets the text to display in the log section."""
         pass
 
     def setup_signal_listview(self):
         pass
 
     def update_signal_listview(self, items):
+        """Updates the list displaying the signals."""
         pass
 
     def get_button_calculate_all(self):
+        """Returns the button for calculating using all signals ("transform all")."""
         pass
 
     def get_button_calculate_single(self):
+        """Returns the button for calculating using one signal ("transform single")."""
         pass

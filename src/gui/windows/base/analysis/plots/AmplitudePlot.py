@@ -18,8 +18,18 @@ from gui.plotting.MatplotlibComponent import MatplotlibComponent
 
 class AmplitudePlot(MatplotlibComponent):
 
+    def __init__(self, parent):
+        self.ylabel = "Frequency (Hz)"
+        self.xlabel = ""
+        super(AmplitudePlot, self).__init__(parent)
+
     def plot(self, amplitude, freq, surrogates=None):
         self.clear()
+
+        self.update_ylabel()
+        self.update_xlabel()
+
+        self.axes.yaxis.set_label_position("right")
 
         y = freq
         ylim = sorted([y[0], y[-1]])
@@ -33,3 +43,15 @@ class AmplitudePlot(MatplotlibComponent):
         self.apply_scale()
         self.axes.autoscale(False)
         self.on_plot_complete()
+
+    def get_ylabel(self):
+        return self.ylabel
+
+    def get_xlabel(self):
+        return self.xlabel
+
+    def set_xlabel(self, text):
+        self.xlabel = text
+
+    def set_ylabel(self, text):
+        self.ylabel = text

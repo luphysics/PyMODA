@@ -44,6 +44,9 @@ class TFWindow(BaseTFWindow, TFView):
         self.setup_radio_test()
         self.setup_combo_wt()
 
+        amp = self.amplitude_plot()
+        amp.set_xlabel("Average Amplitude")
+
     def get_layout_file(self) -> str:
         return resources.get("layout:window_time_freq.ui")
 

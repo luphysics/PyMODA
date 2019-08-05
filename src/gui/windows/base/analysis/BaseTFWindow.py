@@ -23,7 +23,7 @@ from gui.windows.base.MaximisedWindow import MaximisedWindow
 from gui.windows.base.analysis.BaseTFView import BaseTFView
 from gui.windows.base.analysis.plots.AmplitudePlot import AmplitudePlot
 from gui.windows.base.analysis.plots.SignalPlot import SignalPlot
-from gui.windows.base.analysis.plots.WFTPlot import WFTPlot
+from gui.windows.base.analysis.plots.ColorMeshPlot import ColorMeshPlot
 
 
 class BaseTFWindow(MaximisedWindow, BaseTFView):
@@ -70,7 +70,7 @@ class BaseTFWindow(MaximisedWindow, BaseTFView):
         )
         self.presenter.init()
 
-    def main_plot(self) -> WFTPlot:
+    def main_plot(self) -> ColorMeshPlot:
         return self.plot_main
 
     def signal_plot(self) -> SignalPlot:

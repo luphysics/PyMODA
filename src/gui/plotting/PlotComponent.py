@@ -41,8 +41,8 @@ class PlotComponent(BaseComponent):
     def clear(self):
         pass
 
-    def set_xlabel(self, text):
+    def update_xlabel(self, text=None ):
         pass
 
-    def set_ylabel(self, text):
+    def update_ylabel(self, text=None):
         pass

@@ -41,6 +41,9 @@ class PCWindow(BaseTFWindow, PCView):
         self.setup_surr_type()
         self.setup_analysis_type()
 
+        amp = self.amplitude_plot()
+        amp.set_xlabel("Overall Coherence")
+
     def plot_signal_pair(self, pair):
         plot = self.signal_plot()
         plot.plot(pair[0], clear=True)
@@ -87,9 +90,14 @@ class PCWindow(BaseTFWindow, PCView):
 
     @staticmethod
     def slider_maximum(value: int):
+        """
+        Gets the maximum value to use for the surrogate
+        slider, based on the currently selected value.
+        """
         return math.ceil(value / 10.0) * 10
 
     def setup_surr_count(self):
+        """Sets up the "surrogate count" slider."""
         default = 19
 
         slider = self.get_slider_count()
@@ -107,6 +115,7 @@ class PCWindow(BaseTFWindow, PCView):
         line.setText(f"{default}")
 
     def on_count_line_edited(self):
+        """Called when the surrogate count is typed manually."""
         c = self.get_surr_count()
         if c is None or c <= 1:
             value = 2

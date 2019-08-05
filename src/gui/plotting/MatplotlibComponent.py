@@ -314,8 +314,8 @@ class MatplotlibComponent(PlotComponent):
         """Sets the progress bar to display whether the plotting is in progress."""
         self.options.set_in_progress(in_progress)
 
-    def set_xlabel(self, text):
-        self.axes.set_xlabel(text)
+    def update_xlabel(self, text=None):
+        self.axes.set_xlabel(text if text else self.get_xlabel())
 
-    def set_ylabel(self, text):
-        self.axes.set_ylabel(text)
+    def update_ylabel(self, text=None):
+        self.axes.set_ylabel(text if text else self.get_ylabel())

@@ -21,13 +21,20 @@ from gui.plotting.MatplotlibComponent import MatplotlibComponent
 from maths.utils import subset2d, calc_subset_count
 
 
-class WFTPlot(MatplotlibComponent):
+class ColorMeshPlot(MatplotlibComponent):
     """
-    Plots the windowed Fourier transform.
+    Plots a color mesh as a contour plot. Used for
+    wavelet transforms, phase coherence, etc.
     """
+
+    def init_ui(self):
+        super().init_ui()
 
     def plot(self, times, values, freq):
         self.clear()
+
+        self.update_ylabel()
+        self.update_xlabel()
 
         finite = values[np.isfinite(values)]  # Remove the 'NaN' items.
         mesh1, mesh2 = np.meshgrid(times, freq)
@@ -46,6 +53,7 @@ class WFTPlot(MatplotlibComponent):
         self.axes.set_title('STFT Magnitude')
         self.axes.autoscale(False)
         self.on_plot_complete()
+
         # self.colorbar()
 
     def colormap(self):

@@ -131,12 +131,12 @@ class PCPresenter(BaseTFPresenter):
             ampl.clear()
             return
 
-        main.set_xlabel("Time (s)")
-        main.set_xlabel("Frequency (Hz)")
+        main.update_xlabel("Time (s)")
+        main.update_xlabel("Frequency (Hz)")
         main.plot(times, values, freq)
 
-        ampl.set_xlabel("Overall coherence")
-        ampl.set_ylabel("Frequency (Hz)")
+        ampl.update_xlabel("Overall coherence")
+        ampl.update_ylabel("Frequency (Hz)")
         ampl.plot(data.overall_coherence, freq, surrogates=data.surrogate_avg)
 
     def load_data(self):
