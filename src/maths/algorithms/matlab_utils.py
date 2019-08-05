@@ -16,10 +16,12 @@
 import numpy as np
 import scipy
 import scipy.integrate
+import scipy.optimize
 
 """
 Contains Python replicas of oft-used Matlab functions.
 """
+
 
 def isempty(value):
     """
@@ -41,7 +43,7 @@ def isfinite(value):
 
 def backslash(x, y):
     """Imitates the MATLAB backslash operator."""
-    return np.linalg.lstsq(x, y, rcond=None)[0] # TODO: check this
+    return np.linalg.lstsq(x, y, rcond=None)[0]  # TODO: check this
 
 
 def nextpow2(x):
@@ -53,13 +55,37 @@ def quadgk(func, x0, x1, limit, epsabs, epsrel):
         epsrel = np.max([50 * eps, 5e-29])
     return scipy.integrate.quad(func, x0, x1, limit=limit, epsabs=epsabs, epsrel=epsrel)
 
+
 def fft(x):
     return np.fft.fft(x)
 
 
+def sqrt(n): return np.sqrt(n)
+
+
+def fminsearch(func, x0, xtol):
+    return scipy.optimize.fmin(func=func, x0=x0, xtol=xtol)
+
+
+# Function aliases.
+rand = np.random.rand
+exp = np.exp
+log = np.log
+max = np.max
+conj = np.conj
+abs = np.abs
+sum = np.sum
+ceil = np.ceil
+arange = np.arange
+length = len
+zeros = np.zeros
+ifft = np.fft.ifft
+
+# Variable and constant aliases.
 twopi = 2 * np.pi
 pi = np.pi
 eps = np.finfo(np.float64).eps
+inf = np.inf
 
 
 def find(arr, condition):

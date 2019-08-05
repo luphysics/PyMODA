@@ -58,12 +58,12 @@ class WindowParams:
     xi2h = None
 
 
-gaussian = "Gaussian"
-hann = "Hann"
-blackman = "Blackman"
-exp = "exp"
-rect = "rect"
-kaiser = "kaiser"
+_gaussian = "Gaussian"
+_hann = "Hann"
+_blackman = "Blackman"
+_exp = "exp"
+_rect = "rect"
+_kaiser = "kaiser"
 
 
 def wft(signal,
@@ -245,12 +245,147 @@ def wft(signal,
         return WFT, freq
 
 
-def parcalc(racc, L, wp, fwt, twf, disp_mode):
-    racc = min(racc, 0.5 - 10 ** -10)
+def parcalc(racc, L, wp, fwt, twf, disp_mode, f0, fmax, wavelet="Lognorm"):
+    racc = np.min([racc, 1 - 10 ** -10])
     # level0
-    ctol = max(racc / 1000, 10 ** -12)  # parameter of numerical accuracy
-    MIC = max(10000, 10 * L)  # max interval count
+    ctol = np.max([racc / 1000, 10 ** -12])  # parameter of numerical accuracy
+    MIC = np.max([10000, 10 * L])  # max interval count
 
+    if not isempty(fwt):
+        wp.fwt = fwt
+        if isempty(wp.ompeak):
+            wp.ompeak = 1
+            if "Morlet" in wavelet:
+                wp.ompeak = twopi * f0
+
+            if wp.xi1 > 0 and isfinite(wp.xi2):
+                wp.ompeak = sqrt(wp.xi1 * wp.xi2)
+            elif isfinite(wp.xi2):
+                wp.ompeak = wp.xi2 / 2
+
+            if fwt(wp.ompeak) == 0 or isnan(fwt(wp.ompeak)) or not isfinite(fwt(wp.ompeak)):
+                cp1 = wp.ompeak * np.exp(-10 ** -14)
+                cp2 = wp.ompeak * np.exp(10 ** -14)
+                kk = 1
+
+                while kk < 10 ** 28:
+                    cv1 = np.abs(fwt(cp1))
+                    cv2 = np.abs(fwt(cp2))
+                    kk *= 2
+
+                    if isfinite(cv1) and cv1 > 0:
+                        wp.ompeak = cp1
+                        break
+                    if isfinite(cv2) and cv2 > 0:
+                        wp.ompeak = cp2
+                        break
+
+                    cp1 *= np.exp(-kk * 10 ** -14)
+                    if cp1 <= np.max([wp.xi1, 0]):
+                        cp1 *= (np.exp(kk * 10 ** (-14)) + max([wp.xi1, 0])) / 2
+
+                    cp2 *= np.exp(kk * 10 ** -14)
+                    if cp2 >= wp.xi2:
+                        cp2 *= (np.exp(-kk * 10 ** (-14)) + wp.xi2) / 2
+
+                cv = abs(fwt(wp.ompeak))
+                while isnan(cv) or cv == 0:
+                    if isfinite(wp.xi2):
+                        pp = max([wp.xi1, 0]) + (wp.xi2 - max([wp.xi1, 0])) * rand(MIC, 1)
+                    else:
+                        pp = np.exp(np.arctan(pi * (rand(MIC, 1) - 1 / 2)))
+
+                    cv = max(abs(fwt(pp)))
+                    ipeak = np.argmax(abs(fwt(pp)))
+
+                    wp.ompeak = pp[ipeak]
+
+            wp.ompeak = fminsearch(lambda x: -np.abs(fwt(np.exp(x)), x0=np.log(wp.ompeak), xtol=10 ** -14))
+            wp.ompeak = np.exp(wp.ompeak)
+
+        if isempty(wp.fwtmax):
+            wp.fwtmax = fwt(wp.ompeak)
+            if isnan(wp.fwtmax):
+                wp.fwtmax = fwt(wp.ompeak + 10 ** (-14))
+
+        vfun = lambda u: np.conj(fwt(exp(u)))
+        xp = np.log(wp.ompeak)
+        lim1 = log(max([wp.xi1, 0]))
+        lim2 = log(wp.xi2)
+
+        # Test admissibility
+        if wp.xi1 <= 0:
+            AC = fwt(0)
+        else:
+            AC = 0
+        if isnan(AC):
+            cx0 = 10 ** -14
+            while fwt(cx0) > 10 ** -14:
+                cx0 /= 2
+            while isnan(fwt(cx0)):
+                cx0 *= 2
+            AC = fwt(cx0)
+
+        if AC > 10 ** -12:
+            print("Wavelet does not seem to be admissible.")
+
+        QQ, wflag, xx, ss = sqeps(vfun, xp, lim1, lim2, racc, MIC,
+                                  [log((wp.ompeak / fmax) * fs / L / 8), log(8 * (wp.ompeak / (fs / L)) * fs)]
+                                  )
+        wp.xi1e = exp(ss[0, 0])
+        wp.xi2e = exp(ss[0, 1])
+        wp.xi1h = exp(ss[1, 0])
+        wp.xi2h = exp(ss[1, 1])
+
+        if isempty(wp.C):
+            wp.C = (QQ[0, 0] + QQ[0, 1]) / 2
+
+        if isempty(wp.D):
+            D1, err1, _, _ = quadgk(lambda u: conj(fwt(1 / u)), 1 / wp.ompeak, exp(-xx[0, 0]), 2 * MIC, 0, 10 ** -12)
+            D2, err2, _, _ = quadgk(lambda u: -conj(fwt(1 / u)), 1 / wp.ompeak, exp(-xx[0, 1]), 2 * MIC, 0, 10 ** -12)
+            D3, err3, _, _ = quadgk(lambda u: conj(fwt(1 / u)), exp(-xx[0, 0]), exp(-xx[3, 0]), 2 * MIC, 0, 10 ** -12)
+            D4, err4, _, _ = quadgk(lambda u: -conj(fwt(1 / u)), exp(-xx[0, 1]), exp(-xx[3, 1]), 2 * MIC, 0, 10 ** -12)
+            if abs((err1 + err2 + err3 + err4) / (D1 + D2 + D3 + D4)) < 10 ** -4:
+                wp.D = (wp.ompeak / 2) * (D1 + D2 + D3 + D4)
+            else:
+                wp.D = inf
+
+        if wflag == 1:
+            print("WARNING")
+
+        if isempty(twf):
+            PP, wflag, xx, ss = sqeps(lambda x: abs(fwt(x)) ** 2, wp.ompeak, max([wp.xi1, 0]), wp.xi2, racc, MIC,
+                                      [0,8*(wp.ompeak/(fs/L))*fs])
+
+            Etot = sum(PP[0,:]) /twopi
+
+            CL = 2 ** nextpow2(MIC / 8);
+            CT = CL / (2 * abs(ss[0,1] - ss[0,0]));
+            CNq = ceil((CL + 1) / 2);
+            cxi = (2 * pi / CT) * arange(CNq - CL-1,CNq-1).transpose()
+            idm=find(cxi<=max([wp.xi1,0])); idc=find(cxi>max([wp.xi1,0]) & cxi<wp.xi2); idp=find(cxi>=wp.xi2);
+            Cfwt = [zeros(length(idm), 1);
+            fwt(cxi(idc));
+            zeros((length(idp), 1,))]; idnan = find(isnan(Cfwt));
+            if ~isempty(
+                    idnan):
+                idnorm=find(~isnan(Cfwt)); Cfwt(idnan)=interp1(idnorm, Cfwt(idnorm), idnan, 'spline', 'extrap');
+            Ctwf = ifft((CL / CT) * Cfwt([CL - CNq + 1:CL, 1: CL - CNq])); Ctwf = Ctwf([CNq + 1:CL, 1: CNq]);
+            Etwf = abs(Ctwf). ^ 2;
+            Efwt = abs(Cfwt). ^ 2;
+            Iest1 = (CT / CL) * sum(abs(Etwf(3:end)-2 * Etwf(2: end - 1)+Etwf(1: end - 2))) / 24; % error
+            of
+            integration in time
+            Iest2 = (1 / CT) * sum(abs(Efwt(3:end)-2 * Efwt(2: end - 1)+Efwt(1: end - 2))) / 24; % error
+            of
+            integration in frequency
+            Eest = (CT / CL) * sum(Etwf);
+            perr = Inf;
+
+
+
+
+    """BREAK"""
     nt = (1 / (4 * fs)) * np.arange(-8 * L + 1, 8 * L).transpose()  # level1 should be hermitian conjugate?
     nt = nt[wp.t1 < nt][nt < wp.t2]
 
@@ -1185,7 +1320,6 @@ def fcast(sig, fs, NP, fint, *args):  # line1145
             break
         if itn > 2 and cic > ic[itn - 1] and cic[itn - 1] > ic[itn - 2]:
             break
-
 
     frq = frq[1:itn + 1]
     amp = amp[1:itn + 1]
