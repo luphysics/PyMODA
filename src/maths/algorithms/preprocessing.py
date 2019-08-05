@@ -13,36 +13,35 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from gui.plotting.MatplotlibComponent import MatplotlibComponent
+import numpy as np
+
 from maths.TimeSeries import TimeSeries
 
 
-class SignalPlot(MatplotlibComponent):
-    """
-    Plots the signal, which is a simple set of amplitudes against time.
-    """
+def preprocess(time_series: TimeSeries, fs, fmin, fmax):
+    sig = time_series.signal
+    L = len(sig)
 
-    def plot(self, data: TimeSeries, clear=True):
-        if clear:
-            self.clear()
-            self.rect_stack.clear()
+    # Detrending
+    X = np.arange(0, len(sig)).transpose() / fs
+    XM = np.ones((len(X), 4,), dtype=np.complex)
+    for pn in range(1, 4):
+        CX = X ** pn
+        XM[:, pn] = (CX - np.mean(CX)) / np.std(CX)
 
-        self.axes.xaxis.set_label_position("top")
-        self.update_xlabel()
-        self.update_ylabel()
-        self.axes.autoscale(True)
+        sig -= XM * (np.linalg.pinv(XM) * sig)
 
-        x = data.times
-        y = data.signal
+    # Filtering
+    fx = np.fft.fft(sig, L)
+    Nq = np.ceil((L + 1) / 2)
 
-        xlim = (x[0], x[-1])
-        self.axes.plot(x, y, linewidth=0.7)
-        self.axes.autoscale(False)
-        self.axes.set_xlim(xlim)
-        self.on_plot_complete()
+    ff = np.asarray(
+        np.arange(0, Nq),
+        -np.fliplr(np.arange(1, L - Nq + 1))
+    ) * fs / L
 
-    def get_xlabel(self):
-        return "Time (s)"
+    ff = ff[:]
+    fx[np.abs(ff) <= np.max([fmin, fs / L]) or np.abs(ff) >= fmax] = 0
 
-    def get_ylabel(self):
-        return "Value"
+    sig = np.fft.ifft(fx)
+    return sig

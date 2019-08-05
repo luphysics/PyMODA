@@ -197,7 +197,7 @@
           <item>
            <layout class="QGridLayout" name="original_preprocessed_sig" rowstretch="2,9" columnstretch="0">
             <item row="1" column="0">
-             <widget class="QWidget" name="preprocSig" native="true"/>
+             <widget class="PreprocessPlot" name="plot_preproc" native="true"/>
             </item>
             <item row="0" column="0">
              <widget class="QLabel" name="label_16">
@@ -590,6 +590,12 @@
    <class>AmplitudePlot</class>
    <extends>QWidget</extends>
    <header>gui.windows.base.analysis.plots.AmplitudePlot</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>PreprocessPlot</class>
+   <extends>QWidget</extends>
+   <header>gui.windows.base.analysis.plots.PreprocessPlot</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

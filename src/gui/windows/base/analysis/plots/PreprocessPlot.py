@@ -14,35 +14,18 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from gui.plotting.MatplotlibComponent import MatplotlibComponent
-from maths.TimeSeries import TimeSeries
 
 
-class SignalPlot(MatplotlibComponent):
-    """
-    Plots the signal, which is a simple set of amplitudes against time.
-    """
+class PreprocessPlot(MatplotlibComponent):
 
-    def plot(self, data: TimeSeries, clear=True):
-        if clear:
-            self.clear()
-            self.rect_stack.clear()
+    def plot(self, times, original, preprocessed):
+        self.clear()
+        self.rect_stack.clear()
 
-        self.axes.xaxis.set_label_position("top")
-        self.update_xlabel()
-        self.update_ylabel()
         self.axes.autoscale(True)
 
-        x = data.times
-        y = data.signal
+        self.axes.plot(times, original)
+        self.axes.plot(times, preprocessed)
 
-        xlim = (x[0], x[-1])
-        self.axes.plot(x, y, linewidth=0.7)
         self.axes.autoscale(False)
-        self.axes.set_xlim(xlim)
         self.on_plot_complete()
-
-    def get_xlabel(self):
-        return "Time (s)"
-
-    def get_ylabel(self):
-        return "Value"

@@ -21,6 +21,7 @@ from maths.Signals import Signals
 from maths.TFOutputData import TFOutputData
 from maths.TimeSeries import TimeSeries
 from maths.algorithms.TFParams import TFParams, _wt, _wft, create
+from maths.algorithms.preprocessing import preprocess
 from maths.multiprocessing.MPHelper import MPHelper
 
 
@@ -183,7 +184,11 @@ class TFPresenter(BaseTFPresenter):
 
     def plot_signal(self):
         """Plots the signal on the SignalPlot."""
-        self.view.plot_signal(self.get_selected_signal())
+        sig = self.get_selected_signal()
+        p = preprocess(sig, 0.1, 10, 1)
+
+        self.view.plot_signal(sig)
+        self.view.plot_preproc.plot(sig, p)
 
     def on_data_loaded(self):
         """Called when the time-series data has been loaded."""
