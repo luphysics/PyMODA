@@ -30,14 +30,16 @@ class TFPresenter(BaseTFPresenter):
     """
 
     def get_total_tasks_count(self) -> int:
-        return len(self.signals)
+        return len(self.signals) if self.is_calculating_all else 1
 
-    def calculate(self):
+    def calculate(self, calculate_all: bool):
         """Calculates the desired transform(s), and plots the result."""
+        self.set_calculating_all(calculate_all)
+
         if self.mp_handler:
             self.mp_handler.stop()
 
-        params = self.get_params()
+        params = self.get_params(all_signals=calculate_all)
         if params.transform == _wft:
             if self.view.get_fmin() is None:
                 # Will be caught by error handling and shown as a dialog.
@@ -80,9 +82,10 @@ class TFPresenter(BaseTFPresenter):
         print(f"Finished calculation for '{name}'.")
         self.on_task_completed(self.get_total_tasks_count())
 
-        # Plot result only if signal is selected.
-        if self.selected_signal_name == t.name:
+        # Plot result if all signals finished.
+        if all([s.output_data.is_valid() for s in self.signals_calc]):
             self.plot_output()
+            self.on_all_tasks_completed()
 
     def get_values_to_plot(self, amplitude=None) -> tuple:
         """
@@ -132,14 +135,22 @@ class TFPresenter(BaseTFPresenter):
         if t is not None and f is not None:
             self.plot(t, f, values, avg_values)
             self.is_plotted = True
+        else:
+            self.view.main_plot().clear()
+            self.view.amplitude_plot().clear()
 
-    def get_params(self) -> TFParams:
+    def get_params(self, all_signals=True) -> TFParams:
         """
         Creates the parameters to use when performing the calculations.
         """
+        if all_signals:
+            self.signals_calc = self.signals
+        else:
+            self.signals_calc = self.signals.only(self.selected_signal_name)
+
         return create(
             params_type=TFParams,
-            signals=self.signals,
+            signals=self.signals_calc,
             fmin=self.view.get_fmin(),
             fmax=self.view.get_fmax(),
             f0=self.view.get_f0(),

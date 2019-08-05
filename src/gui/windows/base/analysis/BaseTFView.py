@@ -120,3 +120,9 @@ class BaseTFView:
 
     def update_signal_listview(self, items):
         pass
+
+    def get_button_calculate_all(self):
+        pass
+
+    def get_button_calculate_single(self):
+        pass

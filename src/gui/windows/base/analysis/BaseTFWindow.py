@@ -13,8 +13,10 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from functools import partial
+
 from PyQt5 import uic, QtGui
-from PyQt5.QtWidgets import QDialog, QListWidget, QProgressBar
+from PyQt5.QtWidgets import QDialog, QListWidget, QProgressBar, QPushButton
 
 from gui.dialogs.files.SelectFileDialog import SelectFileDialog
 from gui.windows.base.MaximisedWindow import MaximisedWindow
@@ -60,7 +62,12 @@ class BaseTFWindow(MaximisedWindow, BaseTFView):
         self.setup_xlim_edits()
         self.setup_progress()
 
-        self.btn_calculate.clicked.connect(self.presenter.calculate)
+        self.get_button_calculate_all().clicked.connect(
+            partial(self.presenter.calculate, True)
+        )
+        self.get_button_calculate_single().clicked.connect(
+            partial(self.presenter.calculate, False)
+        )
         self.presenter.init()
 
     def main_plot(self) -> WFTPlot:
@@ -107,10 +114,12 @@ class BaseTFWindow(MaximisedWindow, BaseTFView):
         self.main_plot().set_in_progress(True)
         self.amplitude_plot().clear()
         self.amplitude_plot().set_in_progress(True)
-        btn = self.btn_calculate
+        btn = self.get_button_calculate_all()
 
         btn.setText("Cancel")
         btn.setStyleSheet("color: blue;")
+
+        self.get_button_calculate_single().hide()
 
         btn.clicked.disconnect()
         btn.clicked.connect(self.presenter.cancel_calculate)
@@ -118,13 +127,16 @@ class BaseTFWindow(MaximisedWindow, BaseTFView):
     def on_calculate_stopped(self):
         self.main_plot().set_in_progress(False)
         self.amplitude_plot().set_in_progress(False)
-        btn = self.btn_calculate
+        btn = self.get_button_calculate_all()
 
-        btn.setText("Calculate")
+        btn.setText("Transform All")
         btn.setStyleSheet("color: black;")
+        self.get_button_calculate_single().show()
 
         btn.clicked.disconnect()
-        btn.clicked.connect(self.presenter.calculate)
+        btn.clicked.connect(partial(self.presenter.calculate, True))
+
+        self.setup_progress()
 
     def setup_progress(self):
         self.update_progress(0, 0)
@@ -140,3 +152,9 @@ class BaseTFWindow(MaximisedWindow, BaseTFView):
             progress.setValue(current / total * 100)
 
         lbl.setText(self.progress_message(current, total))
+
+    def get_button_calculate_all(self) -> QPushButton:
+        return self.btn_calculate_all
+
+    def get_button_calculate_single(self) -> QPushButton:
+        return self.btn_calculate_single

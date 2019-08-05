@@ -13,6 +13,8 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import itertools
+
 from maths.Signals import Signals, get_parser
 from maths.TimeSeries import TimeSeries
 
@@ -56,6 +58,17 @@ class SignalPairs(Signals):
     def pair_count(self):
         """Returns the number of signal pairs."""
         return len(self) // 2
+
+    def only(self, *pair_names):
+        # List of tuples.
+        pairs = [self.get_pair_by_name(n) for n in pair_names]
+
+        # Expand tuples to list of all signals.
+        pairs_list = list(itertools.chain.from_iterable(pairs))
+
+        signals = SignalPairs(*pairs_list)
+        signals.set_frequency(self.frequency)
+        return signals
 
     @staticmethod
     def from_file(file: str):

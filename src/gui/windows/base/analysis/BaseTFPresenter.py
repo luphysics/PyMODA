@@ -43,12 +43,21 @@ class BaseTFPresenter:
         # Open dialog to select a data file.
         self.view.select_file()
 
-    def calculate(self):
+    def calculate(self, calculate_all: bool):
+        """
+        Perform the main calculation. To connect as a slot,
+        use functools.partial:
+
+        `button.clicked.connect(partial(self.calculate, my_argument))`
+        """
         pass
 
-    def on_task_completed(self, total):
-        self.tasks_completed += 1
+    def on_task_completed(self, total, weighting=1):
+        self.tasks_completed += weighting
         self.view.update_progress(self.tasks_completed, total)
+
+    def on_all_tasks_completed(self):
+        self.tasks_completed = 0
 
     def on_error(self, exc_type, value, traceback):
         """Called when an error occurs, provided that the debug argument is not in use."""
@@ -82,6 +91,7 @@ class BaseTFPresenter:
             self.mp_handler.stop()
         self.view.on_calculate_stopped()
         self.is_plotted = False
+        self.on_all_tasks_completed()
         print("Calculation terminated.")
 
     def on_freq_changed(self, freq):
@@ -129,3 +139,9 @@ class BaseTFPresenter:
     def get_total_tasks_count(self) -> int:
         """Returns the total number of tasks in progress."""
         return 0
+
+    def calculating_all(self) -> bool:
+        return self.is_calculating_all
+
+    def set_calculating_all(self, value: bool):
+        self.is_calculating_all = value

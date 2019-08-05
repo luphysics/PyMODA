@@ -68,7 +68,7 @@ class TFOutputData:
         self.avg_pow = None
 
     def has_phase_coherence(self):
-        return self.overall_coherence is not None
+        return not (self.overall_coherence is None or len(self.freq) != len(self.overall_coherence))
 
     def has_surrogates(self):
         return self.surrogate_avg is not None

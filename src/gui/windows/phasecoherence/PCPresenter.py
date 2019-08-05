@@ -31,7 +31,13 @@ class PCPresenter(BaseTFPresenter):
     def __init__(self, view: PCView):
         super().__init__(view)
 
-    def calculate(self):
+    def on_task_completed(self, total, weighting=1):
+        self.tasks_completed += weighting
+        self.view.update_progress(self.tasks_completed, total)
+
+    def calculate(self, calculate_all: bool):
+        self.is_calculating_all = calculate_all
+
         if self.mp_handler:
             self.mp_handler.stop()
 
@@ -43,7 +49,9 @@ class PCPresenter(BaseTFPresenter):
         self.view.amplitude_plot().clear()
         self.view.amplitude_plot().set_in_progress(True)
 
-        params = self.get_params()
+        params = self.get_params(all_signals=calculate_all)
+        self.surrogate_count = self.view.get_surr_count()
+        self.surrogates_enabled = self.view.get_surr_enabled()
 
         self.mp_handler = MPHelper()
         self.mp_handler.wft(
@@ -55,6 +63,7 @@ class PCPresenter(BaseTFPresenter):
         self.view.amplitude_plot().set_log_scale(logarithmic=True)
 
         self.view.on_calculate_started()
+        self.view.update_progress(0, self.get_total_tasks_count())
         print("Started calculation...")
 
     def on_transform_completed(self, name, times, freq, values, ampl, powers, avg_ampl, avg_pow):
@@ -71,15 +80,17 @@ class PCPresenter(BaseTFPresenter):
             avg_pow,
         )
 
+        self.on_task_completed(self.get_total_tasks_count())
+
         # Whether all signals have finished calculating.
-        if all([s.output_data.is_valid() for s in self.signals]):
+        if all([s.output_data.is_valid() for s in self.signals_calc]):
             self.calculate_phase_coherence()
 
     def calculate_phase_coherence(self):
         mp = self.mp_handler
         mp.wpc(
-            self.signals,
-            params=self.get_params(),
+            self.signals_calc,
+            params=self.get_params(all_signals=self.is_calculating_all),
             window=self.view.get_window(),
             on_result=self.on_phase_coherence_completed
         )
@@ -96,10 +107,14 @@ class PCPresenter(BaseTFPresenter):
         sig = self.signals.get(s1.name)
         sig.output_data = d
 
+        self.on_task_completed(self.get_total_tasks_count(),
+                               weighting=1 + (self.surrogate_count if self.surrogates_enabled else 0))
+
         # If all calculations have completed.
-        if all([s.output_data.has_phase_coherence() for s in self.signals[::2]]):
+        if all([s.output_data.has_phase_coherence() for s in self.signals_calc[::2]]):
             self.plot_phase_coherence()
             self.view.on_calculate_stopped()
+            self.on_all_tasks_completed()
             print("Finished calculating phase coherence.")
 
     def plot_phase_coherence(self):
@@ -160,13 +175,15 @@ class PCPresenter(BaseTFPresenter):
             self.view.on_xlim_edited()
             self.plot_phase_coherence()
 
-    def plot_output(self):
-        pass  # TODO: implement
+    def get_params(self, all_signals=True):
+        if all_signals:
+            self.signals_calc = self.signals
+        else:
+            self.signals_calc = self.signals.only(self.selected_signal_name)
 
-    def get_params(self):
         return create(
             params_type=PCParams,
-            signals=self.signals,
+            signals=self.signals_calc,
             fmin=self.view.get_fmin(),
             fmax=self.view.get_fmax(),
             f0=self.view.get_f0(),
@@ -180,4 +197,10 @@ class PCPresenter(BaseTFPresenter):
         )
 
     def get_total_tasks_count(self) -> int:
-        return len(self.signals)
+        count = len(self.signals) if self.is_calculating_all else 2
+        count += count // 2
+
+        if self.surrogates_enabled:
+            count += count * self.surrogate_count // 2
+
+        return count

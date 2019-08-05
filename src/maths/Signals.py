@@ -119,6 +119,15 @@ class Signals(list):
         for t in self:
             t.set_xlimits(x1, x2)
 
+    def only(self, *signal_names):
+        """
+        Creates a new Signals object containing only
+        the desired signals.
+        """
+        signals = Signals(*[sig for sig in self if sig.name in signal_names])
+        signals.set_frequency(self.frequency)
+        return signals
+
     @staticmethod
     def from_file(file: str):
         """Creates a Signals instance from a provided file."""

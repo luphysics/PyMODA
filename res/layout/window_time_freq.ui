@@ -114,7 +114,7 @@
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_4">
                <item>
-                <widget class="QPushButton" name="btn_calculate">
+                <widget class="QPushButton" name="btn_calculate_all">
                  <property name="text">
                   <string>Transform All</string>
                  </property>
