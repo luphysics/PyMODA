@@ -15,7 +15,8 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import numpy as np
-from multiprocess import sharedctypes
+import psutil as psutil
+from multiprocess import sharedctypes, Process
 from multiprocess.sharedctypes import RawArray
 from numpy import ctypeslib, ndarray
 
@@ -24,7 +25,7 @@ Experimental. Contains functions to help with accessing shared memory arrays.
 """
 
 
-def convert_to_ctypes(arr: ndarray) -> RawArray:
+def convert_to_ctypes(arr: np.ndarray) -> RawArray:
     size = arr.size
     shape = arr.shape
     arr.shape = size
@@ -36,8 +37,22 @@ def convert_to_ctypes(arr: ndarray) -> RawArray:
     return arr_ctypes
 
 
-def convert_to_numpy(arr_ctypes: RawArray, shape=None) -> ndarray:
+def convert_to_numpy(arr_ctypes: RawArray, shape=None) -> np.ndarray:
     result = ctypeslib.as_array(arr_ctypes)
     if shape:
         result.shape = shape
     return result
+
+
+def terminate_tree(process: Process):
+    """
+    Terminates a process along with all of its child processes.
+    """
+    try:
+        pid = process.pid
+        for child in psutil.Process(pid).children(recursive=True):
+            child.terminate()
+    except psutil.NoSuchProcess:
+        pass
+    finally:
+        process.terminate()

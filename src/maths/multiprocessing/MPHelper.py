@@ -17,7 +17,6 @@
 import time
 
 import numpy as np
-import psutil as psutil
 from PyQt5.QtGui import QWindow
 from multiprocess import Queue, Process
 
@@ -29,6 +28,7 @@ from maths.algorithms.TFParams import TFParams, _wft
 from maths.algorithms.surrogates import surrogate_calc
 from maths.algorithms.wpc import wpc, wphcoh
 from maths.multiprocessing.Watcher import Watcher
+from maths.multiprocessing.mp_utils import terminate_tree
 from maths.utils import matlab_to_numpy
 
 
@@ -237,14 +237,3 @@ def _time_frequency(queue, time_series: TimeSeries, params: TFParams):
         avg_ampl,
         avg_pow,
     ))
-
-
-def terminate_tree(process: Process):
-    """
-    Terminates a process along with all of its child processes.
-    """
-    pid = process.pid
-    for child in psutil.Process(pid).children(recursive=True):
-        child.terminate()
-
-    process.terminate()
