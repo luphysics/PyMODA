@@ -27,9 +27,14 @@ class PreprocessPlot(MatplotlibComponent):
 
         self.axes.autoscale(True)
 
-        width = 0.5
-        self.axes.plot(times, original, linewidth=width)
+        width = 0.3
+        self.axes.plot(times, original, linewidth=width * 1.5)
         self.axes.plot(times, preprocessed, linewidth=width)
+
+        self.axes.legend(["Original", "Preprocessed"])
+
+        xlim = sorted((times[0], times[-1],))
+        self.axes.set_xlim(xlim)
 
         self.axes.autoscale(False)
         self.on_plot_complete()

@@ -184,16 +184,18 @@ class TFPresenter(BaseTFPresenter):
 
     def plot_signal(self):
         """Plots the signal on the SignalPlot."""
-        sig = self.get_selected_signal()
-        p = preprocess(sig, 0.1, 10, 1)
+        self.view.plot_signal(self.get_selected_signal())
 
-        self.view.plot_signal(sig)
+    def plot_preprocessed(self):
+        sig = self.get_selected_signal()
+        p = preprocess(sig.signal, sig.frequency, 0.2, 3)
         self.view.plot_preproc.plot(sig.times, sig.signal, p)
 
     def on_data_loaded(self):
         """Called when the time-series data has been loaded."""
         self.view.update_signal_listview(self.signals.names())
         self.plot_signal()
+        self.plot_preprocessed()
 
     def on_signal_selected(self, item):
         """

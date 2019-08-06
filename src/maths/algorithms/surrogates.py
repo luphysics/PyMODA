@@ -66,7 +66,7 @@ def surrogate_calc(time_series: TimeSeries, N, method, pp, fs):
     params.time = time
 
     if method == _RP:
-        for k in range(0, N):
+        for k in range(N):
             surr[k, :] = sig[randperm(L)]
 
     elif method == _FT:

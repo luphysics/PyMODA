@@ -15,36 +15,37 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import numpy as np
 
-from maths.TimeSeries import TimeSeries
 
-
-def preprocess(time_series: TimeSeries, fs, fmin, fmax) -> np.ndarray:
-    # TODO: fix
-    return time_series.signal
-
-    sig = time_series.signal
+def preprocess(sig, fs, fmin, fmax) -> np.ndarray:
     L = len(sig)
 
     # Detrending
-    X = np.arange(0, len(sig)).transpose() / fs
-    XM = np.ones((len(X), 4,), dtype=np.complex)
+    X = np.arange(1, len(sig) + 1).transpose() / fs
+    XM = np.ones((len(X), 4,), dtype=np.float64)
+
     for pn in range(1, 4):
         CX = X ** pn
         XM[:, pn] = (CX - np.mean(CX)) / np.std(CX)
 
-        sig -= XM * (np.linalg.pinv(XM) * sig)
+    sig = sig.reshape(len(sig), 1)
+    new_sig = sig - np.matmul(XM, np.matmul((np.linalg.pinv(XM)), sig))
 
     # Filtering
-    fx = np.fft.fft(sig, L)
+    fx = np.fft.fft(new_sig, axis=0)
     Nq = np.ceil((L + 1) / 2)
 
-    ff = np.asarray(
+    ff = np.concatenate([
         np.arange(0, Nq),
-        -np.fliplr(np.arange(1, L - Nq + 1))
-    ) * fs / L
+        -np.arange(1, L - Nq + 1)[::-1]
+    ]) * fs / L
+    ff = ff.reshape(len(ff), 1)
 
-    ff = ff[:]
-    fx[np.abs(ff) <= np.max([fmin, fs / L]) or np.abs(ff) >= fmax] = 0
+    cutoff = np.max([fmin, fs / L])
+    ind1 = np.nonzero(np.abs(ff) <= cutoff)
+    ind2 = np.nonzero(np.abs(ff) >= fmax)
 
-    sig = np.fft.ifft(fx)
-    return sig
+    fx[ind1] = 0
+    fx[ind2] = 0
+
+    result = np.real(np.fft.ifft(fx, axis=0))
+    return result
