@@ -75,7 +75,7 @@ class MPHelper:
             self.queue.append(q)
 
             self.processes.append(
-                Process(target=self._time_frequency, args=(q, time_series, params,))
+                Process(target=_time_frequency, args=(q, time_series, params,))
             )
             self.watchers.append(Watcher(window, q, 0.5, on_result))
 
@@ -101,7 +101,7 @@ class MPHelper:
 
             pair = signals.get_pair_by_index(i)
             self.processes.append(
-                Process(target=self._phase_coherence, args=(q, pair, params,))
+                Process(target=_phase_coherence, args=(q, pair, params,))
             )
             self.watchers.append(Watcher(window, q, 0.5, on_result))
 
@@ -110,117 +110,6 @@ class MPHelper:
 
         for watcher in self.watchers:
             watcher.start()
-
-    def _phase_coherence(self, queue, signal_pair, params: PCParams):
-        """Should not be called in the main process."""
-        s1, s2 = signal_pair
-
-        wt1 = s1.output_data.values
-        wt2 = s2.output_data.values
-
-        freq = s1.output_data.freq
-        fs = s1.frequency
-
-        # Calculate phase coherence.
-        tpc, pc, pdiff = wpc(wt1, wt2, freq, fs)
-
-        # Calculate surrogates.
-        surr_count = params.surr_count
-        surr_method = params.surr_method
-        surr_preproc = params.surr_preproc
-        surrogates, _ = surrogate_calc(s1, surr_count, surr_method, surr_preproc, fs)
-
-        tpc_surr = list(range(surr_count))
-        processes = []
-        queues = []
-
-        for i in range(surr_count):
-            q = Queue()
-            queues.append(q)
-
-            processes.append(
-                Process(
-                    target=self._wt_surrogate_calc, args=(q, wt1, surrogates[i], params, i)
-                )
-            )
-
-        for p in processes:
-            p.start()
-
-        # Wait for processes to calculate surrogate results.
-        # This is fine since we're not running on the main process.
-        for p in processes:
-            p.join()
-
-        # After all processes finished, get all surrogate results.
-        for q in queues:
-            index, result = q.get()
-            tpc_surr[index] = result
-
-        if len(tpc_surr) > 0:
-            tpc_surr = np.mean(tpc_surr, axis=0)
-
-        # Put all results, including phase coherence and surrogates,
-        # in the queue to be returned to the GUI.
-        queue.put((
-            signal_pair,
-            tpc,
-            pc,
-            pdiff,
-            tpc_surr,
-        ))
-
-    def _wt_surrogate_calc(self, queue, wt1, surrogate, params, index):
-        from maths.algorithms import wt
-
-        transform, freq = wt.calculate(surrogate, params)
-        wt_surrogate = matlab_to_numpy(transform)
-
-        surr_avg, _ = wphcoh(wt1, wt_surrogate)
-
-        queue.put((index, surr_avg,))
-
-    def _time_frequency(self, queue, time_series: TimeSeries, params: TFParams):
-        """Should not be called in the main process."""
-        # Don't move the import statements.
-        from maths.algorithms import wt, wft
-
-        if params.transform == _wft:
-            func = wft
-        else:
-            func = wt
-
-        transform, freq = func.calculate(time_series, params)
-        transform = matlab_to_numpy(transform)
-        freq = matlab_to_numpy(freq)
-
-        amplitude = np.abs(transform)
-
-        power = np.square(amplitude)
-        length = len(amplitude)
-
-        avg_ampl = np.empty(length, dtype=np.float64)
-        avg_pow = np.empty(length, dtype=np.float64)
-
-        for i in range(length):
-            arr = amplitude[i]
-            row = arr[np.isfinite(arr)]
-
-            avg_ampl[i] = np.mean(row)
-            avg_pow[i] = np.mean(np.square(row))
-
-        print(f"Started putting items in queue at time: {time.time():.1f} seconds.")
-
-        queue.put((
-            time_series.name,
-            time_series.times,
-            freq,
-            transform,
-            amplitude,
-            power,
-            avg_ampl,
-            avg_pow,
-        ))
 
     def stop(self):
         """
@@ -234,6 +123,120 @@ class MPHelper:
             terminate_tree(self.processes.pop())
             self.watchers.pop().stop()
             self.queue.pop().close()
+
+
+def _wt_surrogate_calc(queue, wt1, surrogate, params, index):
+    from maths.algorithms import wt
+
+    transform, freq = wt.calculate(surrogate, params)
+    wt_surrogate = matlab_to_numpy(transform)
+
+    surr_avg, _ = wphcoh(wt1, wt_surrogate)
+
+    queue.put((index, surr_avg,))
+
+
+def _phase_coherence(queue, signal_pair, params: PCParams):
+    """Should not be called in the main process."""
+    s1, s2 = signal_pair
+
+    wt1 = s1.output_data.values
+    wt2 = s2.output_data.values
+
+    freq = s1.output_data.freq
+    fs = s1.frequency
+
+    # Calculate phase coherence.
+    tpc, pc, pdiff = wpc(wt1, wt2, freq, fs)
+
+    # Calculate surrogates.
+    surr_count = params.surr_count
+    surr_method = params.surr_method
+    surr_preproc = params.surr_preproc
+    surrogates, _ = surrogate_calc(s1, surr_count, surr_method, surr_preproc, fs)
+
+    tpc_surr = list(range(surr_count))
+    processes = []
+    queues = []
+
+    for i in range(surr_count):
+        q = Queue()
+        queues.append(q)
+
+        processes.append(
+            Process(
+                target=_wt_surrogate_calc, args=(q, wt1, surrogates[i], params, i)
+            )
+        )
+
+    for p in processes:
+        p.start()
+
+    # Wait for processes to calculate surrogate results.
+    # This is fine since we're not running on the main process.
+    for p in processes:
+        p.join()
+
+    # After all processes finished, get all surrogate results.
+    for q in queues:
+        index, result = q.get()
+        tpc_surr[index] = result
+
+    if len(tpc_surr) > 0:
+        tpc_surr = np.mean(tpc_surr, axis=0)
+
+    # Put all results, including phase coherence and surrogates,
+    # in the queue to be returned to the GUI.
+    queue.put((
+        signal_pair,
+        tpc,
+        pc,
+        pdiff,
+        tpc_surr,
+    ))
+
+
+def _time_frequency(queue, time_series: TimeSeries, params: TFParams):
+    """Should not be called in the main process."""
+    # Don't move the import statements.
+    from maths.algorithms import wt, wft
+
+    if params.transform == _wft:
+        func = wft
+    else:
+        func = wt
+
+    transform, freq = func.calculate(time_series, params)
+    transform = matlab_to_numpy(transform)
+    freq = matlab_to_numpy(freq)
+
+    amplitude = np.abs(transform)
+
+    power = np.square(amplitude)
+    length = len(amplitude)
+
+    avg_ampl = np.empty(length, dtype=np.float64)
+    avg_pow = np.empty(length, dtype=np.float64)
+
+    for i in range(length):
+        arr = amplitude[i]
+        row = arr[np.isfinite(arr)]
+
+        avg_ampl[i] = np.mean(row)
+        avg_pow[i] = np.mean(np.square(row))
+
+    print(f"Started putting items in queue at time: {time.time():.1f} seconds.")
+
+    queue.put((
+        time_series.name,
+        time_series.times,
+        freq,
+        transform,
+        amplitude,
+        power,
+        avg_ampl,
+        avg_pow,
+    ))
 
 
 def terminate_tree(process: Process):

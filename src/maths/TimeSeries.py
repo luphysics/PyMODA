@@ -53,9 +53,12 @@ class TimeSeries:
     def has_name(self):
         return self.name is not None
 
+    def has_times(self):
+        return self.times is not None
+
     def generate_times(self):
         """Generates the time values associated with the data."""
-        times = self.signal.copy()
+        times = np.empty(self.signal.shape, dtype=np.float)
         for i in range(0, len(self.signal)):
             times[i] = self.initial_time + i / self.frequency
 

@@ -18,7 +18,10 @@ import numpy as np
 from maths.TimeSeries import TimeSeries
 
 
-def preprocess(time_series: TimeSeries, fs, fmin, fmax):
+def preprocess(time_series: TimeSeries, fs, fmin, fmax) -> np.ndarray:
+    # TODO: fix
+    return time_series.signal
+
     sig = time_series.signal
     L = len(sig)
 

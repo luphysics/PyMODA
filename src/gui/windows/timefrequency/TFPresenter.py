@@ -188,7 +188,7 @@ class TFPresenter(BaseTFPresenter):
         p = preprocess(sig, 0.1, 10, 1)
 
         self.view.plot_signal(sig)
-        self.view.plot_preproc.plot(sig, p)
+        self.view.plot_preproc.plot(sig.times, sig.signal, p)
 
     def on_data_loaded(self):
         """Called when the time-series data has been loaded."""

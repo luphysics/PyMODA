@@ -13,19 +13,23 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import numpy as np
+
 from gui.plotting.MatplotlibComponent import MatplotlibComponent
+from maths.TimeSeries import TimeSeries
 
 
 class PreprocessPlot(MatplotlibComponent):
 
-    def plot(self, times, original, preprocessed):
+    def plot(self, times: np.ndarray, original: np.ndarray, preprocessed: np.ndarray):
         self.clear()
         self.rect_stack.clear()
 
         self.axes.autoscale(True)
 
-        self.axes.plot(times, original)
-        self.axes.plot(times, preprocessed)
+        width = 0.5
+        self.axes.plot(times, original, linewidth=width)
+        self.axes.plot(times, preprocessed, linewidth=width)
 
         self.axes.autoscale(False)
         self.on_plot_complete()
