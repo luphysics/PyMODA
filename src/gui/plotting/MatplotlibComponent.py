@@ -21,6 +21,7 @@ from matplotlib import patches
 from matplotlib.backend_bases import MouseButton
 from matplotlib.backends.backend_qt5agg import (FigureCanvas)
 from matplotlib.figure import Figure
+from scipy.constants.codata import val
 
 from gui.plotting.PlotComponent import PlotComponent
 from gui.plotting.Callbacks import Callbacks
@@ -29,7 +30,9 @@ from gui.windows.base.analysis.plots.Rect import Rect
 
 
 class MatplotlibComponent(PlotComponent):
-    """A component which enables plotting via matplotlib."""
+    """
+    A widget which enables plotting via matplotlib.
+    """
 
     def __init__(self, parent):
         self.callbacks: Callbacks = None
@@ -38,7 +41,7 @@ class MatplotlibComponent(PlotComponent):
         self.axes = None
         self.log = False  # Whether the axes should be logarithmic.
 
-        self.temp_plots = []  # Temporary crosshair plots which should be removed on each update.
+        self.temp_lines = []  # Temporary crosshair plots which should be removed on each update.
         self.selected_plots = []  # Selected crosshair plots which should be kept.
         self.crosshair_width = 0.7
         self.show_crosshair = True
@@ -48,6 +51,12 @@ class MatplotlibComponent(PlotComponent):
         self.rect_stack = []  # A List of Rect objects corresponding to a stack of previous zoom states.
 
         self.zoom_listeners = []  # A list of listeners which are notified of zoom events.
+        self.mouse_zoom_enabled = True
+
+        self.click_crosshair_enabled = False
+        self.max_crosshairs = 10
+        self.crosshair_listeners = []
+
         super(MatplotlibComponent, self).__init__(parent)
 
     def init_ui(self):
@@ -100,6 +109,12 @@ class MatplotlibComponent(PlotComponent):
         self.options.set_in_progress(False)
         self.canvas.draw()
 
+    def set_mouse_zoom_enabled(self, value: bool):
+        self.mouse_zoom_enabled = value
+
+    def set_click_crosshair_enabled(self, value: bool):
+        self.click_crosshair_enabled = value
+
     def cross_cursor(self, cross=True):
         """Sets the cursor to a cross, or resets it to the normal arrow style."""
         if cross:
@@ -139,15 +154,41 @@ class MatplotlibComponent(PlotComponent):
         """
         self.axes.set_yscale("log" if self.log else "linear")
 
-    def remove_temp_crosshairs(self):
+    def set_max_crosshair_count(self, limit: int):
+        self.max_crosshairs = limit
+
+    def remove_crosshairs(self, all=True, max_count=None):
         """
-        Removes the temporary crosshairs (the crosshairs that follow the cursor
-        as it moves).
+        Removes the crosshairs.
+
+        If `all` is False, only crosshairs
+        exceeding the max_count crosshair count
+        will be removed. More recent
+        crosshairs are prioritised.
         """
-        num = len(self.temp_plots)
-        for i in range(num):
-            item = self.temp_plots.pop()  # Take last item and remove from list.
-            item.remove()  # Remove from plotting.
+        num = len(self.temp_lines) // 2
+        max_count = max_count or self.max_crosshairs
+
+        if all:
+            to_remove = len(self.temp_lines)
+        else:
+            to_remove = max(0, num - max_count) * 2
+
+        for i in range(to_remove):
+            item = self.temp_lines.pop()  # Take last item and remove from list.
+            try:
+                item.remove()  # Remove from plotting.
+            except:
+                # Line was removed in `remove_line_at(...)`. No problem.
+                pass
+
+    def remove_line_at(self, x=None, y=None):
+        for l in self.temp_lines:
+            if (x is not None and l._x[0] == x) or (y is not None and l._y[0] == y):
+                try:
+                    l.remove()
+                except:
+                    pass
 
     def remove_temp_rectangle(self):
         """
@@ -161,27 +202,32 @@ class MatplotlibComponent(PlotComponent):
 
     def remove_temp(self):
         """Removes all temporary items on the plotting."""
-        self.remove_temp_crosshairs()
         self.remove_temp_rectangle()
 
     def on_move(self, event):
         """Called when the mouse moves over the plotting."""
         self.cross_cursor(True)
-        x, y = self.xy(event)
-        if x and y:
-            self.pre_update()
-            if self.rect:
-                self.rect.set_corner(x, y)
-                self.draw_rect()
+        if self.mouse_zoom_enabled:
+            x, y = self.xy(event)
+            if x and y:
+                self.pre_update()
+                if self.rect:
+                    self.rect.set_corner(x, y)
+                    self.draw_rect()
 
-            self.update()
+                self.update()
 
     def on_click(self, event):
         """Called when the mouse clicks down on the plotting, but before the click is released."""
         if event.button == MouseButton.LEFT:
             x, y = self.xy(event)
             if x and y:
-                self.rect = Rect(x, y)
+                if self.mouse_zoom_enabled:
+                    self.rect = Rect(x, y)
+
+                if self.click_crosshair_enabled:
+                    self.draw_crosshair(x, y)
+
                 self.pre_update()
                 self.update()
 
@@ -190,7 +236,7 @@ class MatplotlibComponent(PlotComponent):
         if event.button == MouseButton.LEFT:
             x, y = self.xy(event)
             if x and y:
-                if self.rect:
+                if self.mouse_zoom_enabled and self.rect:
                     self.zoom_to(self.rect)
                     self.rect = None
 
@@ -232,6 +278,12 @@ class MatplotlibComponent(PlotComponent):
 
     def remove_zoom_listener(self, func):
         self.zoom_listeners.remove(func)
+
+    def add_crosshair_listener(self, func):
+        self.crosshair_listeners.append(func)
+
+    def remove_crosshair_listener(self, func):
+        self.crosshair_listeners.remove(func)
 
     def clear_rect_states(self):
         self.rect_stack.clear()
@@ -282,15 +334,20 @@ class MatplotlibComponent(PlotComponent):
         self.temp_patch = patches.Rectangle((x, y), width, height, edgecolor="red", fill=False, zorder=10)
         self.axes.add_patch(self.temp_patch)
 
-    def draw_lines(self, x, y):
+    def draw_crosshair(self, x, y):
         """Draws a horizontal and vertical line, intersecting at (x,y)."""
+        self.remove_crosshairs(all=False, max_count=self.max_crosshairs - 1)
+
         self.plot_hor(y)
         self.plot_ver(x)
+
+        for l in self.crosshair_listeners:
+            l(x, y)
 
     def plot_ver(self, x):
         """Plots a vertical line at a given x-value, and adds to the list of temporary plots."""
         line = self.ver_line(x)
-        self.temp_plots.append(line)
+        self.temp_lines.append(line)
 
     def ver_line(self, x):
         """Creates a vertical line at a given x-value."""
@@ -299,7 +356,7 @@ class MatplotlibComponent(PlotComponent):
     def plot_hor(self, y):
         """Plots a horizontal line at a given y-value, and adds to the list of temporary plots."""
         line = self.hor_line(y)
-        self.temp_plots.append(line)
+        self.temp_lines.append(line)
 
     def hor_line(self, y):
         """Creates a horizontal line at a given y-value."""

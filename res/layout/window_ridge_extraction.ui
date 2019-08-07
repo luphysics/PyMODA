@@ -271,7 +271,7 @@
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_3">
                 <item>
-                 <widget class="QListWidget" name="listWidget"/>
+                 <widget class="QListWidget" name="list_intervals"/>
                 </item>
                </layout>
               </widget>
