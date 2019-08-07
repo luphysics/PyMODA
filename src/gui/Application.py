@@ -17,6 +17,7 @@
 from PyQt5.QtWidgets import QApplication
 
 from gui.windows.phasecoherence.PCWindow import PCWindow
+from gui.windows.ridgeextraction.REWindow import REWindow
 from gui.windows.timefrequency.TFWindow import TFWindow
 from gui.windows.LauncherWindow import LauncherWindow
 
@@ -42,6 +43,10 @@ class Application(QApplication):
     def start_phase_coherence(self):
         """Opens the phase coherence window."""
         self.open_window(PCWindow)
+
+    def start_ridge_extraction(self):
+        """Opens the phase coherence window."""
+        self.open_window(REWindow)
 
     def open_window(self, WindowType):
         w = WindowType(self)

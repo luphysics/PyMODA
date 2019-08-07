@@ -13,27 +13,12 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-import numpy as np
+from gui.windows.ridgeextraction.REView import REView
+from gui.windows.timefrequency.TFPresenter import TFPresenter
 
-from gui.plotting.MatplotlibComponent import MatplotlibComponent
 
+class REPresenter(TFPresenter):
 
-class PreprocessPlot(MatplotlibComponent):
+    """
 
-    def plot(self, times: np.ndarray, original: np.ndarray, preprocessed: np.ndarray):
-        self.clear()
-        self.rect_stack.clear()
-
-        self.axes.autoscale(True)
-
-        width = 0.7
-        self.axes.plot(times, original, linewidth=width)
-        self.axes.plot(times, preprocessed, linewidth=width)
-
-        self.axes.legend(["Original", "Preprocessed"])
-
-        xlim = sorted((times[0], times[-1],))
-        self.axes.set_xlim(xlim)
-
-        self.axes.autoscale(False)
-        self.on_plot_complete()
+    """
