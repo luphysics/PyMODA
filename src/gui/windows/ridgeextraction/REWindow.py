@@ -18,6 +18,7 @@ from functools import partial
 from PyQt5.QtWidgets import QListWidget
 
 from data import resources
+from gui.windows.ridgeextraction.REPresenter import REPresenter
 from gui.windows.ridgeextraction.REView import REView
 from gui.windows.timefrequency.TFWindow import TFWindow
 from maths.utils import float_or_none
@@ -36,7 +37,7 @@ class REWindow(REView, TFWindow):
         self.is_marking_region = False
         self.most_recent_changed_freq = 0
 
-        super(REWindow, self).__init__(parent)
+        super(REWindow, self).__init__(parent, REPresenter(self))
 
     def init_ui(self):
         super(REWindow, self).init_ui()
@@ -45,11 +46,30 @@ class REWindow(REView, TFWindow):
         self.setup_btn_add_marked_region()
         self.setup_freq_boxes()
 
+        self.setup_btn_ridge_extraction()
+        self.setup_btn_filter()
+
         self.main_plot().set_max_crosshair_count(2)
         self.main_plot().add_crosshair_listener(self.on_crosshair_drawn)
 
+        self.get_button_calculate_single().hide()
+        self.set_ridge_filter_disabled(True)
+
     def get_layout_file(self) -> str:
         return resources.get("layout:window_ridge_extraction.ui")
+
+    def on_calculate_stopped(self):
+        super(REWindow, self).on_calculate_stopped()
+        self.get_button_calculate_single().hide()
+
+    def on_calculate_started(self):
+        super(REWindow, self).on_calculate_started()
+        self.set_ridge_filter_disabled(True)
+
+    def set_ridge_filter_disabled(self, disabled: bool):
+        buttons = (self.get_btn_filter(), self.get_btn_ridge_extraction())
+        for btn in buttons:
+            btn.setDisabled(disabled)
 
     def on_freq_region_updated(self):
         freq_tuple = self.get_freq_region()
@@ -118,7 +138,7 @@ class REWindow(REView, TFWindow):
         self.get_btn_mark_region().setText(self._mark_region_text)
 
     def mark_region(self, freq1, freq2):
-        l = self.get_intervals_list()
+        l = self.get_intervals_listwidget()
         l.addItem(f"{freq1}, {freq2}")
 
     def get_freq_region(self):
@@ -140,8 +160,18 @@ class REWindow(REView, TFWindow):
     def get_btn_add_region(self):
         return self.btn_add_region
 
-    def get_intervals_list(self) -> QListWidget:
+    def get_btn_filter(self):
+        return self.btn_filter
+
+    def get_btn_ridge_extraction(self):
+        return self.btn_ridges
+
+    def get_intervals_listwidget(self) -> QListWidget:
         return self.list_intervals
+
+    def get_intervals(self) -> list:
+        w = self.get_intervals_listwidget()
+        return [w.item(i).text() for i in range(w.count())]
 
     def setup_btn_mark_region(self):
         self.get_btn_mark_region().clicked.connect(self.on_mark_region_clicked)
@@ -157,3 +187,9 @@ class REWindow(REView, TFWindow):
 
         l1.textEdited.connect(partial(self.on_freq_text_edited, l1))
         l2.textEdited.connect(partial(self.on_freq_text_edited, l2))
+
+    def setup_btn_ridge_extraction(self):
+        self.get_btn_ridge_extraction().clicked.connect(self.presenter.on_ridge_extraction_clicked)
+
+    def setup_btn_filter(self):
+        self.get_btn_filter().clicked.connect(self.presenter.on_filter_clicked)

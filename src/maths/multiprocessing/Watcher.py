@@ -28,7 +28,7 @@ class Watcher:
     def __init__(self, window, queue, delay_seconds, on_result):
         """
         :param window: the QWindow from which the operation is being performed
-        :param queue: the queue which will be used to get the result from the other process
+        :param queue: the queues which will be used to get the result from the other process
         :param delay_seconds: the time between each consecutive check for a result
         :param on_result: a callback which should run on the main process/thread, taking
         the result of the operation
@@ -57,6 +57,6 @@ class Watcher:
     def check_result(self):
         """Check for a result from the other process."""
         if not self.queue.empty():
-            # print(f"Received items from queue at time: {time.time():.1f} seconds.")
+            # print(f"Received items from queues at time: {time.time():.1f} seconds.")
             self.stop()
             self.on_result(*self.queue.get())

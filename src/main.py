@@ -16,19 +16,13 @@
 
 import sys
 
-from utils import errorhandling, stdout_redirect, args
+from utils import errorhandling, stdout_redirect, args, cache
 from gui.Application import Application
-
-
-def main():
-    """Starts the application."""
-    app = Application(sys.argv)
-    app.exec()
-
 
 # The entry-point of the program.
 if __name__ == "__main__":
     args.parse_args()
     errorhandling.init()
     stdout_redirect.init()
-    main()
+
+    Application(sys.argv).exec()

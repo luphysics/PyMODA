@@ -33,6 +33,12 @@ class REView(TFView):
     def get_btn_add_region(self):
         pass
 
+    def get_btn_ridge_extraction(self):
+        pass
+
+    def get_btn_filter(self):
+        pass
+
     def setup_radio_stats_avg(self):
         """
         Override method from TFView to remove functionality

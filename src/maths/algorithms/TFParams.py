@@ -122,7 +122,7 @@ class TFParams:
 
 def create(signals, params_type=TFParams, **kwargs):
     """
-    Creates a TFParams object, taking the same **kwargs as
+    Creates a params object, taking the same **kwargs as
     the constructor. Any argument that is set to None - or not
     supplied at all - will cause the params object to use the default
     value for that argument.

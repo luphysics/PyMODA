@@ -27,7 +27,7 @@ from maths.multiprocessing.MPHelper import MPHelper
 
 class TFPresenter(BaseTFPresenter):
     """
-    The Presenter in control of the time-frequency window.
+    The presenter in control of the time-frequency window.
     """
 
     def get_total_tasks_count(self) -> int:
@@ -55,7 +55,7 @@ class TFPresenter(BaseTFPresenter):
         self.mp_handler.wft(
             params=params,
             window=self.view.get_window(),
-            on_result=self.on_calculation_completed)
+            on_result=self.on_transform_completed)
 
         log: bool = (params.transform == _wt)
         self.view.main_plot().set_log_scale(logarithmic=log)
@@ -65,7 +65,7 @@ class TFPresenter(BaseTFPresenter):
         self.view.update_progress(0, self.get_total_tasks_count())
         print("Started calculation...")
 
-    def on_calculation_completed(self, name, times, freq, values, ampl, powers, avg_ampl, avg_pow):
+    def on_transform_completed(self, name, times, freq, values, ampl, powers, avg_ampl, avg_pow):
         """Called when the calculation of the desired transform(s) is completed."""
         self.view.on_calculate_stopped()
 
@@ -84,9 +84,17 @@ class TFPresenter(BaseTFPresenter):
         self.on_task_completed(self.get_total_tasks_count())
 
         # Plot result if all signals finished.
-        if all([s.output_data.is_valid() for s in self.signals_calc]):
-            self.plot_output()
-            self.on_all_tasks_completed()
+        if self.all_transforms_completed():
+            self.on_all_transforms_completed()
+
+    def all_transforms_completed(self):
+        """Returns whether all transforms have been completed."""
+        return all([s.output_data.is_valid() for s in self.signals_calc])
+
+    def on_all_transforms_completed(self):
+        """Called when all transforms have been completed."""
+        self.plot_output()
+        self.on_all_tasks_completed()
 
     def get_values_to_plot(self, amplitude=None) -> tuple:
         """

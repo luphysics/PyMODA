@@ -24,6 +24,7 @@ from maths.SignalPairs import SignalPairs
 from maths.Signals import Signals
 from maths.TimeSeries import TimeSeries
 from maths.algorithms.PCParams import PCParams
+from maths.algorithms.REParams import REParams
 from maths.algorithms.TFParams import TFParams, _wft
 from maths.algorithms.surrogates import surrogate_calc
 from maths.algorithms.wpc import wpc, wphcoh
@@ -46,10 +47,9 @@ class MPHelper:
     """
 
     def __init__(self):
-        self.queue = []
+        self.queues = []
         self.processes = []
         self.watchers = []
-        self.on_stop = lambda: None
 
     def wft(self,
             params: TFParams,
@@ -72,7 +72,7 @@ class MPHelper:
 
         for time_series in signals:
             q = Queue()
-            self.queue.append(q)
+            self.queues.append(q)
 
             self.processes.append(
                 Process(target=_time_frequency, args=(q, time_series, params,))
@@ -97,7 +97,7 @@ class MPHelper:
 
         for i in range(signals.pair_count()):
             q = Queue()
-            self.queue.append(q)
+            self.queues.append(q)
 
             pair = signals.get_pair_by_index(i)
             self.processes.append(
@@ -111,6 +111,38 @@ class MPHelper:
         for watcher in self.watchers:
             watcher.start()
 
+    def ridge_extraction(self,
+                         num_transforms: int,
+                         frequencies: np.ndarray,
+                         fs: float,
+                         params: REParams,
+                         window: QWindow,
+                         on_result):
+        """
+        Performs ridge extraction on wavelet transforms.
+
+        :param wavelet_transforms: the wavelet transforms to perform ridge extraction on
+        :param frequencies: a 1d array of frequencies
+        :param fs: the sampling frequency
+        :return:
+        """
+        self.stop()
+
+        for i in range(num_transforms):
+            q = Queue()
+            self.queues.append(q)
+
+            self.processes.append(
+                Process(target=_ridge_extraction, args=(q, frequencies, fs, params))
+            )
+            self.watchers.append(Watcher(window, q, 0.5, on_result))
+
+        for p in self.processes:
+            p.start()
+
+        for w in self.watchers:
+            w.start()
+
     def stop(self):
         """
         Stops the tasks in progress. The MPHelper can be reused.
@@ -118,11 +150,21 @@ class MPHelper:
         Removes all items from the lists of processes, queues
         and watchers.
         """
-        self.on_stop()
         for i in range(len(self.processes)):
             terminate_tree(self.processes.pop())
             self.watchers.pop().stop()
-            self.queue.pop().close()
+            self.queues.pop().close()
+
+
+def _ridge_extraction(queue, frequencies, fs, params):
+    from maths.algorithms import ecurve
+
+    tfsupp, ecinfo, skel = ecurve.calculate(frequencies, fs, params)
+    queue.put((
+        tfsupp,
+        ecinfo,
+        skel
+    ))
 
 
 def _wt_surrogate_calc(queue, wt1, surrogate, params, index):
@@ -186,7 +228,7 @@ def _phase_coherence(queue, signal_pair, params: PCParams):
         tpc_surr = np.mean(tpc_surr, axis=0)
 
     # Put all results, including phase coherence and surrogates,
-    # in the queue to be returned to the GUI.
+    # in the queues to be returned to the GUI.
     queue.put((
         signal_pair,
         tpc,

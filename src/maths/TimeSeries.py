@@ -21,8 +21,10 @@ from maths.TFOutputData import TFOutputData
 class TimeSeries:
     """
     A time-series of data: a 1-dimensional series of recorded values,
-    with a frequency at which the data were recorded. The sampling frequency can be used
-    to calculate the time for each datum point in the series.
+    with a sampling frequency at which the data were recorded.
+
+    The sampling frequency can be used to calculate the time for
+    each datum point in the series.
     """
 
     def __init__(self, data, frequency=None, name=None):
@@ -48,7 +50,7 @@ class TimeSeries:
         of the time values.
         """
         self.frequency = freq
-        self.times = self.generate_times()
+        self.times = self._generate_times()
 
     def has_name(self):
         return self.name is not None
@@ -56,7 +58,7 @@ class TimeSeries:
     def has_times(self):
         return self.times is not None
 
-    def generate_times(self):
+    def _generate_times(self):
         """Generates the time values associated with the data."""
         times = np.empty(self.signal.shape, dtype=np.float)
         for i in range(0, len(self.signal)):

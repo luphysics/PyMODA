@@ -104,7 +104,7 @@
           <property name="title">
            <string>Log</string>
           </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="4,1">
+          <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="4,2">
            <property name="leftMargin">
             <number>6</number>
            </property>
@@ -133,6 +133,20 @@
                 <widget class="QPushButton" name="btn_calculate_single">
                  <property name="text">
                   <string>Transform Single</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="btn_ridges">
+                 <property name="text">
+                  <string>Extract Ridge(s)</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="btn_filter">
+                 <property name="text">
+                  <string>Bandpass Filter</string>
                  </property>
                 </widget>
                </item>
@@ -193,20 +207,18 @@
          </layout>
         </item>
         <item row="3" column="0">
-         <layout class="QVBoxLayout" name="advanced_options_section" stretch="4,0">
+         <layout class="QVBoxLayout" name="advanced_options_section" stretch="0,0">
           <item>
-           <layout class="QGridLayout" name="original_preprocessed_sig" rowstretch="2,9" columnstretch="0">
-            <item row="1" column="0">
-             <widget class="PreprocessPlot" name="plot_preproc" native="true"/>
-            </item>
-            <item row="0" column="0">
-             <widget class="QLabel" name="label_16">
-              <property name="text">
-               <string>Preproc Sig</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           <widget class="QGroupBox" name="groupBox">
+            <property name="title">
+             <string>Preprocessed Signal</string>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_11">
+             <item>
+              <widget class="PreprocessPlot" name="plot_preproc" native="true"/>
+             </item>
+            </layout>
+           </widget>
           </item>
           <item>
            <widget class="QGroupBox" name="groupBox_3">
