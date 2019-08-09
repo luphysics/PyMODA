@@ -16,9 +16,10 @@
 from functools import partial
 from typing import List, Tuple
 
-from PyQt5.QtWidgets import QListWidget
+from PyQt5.QtWidgets import QListWidget, QVBoxLayout
 
 from data import resources
+from gui.windows.ridgeextraction.REPlot import REPlot
 from gui.windows.ridgeextraction.REPresenter import REPresenter
 from gui.windows.ridgeextraction.REView import REView
 from gui.windows.timefrequency.TFWindow import TFWindow
@@ -137,6 +138,19 @@ class REWindow(REView, TFWindow):
         self.on_mark_region_finished()
 
         self.get_btn_mark_region().setText(self._mark_region_text)
+
+    def switch_to_three_plots(self):
+        layout: QVBoxLayout = self.get_plot_layout()
+        main = self.main_plot()
+
+        self.re_top = REPlot(self)
+        self.re_bottom = REPlot(self)
+
+        layout.insertWidget(0, self.re_top)
+        layout.addWidget(self.re_bottom)
+
+    def get_plot_layout(self):
+        return self.plot_layout
 
     def mark_region(self, freq1, freq2):
         l = self.get_intervals_listwidget()

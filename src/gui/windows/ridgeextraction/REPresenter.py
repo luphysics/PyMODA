@@ -34,6 +34,8 @@ class REPresenter(TFPresenter):
         self.view.set_ridge_filter_disabled(True)
         super(REPresenter, self).calculate(calculate_all)
 
+        self.view.switch_to_three_plots()
+
     def on_all_transforms_completed(self):
         super(REPresenter, self).on_all_transforms_completed()
 
@@ -76,6 +78,7 @@ class REPresenter(TFPresenter):
 
         interval = intervals[0]  # TODO: support multiple intervals.
         fmin, fmax = interval
+
         return create(
             signals=self.signals,
             params_type=REParams,

@@ -28,11 +28,11 @@
            <number>0</number>
           </property>
           <item row="1" column="0">
-           <layout class="QGridLayout" name="gridLayout_2">
+           <layout class="QVBoxLayout" name="plot_layout">
             <property name="spacing">
              <number>0</number>
             </property>
-            <item row="0" column="0">
+            <item>
              <widget class="ColorMeshPlot" name="plot_main" native="true"/>
             </item>
            </layout>
