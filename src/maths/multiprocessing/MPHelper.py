@@ -20,17 +20,18 @@ import numpy as np
 from PyQt5.QtGui import QWindow
 from multiprocess import Queue, Process
 
-from maths.SignalPairs import SignalPairs
-from maths.Signals import Signals
-from maths.TimeSeries import TimeSeries
-from maths.algorithms.PCParams import PCParams
-from maths.algorithms.REParams import REParams
-from maths.algorithms.TFParams import TFParams, _wft
+from maths.signals.SignalPairs import SignalPairs
+from maths.signals.Signals import Signals
+from maths.signals.TimeSeries import TimeSeries
+from maths.params.PCParams import PCParams
+from maths.params.REParams import REParams
+from maths.params.TFParams import TFParams, _wft
 from maths.algorithms.surrogates import surrogate_calc
 from maths.algorithms.wpc import wpc, wphcoh
 from maths.multiprocessing.Watcher import Watcher
 from maths.multiprocessing.mp_utils import terminate_tree
 from maths.utils import matlab_to_numpy
+from utils.cache import Cache
 
 
 class MPHelper:
@@ -112,7 +113,7 @@ class MPHelper:
             watcher.start()
 
     def ridge_extraction(self,
-                         num_transforms: int,
+                         transforms: np.ndarray,
                          frequencies: np.ndarray,
                          fs: float,
                          params: REParams,
@@ -128,12 +129,19 @@ class MPHelper:
         """
         self.stop()
 
-        for i in range(num_transforms):
+        cache = Cache()
+        signals = params.signals
+
+        for i in range(len(transforms)):
             q = Queue()
             self.queues.append(q)
 
+            wt = transforms[i]
+            cache_file = cache.save_data(cached_wt=wt, cached_freq=frequencies)
+            params.set_cache_file(cache_file)
+
             self.processes.append(
-                Process(target=_ridge_extraction, args=(q, frequencies, fs, params))
+                Process(target=_ridge_extraction, args=(q, signals[i], frequencies, fs, params))
             )
             self.watchers.append(Watcher(window, q, 0.5, on_result))
 
@@ -156,14 +164,16 @@ class MPHelper:
             self.queues.pop().close()
 
 
-def _ridge_extraction(queue, frequencies, fs, params):
+def _ridge_extraction(queue, signal, frequencies, fs, params):
     from maths.algorithms import ecurve
 
-    tfsupp, ecinfo, skel = ecurve.calculate(frequencies, fs, params)
+    tfsupp = ecurve.calculate(frequencies, fs, params)
+    result = matlab_to_numpy(tfsupp)
+
     queue.put((
-        tfsupp,
-        ecinfo,
-        skel
+        signal,
+        None,
+        result,
     ))
 
 

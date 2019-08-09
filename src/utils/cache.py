@@ -14,8 +14,14 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import os
+import shutil
 
 import scipy.io
+
+
+def clear():
+    c = Cache()
+    c.clear_all()
 
 
 class Cache:
@@ -42,13 +48,15 @@ class Cache:
         return os.listdir(self.cache)
 
     def generate_file_name(self, extension=".mat") -> str:
-        names = self.get_file_names()
+        # Names of existing files without file extensions.
+        names = [".".join(name.split(".")[:-1]) for name in self.get_file_names()]
+
         i = -1
         while True:
             i += 1
             n = self._name_template(i)
 
-            if i not in names:
+            if n not in names:
                 break
 
         return f"{n}{extension}"
@@ -56,11 +64,20 @@ class Cache:
     def get_path_to(self, file: str):
         return f"{self.cache}/{file}"
 
-    def save_data(self, data) -> str:
+    def save_data(self, **kwargs) -> str:
         name = self.generate_file_name()
         path = self.get_path_to(name)
-        scipy.io.savemat(path, data)
-        return name
+        scipy.io.savemat(path, kwargs)
+        return path
+
+    def clear_all(self):
+        """
+        Removes the cache folder and all its contents.
+
+        The cache folder will be recreated next time
+        Cache is instantiated.
+        """
+        shutil.rmtree(self.cache)
 
     @staticmethod
     def _name_template(index) -> str:

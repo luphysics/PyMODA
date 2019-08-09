@@ -24,8 +24,8 @@ class CentredWindow(BaseWindow):
     A window which opens at the centre of the screen.
     """
 
-    def __init__(self):
-        super(CentredWindow, self).__init__()
+    def __init__(self, application):
+        super(CentredWindow, self).__init__(application)
         self.centre()
 
     def centre(self):

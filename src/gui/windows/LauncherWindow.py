@@ -30,8 +30,7 @@ class LauncherWindow(CentredWindow):
     """
 
     def __init__(self, application):
-        self.application = application
-        super().__init__()
+        super().__init__(application)
 
     def init_ui(self):
         uic.loadUi(get("layout:window_launcher.ui"), self)

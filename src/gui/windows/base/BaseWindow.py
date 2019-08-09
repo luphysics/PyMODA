@@ -13,6 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from PyQt5 import QtGui
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMainWindow
 
@@ -25,7 +26,9 @@ class BaseWindow(QMainWindow, BaseUI):
     A base window which inherits from BaseUI.
     """
 
-    def __init__(self):
+    def __init__(self, application):
+        self.application = application
+
         super(BaseWindow, self).__init__()
         self.update_title()
         self.set_icon()
@@ -40,3 +43,7 @@ class BaseWindow(QMainWindow, BaseUI):
     def set_icon(self, img=resources.get("image:icon.svg")):
         icon = QIcon(img)
         self.setWindowIcon(icon)
+
+    def closeEvent(self, e: QtGui.QCloseEvent) -> None:
+        self.application.notify_close_event(self)
+        super(BaseWindow, self).closeEvent(e)

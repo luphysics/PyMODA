@@ -18,7 +18,7 @@
 DO NOT import this module in the main process, or it will break Linux support
 due to issues with the LD_LIBRARY_PATH.
 """
-from maths.algorithms.REParams import REParams
+from maths.params.REParams import REParams
 from utils import args
 
 # This must be above the matlab imports.
@@ -39,12 +39,12 @@ def calculate(freq, fs, params: REParams) -> tuple:
     safely in a new process.
     """
 
-    tfsupp, ecinfo, skel = package.ecurve(
+    tfsupp = package.ecurve(
         matlab.double([1]),
         matlab.double([1]),
         matlab.double([fs]),
         params.get(),
-        nargout=3
+        nargout=1
     )
 
-    return tfsupp, ecinfo, skel
+    return tfsupp

@@ -33,7 +33,9 @@ class TFOutputData:
                  overall_coherence=None,
                  phase_coherence=None,
                  phase_diff=None,
+                 tfsupp=None,
                  ):
+        self.tfsupp = tfsupp
         self.times = times
         self.values = values
         self.ampl = ampl
@@ -66,12 +68,16 @@ class TFOutputData:
         self.powers = None
         self.avg_ampl = None
         self.avg_pow = None
+        self.tfsupp = None
 
     def has_phase_coherence(self):
         return not (self.overall_coherence is None or len(self.freq) != len(self.overall_coherence))
 
     def has_surrogates(self):
         return self.surrogate_avg is not None
+
+    def has_ridge_data(self) -> bool:
+        return self.tfsupp is not None
 
     @staticmethod
     def empty():

@@ -19,10 +19,10 @@ from PyQt5.QtWidgets import QDialog, QListWidgetItem
 from gui.dialogs.FrequencyDialog import FrequencyDialog
 from gui.windows.base.analysis.BaseTFPresenter import BaseTFPresenter
 from gui.windows.phasecoherence.PCView import PCView
-from maths.SignalPairs import SignalPairs
-from maths.TFOutputData import TFOutputData
-from maths.algorithms.PCParams import PCParams
-from maths.algorithms.TFParams import TFParams, create
+from maths.signals.SignalPairs import SignalPairs
+from maths.signals.TFOutputData import TFOutputData
+from maths.params.PCParams import PCParams
+from maths.params.TFParams import create
 from maths.multiprocessing.MPHelper import MPHelper
 
 

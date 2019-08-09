@@ -16,7 +16,7 @@
 from typing import List
 
 from data.parsing.CSVParser import CSVParser
-from maths.TimeSeries import TimeSeries
+from maths.signals.TimeSeries import TimeSeries
 
 
 class Signals(list):

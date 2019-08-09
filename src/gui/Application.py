@@ -20,10 +20,12 @@ from gui.windows.phasecoherence.PCWindow import PCWindow
 from gui.windows.ridgeextraction.REWindow import REWindow
 from gui.windows.timefrequency.TFWindow import TFWindow
 from gui.windows.LauncherWindow import LauncherWindow
+from utils import cache
 
 
 class Application(QApplication):
     """The base application."""
+
     launcher_window = None
     windows = []
 
@@ -52,3 +54,12 @@ class Application(QApplication):
         w = WindowType(self)
         self.windows.append(w)
         w.show()
+
+    def notify_close_event(self, window):
+        try:
+            self.windows.remove(window)
+        except ValueError:
+            pass
+
+        if len(self.windows) == 0:
+            cache.clear()

@@ -14,6 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from functools import partial
+from typing import List, Tuple
 
 from PyQt5.QtWidgets import QListWidget
 
@@ -167,11 +168,20 @@ class REWindow(REView, TFWindow):
         return self.btn_ridges
 
     def get_intervals_listwidget(self) -> QListWidget:
+        """Gets the intervals list widget."""
         return self.list_intervals
 
-    def get_intervals(self) -> list:
+    def get_interval_strings(self) -> list:
+        """Gets the items from the intervals list widget as strings."""
         w = self.get_intervals_listwidget()
         return [w.item(i).text() for i in range(w.count())]
+
+    def get_interval_tuples(self) -> List[Tuple[float, ...]]:
+        """
+        Gets a list of tuples with length 2, each representing
+        a selected frequency range.
+        """
+        return [tuple([float(i) for i in s.split(",")]) for s in self.get_interval_strings()]
 
     def setup_btn_mark_region(self):
         self.get_btn_mark_region().clicked.connect(self.on_mark_region_clicked)

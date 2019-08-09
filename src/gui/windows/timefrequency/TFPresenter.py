@@ -17,10 +17,10 @@ from PyQt5.QtWidgets import QDialog, QListWidgetItem
 
 from gui.dialogs.FrequencyDialog import FrequencyDialog
 from gui.windows.base.analysis.BaseTFPresenter import BaseTFPresenter
-from maths.Signals import Signals
-from maths.TFOutputData import TFOutputData
-from maths.TimeSeries import TimeSeries
-from maths.algorithms.TFParams import TFParams, _wt, _wft, create
+from maths.signals.Signals import Signals
+from maths.signals.TFOutputData import TFOutputData
+from maths.signals.TimeSeries import TimeSeries
+from maths.params.TFParams import TFParams, _wt, _wft, create
 from maths.algorithms.preprocessing import preprocess
 from maths.multiprocessing.MPHelper import MPHelper
 

@@ -24,7 +24,7 @@ class MaximisedWindow(CentredWindow):
     by a command-line argument.
     """
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, application):
+        super().__init__(application)
         if args.maximise():
             self.showMaximized()

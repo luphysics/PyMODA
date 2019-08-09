@@ -18,7 +18,7 @@
 DO NOT import this module in the main process, or it will break Linux support
 due to issues with the LD_LIBRARY_PATH.
 """
-from maths.TimeSeries import TimeSeries
+from maths.signals.TimeSeries import TimeSeries
 from utils import args
 
 # This must be above the WT and matlab imports.

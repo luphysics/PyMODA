@@ -15,8 +15,8 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import itertools
 
-from maths.Signals import Signals, get_parser
-from maths.TimeSeries import TimeSeries
+from maths.signals.Signals import Signals, get_parser
+from maths.signals.TimeSeries import TimeSeries
 
 
 class SignalPairs(Signals):

@@ -16,9 +16,8 @@
 
 import numpy as np
 from numpy.random import permutation as randperm
-from time import time as t
 
-from maths.TimeSeries import TimeSeries
+from maths.signals.TimeSeries import TimeSeries
 
 _RP = "RP"
 _FT = "FT"
