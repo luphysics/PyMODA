@@ -52,10 +52,10 @@ class MPHelper:
         self.processes = []
         self.watchers = []
 
-    def wft(self,
-            params: TFParams,
-            window: QWindow,
-            on_result):
+    def transform(self,
+                  params: TFParams,
+                  window: QWindow,
+                  on_result):
         """
         Performs the windowed Fourier transform in another process, returning a result
         in the main process.
@@ -86,11 +86,11 @@ class MPHelper:
         for watcher in self.watchers:
             watcher.start()
 
-    def wpc(self,
-            signals: SignalPairs,
-            params: PCParams,
-            window: QWindow,
-            on_result):
+    def phase_coherence(self,
+                        signals: SignalPairs,
+                        params: PCParams,
+                        window: QWindow,
+                        on_result):
         """
         Calculates the wavelet phase coherence for pairs of signals.
         """
@@ -113,14 +113,12 @@ class MPHelper:
             watcher.start()
 
     def ridge_extraction(self,
-                         transforms: np.ndarray,
-                         frequencies: np.ndarray,
-                         fs: float,
                          params: REParams,
                          window: QWindow,
                          on_result):
         """
-        Performs ridge extraction on wavelet transforms.
+        Calculates transforms in required frequency interval,
+        and performs ridge extraction on transforms.
 
         :param wavelet_transforms: the wavelet transforms to perform ridge extraction on
         :param frequencies: a 1d array of frequencies
@@ -129,27 +127,20 @@ class MPHelper:
         """
         self.stop()
 
-        cache = Cache()
         signals = params.signals
+        num_transforms = len(signals)
 
-        for i in range(len(transforms)):
+        for i in range(num_transforms):
             q = Queue()
             self.queues.append(q)
 
-            wt = transforms[i]
-            cache_file = cache.save_data(cached_wt=wt, cached_freq=frequencies)
-            params.set_cache_file(cache_file)
-
             self.processes.append(
-                Process(target=_ridge_extraction, args=(q, signals[i], frequencies, fs, params))
+                Process(target=_ridge_extraction, args=(q, signals[i], params))
             )
             self.watchers.append(Watcher(window, q, 0.5, on_result))
 
-        for p in self.processes:
-            p.start()
-
-        for w in self.watchers:
-            w.start()
+        [p.start() for p in self.processes]
+        [w.start() for w in self.watchers]
 
     def stop(self):
         """
@@ -164,15 +155,48 @@ class MPHelper:
             self.queues.pop().close()
 
 
-def _ridge_extraction(queue, signal, frequencies, fs, params):
+def _ridge_extraction(queue, signal, params):
+    result = _time_frequency(None, signal, params)
+    _, times, frequencies, transform, _, _, _, _ = result
+
+    cache = Cache()
+    cache_file = cache.save_data(cached_wt=transform, cached_freq=frequencies)
+    params.set_cache_file(cache_file)
+
     from maths.algorithms import ecurve
 
-    tfsupp = ecurve.calculate(frequencies, fs, params)
+    tfsupp = ecurve.calculate(frequencies, params.fs, params)
+
+
+
     result = matlab_to_numpy(tfsupp)
 
+    amplitude = np.abs(transform)
+    powers = np.square(amplitude)
+
+    length = len(amplitude)
+
+    avg_ampl = np.empty(length, dtype=np.float64)
+    avg_pow = np.empty(length, dtype=np.float64)
+
+    for i in range(length):
+        arr = amplitude[i]
+        row = arr[np.isfinite(arr)]
+
+        avg_ampl[i] = np.mean(row)
+        avg_pow[i] = np.mean(np.square(row))
+
+    d = params.get()
     queue.put((
-        signal,
-        None,
+        signal.name,
+        times,
+        frequencies,
+        transform,
+        amplitude,
+        powers,
+        avg_ampl,
+        avg_pow,
+        (d["fmin"], d["fmax"]),
         result,
     ))
 
@@ -279,7 +303,7 @@ def _time_frequency(queue, time_series: TimeSeries, params: TFParams):
 
     print(f"Started putting items in queue at time: {time.time():.1f} seconds.")
 
-    queue.put((
+    out = (
         time_series.name,
         time_series.times,
         freq,
@@ -288,4 +312,9 @@ def _time_frequency(queue, time_series: TimeSeries, params: TFParams):
         power,
         avg_ampl,
         avg_pow,
-    ))
+    )
+
+    if queue:
+        queue.put(out)
+    else:
+        return out

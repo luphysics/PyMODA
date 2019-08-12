@@ -54,7 +54,7 @@ class PCPresenter(BaseTFPresenter):
         self.surrogates_enabled = self.view.get_surr_enabled()
 
         self.mp_handler = MPHelper()
-        self.mp_handler.wft(
+        self.mp_handler.transform(
             params=params,
             window=self.view.get_window(),
             on_result=self.on_transform_completed)
@@ -88,7 +88,7 @@ class PCPresenter(BaseTFPresenter):
 
     def calculate_phase_coherence(self):
         mp = self.mp_handler
-        mp.wpc(
+        mp.phase_coherence(
             self.signals_calc,
             params=self.get_params(all_signals=self.is_calculating_all),
             window=self.view.get_window(),

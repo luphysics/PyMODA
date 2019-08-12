@@ -16,6 +16,7 @@
 from functools import partial
 from typing import List, Tuple
 
+from PyQt5 import sip
 from PyQt5.QtWidgets import QListWidget, QVBoxLayout
 
 from data import resources
@@ -148,6 +149,22 @@ class REWindow(REView, TFWindow):
 
         layout.insertWidget(0, self.re_top)
         layout.addWidget(self.re_bottom)
+
+    def switch_to_single_plot(self):
+        layout = self.get_plot_layout()
+        for plot in (self.re_top, self.re_bottom):
+            layout.remove(plot)
+            plot.deleteLater()
+            sip.delete(plot)
+
+        self.re_top = None
+        self.re_bottom = None
+
+    def get_re_top_plot(self):
+        return self.re_top
+
+    def get_re_bottom_plot(self):
+        return self.re_bottom
 
     def get_plot_layout(self):
         return self.plot_layout

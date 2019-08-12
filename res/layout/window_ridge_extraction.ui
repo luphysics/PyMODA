@@ -23,7 +23,7 @@
          <number>10</number>
         </property>
         <item>
-         <layout class="QGridLayout" name="gridLayout" rowstretch="3,7" columnstretch="7,2">
+         <layout class="QGridLayout" name="gridLayout" rowstretch="4,10" columnstretch="7,2">
           <property name="verticalSpacing">
            <number>0</number>
           </property>
