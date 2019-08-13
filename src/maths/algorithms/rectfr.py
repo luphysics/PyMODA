@@ -30,7 +30,7 @@ import matlab
 package = rectfr.initialize()
 
 
-def calculate(freq, fs, params: REParams) -> tuple:
+def calculate(tfsupp, tfr, freq, wopt, params: REParams) -> tuple:
     """
     Extracts ridge curve from wavelet transform or windowed Fourier transform.
 
@@ -39,12 +39,12 @@ def calculate(freq, fs, params: REParams) -> tuple:
     safely in a new process.
     """
 
-    tfsupp = package.ecurve(
-        matlab.double([1]),
-        matlab.double([1]),
-        matlab.double([fs]),
+    iamp, iphi, ifreq, rtfsupp = package.rectfr(
+        tfsupp,
+        matlab.double(tfr.tolist()),  # Pass nothing; data is saved in cache.
+        matlab.double(freq.tolist()),  # Pass nothing; data is saved in cache.
         params.get(),
-        nargout=1
+        "direct",
     )
 
-    return tfsupp
+    return iamp, iphi, ifreq

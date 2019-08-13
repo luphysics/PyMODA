@@ -40,8 +40,8 @@ def calculate(freq, fs, params: REParams) -> tuple:
     """
 
     tfsupp = package.ecurve(
-        matlab.double([1]),
-        matlab.double([1]),
+        matlab.double([1]),  # Pass nothing; data is saved in cache.
+        matlab.double([1]),  # Pass nothing; data is saved in cache.
         matlab.double([fs]),
         params.get(),
         nargout=1

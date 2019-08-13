@@ -51,7 +51,7 @@ class TFOutputData:
         self.phase_diff = phase_diff
         self.surrogate_avg = None
 
-        self.tfsupp = tfsupp
+        self.iamp = tfsupp
         self.valid = True
 
     def is_valid(self):
@@ -71,7 +71,7 @@ class TFOutputData:
         self.powers = None
         self.avg_ampl = None
         self.avg_pow = None
-        self.tfsupp = None
+        self.iamp = None
         self.re_transform = None
 
     def has_phase_coherence(self):
@@ -81,7 +81,7 @@ class TFOutputData:
         return self.surrogate_avg is not None
 
     def has_ridge_data(self) -> bool:
-        return self.tfsupp is not None
+        return self.iamp is not None
 
     @staticmethod
     def empty():

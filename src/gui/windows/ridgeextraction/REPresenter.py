@@ -13,6 +13,8 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import time
+
 from gui.windows.ridgeextraction.REView import REView
 from gui.windows.timefrequency.TFPresenter import TFPresenter
 from maths.params.REParams import REParams
@@ -57,12 +59,15 @@ class REPresenter(TFPresenter):
 
     def on_ridge_completed(self, name, times, freq, values,
                            ampl, powers, avg_ampl, avg_pow,
-                           intervals, tfsupp):
+                           intervals, iamp, iphi, ifreq):
 
         sig = self.signals.get(name)
 
         d: TFOutputData = sig.output_data
-        d.tfsupp = tfsupp
+        d.iamp = iamp
+        d.iphi = iphi
+        d.ifreq = ifreq
+
         d.intervals = intervals
         d.transform = values
 
@@ -83,12 +88,15 @@ class REPresenter(TFPresenter):
         sig = self.get_selected_signal()
         data = sig.output_data
 
-        top, middle, bottom = data.tfsupp
         times = data.times
 
-        self.view.main_plot().plot(times, data.ampl, data.freq)
-        self.view.main_plot().plot_line(times, top)
-        # self.view.get_re_bottom_plot().plot(times, bottom)
+        main = self.view.main_plot()
+        main.plot(times, data.ampl, data.freq)
+        main.plot_line(times, data.ifreq)
+        main.update()
+
+        self.view.get_re_bottom_plot().plot(times, data.iphi)
+        self.view.get_re_top_plot().plot(times, data.iamp)
 
     def on_filter_clicked(self):
         print("Starting filtering...")

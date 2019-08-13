@@ -31,6 +31,7 @@ from maths.algorithms.wpc import wpc, wphcoh
 from maths.multiprocessing.Watcher import Watcher
 from maths.multiprocessing.mp_utils import terminate_tree
 from maths.utils import matlab_to_numpy
+from utils import args
 from utils.cache import Cache
 
 
@@ -155,21 +156,39 @@ class MPHelper:
             self.queues.pop().close()
 
 
-def _ridge_extraction(queue, signal, params):
-    result = _time_frequency(None, signal, params)
-    _, times, frequencies, transform, _, _, _, _ = result
+def _ridge_extraction(queue, signal: TimeSeries, params: REParams):
+    args.setup_matlab_runtime()
+    import ridge_extraction
+    import matlab
 
-    cache = Cache()
-    cache_file = cache.save_data(cached_wt=transform, cached_freq=frequencies)
-    params.set_cache_file(cache_file)
+    package = ridge_extraction.initialize()
 
-    from maths.algorithms import ecurve
+    d = params.get()
+    transform, freq, iamp, iphi, ifreq, filtered_signal = package.ridge_extraction(1,
+                                                                  matlab.double(signal.signal.tolist()),
+                                                                  params.fs,
+                                                                  d["fmin"],
+                                                                  d["fmax"],
+                                                                  d["CutEdges"],
+                                                                  d["Preprocess"],
+                                                                  d["Wavelet"],
+                                                                  nargout=6
+                                                                  )
 
-    tfsupp = ecurve.calculate(frequencies, params.fs, params)
+    transform = matlab_to_numpy(transform)
+    freq = matlab_to_numpy(freq)
 
+    iamp = matlab_to_numpy(iamp)
+    iamp = iamp.reshape(iamp.shape[1])
 
+    iphi = matlab_to_numpy(iphi)
+    iphi = iphi.reshape(iphi.shape[1])
 
-    result = matlab_to_numpy(tfsupp)
+    ifreq = matlab_to_numpy(ifreq)
+    ifreq = ifreq.reshape(ifreq.shape[1])
+
+    filtered_signal = matlab_to_numpy(filtered_signal)
+    filtered_signal = filtered_signal.reshape(filtered_signal.shape[1])
 
     amplitude = np.abs(transform)
     powers = np.square(amplitude)
@@ -189,15 +208,17 @@ def _ridge_extraction(queue, signal, params):
     d = params.get()
     queue.put((
         signal.name,
-        times,
-        frequencies,
+        signal.times,
+        freq,
         transform,
         amplitude,
         powers,
         avg_ampl,
         avg_pow,
         (d["fmin"], d["fmax"]),
-        result,
+        filtered_signal,
+        iphi,
+        ifreq,
     ))
 
 

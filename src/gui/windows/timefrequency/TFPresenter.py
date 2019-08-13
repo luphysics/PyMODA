@@ -195,6 +195,7 @@ class TFPresenter(BaseTFPresenter):
         self.view.plot_signal(self.get_selected_signal())
 
     def plot_preprocessed(self):
+        """Plots the preprocessed version of the signal."""
         sig = self.get_selected_signal()
         p = preprocess(sig.signal, sig.frequency, 0.2, 3)
         self.view.plot_preproc.plot(sig.times, sig.signal, p)
