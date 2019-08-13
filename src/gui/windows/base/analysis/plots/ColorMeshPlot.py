@@ -50,11 +50,14 @@ class ColorMeshPlot(MatplotlibComponent):
                                        cmap=self.colormap())
 
         self.apply_scale()
-        self.axes.set_title('STFT Magnitude')
+        # self.axes.set_title('STFT Magnitude')
         self.axes.autoscale(False)
         self.on_plot_complete()
 
         # self.colorbar()
+
+    def plot_line(self, times, values):
+        self.axes.plot(times, values)
 
     def colormap(self):
         file = resources.get("colours:colormap.csv")

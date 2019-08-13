@@ -34,8 +34,6 @@ class REPresenter(TFPresenter):
         self.view.set_ridge_filter_disabled(True)
         super(REPresenter, self).calculate(calculate_all)
 
-        self.view.switch_to_three_plots()
-
     def on_all_transforms_completed(self):
         super(REPresenter, self).on_all_transforms_completed()
 
@@ -51,24 +49,46 @@ class REPresenter(TFPresenter):
         transforms = [d.values for d in data]
         frequencies = data[0].freq
 
-        self.mp_handler.ridge_extraction(transforms,
-                                         frequencies,
-                                         self.signals.frequency,
-                                         self.get_re_params(),
+        self.view.switch_to_three_plots()
+
+        self.mp_handler.ridge_extraction(self.get_re_params(),
                                          self.view,
                                          self.on_ridge_completed)
 
-    def on_ridge_completed(self, signal: TimeSeries, intervals, tfsupp):
-        sig = self.signals.get(signal.name)
+    def on_ridge_completed(self, name, times, freq, values,
+                           ampl, powers, avg_ampl, avg_pow,
+                           intervals, tfsupp):
+
+        sig = self.signals.get(name)
 
         d: TFOutputData = sig.output_data
         d.tfsupp = tfsupp
+        d.intervals = intervals
+        d.transform = values
+
+        d.ampl = ampl
+        d.powers = powers
+
+        d.avg_ampl = avg_ampl
+        d.avg_pow = avg_pow
+
+        d.freq = freq
+        d.times = times
 
         if all([i.output_data.has_ridge_data() for i in self.signals]):
             self.on_all_ridge_completed()
 
     def on_all_ridge_completed(self):
         print("All ridge extraction completed.")
+        sig = self.get_selected_signal()
+        data = sig.output_data
+
+        top, middle, bottom = data.tfsupp
+        times = data.times
+
+        self.view.main_plot().plot(times, data.ampl, data.freq)
+        self.view.main_plot().plot_line(times, top)
+        # self.view.get_re_bottom_plot().plot(times, bottom)
 
     def on_filter_clicked(self):
         print("Starting filtering...")
@@ -82,4 +102,19 @@ class REPresenter(TFPresenter):
         return create(
             signals=self.signals,
             params_type=REParams,
+
+            fmin=fmin,
+            fmax=fmax,
+            f0=self.view.get_f0(),
+            fstep=self.view.get_fstep(),
+            padding=self.view.get_padding(),
+
+            # Only one of these two will be used, depending on the selected transform.
+            window=self.view.get_wt_wft_type(),
+            wavelet=self.view.get_wt_wft_type(),
+
+            rel_tolerance=self.view.get_rel_tolerance(),
+            cut_edges=self.view.get_cut_edges(),
+            preprocess=self.view.get_preprocess(),
+            transform=self.view.get_transform_type(),
         )

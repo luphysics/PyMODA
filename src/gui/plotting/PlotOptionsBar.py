@@ -42,7 +42,7 @@ class PlotOptionsBar(QWidget, BaseUI):
         self.back_button = BackButton()
         self.layout.addWidget(self.back_button)
 
-        self.setFixedHeight(40)
+        self.setFixedHeight(60)
         self.setFixedWidth(240)
 
         self.create_progressbar()

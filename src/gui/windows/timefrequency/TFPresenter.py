@@ -52,7 +52,7 @@ class TFPresenter(BaseTFPresenter):
         self.invalidate_data()
 
         self.mp_handler = MPHelper()
-        self.mp_handler.wft(
+        self.mp_handler.transform(
             params=params,
             window=self.view.get_window(),
             on_result=self.on_transform_completed)

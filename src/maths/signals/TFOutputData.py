@@ -35,20 +35,23 @@ class TFOutputData:
                  phase_diff=None,
                  tfsupp=None,
                  ):
-        self.tfsupp = tfsupp
         self.times = times
+        self.transform = transform
         self.values = values
+
         self.ampl = ampl
         self.freq = freq
         self.powers = powers
+
         self.avg_ampl = avg_ampl
         self.avg_pow = avg_pow
-        self.transform = transform
+
         self.overall_coherence = overall_coherence
         self.phase_coherence = phase_coherence
         self.phase_diff = phase_diff
         self.surrogate_avg = None
 
+        self.tfsupp = tfsupp
         self.valid = True
 
     def is_valid(self):
@@ -69,6 +72,7 @@ class TFOutputData:
         self.avg_ampl = None
         self.avg_pow = None
         self.tfsupp = None
+        self.re_transform = None
 
     def has_phase_coherence(self):
         return not (self.overall_coherence is None or len(self.freq) != len(self.overall_coherence))
@@ -84,4 +88,4 @@ class TFOutputData:
         """
         Creates an instance of this class with only empty lists as data.
         """
-        return TFOutputData(*[[] for _ in range(7)])
+        return TFOutputData(*[[] for _ in range(8)])
