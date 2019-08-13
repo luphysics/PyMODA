@@ -32,7 +32,7 @@ class PCWindow(BaseTFWindow, PCView):
 
     def __init__(self, application: Application):
         PCView.__init__(self, application, PCPresenter(self))
-        BaseTFWindow.__init__(self)
+        BaseTFWindow.__init__(self, application)
 
     def init_ui(self):
         super().init_ui()
