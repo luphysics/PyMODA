@@ -20,6 +20,7 @@ from maths.params.REParams import REParams
 from maths.params.TFParams import create
 
 from maths.signals.TFOutputData import TFOutputData
+from maths.signals.TimeSeries import TimeSeries
 
 
 class REPresenter(TFPresenter):
@@ -94,17 +95,27 @@ class REPresenter(TFPresenter):
     def plot_ridge_data(self, data: TFOutputData):
         times = data.times
         filtered, freq, phi = data.get_ridge_data(self.view.get_selected_interval())
+
+        self.triple_plot(times, filtered, freq, phi)
+
+    def plot_band_data(self, data: TFOutputData):
+        times = data.times
+        bands, amp, phi = data.get_band_data(self.view.get_selected_interval())
+
+        self.triple_plot(times, bands, amp, phi)
+
+    def triple_plot(self, x, top_y, middle_y, bottom_y):
         main = self.view.main_plot()
-        main.plot_line(times, freq)
+        main.plot_line(x, middle_y)
         main.update()
 
         top = self.view.get_re_top_plot()
         top.clear()
-        top.plot(times, filtered)
+        top.plot(x, top_y)
 
         bottom = self.view.get_re_bottom_plot()
         bottom.clear()
-        bottom.plot(times, phi)
+        bottom.plot(x, bottom_y)
 
     def on_signal_selected(self, item):
         super().on_signal_selected(item)
@@ -117,6 +128,31 @@ class REPresenter(TFPresenter):
 
     def on_filter_clicked(self):
         print("Starting filtering...")
+
+        self.mp_handler.bandpass_filter(
+            self.signals,
+            self.view.get_interval_tuples(),
+            self.view,
+            self.on_filter_completed
+        )
+
+    def on_filter_completed(self, name, bands, phase, amp, interval):
+        d: TFOutputData = self.signals.get(name)
+        d.set_band_data(interval, bands, phase, amp)
+
+        if all([i.output_data.has_band_data() for i in self.signals]):
+            self.on_all_filter_completed()
+
+    def on_all_filter_completed(self):
+        print("All bandpass filtering completed.")
+        sig = self.get_selected_signal()
+        data = sig.output_data
+
+        times = data.times
+
+        main = self.view.main_plot()
+        main.plot(times, data.ampl, data.freq)
+        self.plot_band_data(data)
 
     def get_re_params(self) -> REParams:
         return create(

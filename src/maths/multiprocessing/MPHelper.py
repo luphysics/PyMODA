@@ -19,7 +19,9 @@ import time
 import numpy as np
 from PyQt5.QtGui import QWindow
 from multiprocess import Queue, Process
+from scipy.signal import hilbert
 
+from maths.algorithms.loop_butter import loop_butter
 from maths.signals.SignalPairs import SignalPairs
 from maths.signals.Signals import Signals
 from maths.signals.TimeSeries import TimeSeries
@@ -149,6 +151,29 @@ class MPHelper:
         [p.start() for p in self.processes]
         [w.start() for w in self.watchers]
 
+    def bandpass_filter(self,
+                        signals: Signals,
+                        intervals: tuple,
+                        window: QWindow,
+                        on_result):
+
+        self.stop()
+
+        for s in signals:
+            fs = s.frequency
+            for i in range(len(intervals)):
+                q = Queue()
+                self.queues.append(q)
+
+                fmin, fmax = intervals[i]
+                self.processes.append(
+                    Process(target=_bandpass_filter, args=(q, s, fmin, fmax, fs))
+                )
+                self.watchers.append(Watcher(window, q, 0.5, on_result))
+
+        [p.start() for p in self.processes]
+        [w.start() for w in self.watchers]
+
     def stop(self):
         """
         Stops the tasks in progress. The MPHelper can be reused.
@@ -162,7 +187,23 @@ class MPHelper:
             self.queues.pop().close()
 
 
-def _ridge_extraction(queue, signal: TimeSeries, params: REParams):
+def _bandpass_filter(queue, time_series: TimeSeries, fmin, fmax, fs):
+    bands, _ = loop_butter(time_series.signal, fmin, fmax, fs)
+    h = hilbert(bands)
+
+    phase = np.angle(h)
+    amp = np.abs(h)
+
+    queue.put((
+        time_series.name,
+        bands,
+        phase,
+        amp,
+        (fmin, fmax),
+    ))
+
+
+def _ridge_extraction(queue, time_series: TimeSeries, params: REParams):
     args.setup_matlab_runtime()
     import ridge_extraction
     import matlab
@@ -172,7 +213,7 @@ def _ridge_extraction(queue, signal: TimeSeries, params: REParams):
     d = params.get()
     transform, freq, iamp, iphi, ifreq, filtered_signal = package.ridge_extraction(1,
                                                                                    matlab.double(
-                                                                                       signal.signal.tolist()),
+                                                                                       time_series.signal.tolist()),
                                                                                    params.fs,
                                                                                    d["fmin"],
                                                                                    d["fmax"],
@@ -213,8 +254,8 @@ def _ridge_extraction(queue, signal: TimeSeries, params: REParams):
         avg_pow[i] = np.mean(np.square(row))
 
     queue.put((
-        signal.name,
-        signal.times,
+        time_series.name,
+        time_series.times,
         freq,
         transform,
         amplitude,

@@ -232,7 +232,8 @@ class REWindow(REView, TFWindow):
         Gets a list of tuples with length 2, each representing
         a selected frequency range.
         """
-        return [tuple([float(i) for i in s.split(",")]) for s in self.get_interval_strings()]
+        strings = filter(lambda i: "None" not in i, self.get_interval_strings())
+        return [tuple([float(i) for i in s.split(",")]) for s in strings]
 
     def get_selected_interval(self):
         l: QListWidget = self.get_intervals_listwidget()
