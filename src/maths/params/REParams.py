@@ -36,7 +36,8 @@ class REParams(TFParams):
                  normalize=False,
                  path_opt=True,
                  max_iterations=20,
-                 cache_file=None
+                 cache_file=None,
+                 intervals=None
                  ):
         super().__init__(signals,
                          fmin,
@@ -50,6 +51,8 @@ class REParams(TFParams):
                          preprocess,
                          rel_tolerance,
                          transform)
+
+        self.intervals = intervals
 
         # Add params not used in TFParams.
         self.data["Method"] = method

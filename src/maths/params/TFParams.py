@@ -109,6 +109,12 @@ class TFParams:
 
         return self.data
 
+    def set_item(self, key, value):
+        self.data[key] = value
+
+    def get_item(self, key):
+        return self.data.get(key)
+
     def remove_signals(self):
         """
         Remove the signals parameter, since it is expensive to

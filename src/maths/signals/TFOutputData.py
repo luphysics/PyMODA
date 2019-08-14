@@ -33,7 +33,6 @@ class TFOutputData:
                  overall_coherence=None,
                  phase_coherence=None,
                  phase_diff=None,
-                 tfsupp=None,
                  ):
         self.times = times
         self.transform = transform
@@ -51,7 +50,8 @@ class TFOutputData:
         self.phase_diff = phase_diff
         self.surrogate_avg = None
 
-        self.iamp = tfsupp
+        self.filtered_signal = None
+        self.ridge_data = {}
         self.valid = True
 
     def is_valid(self):
@@ -71,8 +71,9 @@ class TFOutputData:
         self.powers = None
         self.avg_ampl = None
         self.avg_pow = None
-        self.iamp = None
+        self.filtered_signal = None
         self.re_transform = None
+        self.ridge_data = {}
 
     def has_phase_coherence(self):
         return not (self.overall_coherence is None or len(self.freq) != len(self.overall_coherence))
@@ -81,11 +82,18 @@ class TFOutputData:
         return self.surrogate_avg is not None
 
     def has_ridge_data(self) -> bool:
-        return self.iamp is not None
+        return len(self.ridge_data.keys()) > 0
+
+    def set_ridge_data(self, intervals: tuple, filtered, freq, phi):
+        self.ridge_data[intervals] = (filtered, freq, phi)
+
+    def get_ridge_data(self, interval: tuple):
+        data = self.ridge_data.get(interval)
+        return data
 
     @staticmethod
     def empty():
         """
         Creates an instance of this class with only empty lists as data.
         """
-        return TFOutputData(*[[] for _ in range(8)])
+        return TFOutputData(*[[] for _ in range(7)])

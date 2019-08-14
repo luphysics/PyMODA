@@ -25,7 +25,7 @@ from maths.signals.Signals import Signals
 from maths.signals.TimeSeries import TimeSeries
 from maths.params.PCParams import PCParams
 from maths.params.REParams import REParams
-from maths.params.TFParams import TFParams, _wft
+from maths.params.TFParams import TFParams, _wft, _fmin, _fmax
 from maths.algorithms.surrogates import surrogate_calc
 from maths.algorithms.wpc import wpc, wphcoh
 from maths.multiprocessing.Watcher import Watcher
@@ -130,15 +130,21 @@ class MPHelper:
 
         signals = params.signals
         num_transforms = len(signals)
+        intervals = params.intervals
 
         for i in range(num_transforms):
-            q = Queue()
-            self.queues.append(q)
+            for j in range(len(intervals)):
+                fmin, fmax = intervals[j]
+                params.set_item(_fmin, fmin)
+                params.set_item(_fmax, fmax)
 
-            self.processes.append(
-                Process(target=_ridge_extraction, args=(q, signals[i], params))
-            )
-            self.watchers.append(Watcher(window, q, 0.5, on_result))
+                q = Queue()
+                self.queues.append(q)
+
+                self.processes.append(
+                    Process(target=_ridge_extraction, args=(q, signals[i], params))
+                )
+                self.watchers.append(Watcher(window, q, 0.5, on_result))
 
         [p.start() for p in self.processes]
         [w.start() for w in self.watchers]
@@ -165,15 +171,16 @@ def _ridge_extraction(queue, signal: TimeSeries, params: REParams):
 
     d = params.get()
     transform, freq, iamp, iphi, ifreq, filtered_signal = package.ridge_extraction(1,
-                                                                  matlab.double(signal.signal.tolist()),
-                                                                  params.fs,
-                                                                  d["fmin"],
-                                                                  d["fmax"],
-                                                                  d["CutEdges"],
-                                                                  d["Preprocess"],
-                                                                  d["Wavelet"],
-                                                                  nargout=6
-                                                                  )
+                                                                                   matlab.double(
+                                                                                       signal.signal.tolist()),
+                                                                                   params.fs,
+                                                                                   d["fmin"],
+                                                                                   d["fmax"],
+                                                                                   d["CutEdges"],
+                                                                                   d["Preprocess"],
+                                                                                   d["Wavelet"],
+                                                                                   nargout=6
+                                                                                   )
 
     transform = matlab_to_numpy(transform)
     freq = matlab_to_numpy(freq)
@@ -205,7 +212,6 @@ def _ridge_extraction(queue, signal: TimeSeries, params: REParams):
         avg_ampl[i] = np.mean(row)
         avg_pow[i] = np.mean(np.square(row))
 
-    d = params.get()
     queue.put((
         signal.name,
         signal.times,

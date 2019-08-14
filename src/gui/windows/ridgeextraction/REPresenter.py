@@ -13,7 +13,6 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-import time
 
 from gui.windows.ridgeextraction.REView import REView
 from gui.windows.timefrequency.TFPresenter import TFPresenter
@@ -21,7 +20,6 @@ from maths.params.REParams import REParams
 from maths.params.TFParams import create
 
 from maths.signals.TFOutputData import TFOutputData
-from maths.signals.TimeSeries import TimeSeries
 
 
 class REPresenter(TFPresenter):
@@ -34,6 +32,7 @@ class REPresenter(TFPresenter):
 
     def calculate(self, calculate_all: bool):
         self.view.set_ridge_filter_disabled(True)
+        self.view.switch_to_single_plot()
         super(REPresenter, self).calculate(calculate_all)
 
     def on_all_transforms_completed(self):
@@ -47,28 +46,26 @@ class REPresenter(TFPresenter):
             raise Exception("At least one interval must be specified for ridge extraction.")
 
         print("Starting ridge extraction...")
-        data = [s.output_data for s in self.signals]
-        transforms = [d.values for d in data]
-        frequencies = data[0].freq
-
+        self.view.clear_all()
         self.view.switch_to_three_plots()
 
         self.mp_handler.ridge_extraction(self.get_re_params(),
                                          self.view,
                                          self.on_ridge_completed)
 
-    def on_ridge_completed(self, name, times, freq, values,
-                           ampl, powers, avg_ampl, avg_pow,
-                           intervals, iamp, iphi, ifreq):
+    def on_ridge_completed(self, name,
+                           times, freq, values,
+                           ampl, powers,
+                           avg_ampl, avg_pow,
+                           interval,
+                           filtered_signal, iphi, ifreq,
+                           ):
 
         sig = self.signals.get(name)
 
         d: TFOutputData = sig.output_data
-        d.iamp = iamp
-        d.iphi = iphi
-        d.ifreq = ifreq
 
-        d.intervals = intervals
+        d.set_ridge_data(interval, filtered_signal, ifreq, iphi)
         d.transform = values
 
         d.ampl = ampl
@@ -92,27 +89,43 @@ class REPresenter(TFPresenter):
 
         main = self.view.main_plot()
         main.plot(times, data.ampl, data.freq)
-        main.plot_line(times, data.ifreq)
+        self.plot_ridge_data(data)
+
+    def plot_ridge_data(self, data: TFOutputData):
+        times = data.times
+        filtered, freq, phi = data.get_ridge_data(self.view.get_selected_interval())
+        main = self.view.main_plot()
+        main.plot_line(times, freq)
         main.update()
 
-        self.view.get_re_bottom_plot().plot(times, data.iphi)
-        self.view.get_re_top_plot().plot(times, data.iamp)
+        top = self.view.get_re_top_plot()
+        top.clear()
+        top.plot(times, filtered)
+
+        bottom = self.view.get_re_bottom_plot()
+        bottom.clear()
+        bottom.plot(times, phi)
+
+    def on_signal_selected(self, item):
+        super().on_signal_selected(item)
+
+        data = self.get_selected_signal().output_data
+        if data.has_ridge_data():
+            _, freq, _ = data.get_ridge_data(self.view.get_selected_interval())
+            if freq is not None and len(freq) > 0:
+                self.plot_ridge_data(data)
 
     def on_filter_clicked(self):
         print("Starting filtering...")
 
     def get_re_params(self) -> REParams:
-        intervals = self.view.get_interval_tuples()
-
-        interval = intervals[0]  # TODO: support multiple intervals.
-        fmin, fmax = interval
-
         return create(
             signals=self.signals,
             params_type=REParams,
+            intervals=self.view.get_interval_tuples(),
 
-            fmin=fmin,
-            fmax=fmax,
+            # fmin=fmin,
+            # fmax=fmax,
             f0=self.view.get_f0(),
             fstep=self.view.get_fstep(),
             padding=self.view.get_padding(),

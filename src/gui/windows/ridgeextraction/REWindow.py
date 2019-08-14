@@ -39,6 +39,10 @@ class REWindow(REView, TFWindow):
     def __init__(self, parent):
         self.is_marking_region = False
         self.most_recent_changed_freq = 0
+        self.single_plot_mode = True
+
+        self.re_top = None
+        self.re_bottom = None
 
         super(REWindow, self).__init__(parent, REPresenter(self))
 
@@ -141,8 +145,10 @@ class REWindow(REView, TFWindow):
         self.get_btn_mark_region().setText(self._mark_region_text)
 
     def switch_to_three_plots(self):
+        if not self.single_plot_mode:
+            return
+
         layout: QVBoxLayout = self.get_plot_layout()
-        main = self.main_plot()
 
         self.re_top = REPlot(self)
         self.re_bottom = REPlot(self)
@@ -150,15 +156,23 @@ class REWindow(REView, TFWindow):
         layout.insertWidget(0, self.re_top)
         layout.addWidget(self.re_bottom)
 
+        self.single_plot_mode = False
+
     def switch_to_single_plot(self):
+        if self.single_plot_mode:
+            return
+
         layout = self.get_plot_layout()
         for plot in (self.re_top, self.re_bottom):
-            layout.remove(plot)
-            plot.deleteLater()
-            sip.delete(plot)
+            if plot is not None:
+                layout.removeWidget(plot)
+                plot.deleteLater()
+                sip.delete(plot)
 
         self.re_top = None
         self.re_bottom = None
+
+        self.single_plot_mode = True
 
     def get_re_top_plot(self):
         return self.re_top
@@ -169,9 +183,15 @@ class REWindow(REView, TFWindow):
     def get_plot_layout(self):
         return self.plot_layout
 
+    def clear_all(self):
+        for plot in (self.re_top, self.re_bottom, self.main_plot()):
+            if plot is not None:
+                plot.clear()
+
     def mark_region(self, freq1, freq2):
-        l = self.get_intervals_listwidget()
+        l: QListWidget = self.get_intervals_listwidget()
         l.addItem(f"{freq1}, {freq2}")
+        l.setCurrentRow(l.count() - 1)
 
     def get_freq_region(self):
         l1 = self.line_freq1.text()
@@ -213,6 +233,13 @@ class REWindow(REView, TFWindow):
         a selected frequency range.
         """
         return [tuple([float(i) for i in s.split(",")]) for s in self.get_interval_strings()]
+
+    def get_selected_interval(self):
+        l: QListWidget = self.get_intervals_listwidget()
+        indices = l.selectedIndexes()
+        if indices:
+            return self.get_interval_tuples()[indices[0].row()]
+        return None
 
     def setup_btn_mark_region(self):
         self.get_btn_mark_region().clicked.connect(self.on_mark_region_clicked)
