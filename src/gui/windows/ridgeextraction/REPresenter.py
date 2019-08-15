@@ -100,7 +100,7 @@ class REPresenter(TFPresenter):
 
     def plot_band_data(self, data: TFOutputData):
         times = data.times
-        bands, amp, phi = data.get_band_data(self.view.get_selected_interval())
+        bands, phi, amp = data.get_band_data(self.view.get_selected_interval())
 
         self.triple_plot(times, bands, amp, phi)
 
@@ -137,21 +137,21 @@ class REPresenter(TFPresenter):
         )
 
     def on_filter_completed(self, name, bands, phase, amp, interval):
-        d: TFOutputData = self.signals.get(name)
+        d: TFOutputData = self.signals.get(name).output_data
         d.set_band_data(interval, bands, phase, amp)
 
         if all([i.output_data.has_band_data() for i in self.signals]):
             self.on_all_filter_completed()
 
     def on_all_filter_completed(self):
+        self.view.switch_to_three_plots()
         print("All bandpass filtering completed.")
+
         sig = self.get_selected_signal()
         data = sig.output_data
 
-        times = data.times
-
         main = self.view.main_plot()
-        main.plot(times, data.ampl, data.freq)
+        main.clear()
         self.plot_band_data(data)
 
     def get_re_params(self) -> REParams:

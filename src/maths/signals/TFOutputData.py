@@ -106,7 +106,7 @@ class TFOutputData:
         return len(self.band_data.keys()) > 0
 
     def set_band_data(self, interval: tuple, band, phase, amp):
-        self.ridge_data[interval] = (band, phase, amp,)
+        self.band_data[interval] = (band, phase, amp,)
 
     def get_band_data(self, interval: tuple) -> tuple:
         return self.band_data.get(interval)

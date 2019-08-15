@@ -57,6 +57,5 @@ class Watcher:
     def check_result(self):
         """Check for a result from the other process."""
         if not self.queue.empty():
-            # print(f"Received items from queues at time: {time.time():.1f} seconds.")
             self.stop()
             self.on_result(*self.queue.get())

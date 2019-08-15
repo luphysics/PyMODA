@@ -22,19 +22,18 @@ from multiprocess import Queue, Process
 from scipy.signal import hilbert
 
 from maths.algorithms.loop_butter import loop_butter
-from maths.signals.SignalPairs import SignalPairs
-from maths.signals.Signals import Signals
-from maths.signals.TimeSeries import TimeSeries
-from maths.params.PCParams import PCParams
-from maths.params.REParams import REParams
-from maths.params.TFParams import TFParams, _wft, _fmin, _fmax
 from maths.algorithms.surrogates import surrogate_calc
 from maths.algorithms.wpc import wpc, wphcoh
 from maths.multiprocessing.Watcher import Watcher
 from maths.multiprocessing.mp_utils import terminate_tree
+from maths.params.PCParams import PCParams
+from maths.params.REParams import REParams
+from maths.params.TFParams import TFParams, _wft, _fmin, _fmax
+from maths.signals.SignalPairs import SignalPairs
+from maths.signals.Signals import Signals
+from maths.signals.TimeSeries import TimeSeries
 from maths.utils import matlab_to_numpy
 from utils import args
-from utils.cache import Cache
 
 
 class MPHelper:

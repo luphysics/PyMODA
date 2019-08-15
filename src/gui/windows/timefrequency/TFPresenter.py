@@ -197,7 +197,11 @@ class TFPresenter(BaseTFPresenter):
     def plot_preprocessed(self):
         """Plots the preprocessed version of the signal."""
         sig = self.get_selected_signal()
-        p = preprocess(sig.signal, sig.frequency, 0.2, 3)
+
+        fmin = self.view.get_fmin()
+        fmax = self.view.get_fmax()
+
+        p = preprocess(sig.signal, sig.frequency, fmin, fmax)
         self.view.plot_preproc.plot(sig.times, sig.signal, p)
 
     def on_data_loaded(self):

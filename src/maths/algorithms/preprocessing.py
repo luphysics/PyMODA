@@ -16,7 +16,7 @@
 import numpy as np
 
 
-def preprocess(sig, fs, fmin, fmax) -> np.ndarray:
+def preprocess(sig: np.ndarray, fs: float, fmin: float, fmax: float) -> np.ndarray:
     L = len(sig)
 
     # Detrending
@@ -40,9 +40,15 @@ def preprocess(sig, fs, fmin, fmax) -> np.ndarray:
     ]) * fs / L
     ff = ff.reshape(len(ff), 1)
 
+    abs_ff = np.abs(ff)
+    if fmin is None:
+        fmin = fs / L  # Avoid error calculating cutoff and ind1.
+    if fmax is None:
+        fmax = np.max(abs_ff) + 1  # Avoid error calculating ind2.
+
     cutoff = np.max([fmin, fs / L])
-    ind1 = np.nonzero(np.abs(ff) <= cutoff)
-    ind2 = np.nonzero(np.abs(ff) >= fmax)
+    ind1 = np.nonzero(abs_ff <= cutoff)
+    ind2 = np.nonzero(abs_ff >= fmax)
 
     fx[ind1] = 0
     fx[ind2] = 0

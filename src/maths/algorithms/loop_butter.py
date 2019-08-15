@@ -21,7 +21,7 @@ def bandpass_butter(c, n, flp, fhi, fs):
     fnq = fs / 2
 
     Wn = np.asarray([flp / fnq, fhi / fnq])
-    b, a = butter(n, Wn)
+    b, a = butter(n, Wn, btype="bandpass")
 
     return filtfilt(b, a, c)
 
