@@ -56,8 +56,10 @@ class ColorMeshPlot(MatplotlibComponent):
 
         # self.colorbar()
 
-    def plot_line(self, times, values):
-        self.axes.plot(times, values, "#00ccff")
+    def plot_line(self, times, values, xlim=False):
+        self.axes.plot(times, values, "#00ccff", linewidth=0.8)
+        if xlim:
+            self.set_xrange(times[0], times[-1])
 
     def colormap(self):
         file = resources.get("colours:colormap.csv")

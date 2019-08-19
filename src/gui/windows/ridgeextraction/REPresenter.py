@@ -100,13 +100,16 @@ class REPresenter(TFPresenter):
 
     def plot_band_data(self, data: TFOutputData):
         times = data.times
-        bands, phi, amp = data.get_band_data(self.view.get_selected_interval())
+        band_data = data.get_band_data(self.view.get_selected_interval())
 
-        self.triple_plot(times, bands, amp, phi)
+        if band_data:
+            bands, phi, amp = band_data
+            self.triple_plot(times, bands, amp, phi)
 
     def triple_plot(self, x, top_y, middle_y, bottom_y):
         main = self.view.main_plot()
-        main.plot_line(x, middle_y)
+        main.clear()
+        main.plot_line(x, middle_y, xlim=True)
         main.update()
 
         top = self.view.get_re_top_plot()
@@ -125,6 +128,14 @@ class REPresenter(TFPresenter):
             _, freq, _ = data.get_ridge_data(self.view.get_selected_interval())
             if freq is not None and len(freq) > 0:
                 self.plot_ridge_data(data)
+
+    def on_interval_selected(self, interval: tuple):
+        if not interval:
+            return
+
+        fmin, fmax = interval
+        print(f"Selected interval: {fmin}, {fmax}")
+        self.plot_band_data(self.get_selected_signal().output_data)
 
     def on_filter_clicked(self):
         print("Starting filtering...")

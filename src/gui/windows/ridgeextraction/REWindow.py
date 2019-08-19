@@ -17,7 +17,7 @@ from functools import partial
 from typing import List, Tuple
 
 from PyQt5 import sip
-from PyQt5.QtWidgets import QListWidget, QVBoxLayout
+from PyQt5.QtWidgets import QListWidget, QVBoxLayout, QListWidgetItem
 
 from data import resources
 from gui.windows.ridgeextraction.REPlot import REPlot
@@ -52,6 +52,7 @@ class REWindow(REView, TFWindow):
         self.setup_btn_mark_region()
         self.setup_btn_add_marked_region()
         self.setup_freq_boxes()
+        self.setup_intervals_list()
 
         self.setup_btn_ridge_extraction()
         self.setup_btn_filter()
@@ -233,14 +234,26 @@ class REWindow(REView, TFWindow):
         a selected frequency range.
         """
         strings = filter(lambda i: "None" not in i, self.get_interval_strings())
-        return [tuple([float(i) for i in s.split(",")]) for s in strings]
+        return [self._get_interval_tuple(s) for s in strings]
+
+    def _get_interval_tuple(self, item: str) -> tuple:
+        return tuple([float(i) for i in item.split(",")])
 
     def get_selected_interval(self):
         l: QListWidget = self.get_intervals_listwidget()
         indices = l.selectedIndexes()
-        if indices:
+
+        tuples = self.get_interval_tuples()
+        if indices and len(tuples) > indices[0].row():
             return self.get_interval_tuples()[indices[0].row()]
         return None
+
+    def setup_intervals_list(self):
+        l: QListWidget = self.get_intervals_listwidget()
+        l.itemSelectionChanged.connect(self.on_interval_selected)
+
+    def on_interval_selected(self):
+        self.presenter.on_interval_selected(self.get_selected_interval())
 
     def setup_btn_mark_region(self):
         self.get_btn_mark_region().clicked.connect(self.on_mark_region_clicked)

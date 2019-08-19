@@ -34,7 +34,7 @@ class Cache:
             pass
 
     @staticmethod
-    def get_cache_location():
+    def get_cache_location() -> str:
         base = os.getcwd()
 
         # If current directory is src, then create cache
@@ -48,7 +48,7 @@ class Cache:
         return os.listdir(self.cache)
 
     def generate_file_name(self, extension=".mat") -> str:
-        # Names of existing files without file extensions.
+        # Get names of existing files without their file extensions.
         names = [".".join(name.split(".")[:-1]) for name in self.get_file_names()]
 
         i = -1
@@ -61,7 +61,7 @@ class Cache:
 
         return f"{n}{extension}"
 
-    def get_path_to(self, file: str):
+    def get_path_to(self, file: str) -> str:
         return f"{self.cache}/{file}"
 
     def save_data(self, **kwargs) -> str:

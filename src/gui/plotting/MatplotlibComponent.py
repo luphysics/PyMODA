@@ -78,6 +78,7 @@ class MatplotlibComponent(PlotComponent):
         self.axes.set_ylabel(self.get_ylabel())
 
         self.fig = self.axes.get_figure()
+        # self.fig.tight_layout(pad=0)
         background = self.palette().color(QPalette.Background)
         self.fig.patch.set_facecolor(background.name())
 

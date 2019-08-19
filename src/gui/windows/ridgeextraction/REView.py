@@ -21,6 +21,8 @@ class REView(TFView):
     The View class for ridge extraction.
     """
 
+    name = "Ridge Extraction and Filtering"
+
     def setup_btn_mark_region(self):
         pass
 
