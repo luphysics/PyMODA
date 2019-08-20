@@ -20,7 +20,6 @@ from maths.params.REParams import REParams
 from maths.params.TFParams import create
 
 from maths.signals.TFOutputData import TFOutputData
-from maths.signals.TimeSeries import TimeSeries
 
 
 class REPresenter(TFPresenter):

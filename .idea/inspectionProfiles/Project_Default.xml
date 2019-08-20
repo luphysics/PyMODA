@@ -39,6 +39,7 @@
           <option value="matplotlib.backends.backend_qt5agg.FigureCanvas" />
           <option value="matplotlib.backends.qt_compat.QtWidgets" />
           <option value="matlab" />
+          <option value="PyQt5.QtCore.pyqtBoundSignal.connect" />
         </list>
       </option>
     </inspection_tool>

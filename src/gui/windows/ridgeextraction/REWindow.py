@@ -31,7 +31,7 @@ class REWindow(REView, TFWindow):
     """
     The ridge extraction window. Since ridge extraction uses all of
     the time-frequency analysis functionality (except statistics),
-    it inherits from TFWindow.
+    it inherits directly from TFWindow.
     """
 
     _mark_region_text = "Mark Region"
@@ -79,32 +79,66 @@ class REWindow(REView, TFWindow):
         for btn in buttons:
             btn.setDisabled(disabled)
 
-    def on_freq_region_updated(self):
+    def on_freq_region_updated(self, redraw=False):
         freq_tuple = self.get_freq_region()
+        self.get_btn_add_region().setDisabled(None in freq_tuple)
 
-        if None not in freq_tuple:
-            self.get_btn_add_region().setDisabled(False)
+        if redraw:
+            self.redraw_lines(*freq_tuple)
 
-    def on_freq_text_edited(self, text, line_edit):
-        freq = float_or_none(text.text())
+    def redraw_lines(self, f1, f2):
+        main = self.main_plot()
+        main.remove_crosshairs()
 
-        if freq is not None:
-            print("Changing value manually has not been implemented yet.")
+        if f1:
+            main.draw_crosshair(1, f1)
+            main.remove_line_at(1)
+
+        if f2:
+            main.draw_crosshair(1, f2)
+            main.remove_line_at(1)
+
+        main.update()
+
+    def on_freq_text_edited(self):
+        """
+        Called when the frequency is edited in the
+        interval QLineEdits.
+
+        :param text: the text entered in the QLineEdit
+        :param index: the index of the frequency interval: 0 for "Frequency 1",
+        1 for "Frequency 2"
+        """
+        self.on_freq_region_updated(redraw=True)
 
     def on_crosshair_drawn(self, x: float, y: float):
-        print(f"Selected frequency: {y} Hz")
-        f = f"{y:.6f}"
+        """
+        Called when a crosshair is drawn on the main plot
+        by the user clicking on it.
+        """
+        formatter = lambda x: f"{x:.6f}"
+
+        f = formatter(y)
+        print(f"Selected frequency: {f} Hz")
 
         f1, f2 = self.get_freq_region()
-        if f1 is None:
+        formatted = float(f)
+
+        if f1 is None and f2 != formatted:
             self.line_freq1.setText(f)
-        else:
+        elif f1 != formatted:
             self.line_freq2.setText(f)
+
+        f1, f2 = self.get_freq_region()
+        if f1:
+            self.line_freq1.setText(formatter(f1))
+        if f2:
+            self.line_freq2.setText(formatter(f2))
 
         self.on_freq_region_updated()
 
         # Transform the crosshair into a horizonal line
-        # by removing the vertical part.
+        # by removing the vertical component.
         self.main_plot().remove_line_at(x=x)
 
     def on_mark_region_clicked(self):
@@ -139,11 +173,13 @@ class REWindow(REView, TFWindow):
         self.line_freq2.setText("")
 
     def on_add_region_clicked(self):
-        f1, f2 = self.get_freq_region()
+        f1, f2 = sorted(self.get_freq_region())
         self.mark_region(f1, f2)
         self.on_mark_region_finished()
 
         self.get_btn_mark_region().setText(self._mark_region_text)
+        self.is_marking_region = False
+        self.get_btn_add_region().setDisabled(True)
 
     def switch_to_three_plots(self):
         if not self.single_plot_mode:
@@ -202,9 +238,6 @@ class REWindow(REView, TFWindow):
             float_or_none(l1),
             float_or_none(l2),
         )
-
-        if None not in freq:
-            return sorted(freq)
         return freq
 
     def get_btn_mark_region(self):
@@ -267,8 +300,8 @@ class REWindow(REView, TFWindow):
         l1 = self.line_freq1
         l2 = self.line_freq2
 
-        l1.textEdited.connect(partial(self.on_freq_text_edited, l1))
-        l2.textEdited.connect(partial(self.on_freq_text_edited, l2))
+        l1.editingFinished.connect(partial(self.on_freq_text_edited))
+        l2.editingFinished.connect(partial(self.on_freq_text_edited))
 
     def setup_btn_ridge_extraction(self):
         self.get_btn_ridge_extraction().clicked.connect(self.presenter.on_ridge_extraction_clicked)
