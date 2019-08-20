@@ -16,6 +16,7 @@
 
 from PyQt5.QtWidgets import QApplication
 
+from gui.windows.bispectrum.BAWindow import BAWindow
 from gui.windows.phasecoherence.PCWindow import PCWindow
 from gui.windows.ridgeextraction.REWindow import REWindow
 from gui.windows.timefrequency.TFWindow import TFWindow
@@ -49,6 +50,10 @@ class Application(QApplication):
     def start_ridge_extraction(self):
         """Opens the phase coherence window."""
         self.open_window(REWindow)
+
+    def start_bispectrum(self):
+        """Opens the wavelet bispectrum analysis window."""
+        self.open_window(BAWindow)
 
     def open_window(self, WindowType):
         w = WindowType(self)

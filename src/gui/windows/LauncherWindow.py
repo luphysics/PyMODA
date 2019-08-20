@@ -39,9 +39,9 @@ class LauncherWindow(CentredWindow):
         self.btn_time_freq.clicked.connect(self.application.start_time_frequency)
         self.btn_wavelet_phase.clicked.connect(self.application.start_phase_coherence)
         self.btn_ridge_extraction.clicked.connect(self.application.start_ridge_extraction)
+        self.btn_wavelet_bispectrum.clicked.connect(self.application.start_bispectrum)
 
-        # Placeholders.
-        self.btn_wavelet_bispectrum.clicked.connect(self.application.start_phase_coherence)
+        # Placeholder.
         self.btn_dynamical_bayesian.clicked.connect(self.application.start_phase_coherence)
 
     def load_banner_images(self):
