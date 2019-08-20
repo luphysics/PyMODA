@@ -13,6 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import numpy as np
 
 from gui.windows.ridgeextraction.REView import REView
 from gui.windows.timefrequency.TFPresenter import TFPresenter
@@ -95,7 +96,7 @@ class REPresenter(TFPresenter):
         times = data.times
         filtered, freq, phi = data.get_ridge_data(self.view.get_selected_interval())
 
-        self.triple_plot(times, filtered, freq, phi)
+        self.triple_plot(times, filtered, freq, phi, data.ampl, data.freq)
 
     def plot_band_data(self, data: TFOutputData):
         times = data.times
@@ -105,9 +106,13 @@ class REPresenter(TFPresenter):
             bands, phi, amp = band_data
             self.triple_plot(times, bands, amp, phi)
 
-    def triple_plot(self, x, top_y, middle_y, bottom_y):
+    def triple_plot(self, x, top_y, middle_y, bottom_y, main_values=None, main_freq=None):
         main = self.view.main_plot()
         main.clear()
+
+        if main_values and main_freq:
+            main.plot(x, main_values, main_freq)
+
         main.plot_line(x, middle_y, xlim=True)
         main.update()
 
@@ -124,9 +129,18 @@ class REPresenter(TFPresenter):
 
         data = self.get_selected_signal().output_data
         if data.has_ridge_data():
-            _, freq, _ = data.get_ridge_data(self.view.get_selected_interval())
-            if freq is not None and len(freq) > 0:
-                self.plot_ridge_data(data)
+            d = data.get_ridge_data(self.view.get_selected_interval())
+            if d:
+                _, freq, _ = d
+                if freq is not None and len(freq) > 0:
+                    self.plot_ridge_data(data)
+            else:
+                self.view.clear_all()
+
+        if data.has_band_data():  # TODO: plot correct type
+            d = data.get_band_data(self.view.get_selected_interval())
+            if d:
+                self.plot_band_data(data)
 
     def on_interval_selected(self, interval: tuple):
         if not interval:
