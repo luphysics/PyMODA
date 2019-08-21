@@ -15,9 +15,10 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from gui.windows.base.analysis.BaseTFPresenter import BaseTFPresenter
 from gui.windows.bispectrum.BAView import BAView
+from gui.windows.phasecoherence.PCPresenter import PCPresenter
 
 
-class BAPresenter(BaseTFPresenter):
+class BAPresenter(PCPresenter):
 
     def __init__(self, view: BAView):
         super().__init__(view)

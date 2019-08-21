@@ -13,19 +13,16 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from data import resources
-from gui.windows.base.analysis.BaseTFView import BaseTFView
-from gui.windows.bispectrum.BAViewProperties import BAViewProperties
-from gui.windows.phasecoherence.PCView import PCView
 
 
-class BAView(PCView, BAViewProperties):
+class ViewProperties:
     """
-    The View class for bispectrum analysis.
+    A class which should declare the variables which will be added when
+    the .ui file is inflated to create a window.
+
+    All variables should be initialised as None in the constructor
+    and marked with appropriate type annotations.
+
+    The constructor for this class should be called before the .ui
+    file is inflated.
     """
-
-    name = "Wavelet Bispectrum Analysis"
-
-    def __init__(self, application, presenter):
-        BAViewProperties.__init__(self)
-        BaseTFView.__init__(self, application, presenter)

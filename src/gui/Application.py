@@ -13,9 +13,11 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from typing import Type
 
 from PyQt5.QtWidgets import QApplication
 
+from gui.windows.base.BaseWindow import BaseWindow
 from gui.windows.bispectrum.BAWindow import BAWindow
 from gui.windows.phasecoherence.PCWindow import PCWindow
 from gui.windows.ridgeextraction.REWindow import REWindow
@@ -55,12 +57,12 @@ class Application(QApplication):
         """Opens the wavelet bispectrum analysis window."""
         self.open_window(BAWindow)
 
-    def open_window(self, WindowType):
+    def open_window(self, WindowType: Type[BaseWindow]):
         w = WindowType(self)
         self.windows.append(w)
         w.show()
 
-    def notify_close_event(self, window):
+    def notify_close_event(self, window: BaseWindow):
         try:
             self.windows.remove(window)
         except ValueError:

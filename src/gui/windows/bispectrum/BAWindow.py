@@ -13,13 +13,22 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from data import resources
 from gui.windows.base.analysis.BaseTFWindow import BaseTFWindow
 from gui.windows.bispectrum.BAPresenter import BAPresenter
 from gui.windows.bispectrum.BAView import BAView
+from gui.windows.phasecoherence.PCWindow import PCWindow
 
 
-class BAWindow(BaseTFWindow, BAView):
+class BAWindow(PCWindow, BAView):
 
     def __init__(self, application):
         BAView.__init__(self, application, BAPresenter(self))
         BaseTFWindow.__init__(self, application)
+
+    def init_ui(self):
+        super(BAWindow, self).init_ui()
+        self.get_button_calculate_single().hide()
+
+    def get_layout_file(self) -> str:
+        return resources.get("layout:window_bispectrum_analysis.ui")
