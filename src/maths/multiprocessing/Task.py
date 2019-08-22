@@ -16,20 +16,41 @@
 
 from multiprocess import Queue, Process
 
-from maths.multiprocessing.Watcher import Watcher
 from maths.multiprocessing.mp_utils import terminate_tree
 
 
 class Task:
 
-    def __init__(self, process: Process, watcher: Watcher):
+    def __init__(self, process: Process, queue: Queue, on_result, subtasks=0):
         self.process = process
-        self.watcher = watcher
+        self.queue = queue
+        self.on_result = on_result
+
+        self.running = False
+        self.finished = False
+        self.subtasks: int = subtasks
 
     def start(self):
-        self.process.start()
-        self.watcher.start()
+        if not self.running and not self.finished:
+            self.process.start()
+            self.running = True
 
-    def kill(self):
-        terminate_tree(self.process)
-        self.watcher.stop()
+    def terminate(self):
+        try:
+            terminate_tree(self.process)
+        except:
+            pass
+        finally:
+            self.running = False
+
+    def total_tasks(self) -> int:
+        return 1 + self.subtasks
+
+    def update(self):
+        if self.has_result():
+            self.finished = True
+            self.running = False
+            self.on_result(*self.queue.get())
+
+    def has_result(self) -> bool:
+        return not self.queue.empty()

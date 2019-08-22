@@ -32,3 +32,9 @@ class BAWindow(PCWindow, BAView):
 
     def get_layout_file(self) -> str:
         return resources.get("layout:window_bispectrum_analysis.ui")
+
+    def setup_surr_method(self):
+        """Override to do nothing."""
+
+    def setup_analysis_type(self):
+        """Override to do nothing."""

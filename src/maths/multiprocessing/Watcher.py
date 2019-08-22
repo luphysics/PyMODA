@@ -14,15 +14,12 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import time
-
 from PyQt5.QtCore import QTimer
 
 
 class Watcher:
     """
-    A class which watches for a result from a process, using a QTimer
-    to avoid blocking the main process/thread.
+    A class which watches for a result from a process.
     """
 
     def __init__(self, window, queue, delay_seconds, on_result):
@@ -33,29 +30,14 @@ class Watcher:
         :param on_result: a callback which should run on the main process/thread, taking
         the result of the operation
         """
-
-        self.delay = delay_seconds * 1000
         self.on_result = on_result
         self.queue = queue
-
-        self.timer = QTimer(window)
-        self.timer.timeout.connect(self.check_result)
         self.running = False
 
-    def start(self):
-        """Starts the Watcher checking for a result."""
-        self.timer.start(self.delay)
-        self.running = True
-
-    def stop(self):
-        """Stops the timer and deletes it. The Watcher cannot be started again."""
-        if self.running:
-            self.running = False
-            self.timer.stop()
-            self.timer.deleteLater()
-
-    def check_result(self):
-        """Check for a result from the other process."""
-        if not self.queue.empty():
-            self.stop()
+    def trigger_result(self):
+        """Trigger the result callback to return data to the main process."""
+        if self.has_result():
             self.on_result(*self.queue.get())
+
+    def has_result(self) -> bool:
+        return not self.queue.empty()

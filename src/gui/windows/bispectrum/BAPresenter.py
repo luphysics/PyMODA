@@ -22,3 +22,14 @@ class BAPresenter(PCPresenter):
 
     def __init__(self, view: BAView):
         super().__init__(view)
+
+    def calculate(self, calculate_all: bool):
+        self.is_calculating_all = calculate_all
+
+        if self.mp_handler:
+            self.mp_handler.stop()
+
+        self.is_plotted = False
+        self.invalidate_data()
+
+        # TODO: add remaining code

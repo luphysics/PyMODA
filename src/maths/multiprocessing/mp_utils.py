@@ -14,34 +14,12 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import numpy as np
 import psutil as psutil
-from multiprocess import sharedctypes, Process
-from multiprocess.sharedctypes import RawArray
-from numpy import ctypeslib, ndarray
+from multiprocess import Process
 
 """
-Experimental. Contains functions to help with accessing shared memory arrays.
+Contains functions to help with multiprocessing.
 """
-
-
-def convert_to_ctypes(arr: np.ndarray) -> RawArray:
-    size = arr.size
-    shape = arr.shape
-    arr.shape = size
-
-    arr_ctypes = sharedctypes.RawArray("d", arr)
-    arr = np.frombuffer(arr_ctypes, dtype=np.float64, count=size)
-    arr.shape = shape
-
-    return arr_ctypes
-
-
-def convert_to_numpy(arr_ctypes: RawArray, shape=None) -> np.ndarray:
-    result = ctypeslib.as_array(arr_ctypes)
-    if shape:
-        result.shape = shape
-    return result
 
 
 def terminate_tree(process: Process):
