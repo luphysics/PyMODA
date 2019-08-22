@@ -17,7 +17,6 @@
 import time
 
 import numpy as np
-from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import QWindow
 from multiprocess import Queue, Process
 from scipy.signal import hilbert
@@ -27,8 +26,6 @@ from maths.algorithms.surrogates import surrogate_calc
 from maths.algorithms.wpc import wpc, wphcoh
 from maths.multiprocessing.Scheduler import Scheduler
 from maths.multiprocessing.Task import Task
-from maths.multiprocessing.Watcher import Watcher
-from maths.multiprocessing.mp_utils import terminate_tree
 from maths.params.PCParams import PCParams
 from maths.params.REParams import REParams
 from maths.params.TFParams import TFParams, _wft, _fmin, _fmax
@@ -53,10 +50,6 @@ class MPHelper:
     """
 
     def __init__(self):
-        self.queues = []
-        self.processes = []
-        self.watchers = []
-
         self.scheduler: Scheduler = None
 
     def transform(self,
@@ -98,22 +91,19 @@ class MPHelper:
         Calculates the wavelet phase coherence for pairs of signals.
         """
         self.stop()  # Clear lists of processes, etc.
+        self.scheduler = Scheduler(window)
 
         for i in range(signals.pair_count()):
             q = Queue()
-            self.queues.append(q)
 
             pair = signals.get_pair_by_index(i)
-            self.processes.append(
-                Process(target=_phase_coherence, args=(q, pair, params,))
+            p = Process(target=_phase_coherence, args=(q, pair, params,))
+
+            self.scheduler.append(
+                Task(p, q, on_result, subtasks=params.surr_count)
             )
-            self.watchers.append(Watcher(window, q, 0.5, on_result))
 
-        for proc in self.processes:
-            proc.start()
-
-        for watcher in self.watchers:
-            watcher.start()
+        self.scheduler.start()
 
     def ridge_extraction(self,
                          params: REParams,
@@ -129,6 +119,7 @@ class MPHelper:
         :return:
         """
         self.stop()
+        self.scheduler = Scheduler(window)
 
         signals = params.signals
         num_transforms = len(signals)
@@ -141,15 +132,12 @@ class MPHelper:
                 params.set_item(_fmax, fmax)
 
                 q = Queue()
-                self.queues.append(q)
+                p = Process(target=_ridge_extraction, args=(q, signals[i], params))
 
-                self.processes.append(
-                    Process(target=_ridge_extraction, args=(q, signals[i], params))
+                self.scheduler.append(
+                    Task(p, q, on_result)
                 )
-                self.watchers.append(Watcher(window, q, 0.5, on_result))
-
-        [p.start() for p in self.processes]
-        [w.start() for w in self.watchers]
+        self.scheduler.start()
 
     def bandpass_filter(self,
                         signals: Signals,
@@ -158,21 +146,18 @@ class MPHelper:
                         on_result):
 
         self.stop()
+        self.scheduler = Scheduler(window)
 
         for s in signals:
             fs = s.frequency
             for i in range(len(intervals)):
-                q = Queue()
-                self.queues.append(q)
-
                 fmin, fmax = intervals[i]
-                self.processes.append(
-                    Process(target=_bandpass_filter, args=(q, s, fmin, fmax, fs))
-                )
-                self.watchers.append(Watcher(window, q, 0.5, on_result))
 
-        [p.start() for p in self.processes]
-        [w.start() for w in self.watchers]
+                q = Queue()
+                p = Process(target=_bandpass_filter, args=(q, s, fmin, fmax, fs))
+                self.scheduler.append(Task(p, q, on_result))
+
+        self.scheduler.start()
 
     def stop(self):
         """
@@ -183,12 +168,6 @@ class MPHelper:
         """
         if self.scheduler:
             self.scheduler.terminate()
-
-        # TODO: remove this
-        for i in range(len(self.processes)):
-            terminate_tree(self.processes.pop())
-            self.watchers.pop().stop()
-            self.queues.pop().close()
 
 
 def _bandpass_filter(queue, time_series: TimeSeries, fmin, fmax, fs):

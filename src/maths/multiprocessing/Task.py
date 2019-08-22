@@ -38,6 +38,7 @@ class Task:
     def terminate(self):
         try:
             terminate_tree(self.process)
+            self.queue.close()
         except:
             pass
         finally:

@@ -110,7 +110,7 @@ class REPresenter(TFPresenter):
         main = self.view.main_plot()
         main.clear()
 
-        if main_values and main_freq:
+        if main_values is not None and main_freq is not None:
             main.plot(x, main_values, main_freq)
 
         main.plot_line(x, middle_y, xlim=True)
