@@ -27,8 +27,9 @@ class Scheduler(List[Task]):
     """
     A class which handles scheduling tasks, according to the number of CPU cores.
 
-    As an example, a 4-core, 8-thread machine which must run 16 processes should optimally
-    run 2 batches of 8 processes.
+    As an example, a 4-core, 8-thread machine will run 9 processes
+    concurrently and an 8-core, 16-thread CPU will run 17 processes
+    concurrently.
     """
 
     def __init__(self, window: QWindow, delay_seconds: float = 0.05):

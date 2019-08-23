@@ -41,6 +41,11 @@ class SignalPlot(MatplotlibComponent):
         self.axes.set_xlim(xlim)
         self.on_plot_complete()
 
+    def zoom_to(self, rect, save_state=True, trigger_listeners=True):
+        """Override the zoom to not change the range of visible y-values."""
+        rect.y1, rect.y2 = self.ylim()
+        super(SignalPlot, self).zoom_to(rect, save_state, trigger_listeners)
+
     def get_xlabel(self):
         return "Time (s)"
 
