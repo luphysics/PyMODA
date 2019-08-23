@@ -194,17 +194,17 @@ def _ridge_extraction(queue, time_series: TimeSeries, params: REParams):
     package = ridge_extraction.initialize()
 
     d = params.get()
-    transform, freq, iamp, iphi, ifreq, filtered_signal = package.ridge_extraction(1,
-                                                                                   matlab.double(
-                                                                                       time_series.signal.tolist()),
-                                                                                   params.fs,
-                                                                                   d["fmin"],
-                                                                                   d["fmax"],
-                                                                                   d["CutEdges"],
-                                                                                   d["Preprocess"],
-                                                                                   d["Wavelet"],
-                                                                                   nargout=6
-                                                                                   )
+    result = package.ridge_extraction(1,
+                                      matlab.double(time_series.signal.tolist()),
+                                      params.fs,
+                                      d["fmin"],
+                                      d["fmax"],
+                                      d["CutEdges"],
+                                      d["Preprocess"],
+                                      d["Wavelet"],
+                                      nargout=6)
+
+    transform, freq, iamp, iphi, ifreq, filtered_signal = result
 
     transform = matlab_to_numpy(transform)
     freq = matlab_to_numpy(freq)

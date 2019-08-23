@@ -13,6 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import time
 from multiprocessing import cpu_count
 from typing import List
 
@@ -30,25 +31,29 @@ class Scheduler(List[Task]):
     run 2 batches of 8 processes.
     """
 
-    def __init__(self, window: QWindow, delay_seconds: float = 1):
+    def __init__(self, window: QWindow, delay_seconds: float = 0.05):
         super().__init__()
-        self.core_count: int = cpu_count()
+        self.core_count: int = cpu_count() + 1
         self.running_tasks: List[Task] = []
 
-        self.window = window
         self.delay = int(delay_seconds * 1000)
         self.timer = QTimer(window)
         self.timer.timeout.connect(self.check_results)
 
         self.terminated = False
+        self.time_start: float = 0
 
     def check_results(self):
+        if self.all_tasks_finished():
+            self.on_all_tasks_completed()
+
         for t in self.running_tasks:
             t.update()
             if t.finished:
                 self.on_task_completed(t)
 
     def start(self):
+        self.time_start = time.time()
         self.timer.start(self.delay)
         self.update_tasks()
 
@@ -64,17 +69,26 @@ class Scheduler(List[Task]):
         if not self.terminated:
             [t.terminate() for t in self]
             self.terminated = True
+            self.stop_timer()
 
-            self.timer.stop()
-            self.timer.deleteLater()
+    def stop_timer(self):
+        self.timer.stop()
+        self.timer.deleteLater()
 
     def on_task_completed(self, task):
         self.running_tasks.remove(task)
         self.update_tasks()
 
+    def on_all_tasks_completed(self):
+        print(f"All tasks completed in {(time.time() - self.time_start):.1f} seconds.")
+        self.stop_timer()
+
     def available_tasks(self) -> List[Task]:
         """Gets all tasks which are available to run."""
         return [t for t in self if not (t.running or t.finished)]
+
+    def all_tasks_finished(self) -> bool:
+        return all([t.finished for t in self])
 
     def total_running_tasks(self) -> int:
         running = self.running_tasks
