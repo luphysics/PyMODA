@@ -41,6 +41,7 @@ class Scheduler(List[Task]):
         self.timer.timeout.connect(self.check_results)
 
         self.terminated = False
+        self.stopped = False
         self.time_start: float = 0
 
     def check_results(self):
@@ -66,14 +67,16 @@ class Scheduler(List[Task]):
               f"tasks are currently running.")
 
     def terminate(self):
-        if not self.terminated:
+        if not (self.terminated or self.stopped):
             [t.terminate() for t in self]
             self.terminated = True
             self.stop_timer()
 
     def stop_timer(self):
-        self.timer.stop()
-        self.timer.deleteLater()
+        if not self.stopped:
+            self.stopped = True
+            self.timer.stop()
+            self.timer.deleteLater()
 
     def on_task_completed(self, task):
         self.running_tasks.remove(task)
