@@ -16,48 +16,53 @@
 from argparse import ArgumentParser
 
 # Args are global and should only be modified at startup.
+from typing import Optional
+
 args = None
 
 
-def parser():
+def parser() -> ArgumentParser:
     """
     Creates the argument parser for PyMODA.
     """
     p = ArgumentParser(description="PyMODA argument parser")
-    p.add_argument("-files", metavar="test_files", action="store", nargs="+", default=None,
-                   help="Test files to load")
-    p.add_argument("-freq", metavar="frequency", action="store", type=float, nargs=1, default=None,
-                   help="Frequency to use")
-    p.add_argument("-runtime", metavar="ld_library_path", action="store", nargs=1, default=None,
-                   help="LD_LIBRARY_PATH used to make libraries from the Matlab Runtime")
+
+    p.add_argument("-file", action="store", nargs=1, default=None,
+                   help="A preset data file to use when testing.")
+    p.add_argument("-freq", action="store", type=float, nargs=1, default=None,
+                   help="A preset sampling frequency to use when testing.")
+    p.add_argument("-runtime", action="store", nargs=1, default=None,
+                   help="***Must be specified on Linux.***"
+                        "\nThe LD_LIBRARY_PATH used to make libraries run using the MATLAB Runtime. ")
     p.add_argument("--no-maximise", action="store_false", default=True,
-                   help="Use this argument to prevent base from opening in a maximised state")
+                   help="Use this argument to prevent windows from opening in a maximised state.")
     p.add_argument("--debug", action="store_true", default=False,
-                   help="Use this argument to disable error handling and throw hard exceptions")
+                   help="Use this argument to disable error handling and throw hard exceptions "
+                        "which will crash the program with a traceback.")
     return p
 
 
-def parse_args():
+def init():
     """Parses the args and sets the global 'args' variable."""
     global args
     args = parser().parse_args()
 
 
-def args_file():
+def args_file() -> Optional[str]:
     """Gets the files from the args, or returns None."""
-    if args and args.files:
-        return args.files
+    if args and args.file:
+        return args.file[0]
     return None
 
 
-def args_freq():
+def args_freq() -> Optional[float]:
     """Gets the frequency from the args, or returns None."""
     if args and args.freq:
         return args.freq[0]
     return None
 
 
-def maximise():
+def maximise() -> bool:
     """
     Returns whether a window should be maximised, according to the
     arguments.
@@ -65,20 +70,12 @@ def maximise():
     return not args or args.no_maximise
 
 
-def debug():
+def debug() -> bool:
     """Returns whether error handling should be disabled."""
     return args and args.debug
 
 
-def setup_matlab_runtime():
-    """
-    Sets the LD_LIBRARY_PATH variable to the value provided
-    in the arguments. Should NOT be executed in the main
-    process, because this will crash PyQt on Linux.
-    """
+def matlab_runtime() -> Optional[str]:
     if args and args.runtime:
-        path = args.runtime[0]
-        if path:
-            import os
-            os.environ["LD_LIBRARY_PATH"] = path
-            print(f"Set LD_LIBRARY_PATH to {path}")
+        return args.runtime[0]
+    return None

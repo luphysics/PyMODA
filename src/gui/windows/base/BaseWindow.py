@@ -33,7 +33,7 @@ class BaseWindow(QMainWindow, BaseUI):
         self.update_title()
         self.set_icon()
 
-    def update_title(self, title=resources.get_name()):
+    def update_title(self, title=resources.get_program_name()):
         """
         Sets the title of the window. If no title is supplied,
         the default name of the application is used.

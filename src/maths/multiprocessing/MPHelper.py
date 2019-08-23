@@ -21,6 +21,7 @@ from PyQt5.QtGui import QWindow
 from multiprocess import Queue, Process
 from scipy.signal import hilbert
 
+import maths.multiprocessing.mp_utils
 from maths.algorithms.loop_butter import loop_butter
 from maths.algorithms.surrogates import surrogate_calc
 from maths.algorithms.wpc import wpc, wphcoh
@@ -187,7 +188,7 @@ def _bandpass_filter(queue, time_series: TimeSeries, fmin, fmax, fs):
 
 
 def _ridge_extraction(queue, time_series: TimeSeries, params: REParams):
-    args.setup_matlab_runtime()
+    maths.multiprocessing.mp_utils.setup_matlab_runtime()
     import ridge_extraction
     import matlab
 

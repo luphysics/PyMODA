@@ -57,6 +57,11 @@ class Application(QApplication):
         """Opens the wavelet bispectrum analysis window."""
         self.open_window(BAWindow)
 
+    def start_bayesian(self):
+        """Opens the Bayesian inference window."""
+        raise Exception("Dynamical Bayesian inference is not implemented yet.")
+        # self.open_window(DBIWindow)
+
     def open_window(self, WindowType: Type[BaseWindow]):
         w = WindowType(self)
         self.windows.append(w)

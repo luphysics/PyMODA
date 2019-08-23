@@ -13,10 +13,12 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from PyQt5.QtWidgets import QPushButton
+
 from gui.windows.base.ViewProperties import ViewProperties
 
 
 class BAViewProperties(ViewProperties):
 
     def __init__(self):
-        pass
+        """Define properties introduced by the .ui file."""

@@ -34,18 +34,23 @@ class Scheduler(List[Task]):
 
     def __init__(self, window: QWindow, delay_seconds: float = 0.05):
         super().__init__()
-        self.core_count: int = cpu_count() + 1
+        # Number of tasks to run concurrently.
+        self.concurrent_count: int = cpu_count() + 1
+
+        # List of currently running tasks.
         self.running_tasks: List[Task] = []
 
+        # The delay between each check for finished tasks.
         self.delay = int(delay_seconds * 1000)
         self.timer = QTimer(window)
-        self.timer.timeout.connect(self.check_results)
+        self.timer.timeout.connect(self.update)
 
         self.terminated = False
         self.stopped = False
         self.time_start: float = 0
 
-    def check_results(self):
+    def update(self):
+        """Checks for any tasks that have finished."""
         if self.all_tasks_finished():
             self.on_all_tasks_completed()
 
@@ -55,11 +60,13 @@ class Scheduler(List[Task]):
                 self.on_task_completed(t)
 
     def start(self):
+        """Starts the scheduler running the assigned tasks."""
         self.time_start = time.time()
         self.timer.start(self.delay)
         self.update_tasks()
 
     def update_tasks(self):
+        """Updates the currently running tasks by starting new tasks if necessary."""
         tasks = self.tasks_to_run()
         self.running_tasks.extend(tasks)
         [t.start() for t in tasks]
@@ -68,22 +75,29 @@ class Scheduler(List[Task]):
               f"tasks are currently running.")
 
     def terminate(self):
+        """Terminates all running tasks by killing their processes."""
         if not (self.terminated or self.stopped):
             [t.terminate() for t in self]
             self.terminated = True
             self.stop_timer()
 
     def stop_timer(self):
+        """
+        Stops the timer from checking whether tasks have finished.
+        This should be called when all tasks have been completed.
+        """
         if not self.stopped:
             self.stopped = True
             self.timer.stop()
             self.timer.deleteLater()
 
     def on_task_completed(self, task):
+        """Called when a task finishes."""
         self.running_tasks.remove(task)
         self.update_tasks()
 
     def on_all_tasks_completed(self):
+        """Called when all assigned tasks have been completed."""
         print(f"All tasks completed in {(time.time() - self.time_start):.1f} seconds.")
         self.stop_timer()
 
@@ -92,9 +106,11 @@ class Scheduler(List[Task]):
         return [t for t in self if not (t.running or t.finished)]
 
     def all_tasks_finished(self) -> bool:
+        """Returns whether all tasks have been finished."""
         return all([t.finished for t in self])
 
     def total_running_tasks(self) -> int:
+        """Returns the total number of running tasks, including sub-tasks."""
         running = self.running_tasks
         return sum([t.total_tasks() for t in running])
 
@@ -112,7 +128,7 @@ class Scheduler(List[Task]):
         running_count = self.total_running_tasks()
 
         # Number of tasks that can be started without reducing efficiency.
-        num_to_run = self.core_count - running_count
+        num_to_run = self.concurrent_count - running_count
 
         final_task_index = 0
         for i in range(1, len(task_counts) + 1):

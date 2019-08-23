@@ -18,11 +18,12 @@
 DO NOT import this module in the main process, or it will break Linux support
 due to issues with the LD_LIBRARY_PATH.
 """
+import maths.multiprocessing.mp_utils
 from maths.signals.TimeSeries import TimeSeries
 from utils import args
 
 # This must be above the WT and matlab imports.
-args.setup_matlab_runtime()
+maths.multiprocessing.mp_utils.setup_matlab_runtime()
 
 import WT
 import matlab

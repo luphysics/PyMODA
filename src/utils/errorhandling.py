@@ -14,6 +14,8 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import sys
+import traceback
+
 from utils import args
 
 # List of subscribers, all of which can handle every exception.
@@ -48,15 +50,18 @@ def unsubscribe(subscriber):
     subscribers.remove(subscriber)
 
 
-def notify_subscribers(exc_type, value, traceback):
+def notify_subscribers(exc_type, value, tb):
     """Notifies all subscribers with the current exception."""
+    exc_type = exc_type.__name__
     for s in subscribers:
         if isinstance(s, ExceptionSubscriber):
-            s.notify(exc_type, value, traceback)
+            s.notify(exc_type, value, tb)
         else:
-            s(exc_type, value, traceback)
+            s(exc_type, value, tb)
 
-    print(f"\n\nEXCEPTION: {value}\n{exc_type}\n{traceback}")
+    warning = "\033[91m"
+    endc = "\033[0m"
+    print(f"{warning}\nEXCEPTION: {exc_type}\nMESSAGE: {value}{endc}")
 
 
 def system_exception(exc_type, value, traceback):

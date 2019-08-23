@@ -18,11 +18,12 @@
 class ViewProperties:
     """
     A class which should declare the variables which will be added when
-    the .ui file is inflated to create a window.
+    the .ui file is inflated to create a window. The only purpose of
+    this class is to provide useful code completion in the IDE.
 
     All variables should be initialised as None in the constructor
     and marked with appropriate type annotations.
 
-    The constructor for this class should be called before the .ui
-    file is inflated.
+    Important: The constructor for this class should be called
+    before the .ui file is inflated.
     """

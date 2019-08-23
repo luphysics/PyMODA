@@ -26,7 +26,7 @@ from gui.Application import Application
 
 # The entry-point of the program.
 if __name__ == "__main__":
-    args.parse_args()
+    args.init()
     errorhandling.init()
     stdout_redirect.init()
 

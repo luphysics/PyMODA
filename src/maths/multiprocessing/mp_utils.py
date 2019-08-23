@@ -13,9 +13,13 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import os
 
 import psutil as psutil
 from multiprocess import Process
+from multiprocess.process import current_process
+
+from utils.args import matlab_runtime
 
 """
 Contains functions to help with multiprocessing.
@@ -34,3 +38,30 @@ def terminate_tree(process: Process):
         pass
     finally:
         process.terminate()
+
+
+def is_main_process() -> bool:
+    """Returns whether the current process is the main process."""
+    return current_process().name == "MainProcess"
+
+
+def setup_matlab_runtime():
+    """
+    Sets the LD_LIBRARY_PATH variable to the value provided
+    in the arguments. Should NOT be executed in the main
+    process, because this will crash PyQt on Linux.
+    """
+    if is_main_process():
+        raise MultiProcessingException("Do not set the LD_LIBRARY_PATH environment variable on the main process; "
+                                       "it will break the program on Linux. Instead, call MATLAB code from "
+                                       "another process using Task and Scheduler.")
+    path = matlab_runtime()
+    if path:
+        os.environ["LD_LIBRARY_PATH"] = path
+        print(f"Set LD_LIBRARY_PATH to {path}")
+
+
+class MultiProcessingException(Exception):
+    """
+    Exception thrown when an error is made with multiprocessing.
+    """
