@@ -13,10 +13,11 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from gui.windows.ridgeextraction.REViewProperties import REViewProperties
 from gui.windows.timefrequency.TFView import TFView
 
 
-class REView(TFView):
+class REView(REViewProperties, TFView):
     """
     The View class for ridge extraction.
     """

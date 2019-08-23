@@ -41,9 +41,6 @@ class REWindow(REView, TFWindow):
         self.most_recent_changed_freq = 0
         self.single_plot_mode = True
 
-        self.re_top = None
-        self.re_bottom = None
-
         super(REWindow, self).__init__(parent, REPresenter(self))
 
     def init_ui(self):
@@ -81,7 +78,7 @@ class REWindow(REView, TFWindow):
 
     def on_freq_region_updated(self, redraw=False):
         freq_tuple = self.get_freq_region()
-        self.get_btn_add_region().setDisabled(None in freq_tuple)
+        self.btn_add_region.setDisabled(None in freq_tuple)
 
         if redraw:
             self.redraw_lines(*freq_tuple)
