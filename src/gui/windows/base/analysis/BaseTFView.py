@@ -13,12 +13,13 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from gui.windows.base.analysis.BaseTFViewProperties import BaseTFViewProperties
 from gui.windows.base.analysis.plots.AmplitudePlot import AmplitudePlot
 from gui.windows.base.analysis.plots.SignalPlot import SignalPlot
 from gui.windows.base.analysis.plots.ColorMeshPlot import ColorMeshPlot
 
 
-class BaseTFView:
+class BaseTFView(BaseTFViewProperties):
     """
     A base "View" class in MVP, which defines
     """
@@ -27,6 +28,7 @@ class BaseTFView:
     name = ""
 
     def __init__(self, application, presenter):
+        super(BaseTFView, self).__init__()
         self.application = application
         self.presenter = presenter
 

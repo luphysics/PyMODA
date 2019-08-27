@@ -13,26 +13,13 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from PyQt5.QtWidgets import QPushButton, QLineEdit, QListWidget
+from PyQt5.QtWidgets import QPushButton
 
 from gui.windows.base.ViewProperties import ViewProperties
-from gui.windows.ridgeextraction.REPlot import REPlot
 
 
-class REViewProperties(ViewProperties):
+class BaseTFViewProperties(ViewProperties):
 
     def __init__(self):
-        # The top and bottom REPlots.
-        self.re_top: REPlot = None
-        self.re_bottom: REPlot = None
-
-        self.btn_add_region: QPushButton = None
-        self.btn_mark_region: QPushButton = None
-
-        self.btn_filter: QPushButton = None
-        self.btn_ridges: QPushButton = None
-
-        self.line_freq1: QLineEdit = None
-        self.line_freq2: QLineEdit = None
-
-        self.list_intervals: QListWidget = None
+        self.btn_calculate_single: QPushButton = None
+        self.btn_calculate_all: QPushButton = None

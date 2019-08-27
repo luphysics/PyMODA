@@ -28,7 +28,7 @@ class BAWindow(PCWindow, BAView):
 
     def init_ui(self):
         super(BAWindow, self).init_ui()
-        self.get_button_calculate_single().hide()
+        self.btn_calculate_single.hide()
 
     def get_layout_file(self) -> str:
         return resources.get("layout:window_bispectrum_analysis.ui")

@@ -160,6 +160,13 @@ class MPHelper:
 
         self.scheduler.start()
 
+    def bispectrum_analysis(self,
+                            signal_pairs: SignalPairs,
+                            window: QWindow,
+                            on_result,
+                            ):
+        pass
+
     def stop(self):
         """
         Stops the tasks in progress. The MPHelper can be reused.

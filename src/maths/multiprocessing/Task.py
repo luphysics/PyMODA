@@ -31,11 +31,15 @@ class Task:
         self.subtasks: int = subtasks
 
     def start(self):
+        """Starts the task."""
         if not self.running and not self.finished:
             self.process.start()
             self.running = True
 
     def terminate(self):
+        """
+        Terminates the task and all running sub-tasks.
+        """
         try:
             terminate_tree(self.process)
             self.queue.close()
@@ -45,13 +49,18 @@ class Task:
             self.running = False
 
     def total_tasks(self) -> int:
+        """:returns the total number of tasks, including sub-tasks."""
         return 1 + self.subtasks
 
     def update(self):
+        """
+        Checks for a result, and executes the callback if finished.
+        """
         if self.has_result():
             self.finished = True
             self.running = False
             self.on_result(*self.queue.get())
 
     def has_result(self) -> bool:
+        """:returns whether the task has finished."""
         return not self.queue.empty()

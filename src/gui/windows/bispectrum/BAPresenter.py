@@ -16,6 +16,7 @@
 from gui.windows.base.analysis.BaseTFPresenter import BaseTFPresenter
 from gui.windows.bispectrum.BAView import BAView
 from gui.windows.phasecoherence.PCPresenter import PCPresenter
+from maths.multiprocessing.MPHelper import MPHelper
 
 
 class BAPresenter(PCPresenter):
@@ -24,12 +25,16 @@ class BAPresenter(PCPresenter):
         super().__init__(view)
 
     def calculate(self, calculate_all: bool):
-        self.is_calculating_all = calculate_all
-
         if self.mp_handler:
             self.mp_handler.stop()
 
         self.is_plotted = False
         self.invalidate_data()
 
-        # TODO: add remaining code
+        self.mp_handler = MPHelper()
+        self.mp_handler.bispectrum_analysis(self.signals,
+                                            self.view.get_window(),
+                                            self.on_bispectrum_completed)
+
+    def on_bispectrum_completed(self):
+        pass

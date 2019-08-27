@@ -17,13 +17,15 @@
 
 class ViewProperties:
     """
-    A class which should declare the variables which will be added when
-    the .ui file is inflated to create a window. The only purpose of
-    this class is to provide useful code completion in the IDE.
+    A class which should be overridden to declare the variables which
+    will be added when the .ui file is inflated to create a window.
+
+    The only purpose of this class is to provide useful code
+    completion in the IDE.
 
     All variables should be initialised as None in the constructor
     and marked with appropriate type annotations.
 
-    Important: The constructor for this class should be called
+    Important: The constructor for a ViewProperties class should be called
     before the .ui file is inflated.
     """
