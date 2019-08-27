@@ -34,7 +34,7 @@ class SelectFileDialog(QDialog, BaseUI):
         super().__init__()
 
     def init_ui(self):
-        uic.loadUi(resources.get("layout:dialog_select_file"), self)
+        uic.loadUi(resources.get("layout:dialog_select_file.ui"), self)
         self.setup_drops()
         self.btn_browse.clicked.connect(self.browse_for_file)
         QTimer.singleShot(500, self.check_args)
