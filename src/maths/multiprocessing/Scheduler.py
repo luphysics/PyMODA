@@ -112,10 +112,12 @@ class Scheduler(List[Task]):
 
     def start(self):
         """Starts the scheduler running the assigned tasks."""
+        self.total_task_count = sum([t.total_tasks() for t in self])
+
         self.time_start = time.time()
         self.time_cpu_checked = self.time_start
+        self.report_progress(0)
 
-        self.total_task_count = [t.total_tasks() for t in self]
         self.timer.start(self.delay)
         self.update_tasks()
 

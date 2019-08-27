@@ -15,6 +15,7 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import time
+from typing import Callable
 
 import numpy as np
 from PyQt5.QtGui import QWindow
@@ -56,7 +57,9 @@ class MPHelper:
     def transform(self,
                   params: TFParams,
                   window: QWindow,
-                  on_result):
+                  on_result: Callable,
+                  on_progress: Callable[[int, int], None]
+                  ):
         """
         Performs the windowed Fourier transform in another process, returning a result
         in the main process.
@@ -68,7 +71,7 @@ class MPHelper:
         :return:
         """
         self.stop()
-        self.scheduler = Scheduler(window)
+        self.scheduler = Scheduler(window, progress_callback=on_progress)
 
         signals: Signals = params.signals
         params.remove_signals()  # Don't want to pass large unneeded object to other process.
@@ -87,12 +90,14 @@ class MPHelper:
                         signals: SignalPairs,
                         params: PCParams,
                         window: QWindow,
-                        on_result):
+                        on_result: Callable,
+                        on_progress: Callable[[int, int], None]
+                        ):
         """
         Calculates the wavelet phase coherence for pairs of signals.
         """
         self.stop()  # Clear lists of processes, etc.
-        self.scheduler = Scheduler(window)
+        self.scheduler = Scheduler(window, progress_callback=on_progress)
 
         for i in range(signals.pair_count()):
             q = Queue()
@@ -109,7 +114,9 @@ class MPHelper:
     def ridge_extraction(self,
                          params: REParams,
                          window: QWindow,
-                         on_result):
+                         on_result: Callable,
+                         on_progress: Callable[[int, int], None]
+                         ):
         """
         Calculates transforms in required frequency interval,
         and performs ridge extraction on transforms.
@@ -120,7 +127,7 @@ class MPHelper:
         :return:
         """
         self.stop()
-        self.scheduler = Scheduler(window)
+        self.scheduler = Scheduler(window, progress_callback=on_progress)
 
         signals = params.signals
         num_transforms = len(signals)
@@ -144,10 +151,12 @@ class MPHelper:
                         signals: Signals,
                         intervals: tuple,
                         window: QWindow,
-                        on_result):
+                        on_result: Callable,
+                        on_progress: Callable[[int, int], None]
+                        ):
 
         self.stop()
-        self.scheduler = Scheduler(window)
+        self.scheduler = Scheduler(window, progress_callback=on_progress)
 
         for s in signals:
             fs = s.frequency
@@ -163,7 +172,8 @@ class MPHelper:
     def bispectrum_analysis(self,
                             signal_pairs: SignalPairs,
                             window: QWindow,
-                            on_result,
+                            on_result: Callable,
+                            on_progress: Callable[[int, int], None]
                             ):
         pass
 

@@ -38,7 +38,6 @@ class REPresenter(TFPresenter):
 
     def on_all_transforms_completed(self):
         super(REPresenter, self).on_all_transforms_completed()
-
         self.view.set_ridge_filter_disabled(False)
 
     def on_ridge_extraction_clicked(self):
@@ -52,7 +51,8 @@ class REPresenter(TFPresenter):
 
         self.mp_handler.ridge_extraction(self.get_re_params(),
                                          self.view,
-                                         self.on_ridge_completed)
+                                         self.on_ridge_completed,
+                                         on_progress=self.on_progress_updated)
 
     def on_ridge_completed(self, name,
                            times, freq, values,
@@ -157,7 +157,8 @@ class REPresenter(TFPresenter):
             self.signals,
             self.view.get_interval_tuples(),
             self.view,
-            self.on_filter_completed
+            self.on_filter_completed,
+            on_progress=self.on_progress_updated
         )
 
     def on_filter_completed(self, name, bands, phase, amp, interval):

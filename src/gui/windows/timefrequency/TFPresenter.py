@@ -55,14 +55,14 @@ class TFPresenter(BaseTFPresenter):
         self.mp_handler.transform(
             params=params,
             window=self.view.get_window(),
-            on_result=self.on_transform_completed)
+            on_result=self.on_transform_completed,
+            on_progress=self.on_progress_updated)
 
         log: bool = (params.transform == _wt)
         self.view.main_plot().set_log_scale(logarithmic=log)
         self.view.amplitude_plot().set_log_scale(logarithmic=log)
 
         self.view.on_calculate_started()
-        self.view.update_progress(0, self.get_total_tasks_count())
         print("Started calculation...")
 
     def on_transform_completed(self, name, times, freq, values, ampl, powers, avg_ampl, avg_pow):
@@ -81,7 +81,6 @@ class TFPresenter(BaseTFPresenter):
         )
 
         print(f"Finished calculation for '{name}'.")
-        self.on_task_completed(self.get_total_tasks_count())
 
         # Plot result if all signals finished.
         if self.all_transforms_completed():

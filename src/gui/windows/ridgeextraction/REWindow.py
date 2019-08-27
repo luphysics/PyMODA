@@ -41,7 +41,8 @@ class REWindow(REView, TFWindow):
         self.most_recent_changed_freq = 0
         self.single_plot_mode = True
 
-        super(REWindow, self).__init__(parent, REPresenter(self))
+        REView.__init__(self)
+        TFWindow.__init__(self, parent, REPresenter(self))
 
     def init_ui(self):
         super(REWindow, self).init_ui()
