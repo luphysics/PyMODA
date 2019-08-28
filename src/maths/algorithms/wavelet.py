@@ -94,7 +94,7 @@ def wft(signal,
     fwt = []
     twf = []
 
-    if window == gaussian:
+    if window == _gaussian:
         fwt = lambda xi: np.exp(-(f0 ** 2 / 2) * xi ** 2)
         twf = lambda t: 1 / (f0 * np.sqrt(2 * np.pi)) * np.exp(-t ** 2 / (2 * f0 ** 2))
         wp.ompeak = 0
@@ -118,7 +118,7 @@ def wft(signal,
     if rec_flag == 1:
         if disp_mode:
             print("Estimating window parameters.")
-            parcalc(rel_to_l, L, wp, fwt, twf, disp_mode)
+            parcalc(rel_to_l, L, wp, fwt, twf, disp_mode, f0, fmax)
 
     coib1 = np.ceil(abs(wp.t1e * fs))
     coib2 = np.ceil(abs(wp.t2e * fs))
@@ -246,10 +246,10 @@ def wft(signal,
 
 
 def parcalc(racc, L, wp, fwt, twf, disp_mode, f0, fmax, wavelet="Lognorm"):
-    racc = np.min([racc, 1 - 10 ** -10])
-    # level0
-    ctol = np.max([racc / 1000, 10 ** -12])  # parameter of numerical accuracy
-    MIC = np.max([10000, 10 * L])  # max interval count
+    # TODO: start confirmed
+    racc = min([racc, 1 - 10 ** -6])
+    ctol = max([racc / 1000, 10 ** -12])  # parameter of numerical accuracy
+    MIC = max([10000, 10 * L])  # max interval count
 
     if not isempty(fwt):
         wp.fwt = fwt
@@ -282,11 +282,11 @@ def parcalc(racc, L, wp, fwt, twf, disp_mode, f0, fmax, wavelet="Lognorm"):
 
                     cp1 *= np.exp(-kk * 10 ** -14)
                     if cp1 <= np.max([wp.xi1, 0]):
-                        cp1 *= (np.exp(kk * 10 ** (-14)) + max([wp.xi1, 0])) / 2
+                        cp1 = (cp1 * np.exp(kk * 10 ** (-14)) + max([wp.xi1, 0])) / 2
 
                     cp2 *= np.exp(kk * 10 ** -14)
                     if cp2 >= wp.xi2:
-                        cp2 *= (np.exp(-kk * 10 ** (-14)) + wp.xi2) / 2
+                        cp2 = (cp2 * np.exp(-kk * 10 ** (-14)) + wp.xi2) / 2
 
                 cv = abs(fwt(wp.ompeak))
                 while isnan(cv) or cv == 0:
@@ -300,7 +300,7 @@ def parcalc(racc, L, wp, fwt, twf, disp_mode, f0, fmax, wavelet="Lognorm"):
 
                     wp.ompeak = pp[ipeak]
 
-            wp.ompeak = fminsearch(lambda x: -np.abs(fwt(np.exp(x)), x0=np.log(wp.ompeak), xtol=10 ** -14))
+            wp.ompeak = fminsearch(lambda x: -abs(fwt(np.exp(x))), x0=np.log(wp.ompeak), xtol=10 ** -14)
             wp.ompeak = np.exp(wp.ompeak)
 
         if isempty(wp.fwtmax):
@@ -318,6 +318,7 @@ def parcalc(racc, L, wp, fwt, twf, disp_mode, f0, fmax, wavelet="Lognorm"):
             AC = fwt(0)
         else:
             AC = 0
+
         if isnan(AC):
             cx0 = 10 ** -14
             while fwt(cx0) > 10 ** -14:
@@ -327,7 +328,13 @@ def parcalc(racc, L, wp, fwt, twf, disp_mode, f0, fmax, wavelet="Lognorm"):
             AC = fwt(cx0)
 
         if AC > 10 ** -12:
-            print("Wavelet does not seem to be admissible.")
+            print("""--------------------------------------------- Warning! ---------------------------------------------\n
+Wavelet does not seem to be admissible (its Fourier transform does not vanish at zero frequency)!\n
+Parameters estimated from its frequency domain form, e.g. integration constant Cpsi (which is \n
+infinite for non-admissible wavelets), cannot be estimated appropriately (the same concerns the \n
+number-of-voices ''nv'', when set to ''auto'', so frequency discretization might be also not appropriate).\n
+It is recommended to use only admissible wavelets.\n
+----------------------------------------------------------------------------------------------------\n""")
 
         QQ, wflag, xx, ss = sqeps(vfun, xp, lim1, lim2, racc, MIC,
                                   [log((wp.ompeak / fmax) * fs / L / 8), log(8 * (wp.ompeak / (fs / L)) * fs)]
@@ -355,34 +362,234 @@ def parcalc(racc, L, wp, fwt, twf, disp_mode, f0, fmax, wavelet="Lognorm"):
 
         if isempty(twf):
             PP, wflag, xx, ss = sqeps(lambda x: abs(fwt(x)) ** 2, wp.ompeak, max([wp.xi1, 0]), wp.xi2, racc, MIC,
-                                      [0,8*(wp.ompeak/(fs/L))*fs])
+                                      [0, 8 * (wp.ompeak / (fs / L)) * fs])
 
-            Etot = sum(PP[0,:]) /twopi
+            Etot = sum(PP[0, :]) / twopi
 
-            CL = 2 ** nextpow2(MIC / 8);
-            CT = CL / (2 * abs(ss[0,1] - ss[0,0]));
-            CNq = ceil((CL + 1) / 2);
-            cxi = (2 * pi / CT) * arange(CNq - CL-1,CNq-1).transpose()
-            idm=find(cxi<=max([wp.xi1,0])); idc=find(cxi>max([wp.xi1,0]) & cxi<wp.xi2); idp=find(cxi>=wp.xi2);
-            Cfwt = [zeros(length(idm), 1);
-            fwt(cxi(idc));
-            zeros((length(idp), 1,))]; idnan = find(isnan(Cfwt));
-            if ~isempty(
-                    idnan):
-                idnorm=find(~isnan(Cfwt)); Cfwt(idnan)=interp1(idnorm, Cfwt(idnorm), idnan, 'spline', 'extrap');
-            Ctwf = ifft((CL / CT) * Cfwt([CL - CNq + 1:CL, 1: CL - CNq])); Ctwf = Ctwf([CNq + 1:CL, 1: CNq]);
-            Etwf = abs(Ctwf). ^ 2;
-            Efwt = abs(Cfwt). ^ 2;
-            Iest1 = (CT / CL) * sum(abs(Etwf(3:end)-2 * Etwf(2: end - 1)+Etwf(1: end - 2))) / 24; % error
-            of
-            integration in time
-            Iest2 = (1 / CT) * sum(abs(Efwt(3:end)-2 * Efwt(2: end - 1)+Efwt(1: end - 2))) / 24; % error
-            of
-            integration in frequency
-            Eest = (CT / CL) * sum(Etwf);
-            perr = Inf;
+            CL = 2 ** nextpow2(MIC / 8)
+            CT = CL / (2 * abs(ss[0, 1] - ss[0, 0]))
+            CNq = ceil((CL + 1) / 2)
+            cxi = (twopi / CT) * arange(CNq - CL - 1, CNq - 1).transpose()
 
+            idm = nonzero(cxi <= max([wp.xi1, 0]))
+            idc = nonzero((cxi > max([wp.xi1, 0])) & (cxi < wp.xi2))
+            idp = nonzero(cxi >= wp.xi2)
 
+            Cfwt = np.asarray([zeros(length(idm), 1),
+                               fwt(cxi(idc)),
+                               zeros((length(idp), 1,))])
+
+            idnan = nonzero(isnan(Cfwt))
+
+            if ~isempty(idnan):
+                idnorm = nonzero(not isnan(Cfwt))
+                Cfwt[idnan] = interp1(idnorm, Cfwt[idnorm], idnan)
+
+            Ctwf = ifft((CL / CT) * Cfwt[concat([arange(CL - CNq + 1, CL), arange(1, CL - CNq)])])
+            Ctwf = Ctwf[arange(CNq + 1, CL), arange(1, CNq)]
+            Etwf = abs(Ctwf) ** 2
+            Efwt = abs(Cfwt) ** 2
+            Iest1 = (CT / CL) * sum(abs(Etwf[3:] - 2 * Etwf[2: - 1] + Etwf[1: - 2])) / 24
+            Iest2 = (1 / CT) * sum(abs(Efwt[3:] - 2 * Efwt[2: - 1] + Efwt[1: - 2])) / 24
+            Eest = (CT / CL) * sum(Etwf)
+            perr = Inf
+
+            while (abs(Etot - Eest) + Iest1 + Iest1) / Etot <= perr:
+                CT /= 2
+                perr = (abs(Etot - Eest) + Iest1 + Iest1) / Etot
+                CNq = ceil((CL + 1) / 2)
+                cxi = twopi / CT * arange(CNq - CL, CNq - 1).conj().T
+
+                idm = nonzero(cxi <= max([wp.xi1, 0]))
+                idc = nonzero((cxi > max([wp.xi1, 0])) & (cxi < wp.xi2))
+
+                idp = nonzero(cxi >= wp.xi2)
+
+                if not isempty(idnan):
+                    idnorm = nonzero(~isnan(Cfwt))
+                    Cfwt[idnan] = interp1(idnan, Cfwt[idnorm], idnan)
+
+                Ctwf = ifft(CL / CT * Cfwt[concat([arange(CL - CNq + 1, CL), arange(1, CL - CNq)])])
+                Ctwf = Ctwf[concat([arange(CNq + 1, CL]), arange(1, CNq))]
+
+                Etwf = abs(Ctwf) ** 2
+                Efwt = avs(Cfwt) ** 2
+
+                Iest1 = CT / CL * sum(abs(Etwf[3:] - 2 * Etwf[2:-1] + Etwf[1:-2])) / 24
+                Iest2 = 1 / CT * sum(abs(Efwt[3:] - 2 * Efwt[2:-1] + Efwt[1:-2])) / 24
+                Eest = CT / CL * sum(Etwf)
+
+                if (abs(Etot - Eest) + Iest1 + Iest1) / Etot > 0.01:
+                    print("Warning: cannot accurately invert the specified frequency-domain form....")
+
+                Ctwf = Ctwf[:2 * CNq - 3]
+                ct = CT / CL * arange(-(CNq - 2), CNq - 2).conj().T
+                wp.twf = [Ctwf, ct]
+                Ctwf = Ctwf * exp(-1j * wp.ompeak * ct)
+
+                if isempty(wp.tpeak):
+                    ipeak = nonzero(abs(Ctwf) == max(abs(Ctwf)))
+                    if len(ipeak) == 1:
+                        a1 = abs(Ctwf[ipeak - 1])
+                        a2 = abs(Ctwf[ipeak])
+                        a3 = abs(Ctwf[ipeak + 1])
+
+                        wp.tpeak = ct[ipeak]
+                        if abs(a1 - 2 * a2 + a3) > 2 * eps:
+                            wp.tpeak = wp.tpeak + 0.5 * (a1 - a3) / (a1 - 2 * a2 + a3) * (CT / CL)
+
+                    else:
+                        wp.tpeak = mean(ct[ipeak])
+
+                if isempty(wp.twfmax):
+                    ipeak = argmin(abs(ct - wp.tpeak))
+                    wp.twfmax = interp1(ct[ipeak - 1:ipeak + 1], abs(abs(Ctwf[ipeak - 1:ipeak + 1]), wp.tpeak))
+
+                ct = asarray([ct - CT / CL / 2, ct[-1] + CT / CL / 2])
+                CS = CT / CL * cumsum(Ctwf)
+                CS = asarray([0, CS[:]]) / CS[-1]
+                CS = abs(CS)
+
+                ICS = CT / CL * cumsum(Ctwf[-1:0:-1])
+                ICS = ICS[-1:0:-1]
+                ICS = asarray([ICS[:], 0]) / ICS[0]
+                ICS = abs(ICS)
+
+                xid = nonzero((CS[:-2] < racc / 2) & (CS[1:] >= racc / 2))[0]
+                if isempty(xid):
+                    wp.t1e = ct[0]
+                else:
+                    a1 = CS[xid] - racc / 2
+                    a2 = CS[xid + 1] - racc / 2
+                    wp.t1e = ct[xid] - a1 * (ct[xid + 1] - ct[xid]) / (a2 - a1)
+
+                xid = nonzero((ICS[:-2] < racc / 2) & (ICS[1:] >= racc / 2))[-1]
+                if isempty(xid):
+                    wp.t2e = ct[-1]
+                else:
+                    a1 = ICS[xid] - racc / 2
+                    a2 = ICS[xid + 1] - racc / 2
+                    wp.t2e = ct[xid] - a1 * (ct[xid + 1] - ct[xid]) / (a2 - a1)
+
+                xid = nonzero((CS[:-2] < .25) & (CS[1:] >= .25))[0]
+                if isempty(xid):
+                    wp.t1h = ct[0]
+                else:
+                    a1 = CS[xid] - .25
+                    a2 = CS[xid + 1] - .25
+                    wp.t1h = ct[xid] - a1 * (ct[xid + 1] - ct[xid]) / (a2 - a1)
+
+                xid = nonzero((ICS[:-2] >= .25) & (ICS[1:] < .25))[-1]
+                if isempty(xid):
+                    wp.t2h = ct[-1]
+                else:
+                    a1 = ICS[xid] - .25
+                    a2 = ICS[xid + 1] - .25
+                    wp.t2h = ct[xid] - a1 * (ct[xid + 1] - ct[xid]) / (a2 - a1)
+
+        if not isempty(twf):
+            wp.twf = twf
+            if isempty(wp.tpeak):
+                wp.tpeak = max([min([0, wp.t2 - abs(wp.t2) / 2]), wp.t1 + abs(wp / t1) / 2])
+
+                if isfinite(wp.t1) and isfinite(wp.t2):
+                    wp.tpeak = (wp.t1 + wp.t2) / 2
+
+                if twf(wp.tpeak) == 0 or isnan(twf) or not isfinite(twf(wp.tpeak)):
+                    cp1 = wp.tpeak * -10 ** -14
+                    cp2 = wp.tpeak * 10 ** -14
+                    kk = 1
+
+                    while kk < 10 ** 28:
+                        cv1 = abs(twf(cp1))
+                        cv2 = abs(twf(cp2))
+                        kk *= 2
+
+                        if isfinite(cv1) and cv1 > 0:
+                            wp.tpeak = cp1
+                            break
+                        if isfinite(cv2) and cv2 > 0:
+                            wp.tpeak = cp2
+                            break
+
+                        cp1 = cp1 - np.exp(-kk * 10 ** -14)
+                        if cp1 <= np.max([wp.t1, 0]):
+                            cp1 = (cp1 * np.exp(kk * 10 ** (-14)) + max([wp.t1, 0])) / 2
+
+                        cp2 = cp2 + np.exp(kk * 10 ** -14)
+                        if cp2 >= wp.t2:
+                            cp2 = (cp2 * np.exp(-kk * 10 ** (-14)) + wp.t2) / 2
+
+                    cv = abs(twf(wp.ompeak))
+                    while isnan(cv) or cv == 0:
+                        if isfinite(wp.t2):
+                            pp = max([wp.t1, 0]) + (wp.t2 - max([wp.t1, 0])) * rand(MIC, 1)
+                        else:
+                            pp = np.exp(np.arctan(pi * (rand(MIC, 1) - 1 / 2)))
+
+                        cv = max(abs(twf(pp)))
+                        ipeak = argmax(abs(twf(pp)))
+
+                        wp.tpeak = pp[ipeak]
+
+                wp.tpeak = fminsearch(lambda x: -abs(twf(x)), x0=wp.tpeak, xtol=10 ** -14)
+
+            if isempty(wp.twfmax):
+                wp.twfmax = twf(wp.tpeak)
+                if isnan(wp.twfmax):
+                    wp.twfmax = twf(wp.tpeak + 10 ** -14)
+
+            AC = \
+                quadgk(lambda u: -twf(u), wp.tpeak, xx[0, 0], MIC, 10 ** -16, 0) + \
+                quadgk(lambda u: -twf(u), xx[0, 0], xx[3, 0], MIC, 10 ** -16, 0) + \
+                quadgk(lambda u: twf(u), wp.tpeak, xx[0, 1], MIC, 10 ** -16, 0) + \
+                quadgk(lambda u: twf(u), xx[0, 1], xx[3, 1], MIC, 10 ** -16, 0)
+
+            if AC > 10 ** -8:
+                print("WARNING: wavelet does not seem to be admissible.")
+
+            if isempty(fwt):
+                compeak = wp.ompeak
+
+                if isempty(compeak):
+                    _, _, _, bss = sqeps(lambda u: abs(twf(u)) ** 2, wp.tpeak, wp.t1, wp.t2, 0.01, MIC, [wp.t1, wp.t2])
+                    BL = 2 ** (nextpow2(MIC))
+                    BNq = ceil((BL + 1) / 2)
+                    BT = bss[0, 0]
+
+                    bt = np.linspace(bss[0, 0], bss[0, 1], BL).conj().T
+                    bxi = twopi / BT * concat([arange(0, BNq - 1), arange(BNq - BL, -1)]).conj().T
+
+                    Bfwt = fft(twf(bt))
+                    ix = nonzero((bxi > max([wp.xi1, 0]) & (bxi < wp.xi2)))
+
+                    imax = argmax(abs(Bfwt[ix]))
+                    compeak = bxi[ix[imax]]
+
+                PP, wflag, xx, ss = sqeps(lambda x: abs(twf(x)) ** 2, wp.tpeak, wp.t1, wp.t2, 0.01, MIC, [wp.t1, wp.t2])
+                Etot = sum(PP[0, :])
+
+                CL = 2 ** nextpow2(MIC / 8)
+                CT = 2 * abs(ss[0, 1] - ss[0, 0])
+
+                CNq = ceil((CL + 1) / 2)
+                ct = CT / CL * arange(CNq - CL, CNq - 1).conj().T
+                idm = nonzero(ct <= wp.t1)
+                idc = nonzero((ct > wp.t1) & (ct < wp.t2))
+                idp = nonzero(ct >= wp.t2)
+
+                Ctwf = asarray([
+                    zeros((len(idm), 1)),
+                    twf(ct[idc]),
+                    zeros((len(idp), 1,))
+                ])
+                idnan = nonzero(isnan(Ctwf))
+
+                if not isempty(idnan):
+                    idnorm = nonzero(~isnan(Ctwf))
+                    Ctwf[idnan] = interp1(idnorm, Ctwf(idnorm), idnan)
+
+                Cfwt = CT/CL * fft(Ctwf())
 
 
     """BREAK"""

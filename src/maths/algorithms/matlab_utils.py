@@ -16,6 +16,7 @@
 import numpy as np
 import scipy
 import scipy.integrate
+import scipy.interpolate
 import scipy.optimize
 
 """
@@ -33,14 +34,6 @@ def isempty(value):
     return value is None
 
 
-def isnan(value):
-    return np.isnan(value)
-
-
-def isfinite(value):
-    return np.isfinite(value)
-
-
 def backslash(x, y):
     """Imitates the MATLAB backslash operator."""
     return np.linalg.lstsq(x, y, rcond=None)[0]  # TODO: check this
@@ -56,6 +49,11 @@ def quadgk(func, x0, x1, limit, epsabs, epsrel):
     return scipy.integrate.quad(func, x0, x1, limit=limit, epsabs=epsabs, epsrel=epsrel)
 
 
+def interp1(x, y, xq):
+    # TODO: check this is consistent with Matlab
+    scipy.interpolate.interp1d(x, y, kind="slinear", fill_value="extrapolate")
+
+
 def fft(x):
     return np.fft.fft(x)
 
@@ -68,24 +66,38 @@ def fminsearch(func, x0, xtol):
 
 
 # Function aliases.
+isfinite = np.isfinite
+isnan = np.isnan
 rand = np.random.rand
 exp = np.exp
 log = np.log
+min = np.min
 max = np.max
+argmax = np.argmax
+argmin = np.argmin
+concat = np.concatenate
+
+nonzero = np.nonzero
+asarray = np.asarray
+cumsum = np.cumsum
+
 conj = np.conj
 abs = np.abs
+mean = np.mean
 sum = np.sum
 ceil = np.ceil
 arange = np.arange
 length = len
 zeros = np.zeros
 ifft = np.fft.ifft
+atan = np.arctan
 
 # Variable and constant aliases.
 twopi = 2 * np.pi
 pi = np.pi
 eps = np.finfo(np.float64).eps
 inf = np.inf
+Inf = inf
 
 
 def find(arr, condition):
