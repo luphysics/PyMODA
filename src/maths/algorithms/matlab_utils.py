@@ -98,6 +98,8 @@ pi = np.pi
 eps = np.finfo(np.float64).eps
 inf = np.inf
 Inf = inf
+NAN = np.NaN
+linspace = np.linspace
 
 
 def find(arr, condition):

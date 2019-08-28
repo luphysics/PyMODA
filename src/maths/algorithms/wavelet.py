@@ -410,10 +410,10 @@ It is recommended to use only admissible wavelets.\n
                     Cfwt[idnan] = interp1(idnan, Cfwt[idnorm], idnan)
 
                 Ctwf = ifft(CL / CT * Cfwt[concat([arange(CL - CNq + 1, CL), arange(1, CL - CNq)])])
-                Ctwf = Ctwf[concat([arange(CNq + 1, CL]), arange(1, CNq))]
+                Ctwf = Ctwf[concat([arange(CNq + 1, CL), arange(1, CNq)])]
 
                 Etwf = abs(Ctwf) ** 2
-                Efwt = avs(Cfwt) ** 2
+                Efwt = abs(Cfwt) ** 2
 
                 Iest1 = CT / CL * sum(abs(Etwf[3:] - 2 * Etwf[2:-1] + Etwf[1:-2])) / 24
                 Iest2 = 1 / CT * sum(abs(Efwt[3:] - 2 * Efwt[2:-1] + Efwt[1:-2])) / 24
@@ -589,390 +589,282 @@ It is recommended to use only admissible wavelets.\n
                     idnorm = nonzero(~isnan(Ctwf))
                     Ctwf[idnan] = interp1(idnorm, Ctwf(idnorm), idnan)
 
-                Cfwt = CT/CL * fft(Ctwf())
+                Cfwt = CT / CL * fft(Ctwf[
+                                         concat([
+                                             arange(CL - CNq + 1, CL),
+                                             arange(1, CL - CNq)
+                                         ])
+                                     ])
 
-
-    """BREAK"""
-    nt = (1 / (4 * fs)) * np.arange(-8 * L + 1, 8 * L).transpose()  # level1 should be hermitian conjugate?
-    nt = nt[wp.t1 < nt][nt < wp.t2]
-
-    nxi = 2 * np.pi * 4 * fs / (16 * L - 1) * np.arange(-8 * L + 1, 8 * L).transpose()
-    nxi = nxi[nxi > wp.xi1][nxi < wp.xi2]
-
-    if not isempty(fwt):
-        wp.fwt = fwt
-        if isempty(wp.ompeak):
-            values = np.abs(fwt(nxi))
-            ipeak = values.argmax()  # level2
-            wp.ompeak = np.mean(nxi[ipeak])
-            wp.ompeak = scipy.optimize.fmin(func=lambda x: -np.abs(fwt(x)), x0=wp.ompeak)  # level1
-
-        if isempty(wp.fwtmax):
-            wp.fwtmax = fwt(wp.ompeak)
-            if np.isnan(wp.fwtmax):
-                wp.twfmax = fwt[wp.ompeak + 10 ** -14]
-
-        if np.abs(wp.ompeak) > 10 ** -12:
-            print("Warning")
-            fwt = lambda xi: fwt[xi + wp.ompeak]
-            if not isempty(twf):
-                twf = lambda t: twf[t] * np.exp(-1 * np.complex(0, -1) * wp.ompeak * t)
-            wp.xi1 = wp.xi1 - wp.ompeak
-            wp.xi2 = wp.xi2 - wp.ompeak
-            wp.fwt = fwt
-            wp.ompeak = 0
-
-        vfun = lambda u: fwt(u)
-        xp = wp.ompeak
-        lim1 = wp.xi1
-        lim2 = wp.xi2
-
-        QQ, wflag, xx, ss = sqeps(vfun, xp, lim1, lim2, racc, MIC, np.array([-1, 1]) * 8 * (2 * np.pi * fs))
-        wp.xi1e = ss[0, 0]
-        wp.x2e = ss[0, 1]
-        wp.xi1h = ss[1, 0]
-        wp.xi2h = ss[1, 1]
-
-        if isempty(wp.C):
-            if not twf:  # level0
-                wp.C = np.pi * twf(0)
-                if np.isnan(wp.C):
-                    wp.C = np.pi * twf(10 ** -14)
-            else:
-                wp.C = (QQ[0, 0] + QQ[0, 1]) / 2
-
-        if wflag == 1 and not disp_mode:
-            print("Freq domain window not well behaved")
-        if isempty(wp.omg):
-            px1 = np.min(wp.ompeak - xx[0, 0], xx[0, 1] - wp.ompeak)
-            px2 = np.min(wp.ompeak - xx[3, 0], xx[3, 1] - wp.ompeak)
-            [Y1, errY1] = quadgk(lambda u: u * fwt(wp.ompeak + u) - u * fwt(wp.ompeak - u), 0, px1, limit=2 * MIC,
-                                 epsabs=0, epsrel=10 ** -12)
-            [Y2, errY2] = quadgk(lambda u: u * fwt(wp.ompeak + u) - u * fwt(wp.ompeak - u), px1, px2, limit=2 * MIC,
-                                 epsabs=0, epsrel=10 ** -12)
-            [Y3, errY3] = quadgk(lambda u: -u * fwt(wp.ompeak - u), px2, wp.ompeak - xx[3, 0], limit=2 * MIC, epsabs=0,
-                                 epsrel=10 ** -12)
-            [Y4, errY4] = quadgk(lambda u: u * fwt(wp.ompeak + u), px2, xx[3, 1] - wp.ompeak, limit=2 * MIC, epsabs=0,
-                                 epsrel=10 ** -12)
-            if np.abs((errY1 + errY2 + errY3 + errY4) / (Y1 + Y2 + Y3 + Y4)) < 10 ** -4:
-                wp.omg = wp.ompeak + (Y1 + Y2 + Y3 + Y4) / (2 * wp.C)
-            else:
-                wp.omg = np.inf
-
-        if isempty(twf):
-            PP, wflag, xx, ss = sqeps(lambda x: np.abs(fwt(x)) ** 2, wp.ompeak, wp.xi1, wp.xi2, racc, MIC,
-                                      np.asarray([-1, 1], dtype=np.float64) * 8 * twopi * fs)
-            Etot = np.sum(PP[0]) / twopi
-
-            CL = 2 ** (nextpow2(MIC / 8))
-            CT = CL / (2 * abs(ss[0, 1] - ss[0, 0]))
-            CNq = np.ceil((CL + 1) / 2)
-            cxi = (twopi / CT) * np.arange(CNq - CL, CNq - 2).transpose()
-            idm = find(cxi, lambda i: i <= wp.xi1)
-            idc = find(cxi, lambda i: wp.xi1 < i < wp.xi2)
-            idp = find(cxi, lambda i: i >= wp.xi2)
-
-            Cfwt = np.asarray(np.zeros(len(idm), 1), fwt(cxi[idc]), np.zeros(len(idp), 1))
-            idnan = find(Cfwt, lambda i: isnan(i))
-
-            if not isempty(idnan):
-                idnorm = find(Cfwt, lambda i: not isnan(i))
-                Cfwt[idnan] = scipy.interpolate.interp1d(idnorm, Cfwt(idnorm), idnan, 'spline', 'extrap')
-
-            Ctwf = np.fft.ifft(
-                (CL / CT) * Cfwt[np.asarray(np.arange(CL - CNq + 1, CL + 1), np.arange(1, CL - CNq + 1))])
-            Ctwf = Ctwf[np.asarray(np.arange(CNq + 1, CL + 1), np.arange(1, CNq + 1))]
-
-            Etwf = np.abs(Ctwf) ** 2
-            Efwt = np.abs(Cfwt) ** 2
-
-            Iest1 = CT / CL * np.sum(np.abs(Etwf[3:] - 2 * Etwf[2:-1] + Etwf[2:-1] + Etwf[:-2])) / 24
-            Iest2 = 1 / CL * np.sum(np.abs(Etwf[3:] - 2 * Etwf[2:-1] + Etwf[2:-1] + Etwf[:-2])) / 24
-            Eest = CT / CL * np.sum(Etwf)
-            perr = np.inf
-
-            while (np.abs(Etot - Eest) + Iest1 + Iest2) / Etot < perr:
-                CT /= 2
-                perr = (np.abs(Etot - Eest) + Iest1 + Iest2) / Etot
-
-                CNq = np.ceil((CL + 1) / 2)
-                cxi = (twopi / CT) * np.arange(CNq - CL, CNq - 2).transpose()
-
-                idm = find(cxi, lambda i: i <= wp.xi1)
-                idc = find(cxi, lambda i: wp.xi1 < i < wp.xi2)
-                idp = find(cxi, lambda i: i >= wp.xi2)
-
-                idnan = find(Cfwt, lambda i: isnan(i))
-
-                if not isempty(idnan):
-                    idnorm = find(Cfwt, lambda i: not isnan(i))
-                    Cfwt[idnan] = scipy.interpolate.interp1d(idnorm, Cfwt(idnorm), idnan, 'spline', 'extrap')
-
-                Ctwf = np.fft.ifft(
-                    (CL / CT) * Cfwt[np.asarray(np.arange(CL - CNq + 1, CL + 1), np.arange(1, CL - CNq + 1))])
-                Ctwf = Ctwf[np.asarray(np.arange(CNq + 1, CL + 1), np.arange(1, CNq + 1))]
-
-                Etwf = np.abs(Ctwf) ** 2
-                Efwt = np.abs(Cfwt) ** 2
-
-                Iest1 = CT / CL * np.sum(np.abs(Etwf[3:] - 2 * Etwf[2:-1] + Etwf[2:-1] + Etwf[:-2])) / 24
-                Iest2 = 1 / CL * np.sum(np.abs(Etwf[3:] - 2 * Etwf[2:-1] + Etwf[2:-1] + Etwf[:-2])) / 24
-                Eest = CT / CL * np.sum(Etwf)
-
-            CL = 16 * CL
-            CT *= 2
-
-            CNq = np.ceil((CL + 1) / 2)
-            cxi = (twopi / CT) * np.arange(CNq - CL, CNq - 2).transpose()
-
-            idm = find(cxi, lambda i: i <= wp.xi1)
-            idc = find(cxi, lambda i: wp.xi1 < i < wp.xi2)
-            idp = find(cxi, lambda i: i >= wp.xi2)
-
-            idnan = find(Cfwt, lambda i: isnan(i))
-
-            if not isempty(idnan):
-                idnorm = find(Cfwt, lambda i: not isnan(i))
-                Cfwt[idnan] = scipy.interpolate.interp1d(idnorm, Cfwt(idnorm), idnan, 'spline', 'extrap')
-
-            Ctwf = np.fft.ifft(
-                (CL / CT) * Cfwt[np.asarray(np.arange(CL - CNq + 1, CL + 1), np.arange(1, CL - CNq + 1))])
-            Ctwf = Ctwf[np.asarray(np.arange(CNq + 1, CL + 1), np.arange(1, CNq + 1))]
-
-            Etwf = np.abs(Ctwf) ** 2
-            Efwt = np.abs(Cfwt) ** 2
-
-            Iest1 = CT / CL * np.sum(np.abs(Etwf[3:] - 2 * Etwf[2:-1] + Etwf[2:-1] + Etwf[:-2])) / 24
-            Iest2 = 1 / CL * np.sum(np.abs(Etwf[3:] - 2 * Etwf[2:-1] + Etwf[2:-1] + Etwf[:-2])) / 24
-            Eest = CT / CL * np.sum(Etwf)
-
-            if (abs(Etot - Eest) + Iest1 + Iest2) / Etot > 0.01:
-                print("Warning: Cannot accurately invert the specified...")
-
-            Ctwf = Ctwf[:2 * CNq - 2]
-            ct = CT / CL * np.arange(-(CNq - 2), CNq - 1).transpose()
-
-            wp.twf = [Ctwf, ct]
-
-            if isempty(wp.tpeak):
-                pass
-                # TODO: add later
-
-    if not isempty(twf):
-        wp.twf = twf
-        if isempty(wp.tpeak):
-            values = np.abs(twf(nt))
-            ipeak = values.argmax()  # level2
-            wp.tpeak = np.mean(nt[ipeak])
-            wp.tpeak = scipy.optimize.fmin(lambda x: -np.abs(twf(x)), wp.tpeak)
-
-        if isempty(fwt):
-            PP, wflag, xx, ss = sqeps(lambda x: abs(twf(x)) ** 2, wp.tpeak, wp.t1, wp.t2, racc, MIC,
-                                      np.array([-1, 1]) * 8 * (2 * np.pi * fs))
-            Etot = np.sum(PP[1])
-
-            CL = 2 ** nextpow2(MIC / 8)
-            CT = 2 * abs(ss[1, 2] - ss[1, 1])
-
-            CNq = np.ceil((CL + 1) / 2)
-            ct = (CT / CL) * np.arange(CNq - CL, CNq).transpose()
-            idm = find(ct, lambda x: x <= wp.t1)
-            idc = find(ct, lambda x: wp.t1 < x < wp.t2)
-            idp = find(ct, lambda x: x >= wp.t2)
-
-            Ctwf = [np.zeros(len(idm), 1), twf(ct(idc)), np.zeros(len(idp), 1)]
-            idnan = find(Ctwf, lambda i: np.isnan(i))
-
-            if not isempty(idnan):
-                idnorm = find(Ctwf, lambda x: not isnan(x))
-                Ctwf[idnan] = scipy.interpolate.interp1d(idnorm, Ctwf(idnorm), idnan, 'spline', 'extrap')
-
-            Cfwt = (CT / CL) * np.fft.fft(Ctwf([np.arange(CL - CNq + 1, CL - CNq, CL, 1)]))
-            Cfwt = Cfwt(np.arange(CNq + 1, CNq, CL, 1))
-
-            Etwf = abs(Ctwf) ** 2
-            Efwt = abs(Ctwf) ** 2
-
-            Iest1 = (CT / CL) * sum(abs(Etwf[3:] - 2 * Etwf[2: -1] + Etwf[1: -2])) / 24
-            Iest2 = (1 / CL) * sum(abs(Etwf[3:] - 2 * Etwf[2: -1] + Etwf[1: -2])) / 24
-
-            Eest = (1 / CT) * sum(Efwt)
-            perr = np.inf
-
-            while (abs(Etot - Eest) + Iest1 + Iest2) / Etot <= perr:
-                CT = CT * 2
-                perr = (abs(Etot - Eest) + Iest1 + Iest2) / Etot
-
-                CNq = np.ceil((CL + 1) / 2)
-                ct = ((CT / CL) * (CNq - np.arange(CL, CNq))).transpose()
-                idm = find(ct <= wp.t1)
-                idc = find(ct > wp.t1 & ct < wp.t2)
-                idp = find(ct >= wp.t2)
-
-                Ctwf = [np.zeros(len(idm), 1), twf(ct(idc)), np.zeros(len(idp), 1)]
-                idnan = find(Ctwf, lambda x: isnan(x))
-
-                if not isempty(idnan):
-                    idnorm = find(Ctwf, lambda x: not isnan(x))
-                    Ctwf[idnan] = scipy.interpolate.interp1d(idnorm, Ctwf(idnorm), idnan, 'spline', 'extrap')
-
-                Cfwt = (CT / CL) * np.fft.fft(Ctwf(np.arange(CL - CNq + 1, CL - CNq, CL, 1)))
-                Cfwt = Cfwt(np.arange(CNq + 1, CNq, CL, 1))
+                Cfwt = Cfwt[
+                    concat([
+                        arange(CNq + 1, CL),
+                        arange(1, CNq),
+                    ])
+                ]
 
                 Etwf = abs(Ctwf) ** 2
-                Efwt = abs(Ctwf) ** 2
+                Efwt = abs(Cfwt) ** 2
 
-                Iest1 = (CT / CL) * sum(abs(Etwf[3:] - 2 * Etwf[2: -1] + Etwf[1: -2])) / 24
-                Iest2 = (1 / CL) * sum(abs(Etwf[3:] - 2 * Etwf[2: -1] + Etwf[1: -2])) / 24
-                Eest = (1 / CT) * sum(Efwt)
+                Iest1 = CT / CL * \
+                        sum(
+                            abs(
+                                Etwf[2:] - 2 * Etwf[1:-2] + Etwf[1:-3]
+                            )
+                        ) / 24
 
-            CL = 16 * CL
-            CT = CT * 2
+                Iest2 = 1 / CT * \
+                        sum(
+                            abs(
+                                Etwf[2:] - 2 * Etwf[1:-2] + Etwf[1:-3]
+                            )
+                        ) / 24
 
-            CNq = np.ceil((CL + 1) / 2)
-            ct = ((CT / CL) * (CNq - np.arange(CL, CNq))).transpose()
-            idm = find(ct <= wp.t1)
-            idc = find(ct > wp.t1 & ct < wp.t2)
-            idp = find(ct >= wp.t2)
+                Eest = 1 / CT * sum(Efwt)
+                perr = inf
 
-            Ctwf = [np.zeros(len(idm), 1), twf(ct(idc)), np.zeros(len(idp), 1)]
-            idnan = find(Ctwf, lambda x: isnan(x))
+                while (abs(Etot - Eest) + Iest1 + Iest2) / Etot <= perr:
+                    CT *= 2
+                    perr = (abs(Etot - Eest) + Iest1 + Iest1) / Etot
+                    CNq = ceil((CL + 1) / 2)
+                    ct = CT / CL * arange(CNq - CL, CNq - 1).conj().T
 
-            if not isempty(idnan):
-                idnorm = find(Ctwf, lambda x: not isnan(x))
-                Ctwf[idnan] = scipy.interpolate.interp1d(idnorm, Ctwf(idnorm), idnan, 'spline', 'extrap')
+                    idm = nonzero(ct <= max([wp.t1, 0]))
+                    idc = nonzero((ct > max([wp.t1, 0])) & (ct < wp.t2))
 
-            Cfwt = (CT / CL) * np.fft.fft(Ctwf(np.arange(CL - CNq + 1, CL - CNq, CL, 1)))
-            Cfwt = Cfwt(np.arange(CNq + 1, CNq, CL, 1))
+                    idp = nonzero(ct >= wp.t2)
 
-            Etwf = abs(Ctwf) ** 2
-            Efwt = abs(Ctwf) ** 2
+                    if not isempty(idnan):
+                        idnorm = nonzero(~isnan(Ctwf))
+                        Ctwf[idnan] = interp1(idnan, Ctwf[idnorm], idnan)
 
-            Iest1 = (CT / CL) * sum(abs(Etwf[3:] - 2 * Etwf[2: -1] + Etwf[1: -2])) / 24
-            Iest2 = (1 / CL) * sum(abs(Etwf[3:] - 2 * Etwf[2: -1] + Etwf[1: -2])) / 24
-            Eest = (1 / CT) * sum(Efwt)
+                    Cfwt = CL / CT * fft(
+                        Ctwf[concat([arange(CL - CNq + 1, CL), arange(1, CL - CNq)])]
+                    )
+                    Cfwt = Cfwt[concat([arange(CNq + 1, CL), arange(1, CNq)])]
 
-            if (abs(Etot - Eest) + Iest1 + Iest2) / Etot > 0.01:
-                print("Cannot accurately ...")
+                    Etwf = abs(Ctwf) ** 2
+                    Efwt = abs(Cfwt) ** 2
 
-            Cfwt = Cfwt[1:2 * CNq - 3]
-            cxi = ((twopi / CT) * -np.arange(CNq - 2, CNq - 2)).transpose()
-            wp.fwt = np.asarray(Cfwt, cxi)
+                    Iest1 = CT / CL * sum(abs(Etwf[3:] - 2 * Etwf[2:-1] + Etwf[1:-2])) / 24
+                    Iest2 = 1 / CT * sum(abs(Efwt[3:] - 2 * Efwt[2:-1] + Efwt[1:-2])) / 24
+                    Eest = 1 / CT * sum(Efwt)
 
-            if isempty(wp.ompeak):
-                values = np.abs(fwt(nxi))
-                ipeak = values.argmax()  # level2
-                if len(ipeak) == 1:
-                    a1 = abs(Cfwt[ipeak - 1])
-                    a2 = abs(Cfwt[ipeak])
-                    a3 = abs(Cfwt[ipeak + 1])
+                CL = 16 * CL
+                CT *= 2
 
-                    wp.ompeak = cxi[ipeak]
-                    if abs(a1 - 2 * a2 + a3) > 2 * eps:  # quadratic interp
-                        wp.ompeak = wp.ompeak + 1 / 2 * (a1 - a3) / (a1 - 2 * a2 + a3) * (twopi / CT)
+                CNq = ceil((CL + 1) / 2)
+                ct = CT / CL * arange(CNq - CL, CNq - 1).conj().T
 
-                else:
-                    wp.ompeak = np.mean(cxi[ipeak])
+                idm = nonzero(ct <= wp.t1)
+                idc = nonzero((ct > wp.t1) & (ct < wp.t2))
+                idp = nonzero(ct >= wp.t2)
 
-            if isempty(wp.fwtmax):
-                _, ipeak = min(abs(cxi - wp.ompeak))
-                wp.fwtmax = scipy.interpolate.interp1d(cxi[ipeak - 1:ipeak + 1], abs(Cfwt[ipeak - 1:ipeak + 1]),
-                                                       wp.ompeak, "spline")
-
-            if isempty(wp.C):
-                wp.C = twopi / 2 * twf(0)
-                if isnan(wp.C):
-                    wp.C = twopi / 2 * twf(10 ** -14)
-            if isempty(wp.omg):
-                wp.omg = sum((twopi / CT) * cxi * Cfwt / (2 * wp.C))
-
-            cxi = np.arange(cxi - np.pi, cxi[-1] + np.pi / CT, cxi[-1])
-            CS = (twopi / CT) * np.cumsum(Cfwt)
-            CS = np.asarray([0], CS) / abs(CS[-1])
-            CS = abs(CS)
-
-            ICS = (twopi / CT) * np.cumsum(Cfwt[::-1])  # level3
-            ICS = ICS[::-1]
-            ICS = np.asarray(ICS, []) / ICS[0]
-            ICS = abs(ICS)
-
-            xid = np.asarray()  # TODO: add later
-            xid = find(CS[:-2], lambda i: i < racc / 2)
-            a = CS[:-1]
-            b = CS[2:]
-            if a.any(a < racc / 2) and b.any(b > racc / 2):
-                wp.x1e = cxi[0]
-            else:
-                a1 = CS[xid] - racc / 2
-                a2 = CS[xid + 1] - racc / 2
-                wp.x1e = cxi[xid] - a1 * (cxi[xid + 1] - cxi[xid]) / (a2 - a1)
-
-            xid = np.asarray()  # TODO: add later
-            if isempty(xid):
-                wp.xi2e = cxi[-1]
-            else:
-                a1 = ICS[xid] - racc / 2
-                a2 = ICS[xid + 1] - racc / 2
-                wp.xi1e = cxi[xid] - a1 * (cxi[xid + 1] - cxi[xid]) / (a2 - a1)
-
-            xid = np.asarray()  # TODO: add later
-            if isempty(xid):
-                wp.xi1h = cxi[0]
-            else:
-                a1 = CS[xid] - 0.25
-                a2 = CS[xid + 1] - 0.25
-                wp.xi1h = cxi[xid] - a1 * (cxi[xid + 1] - cxi[xid]) / (a2 - a1)
-
-            xid = np.asarray()  # TODO: add later
-            if isempty(xid):
-                wp.xi2h = cxi[-1]
-            else:
-                a1 = ICS[xid] - 0.25
-                a2 = ICS[xid + 1] - 0.25
-                wp.xi2h = cxi[xid] - a1 * (cxi[xid + 1] - cxi[xid]) / (a2 - a1)
-
-            if abs(wp.ompeak) > 10 ** -12:
-                wp.xi1 = wp.xi1 - wp.ompeak
-                wp.xi2 = wp.xi2 - wp.ompeak
-                wp.xi1e = wp.xi1e - wp.ompeak
-                wp.xi2e = wp.xi2e - wp.ompeak
-                wp.xi1h = wp.xi1h - wp.ompeak
-                wp.xi2h = wp.xi2h - wp.ompeak
-                wp.omg = wp.omg - wp.ompeak
-
-                twf = lambda t: twf(t) * np.exp(np.complex(-1 * wp.ompeak * t))
-                wp.twf = twf
-
-                Ctwf = [np.zeros(len(idm), 1), twf(ct(idc)), np.zeros(len(idp), 1)]
-                idnan = find(Ctwf, lambda x: isnan(x))
+                Ctwf = asarray([
+                    zeros((len(idm), 1)),
+                    twf(ct[idc]),
+                    zeros((len(idp), 1,))
+                ])
+                idnan = nonzero(isnan(Ctwf))
 
                 if not isempty(idnan):
-                    idnorm = find(Ctwf, lambda x: not isnan(x))
-                    Ctwf[idnan] = scipy.interpolate.interp1d(idnorm, Ctwf(idnorm), idnan, 'spline', 'extrap')
+                    idnorm = nonzero(~isnan(Ctwf))
+                    Ctwf[idnan] = interp1(idnorm, Ctwf(idnorm), idnan)
 
-                Cfwt = (CT / CL) * np.fft.fft(Ctwf(np.arange(CL - CNq + 1, CL - CNq, CL, 1)))
-                Cfwt = Cfwt(np.arange(CNq + 1, CNq, CL, 1))
+                Cfwt = CT / CL * fft(Ctwf[
+                                         concat([
+                                             arange(CL - CNq + 1, CL),
+                                             arange(1, CL - CNq)
+                                         ])
+                                     ])
 
-                wp.fwt = np.asarray(Cfwt, cxi)
-                wp.ompeak = 0
+                Etwf = abs(Ctwf) ** 2
+                Efwt = abs(Cfwt[
+                               concat([
+                                   arange(CNq + 1, CL),
+                                   arange(1, CNq)
+                               ])
+                           ]) ** 2
 
-        if isempty(wp.twfmax):
-            wp.twfmax = twf(wp.tpeak)
-            if isnan(wp.twfmax):
-                wp.twfmax = twf(wp.tpeak + 10 ** -14)
+                Iest1 = CT / CL * \
+                        sum(
+                            abs(
+                                Etwf[2:] - 2 * Etwf[1:-2] + Etwf[1:-3]
+                            )
+                        ) / 24
 
-        vfun = twf
-        xp = wp.tpeak
-        lim1 = wp.t1
-        lim2 = wp.t2
+                Iest2 = 1 / CT * \
+                        sum(
+                            abs(
+                                Etwf[2:] - 2 * Etwf[1:-2] + Etwf[1:-3]
+                            )
+                        ) / 24
 
-        QQ, wflag, xx, ss = sqeps(vfun, xp, lim1, lim2, racc, MIC, np.array([-1, 1]) * 8 * (2 * np.pi * fs))
-        wp.t1e = ss[0, 0]
-        wp.t2e = ss[0, 1]
-        wp.t1h = ss[1, 0]
-        wp.t2h = ss[1, 1]
-        if wflag == 1:
-            print("Time domain window not well behaved...")
+                Eest = 1 / CT * sum(Efwt)
+
+                if (abs(Etot - Eest) + Iest1 + Iest2) / Etot > 0.01:
+                    print("WARNING: Cannot accurately invert the specified time-domain form...")
+
+                Cfwt = Cfwt[1:CNq]
+                cxi = twopi / CT * arange(1, CNq - 1).conj().T
+
+                if 2 * abs(CT / CT * sum(Ctwf)) < ctol:
+                    Atot = abs(twopi / CT * sum(Cfwt / cxi))
+                    cxi0 = cxi[0]
+                    Cfwt0 = CT / CL * sum(Ctwf * exp(-1j * cxi0 * ct))
+                    axi = NAN * zeros((CL, 1,))
+                    Afwt = NAN * zeros((CL, 1,))
+                    kn = 1
+
+                    while 2 * abs(Cfwt0) / Atot > ctol:
+                        cxi0 /= 2
+                        Cfwt0 = CT / CL * sum(Ctwf * exp(-1j * cxi0 * ct))
+                        axi[kn] = cxi0
+                        Afwt[kn] = Cfwt0
+                        kn += 1
+                    axi = axi[0:kn - 1]
+                    Afwt = Afwt[0:kn - 1]
+
+                else:
+                    ix = min([
+                        1 + nonzero(np.diff(abs(Cfwt[1:])) <= 0)[0],
+                        len(Cfwt)
+                    ])
+                    cxi0 = interp1(
+                        asarray([
+                            0,
+                            abs(Cfwt[:ix]),
+                        ]),
+                        asarray([
+                            0,
+                            cxi[:ix]
+                        ]),
+                        ctol
+                    )
+                    axi = []
+                    Afwt = []
+                C50 = interp1(
+                    asarray([0, cxi]),
+                    asarray(0, Cfwt),
+                    cxi0 / 4
+                )
+
+                imxi = argmax(abs(Cfwt))
+
+                bxi1 = linspace(log(cxi0), log(cxi[0]), ceil(2 * CL / 3)).conj().T
+                zxi1 = (bxi1[:-2] + bxi1[1:]) / 2
+
+                bxi2 = linspace(log(cxi[0]), log(cxi[imxi]), ceil(2 * CL / 3)).conj().T
+                zxi2 = (bxi2[:-2] + bxi2[1:]) / 2
+
+                bxi3 = linspace(log(cxi0), log(cxi[0]), ceil(2 * CL / 3)).conj().T
+                zxi3 = (bxi3[:-2] + bxi3[1:]) / 2
+
+                zxi = asarray([zxi1, zxi2, zxi3])
+                bxi = asarray([bxi1[:-2], bxi2[:-2], bxi3])
+                dbxi = np.diff(bxi)
+
+                Zfwt = interp1(
+                    asarray([0, axi, cxi]),
+                    asarray([0, Afwt, Cfwt]),
+                    exp(zxi)
+                )
+                wp.fwt = [Zfwt, exp(zxi)]
+
+                # Estimate general parameters
+                if isempty(wp.ompeak):
+                    ipeak = nonzero(abs(Zfwt) == max(abs(Zfwt)))
+                    if len(ipeak) == 1:
+                        a1 = abs(Zfwt[ipeak - 1])
+                        a2 = abs(Zfwt[ipeak])
+                        a3 = abs(Zfwt[ipeak + 1])
+
+                        wp.ompeak = zxi[ipeak]
+                        if abs(a1 - 2 * a2 + a3) > 2 * eps:
+                            wp.ompeak *= wp.ompeak + 0.5 * (a1 - a3) / (a1 - 2 * a2 + a3) * dbxi[ipeak]
+
+                    else:
+                        wp.ompeak = mean(zxi[ipeak])
+                    wp.ompeak = exp(wp.ompeak)
+
+                if isempty(wp.fwtmax):
+                    ipeak = argmin(abs(cxi - wp.ompeak))
+                    wp.fwtmax = interp1(
+                        cxi[ipeak - 1:ipeak + 1],
+                        abs(Cfwt[ipeak - 1:ipeak + 1]),
+                        wp.ompeak
+                    )
+
+                if isempty(wp.C):
+                    wp.C = 0.5 * sum(Zfwt.conj() * dbxi)
+                if isempty(wp.D):
+                    wp.D = inf
+                    if abs(Zfwt[1] / Zfwt[0]) > exp(zxi[1] - zxi[0]):
+                        wp.D = wp.ompeak / 2 * sum(exp(-zxi) * (Zfwt.conj() * dbxi))
+
+                # Calculate cumulative integrals.
+                CS = C50 + cumsum(Zfwt * dbxi)
+                CS = asarray([C50, CS[:]]) / CS[-1]
+                CS = abs(CS)
+
+                ICS = cumsum(np.flipud(Zfwt * dbxi))
+                ICS = ICS[-1:0:-1]
+                ICS = asarray([
+                    ICS[:],
+                    0
+                ]) / (ICS[2] + C50)
+                ICS = abs(ICS)
+
+                # Estimate epsilon supports.
+                xid = nonzero((CS[:-2] < racc / 2) & (CS[1:] >= racc / 2))[0]
+                if isempty(xid):
+                    wp.xi1e = exp(bxi[0])
+                else:
+                    a1 = CS[xid] - racc / 2
+                    a2 = CS[xid + 1] - racc / 2
+                    wp.xi1e = exp(bxi[xid]) - a1 * (bxi[xid + 1] - bxi[xid]) / (a2 - a1)
+
+                xid = nonzero((ICS[:-2] < racc / 2) & (ICS[1:] >= racc / 2))[-1]
+                if isempty(xid):
+                    wp.xi2e = exp(bxi[-1])
+                else:
+                    a1 = ICS[xid] - racc / 2
+                    a2 = ICS[xid + 1] - racc / 2
+                    wp.xi2e = exp(bxi[xid]) - a1 * (bxi[xid + 1] - bxi[xid]) / (a2 - a1)
+
+                xid = nonzero((CS[:-2] < .25) & (CS[1:] >= .25))[0]
+                if isempty(xid):
+                    wp.xi1h = exp(bxi[0])
+                else:
+                    a1 = CS[xid] - .25
+                    a2 = CS[xid + 1] - .25
+                    wp.xi1h = exp(bxi[xid]) - a1 * (bxi[xid + 1] - bxi[xid]) / (a2 - a1)
+
+                xid = nonzero((ICS[:-2] >= .25) & (ICS[1:] < .25))[-1]
+                if isempty(xid):
+                    wp.xi2h = exp(bxi[-1])
+                else:
+                    a1 = ICS[xid] - .25
+                    a2 = ICS[xid + 1] - .25
+                    wp.xi2h = exp(bxi[xid]) - a1 * (bxi[xid + 1] - bxi[xid]) / (a2 - a1)
+
+            # Return to the time-domain form
+            vfun = lambda u: (twf(u) * exp(-1j * wp.ompeak * u)).conj()
+            xp = wp.tpeak
+            lim1 = wp.t1
+            lim2 = wp.t2
+
+            QQ, wflag, xx, ss = sqeps(vfun, xp, lim1, lim2, racc, MIC,
+                                      8 * twopi * fmax / wp.ompeak * L / fs * asarray[-1, 1]
+                                      )
+
+            wp.t1e = ss[0, 0]
+            wp.t2e = ss[0, 1]
+            wp.t1h = ss[1, 0]
+            wp.t2h = ss[1, 1]
+
+            if wflag == 1:
+                print("WARNING: The time-domain wavelet function is not well behaved...")
 
 
 def sqeps(vfun, xp, lim1, lim2, racc, MIC, nlims):
