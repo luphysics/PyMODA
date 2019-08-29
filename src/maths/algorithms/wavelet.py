@@ -80,7 +80,8 @@ def wft(signal,
         preprocess=False,
         disp_mode=True,
         plot_mode=False,
-        cut_edges=False):
+        cut_edges=False,
+        nv=None):
     fmax = fmax or fs / 2
     L = len(signal)
 
@@ -120,12 +121,38 @@ def wft(signal,
             print("Estimating window parameters.")
             parcalc(rel_to_l, L, wp, fwt, twf, disp_mode, f0, fmax)
 
-    coib1 = np.ceil(abs(wp.t1e * fs))
-    coib2 = np.ceil(abs(wp.t2e * fs))
+    if isempty(fmin):
+        fmin = wp.ompeak / twopi * (wp.t2e - wp.t1e) * fs / L
 
-    if wp.t2e - wp.t1e > L / fs:
-        print("No WFT coefficients in cone of influence")
-        cut_edges = False
+    if fmin > fmax:
+        print("WARNING: fmin must be smaller than fmax.")
+
+    if (wp.t2e - wp.t1e) * wp.ompeak / (twopi * fmax) > L / fs:
+        print("WARNING: For wavelet function params and signal time-length there are no WT coefficients...")
+    elif (wp.t2e - wp.t1e) * wp.ompeak / (twopi * fmin) * fs / L > 1 + 2 * eps:
+        print("WARNING: At lowest frequency there are no WT coefficients...")
+
+    nvsim = nv
+    wp.nv = nv
+    if isempty(nv):
+        Nb = 10
+        # TODO: check this
+
+        wp.nv = Nb * log(2) / log(wp.xi2h / wp.xi1h)
+        nv = ceil(wp.nv)
+        print(f"Optimal nv determined to be {nv}")
+
+    freq = 2 ** (arange(ceil(nv * np.log2(fmin)), np.floor(nv * np.log2(fmax))).conj().T / nv)
+    SN = len(freq)
+
+    coib1 = np.ceil(abs(wp.t1e * fs * (wp.ompeak / (twopi * freq))))
+    coib2 = np.ceil(abs(wp.t2e * fs * wp.ompeak / (twopi * freq)))
+
+    dflag = int(padmode == "predictive")
+
+    if preprocess and dflag==0:
+        # TODO
+        pass
 
     fstepsim = fstep
     wp.fstep = fstep
@@ -1487,4 +1514,4 @@ if __name__ == "__main__":
     w, f = wft(signal, fs)
 
     plt.pcolormesh(t, f, np.abs(w))
-    # plt.show()
+    plt.show()
