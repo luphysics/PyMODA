@@ -52,9 +52,8 @@ class BaseTFPresenter:
         """
         pass
 
-    def on_task_completed(self, total, weighting=1):
-        self.tasks_completed += weighting
-        self.view.update_progress(self.tasks_completed, total)
+    def on_progress_updated(self, current, total):
+        self.view.update_progress(current, total)
 
     def on_all_tasks_completed(self):
         self.tasks_completed = 0

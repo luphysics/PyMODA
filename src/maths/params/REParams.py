@@ -13,14 +13,14 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from maths.Signals import Signals
-from maths.algorithms.TFParams import TFParams, _wft
+from maths.signals.Signals import Signals
+from maths.params.TFParams import TFParams, _wft, _fmin, _fmax
 
 
-class PCParams(TFParams):
+class REParams(TFParams):
 
     def __init__(self, signals: Signals,
-                 fmin=0,
+                 fmin=None,
                  fmax=None,
                  fstep="auto",
                  f0=1,
@@ -31,18 +31,14 @@ class PCParams(TFParams):
                  preprocess=True,
                  rel_tolerance=0.01,
                  transform=_wft,
-                 surr_enabled=False,
-                 surr_count=0,
-                 surr_method="RP",
-                 surr_preproc=False,
+                 method=2,
+                 param=None,
+                 normalize=False,
+                 path_opt=True,
+                 max_iterations=20,
+                 cache_file=None,
+                 intervals=None
                  ):
-        if not surr_enabled:
-            surr_count = 0
-
-        self.surr_count = surr_count
-        self.surr_method = surr_method
-        self.surr_preproc = surr_preproc
-
         super().__init__(signals,
                          fmin,
                          fmax,
@@ -55,3 +51,33 @@ class PCParams(TFParams):
                          preprocess,
                          rel_tolerance,
                          transform)
+
+        self.intervals = intervals
+
+        # Add params not used in TFParams.
+        self.data["Method"] = method
+
+        if param:
+            self.data["Param"] = param  # Not tested, may not work.
+
+        self.data["Normalize"] = normalize
+        self.data["PathOpt"] = path_opt
+        self.data["MaxIter"] = max_iterations
+
+        if cache_file:
+            self.data["CachedDataLocation"] = cache_file
+
+        if fmin is None:
+            self.delete(_fmin)
+        else:
+            self.data[_fmin] = fmin
+
+        if fmax is None:
+            self.delete(_fmax)
+        else:
+            self.data[_fmax] = fmax
+
+        self.data["Display"] = "off"
+
+    def set_cache_file(self, file: str):
+        self.data["CachedDataLocation"] = file

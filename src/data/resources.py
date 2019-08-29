@@ -28,49 +28,38 @@ For example, get("layout:my_window.ui") or get("img:my_image.png").
 """
 
 
-def get_base_path():
+def _get_base_path():
     """Returns the path to the resources folder."""
     return "../res/"
 
 
-def get_img_path():
+def _get_img_path():
     """Returns the path to the image folder."""
-    return get_base_path() + "img/"
+    return _get_base_path() + "img/"
 
 
-def get_layout_path():
+def _get_layout_path():
     """Returns the path to the layout folder."""
-    return get_base_path() + "layout/"
+    return _get_base_path() + "layout/"
 
 
-def get_name():
+def get_program_name() -> str:
     """Returns the name of the program."""
     return "PyMODA"
 
 
-def path_from_file_string(str):
+def path_from_file_string(str) -> str:
     """
     Returns the file path from a file string which is
     retrieved from a drag-and-drop event.
     """
     result = str.replace("file://", "")
-    if ":" == result[2]: # This is a Windows path; remove initial forward-slash.
+    if ":" == result[2]:  # This is a Windows path; remove initial forward-slash.
         result = result[1:]
     return result
 
 
-def get_ui(name):
-    """
-    Gets a .ui file from the resources folder. You may
-    specify the name with or without the .ui extension.
-    """
-    ext = ".ui"
-    if ext not in name:
-        name += ext
-    return get_layout_path() + name
-
-
-def get(resource: string) -> string:
+def get(resource: string) -> str:
     """
     Gets the path to a resource from the appropriate folder,
     when given a name beginning with the resource type and
@@ -89,23 +78,25 @@ def get(resource: string) -> string:
     return folder + name
 
 
-def get_test_path():
-    return get_base_path() + "test/"
+def _get_test_path():
+    return _get_base_path() + "test/"
 
 
-def get_colour_path():
-    return get_base_path() + "colours/"
+def _get_colour_path():
+    return _get_base_path() + "colours/"
 
 
 # Used to select the correct path for a given resource type.
 resources_dict = {
-    "layout": get_layout_path(),
-    "img": get_img_path(),
-    "image": get_img_path(),
-    "test": get_test_path(),
-    "colours": get_colour_path(),
+    "layout": _get_layout_path(),
+    "img": _get_img_path(),
+    "image": _get_img_path(),
+    "test": _get_test_path(),
+    "colours": _get_colour_path(),
 }
 
 
 class ResourceException(Exception):
-    pass
+    """
+    An Exception raised when an error occurs while finding resources.
+    """

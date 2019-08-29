@@ -13,16 +13,22 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from typing import Type
 
 from PyQt5.QtWidgets import QApplication
 
+from gui.windows.base.BaseWindow import BaseWindow
+from gui.windows.bispectrum.BAWindow import BAWindow
 from gui.windows.phasecoherence.PCWindow import PCWindow
+from gui.windows.ridgeextraction.REWindow import REWindow
 from gui.windows.timefrequency.TFWindow import TFWindow
 from gui.windows.LauncherWindow import LauncherWindow
+from utils import cache
 
 
 class Application(QApplication):
     """The base application."""
+
     launcher_window = None
     windows = []
 
@@ -43,7 +49,29 @@ class Application(QApplication):
         """Opens the phase coherence window."""
         self.open_window(PCWindow)
 
-    def open_window(self, WindowType):
+    def start_ridge_extraction(self):
+        """Opens the phase coherence window."""
+        self.open_window(REWindow)
+
+    def start_bispectrum(self):
+        """Opens the wavelet bispectrum analysis window."""
+        self.open_window(BAWindow)
+
+    def start_bayesian(self):
+        """Opens the Bayesian inference window."""
+        raise Exception("Dynamical Bayesian inference is not implemented yet.")
+        # self.open_window(DBIWindow)
+
+    def open_window(self, WindowType: Type[BaseWindow]):
         w = WindowType(self)
         self.windows.append(w)
         w.show()
+
+    def notify_close_event(self, window: BaseWindow):
+        try:
+            self.windows.remove(window)
+        except ValueError:
+            pass
+
+        if len(self.windows) == 0:
+            cache.clear()

@@ -31,9 +31,9 @@ class TFWindow(BaseTFWindow, TFView):
     presenter.
     """
 
-    def __init__(self, application):
-        TFView.__init__(self, application, TFPresenter(self))
-        BaseTFWindow.__init__(self)
+    def __init__(self, application, presenter=None):
+        TFView.__init__(self, application, presenter or TFPresenter(self))
+        BaseTFWindow.__init__(self, application)
 
     def init_ui(self):
         super().init_ui()

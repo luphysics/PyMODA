@@ -18,11 +18,12 @@
 DO NOT import this module in the main process, or it will break Linux support
 due to issues with the LD_LIBRARY_PATH.
 """
-from maths.algorithms.TFParams import TFParams, _f0, _fmin
+import maths.multiprocessing.mp_utils
+from maths.params.TFParams import TFParams, _f0, _fmin
 from utils import args
 
 # This must be above the WFT and matlab imports.
-args.setup_matlab_runtime()
+maths.multiprocessing.mp_utils.setup_matlab_runtime()
 
 import WFT
 import matlab
@@ -56,9 +57,9 @@ def calculate(time_series, params: TFParams):
     if f0 is not None and fmin is not None and fmin != 0:
         params_dict[_f0] = f0 / fmin
 
-    wft, frequency = package.wft(signal_matlab,
-                                 params.fs,
-                                 params_dict,
-                                 nargout=2)
+    wft, frequency = package.transform(signal_matlab,
+                                       params.fs,
+                                       params_dict,
+                                       nargout=2)
 
     return wft, frequency

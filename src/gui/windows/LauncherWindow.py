@@ -19,8 +19,8 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 
 from data import resources
+from data.resources import get
 from gui.windows.base.CentredWindow import CentredWindow
-from data.resources import get_ui, get
 
 
 class LauncherWindow(CentredWindow):
@@ -30,8 +30,7 @@ class LauncherWindow(CentredWindow):
     """
 
     def __init__(self, application):
-        self.application = application
-        super().__init__()
+        super().__init__(application)
 
     def init_ui(self):
         uic.loadUi(get("layout:window_launcher.ui"), self)
@@ -39,11 +38,9 @@ class LauncherWindow(CentredWindow):
 
         self.btn_time_freq.clicked.connect(self.application.start_time_frequency)
         self.btn_wavelet_phase.clicked.connect(self.application.start_phase_coherence)
-
-        # Placeholders.
-        self.btn_ridge_extraction.clicked.connect(self.application.start_phase_coherence)
-        self.btn_wavelet_bispectrum.clicked.connect(self.application.start_phase_coherence)
-        self.btn_dynamical_bayesian.clicked.connect(self.application.start_phase_coherence)
+        self.btn_ridge_extraction.clicked.connect(self.application.start_ridge_extraction)
+        self.btn_wavelet_bispectrum.clicked.connect(self.application.start_bispectrum)
+        self.btn_dynamical_bayesian.clicked.connect(self.application.start_bayesian)
 
     def load_banner_images(self):
         physics_label = self.lbl_physics

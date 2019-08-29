@@ -18,6 +18,10 @@ from gui.plotting.BaseComponent import BaseComponent
 
 
 class PlotComponent(BaseComponent):
+    """
+    A base component for plotting. Should be independent of any
+    plotting library.
+    """
 
     def get_xlabel(self):
         """Returns the label for the x-axis. Should be overridden in subclasses."""
@@ -39,10 +43,21 @@ class PlotComponent(BaseComponent):
         pass
 
     def clear(self):
+        """
+        Clears the plot, removing all plotted elements.
+        """
         pass
 
-    def update_xlabel(self, text=None ):
+    def update_xlabel(self, text=None):
+        """
+        Updates the x-label. If no value is passed,
+        the result from get_xlabel() will be used.
+        """
         pass
 
     def update_ylabel(self, text=None):
+        """
+        Updates the y-label. If no value is passed,
+        the result from get_ylabel() will be used.
+        """
         pass

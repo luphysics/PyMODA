@@ -14,7 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from gui.plotting.MatplotlibComponent import MatplotlibComponent
-from maths.TimeSeries import TimeSeries
+from maths.signals.TimeSeries import TimeSeries
 
 
 class SignalPlot(MatplotlibComponent):
@@ -23,7 +23,6 @@ class SignalPlot(MatplotlibComponent):
     """
 
     def plot(self, data: TimeSeries, clear=True):
-
         if clear:
             self.clear()
             self.rect_stack.clear()
@@ -42,12 +41,13 @@ class SignalPlot(MatplotlibComponent):
         self.axes.set_xlim(xlim)
         self.on_plot_complete()
 
+    def zoom_to(self, rect, save_state=True, trigger_listeners=True):
+        """Override the zoom to not change the range of visible y-values."""
+        rect.y1, rect.y2 = self.ylim()
+        super(SignalPlot, self).zoom_to(rect, save_state, trigger_listeners)
 
     def get_xlabel(self):
         return "Time (s)"
 
     def get_ylabel(self):
         return "Value"
-
-    def on_reset(self):
-        super(SignalPlot, self).on_reset()

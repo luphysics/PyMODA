@@ -17,16 +17,17 @@ from PyQt5.QtWidgets import QDialog, QListWidgetItem
 
 from gui.dialogs.FrequencyDialog import FrequencyDialog
 from gui.windows.base.analysis.BaseTFPresenter import BaseTFPresenter
-from maths.Signals import Signals
-from maths.TFOutputData import TFOutputData
-from maths.TimeSeries import TimeSeries
-from maths.algorithms.TFParams import TFParams, _wt, _wft, create
+from maths.signals.Signals import Signals
+from maths.signals.TFOutputData import TFOutputData
+from maths.signals.TimeSeries import TimeSeries
+from maths.params.TFParams import TFParams, _wt, _wft, create
+from maths.algorithms.preprocessing import preprocess
 from maths.multiprocessing.MPHelper import MPHelper
 
 
 class TFPresenter(BaseTFPresenter):
     """
-    The Presenter in control of the time-frequency window.
+    The presenter in control of the time-frequency window.
     """
 
     def get_total_tasks_count(self) -> int:
@@ -51,20 +52,20 @@ class TFPresenter(BaseTFPresenter):
         self.invalidate_data()
 
         self.mp_handler = MPHelper()
-        self.mp_handler.wft(
+        self.mp_handler.transform(
             params=params,
             window=self.view.get_window(),
-            on_result=self.on_calculation_completed)
+            on_result=self.on_transform_completed,
+            on_progress=self.on_progress_updated)
 
         log: bool = (params.transform == _wt)
         self.view.main_plot().set_log_scale(logarithmic=log)
         self.view.amplitude_plot().set_log_scale(logarithmic=log)
 
         self.view.on_calculate_started()
-        self.view.update_progress(0, self.get_total_tasks_count())
         print("Started calculation...")
 
-    def on_calculation_completed(self, name, times, freq, values, ampl, powers, avg_ampl, avg_pow):
+    def on_transform_completed(self, name, times, freq, values, ampl, powers, avg_ampl, avg_pow):
         """Called when the calculation of the desired transform(s) is completed."""
         self.view.on_calculate_stopped()
 
@@ -80,12 +81,19 @@ class TFPresenter(BaseTFPresenter):
         )
 
         print(f"Finished calculation for '{name}'.")
-        self.on_task_completed(self.get_total_tasks_count())
 
         # Plot result if all signals finished.
-        if all([s.output_data.is_valid() for s in self.signals_calc]):
-            self.plot_output()
-            self.on_all_tasks_completed()
+        if self.all_transforms_completed():
+            self.on_all_transforms_completed()
+
+    def all_transforms_completed(self):
+        """Returns whether all transforms have been completed."""
+        return all([s.output_data.is_valid() for s in self.signals_calc])
+
+    def on_all_transforms_completed(self):
+        """Called when all transforms have been completed."""
+        self.plot_output()
+        self.on_all_tasks_completed()
 
     def get_values_to_plot(self, amplitude=None) -> tuple:
         """
@@ -185,10 +193,21 @@ class TFPresenter(BaseTFPresenter):
         """Plots the signal on the SignalPlot."""
         self.view.plot_signal(self.get_selected_signal())
 
+    def plot_preprocessed(self):
+        """Plots the preprocessed version of the signal."""
+        sig = self.get_selected_signal()
+
+        fmin = self.view.get_fmin()
+        fmax = self.view.get_fmax()
+
+        p = preprocess(sig.signal, sig.frequency, fmin, fmax)
+        self.view.plot_preproc.plot(sig.times, sig.signal, p)
+
     def on_data_loaded(self):
         """Called when the time-series data has been loaded."""
         self.view.update_signal_listview(self.signals.names())
         self.plot_signal()
+        self.plot_preprocessed()
 
     def on_signal_selected(self, item):
         """

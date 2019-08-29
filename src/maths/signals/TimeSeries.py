@@ -15,14 +15,16 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import numpy as np
 
-from maths.TFOutputData import TFOutputData
+from maths.signals.TFOutputData import TFOutputData
 
 
 class TimeSeries:
     """
     A time-series of data: a 1-dimensional series of recorded values,
-    with a frequency at which the data were recorded. The sampling frequency can be used
-    to calculate the time for each datum point in the series.
+    with a sampling frequency at which the data were recorded.
+
+    The sampling frequency can be used to calculate the time for
+    each datum point in the series.
     """
 
     def __init__(self, data, frequency=None, name=None):
@@ -48,14 +50,17 @@ class TimeSeries:
         of the time values.
         """
         self.frequency = freq
-        self.times = self.generate_times()
+        self.times = self._generate_times()
 
     def has_name(self):
         return self.name is not None
 
-    def generate_times(self):
+    def has_times(self):
+        return self.times is not None
+
+    def _generate_times(self):
         """Generates the time values associated with the data."""
-        times = self.signal.copy()
+        times = np.empty(self.signal.shape, dtype=np.float)
         for i in range(0, len(self.signal)):
             times[i] = self.initial_time + i / self.frequency
 

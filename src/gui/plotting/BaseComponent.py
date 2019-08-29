@@ -20,8 +20,6 @@ from gui.BaseUI import BaseUI
 
 class BaseComponent(QWidget, BaseUI):
     """
-    A base UI component. Each window should consist of
-    multiple resizable components. Components should be
-    able to nest inside each other.
+    A base UI component. Components are QWidgets.
     """
     pass

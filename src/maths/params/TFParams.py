@@ -13,7 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from maths.Signals import Signals
+from maths.signals.Signals import Signals
 
 # Keys for the dictionary that is supplied to the Matlab function.
 _fmin = "fmin"
@@ -96,6 +96,8 @@ class TFParams:
             _preprocess: "on" if preprocess else "off",
         }
 
+    def get(self) -> dict:
+        """Gets the parameters to supply to the wt/wft function as a dictionary."""
         temp_keys = []
         for key, value in self.data.items():
             if value is None:
@@ -103,11 +105,15 @@ class TFParams:
 
         # Remove values which are None, because they cannot be passed to Matlab.
         for k in temp_keys:
-            del self.data[k]
+            self.delete(k)
 
-    def get(self) -> dict:
-        """Gets the parameters to supply to the wt/wft function as a dictionary."""
         return self.data
+
+    def set_item(self, key, value):
+        self.data[key] = value
+
+    def get_item(self, key):
+        return self.data.get(key)
 
     def remove_signals(self):
         """
@@ -119,10 +125,16 @@ class TFParams:
     def contains(self, key):
         return key in self.data
 
+    def delete(self, key: str):
+        try:
+            del self.data[key]
+        except KeyError:
+            pass
+
 
 def create(signals, params_type=TFParams, **kwargs):
     """
-    Creates a TFParams object, taking the same **kwargs as
+    Creates a params object, taking the same **kwargs as
     the constructor. Any argument that is set to None - or not
     supplied at all - will cause the params object to use the default
     value for that argument.

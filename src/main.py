@@ -16,19 +16,18 @@
 
 import sys
 
-from utils import errorhandling, stdout_redirect, args
+# Important: required for PyInstaller until Numpy 1.17.1 is released.
+import numpy.random.common
+import numpy.random.bounded_integers
+import numpy.random.entropy
+
+from utils import errorhandling, stdout_redirect, args, cache
 from gui.Application import Application
-
-
-def main():
-    """Starts the application."""
-    app = Application(sys.argv)
-    app.exec()
-
 
 # The entry-point of the program.
 if __name__ == "__main__":
-    args.parse_args()
+    args.init()
     errorhandling.init()
     stdout_redirect.init()
-    main()
+
+    Application(sys.argv).exec()

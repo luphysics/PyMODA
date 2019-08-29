@@ -16,9 +16,8 @@
 
 import numpy as np
 from numpy.random import permutation as randperm
-from time import time as t
 
-from maths.TimeSeries import TimeSeries
+from maths.signals.TimeSeries import TimeSeries
 
 _RP = "RP"
 _FT = "FT"
@@ -66,7 +65,7 @@ def surrogate_calc(time_series: TimeSeries, N, method, pp, fs):
     params.time = time
 
     if method == _RP:
-        for k in range(0, N):
+        for k in range(N):
             surr[k, :] = sig[randperm(L)]
 
     elif method == _FT:

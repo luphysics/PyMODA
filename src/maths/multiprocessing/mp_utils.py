@@ -13,31 +13,56 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import os
 
-import numpy as np
-from multiprocess import sharedctypes
-from multiprocess.sharedctypes import RawArray
-from numpy import ctypeslib, ndarray
+import psutil as psutil
+from multiprocess import Process
+from multiprocess.process import current_process
+
+from utils.args import matlab_runtime
 
 """
-Experimental. Contains functions to help with accessing shared memory arrays.
+Contains functions to help with multiprocessing.
 """
 
 
-def convert_to_ctypes(arr: ndarray) -> RawArray:
-    size = arr.size
-    shape = arr.shape
-    arr.shape = size
+def terminate_tree(process: Process):
+    """
+    Terminates a process along with all of its child processes.
+    """
+    try:
+        pid = process.pid
+        for child in psutil.Process(pid).children(recursive=True):
+            child.terminate()
+    except psutil.NoSuchProcess:
+        pass
+    finally:
+        process.terminate()
 
-    arr_ctypes = sharedctypes.RawArray("d", arr)
-    arr = np.frombuffer(arr_ctypes, dtype=np.float64, count=size)
-    arr.shape = shape
 
-    return arr_ctypes
+def is_main_process() -> bool:
+    """Returns whether the current process is the main process."""
+    return current_process().name == "MainProcess"
 
 
-def convert_to_numpy(arr_ctypes: RawArray, shape=None) -> ndarray:
-    result = ctypeslib.as_array(arr_ctypes)
-    if shape:
-        result.shape = shape
-    return result
+def setup_matlab_runtime():
+    """
+    Sets the LD_LIBRARY_PATH variable to the value provided
+    in the arguments. Should NOT be executed in the main
+    process, because this will crash PyQt on Linux.
+    """
+    if is_main_process():
+        raise MultiProcessingException("Do not set the LD_LIBRARY_PATH environment variable on the main process; "
+                                       "it will break the program on Linux. Instead, call MATLAB code from "
+                                       "another process using Task and Scheduler. See MPHelper for examples"
+                                       "of this.")
+    path = matlab_runtime()
+    if path:
+        os.environ["LD_LIBRARY_PATH"] = path
+        print(f"Set LD_LIBRARY_PATH to {path}")
+
+
+class MultiProcessingException(Exception):
+    """
+    Exception thrown when an error is made with multiprocessing.
+    """

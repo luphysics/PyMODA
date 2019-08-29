@@ -42,14 +42,14 @@ class PlotOptionsBar(QWidget, BaseUI):
         self.back_button = BackButton()
         self.layout.addWidget(self.back_button)
 
-        self.setFixedHeight(80)
-        self.setFixedWidth(340)
+        self.setFixedHeight(60)
+        self.setFixedWidth(240)
 
         self.create_progressbar()
 
     def create_progressbar(self):
         self.progress = QProgressBar()
-        self.progress.setFixedWidth(200)
+        self.progress.setFixedWidth(110)
 
         self.progress.setMinimum(0)
         self.progress.setMaximum(0)
@@ -59,8 +59,10 @@ class PlotOptionsBar(QWidget, BaseUI):
     def set_in_progress(self, loading):
         if loading:
             self.progress.show()
+            self.setFixedWidth(240)
         else:
             self.progress.hide()
+            self.setFixedWidth(120)
 
 
 class OptionsButton(QPushButton, BaseUI):

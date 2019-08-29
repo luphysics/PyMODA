@@ -20,7 +20,12 @@ from gui.plotting.PlotComponent import PlotComponent
 
 
 class PyQtGraphComponent(PlotComponent):
-    """A component which enables plotting via PyQtGraph."""
+    """
+    Warning: not fully implemented. Correct implementation is
+    not planned.
+
+    A component which enables plotting via PyQtGraph.
+    """
 
     def init_ui(self):
         self.layout = QVBoxLayout(self)
