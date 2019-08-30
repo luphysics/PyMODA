@@ -64,10 +64,6 @@ def interp1(x, y, xq):
     scipy.interpolate.interp1d(x, y, kind="slinear", fill_value="extrapolate")
 
 
-def fft(x):
-    return np.fft.fft(x)
-
-
 def sqrt(n): return np.sqrt(n)
 
 
@@ -92,6 +88,9 @@ max = np.max
 argmax = np.argmax
 argmin = np.argmin
 concat = np.concatenate
+
+fft = np.fft.fft
+ifft = np.fft.ifft
 
 nonzero = np.nonzero
 asarray = np.asarray

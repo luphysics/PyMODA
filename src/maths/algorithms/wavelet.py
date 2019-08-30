@@ -64,7 +64,7 @@ def wft(signal,
         on_warning=lambda x: print(f"Warning: {x}"),
         window="Lognorm",
         f0=1,
-        fmin=0,
+        fmin=None,
         fmax=None,
         fstep="auto",
         padmode="predictive",
@@ -140,10 +140,12 @@ def wft(signal,
     dflag = int(padmode == "predictive")
 
     if preprocess and dflag == 0:
-        import preprocessing  as preproc
+        import preprocessing as preproc
         signal = preproc.preprocess(signal, fs, fmin, fmax)
 
     NL = 2 ** nextpow2(L + coib1[0] + coib2[0])
+
+    coib1 = coib1.reshape(coib1.shape[1])
     if coib1[0] == 0 and coib2[0] == 0:
         n1 = np.floor((NL - L) / 2)
         n2 = np.ceil((NL - L) / 2)
@@ -155,11 +157,18 @@ def wft(signal,
     if padmode == "predictive":
         pow = (-(L / fs - np.arange(1, L + 1) / fs)) / (wp.t2h - wp.t1h)
         w = 2 ** pow
-        padleft = fcast(np.flip(signal), fs, n1, [max(fmin, fs / L), fmax],
-                        min(np.ceil(SN / 2) + 5, np.round(L / 3)), w)
-        padleft = np.flip(padleft)
+        padleft = fcast(
+            np.flip(signal),
+            fs,
+            n1,
+            [max([fmin, fs / L]), fmax],
+            min([
+                np.ceil(SN / 2) + 5,
+                np.round(L / 3)
+            ]), w)
 
-        padright = fcast(signal, fs, n2, [max(fmin, fs / L), fmax], min(np.ceil(SN / 2) + 5, np.round(L / 3)), w)
+        padleft = np.flip(padleft)
+        padright = fcast(signal, fs, n2, [max([fmin, fs / L]), fmax], min(np.ceil(SN / 2) + 5, np.round(L / 3)), w)
         dflag = 1
 
     signal = np.concatenate([padleft, signal, padright])
@@ -1175,13 +1184,15 @@ def sqeps(vfun, xp, lim1, lim2, racc, MIC, nlims):
 
 def fcast(sig, fs, NP, fint, *args):  # line1145
     MaxOrder = len(sig)
+
     if len(args) > 0:
         MaxOrder = args[0] or MaxOrder
+
     w = []
     if len(args) > 1:
         w = np.asarray(args[1], dtype=np.float64)
+
     rw = np.sqrt(w)
-    # ignore DispMode
 
     WTol = 10 ** -8  # tolerance for cutting weighting.
     Y = sig[:]
@@ -1189,9 +1200,9 @@ def fcast(sig, fs, NP, fint, *args):  # line1145
         Y = rw * Y
 
     max = np.max(rw)
-    L = find(rw, lambda i: i / max >= WTol)[-1]
+    L = nonzero(rw / max >= WTol)[1][-1]
     T = L / fs
-    t = np.arange(0, L + 1) / fs
+    t = arange(0, L + 1) / fs
 
     w = w[-L - 1:]  # level3
     rw = rw[-L - 1:]  # level3
@@ -1216,13 +1227,13 @@ def fcast(sig, fs, NP, fint, *args):  # line1145
 
     while itn < MaxOrder:
         itn += 1
-        aftsig = abs(fft(Y))
+        aftsig = abs(fft(Y, axis=0))
 
-        a = aftsig[2:np.int(Nq)]
-        m = np.max(a)
-        s = find(a, lambda i: i == m)[0]
+        aftsig = aftsig.reshape(aftsig.shape[1])
+        Nq = int(Nq)
 
-        imax = np.int(s) + 1
+        imax = argmax(aftsig[1:Nq - 1])
+        imax += 1
 
         # Forward search
         nf = ftfr[imax]
@@ -1233,8 +1244,7 @@ def fcast(sig, fs, NP, fint, *args):  # line1145
         FM = np.asarray([FM1, FM2, FM3], dtype=np.float64)
 
         if not isempty(rw):
-            temp = rw.reshape(len(rw), 1) * np.ones((1, 3), dtype=np.float64)
-            FM = FM.transpose() * temp
+            FM = FM.transpose() * (rw.reshape(rw.shape[1], 1) * np.ones((1, 3)))
 
         nb = backslash(FM, Y)  # level3
 
@@ -1246,6 +1256,7 @@ def fcast(sig, fs, NP, fint, *args):  # line1145
         while nerr < perr:
             if abs(nf - fs / 2 + FTol) < eps:  # level3 eps
                 break
+
             pf = nf
             perr = nerr
             pb = nb
