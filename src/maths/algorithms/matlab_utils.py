@@ -13,6 +13,8 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import collections
+
 import numpy as np
 import scipy
 import scipy.integrate
@@ -29,9 +31,17 @@ def isempty(value):
     Imitates MATLAB's `isempty` function by returning whether the object
     is empty - if it has a length - or whether it is None.
     """
-    if hasattr(value, "__len__"):
-        return len(value) == 0
-    return value is None
+    if not is_arraylike(value):
+        return value is None
+
+    if isinstance(value, np.ndarray):
+        return value.size == 0
+
+    return len(value) == 0
+
+
+def is_arraylike(value):
+    return hasattr(value, "__len__")
 
 
 def backslash(x, y):
@@ -61,6 +71,12 @@ def fft(x):
 def sqrt(n): return np.sqrt(n)
 
 
+def farr(arr): return np.asarray(arr, dtype=np.float64)
+
+
+def carr(arr): return np.asarray(arr, dtype=np.complex64)
+
+
 def fminsearch(func, x0, xtol):
     return scipy.optimize.fmin(func=func, x0=x0, xtol=xtol)
 
@@ -80,6 +96,8 @@ concat = np.concatenate
 nonzero = np.nonzero
 asarray = np.asarray
 cumsum = np.cumsum
+vstack = np.vstack
+hstack = np.hstack
 
 conj = np.conj
 abs = np.abs

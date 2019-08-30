@@ -20,7 +20,7 @@ def preprocess(sig: np.ndarray, fs: float, fmin: float, fmax: float) -> np.ndarr
     L = len(sig)
 
     # Detrending
-    X = np.arange(1, len(sig) + 1).transpose() / fs
+    X = np.arange(1, len(sig) + 1).conj().T / fs
     XM = np.ones((len(X), 4,), dtype=np.float64)
 
     for pn in range(1, 4):
