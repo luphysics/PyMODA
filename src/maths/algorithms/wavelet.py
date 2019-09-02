@@ -74,13 +74,15 @@ def wft(signal,
         plot_mode=False,
         cut_edges=False,
         nv=None):
+    p = 1  # WT normalisation.
+
     fmax = fmax or fs / 2
     L = len(signal)
 
     if fs <= 0 or not fs:
         on_error("Sampling frequency should be a positive finite number")
 
-    rec_flag = 1  # What is this for?
+    rec_flag = 1
 
     wp = WindowParams()
 
@@ -125,7 +127,6 @@ def wft(signal,
     wp.nv = nv
     if isempty(nv):
         Nb = 10
-        # TODO: check this
 
         wp.nv = Nb * log(2) / log(wp.xi2h / wp.xi1h)
         nv = ceil(wp.nv)
@@ -134,10 +135,10 @@ def wft(signal,
     freq = 2 ** (arange(ceil(nv * np.log2(fmin)), np.floor(nv * np.log2(fmax))).conj().T / nv)
     SN = len(freq)
 
-    coib1 = np.ceil(abs(wp.t1e * fs * (wp.ompeak / (twopi * freq))))
+    coib1 = np.ceil(abs(wp.t1e * fs * wp.ompeak / (twopi * freq)))
     coib2 = np.ceil(abs(wp.t2e * fs * wp.ompeak / (twopi * freq)))
 
-    dflag = int(padmode == "predictive")
+    dflag = int(padmode == "predictive") and fmin < 5 * fs / L
 
     if preprocess and dflag == 0:
         import preprocessing as preproc
@@ -168,73 +169,78 @@ def wft(signal,
             ]), w)
 
         padleft = np.flip(padleft)
-        padright = fcast(signal, fs, n2, [max([fmin, fs / L]), fmax], min(np.ceil(SN / 2) + 5, np.round(L / 3)), w)
+        padright = fcast(signal, fs, n2, [max([fmin, fs / L]), fmax], min([np.ceil(SN / 2) + 5, np.round(L / 3)]), w)
         dflag = 1
 
-    signal = np.concatenate([padleft, signal, padright])
+    signal = concat([padleft, signal, padright])
 
+    NL = NL[0]
     Nq = np.ceil((NL + 1) / 2)
-    f1 = np.arange(0, Nq)
-    f2 = -np.arange(1, NL - Nq + 1)
-    ff = np.concatenate((f1, f2)) * fs / NL
-    # ff = ff[:]
-    fx = np.fft.fft(signal, np.int(NL))
-    if preprocess:
-        fx = fx.where(ff >= fmin or ff <= fmax)
 
-    # Windowed Fourier Transform by itself
-    WFT = np.zeros((SN, L), dtype=np.complex64) * np.NaN
+    ff = concat([
+        np.arange(0, Nq),
+        -arange(1, NL - Nq)[::-1]
+    ]) * fs / NL
+
+    fx = np.fft.fft(signal, np.int(NL), axis=0)
+    if preprocess:
+        fx[(ff <= max([fmin, fs / L])) & (ff >= fmax)] = 0
+
+        # Windowed Fourier Transform by itself
+    WT = np.zeros((SN, L), dtype=np.complex64) * np.NaN
     ouflag = 0
     if wp.t2e - wp.t1e > L / fs:
         coib1 = 0
         coib2 = 0
 
     for sn in range(0, SN):
-        freqwf = freq[sn] - ff  # TODO: add later
-        ii = find(freqwf, lambda i: wp.xi1 / twopi < i < wp.xi2 / twopi)
+        freqwf = ff * wp.ompeak / (twopi * freq[sn])
+        ii = nonzero((wp.xi1 / twopi < freqwf) & (freqwf < wp.xi2 / twopi))[0]
 
         if not isempty(fwt):
-            fw = fwt(twopi * freqwf[ii])
-            nid = find(fw, lambda x: isnan(x) or not np.isfinite(x))
+            fw = fwt(twopi * freqwf[ii]).conj()
+            nid = nonzero((isnan(fw)) | (~isfinite(fw)))[0]
             if not isempty(nid):
-                fw[nid] = fwt(twopi * freqwf[ii[nid]] + 10 ** -14)
-                nid = find(fw, lambda x: isnan(x) or not np.isfinite(x))
+                fw[nid] = fwt(twopi * freqwf[ii[nid]] + 10 ** -14).conj()
+                nid = nonzero((isnan(fw)) | (~isfinite(fw)))[0]
                 fw[nid] = 0
                 if not isempty(nid):
                     ouflag = 1
                     ouval = twopi * freqwf(nid[0])
 
         else:
-            timewf = 1 / fs * np.asarray(-np.arange(1, np.ceil((NL - 1) / 2)),
-                                         np.arange(NL + 1 - (np.ceil((NL - 1) / 2) + 1, NL)))
-            jj = None  # TODO
-            tw = np.zeros(NL, 1)
-            tw[jj] = twf(timewf(jj)) * np.exp(np.complex(0, -1 * twopi * freq[sn] * timewf[jj]))
-            nid = find(fw, lambda x: isnan(x) or not np.isfinite(x))
+            timewf = (twopi * freq[sn] / wp.ompeak / fs) * concat([
+                -arange(0, np.ceil((NL - 1) / 2)) + 1,
+                arange(NL + 1 - (np.ceil((NL - 1) / 2) + 1), NL)
+            ]).conj().T
+
+            jj = nonzero((timewf > wp.t1) & (timewf < wp.t2))
+            tw = np.zeros((NL, 1))
+            tw[jj] = twf[timewf[jj]].conj()
+
+            nid = nonzero((isnan(tw)) | (~isfinite(tw)))[0]
             if not isempty(nid):
-                tw[nid] = twf(timewf(nid) + 10 ** -14)
-                nid = find(fw, lambda x: isnan(x) or not np.isfinite(x))
+                tw[nid] = twf[timewf[nid] + 10 ** -14]
+                nid = nonzero((isnan(tw)) | (~isfinite(tw)))[0]
                 if not isempty(nid):
                     ouflag = 1
-                    ouval = timewf(nid[0])
-            fw = 1 / fs * np.fft.fft(tw)
+                    ouval = timewf[nid[0]]
+            fw = 1 / fs * np.fft.fft(tw, axis=0)
             fw = fw[ii]
 
         cc = np.zeros((np.int(NL), 1), dtype=np.complex64)
-        fxii = fx[ii]
-        cc = cc.reshape(fxii.shape)
-        cc[ii] = fxii * fw
+        cc = cc.reshape(len(cc))
+        cc[ii] = fx[ii] * fw
 
-        out = np.fft.ifft(cc, NL)
-        n1 = np.int(n1)
-        n2 = np.int(n2)
+        out = (wp.ompeak / (twopi * freq[sn])) ** (1 - p) * np.fft.ifft(cc, NL, axis=0)
+
+        n1 = np.int(n1[0])
+        n2 = np.int(n2[0])
         NL = np.int(NL)
 
-        WFT[sn, np.arange(0, L)] = out[1 + n1: NL - n2 + 1]
+        WT[sn, arange(0, L)] = out[n1: NL - n2 + 1]
 
-        # Code for plotting.
-
-        return WFT, freq
+        return WT, freq
 
 
 def parcalc(racc, L, wp, fwt, twf, disp_mode, f0, fmax, wavelet="Lognorm"):
@@ -1199,9 +1205,9 @@ def fcast(sig, fs, NP, fint, *args):  # line1145
     if not isempty(rw):
         Y = rw * Y
 
-    max = np.max(rw)
-    L = nonzero(rw / max >= WTol)[1][-1]
-    T = L / fs
+    L = nonzero(np.flipud(rw) / max(rw) >= WTol)[1][-1]
+
+    T = (L + 1) / fs
     t = arange(0, L + 1) / fs
 
     w = w[-L - 1:]  # level3
@@ -1223,8 +1229,6 @@ def fcast(sig, fs, NP, fint, *args):  # line1145
     phi = v
     itn = 0
 
-    # Skipped if DispMode
-
     while itn < MaxOrder:
         itn += 1
         aftsig = abs(fft(Y, axis=0))
@@ -1238,15 +1242,15 @@ def fcast(sig, fs, NP, fint, *args):  # line1145
         # Forward search
         nf = ftfr[imax]
 
-        FM1 = np.ones(L + 1, dtype=np.float64)
-        FM2 = np.cos(2 * np.pi * nf * t)
-        FM3 = np.sin(2 * np.pi * nf * t)
-        FM = np.asarray([FM1, FM2, FM3], dtype=np.float64)
+        FM1 = np.ones((L + 1, 1,), dtype=np.float64)
+        FM2 = np.cos(2 * np.pi * nf * t.reshape(len(t), 1))
+        FM3 = np.sin(2 * np.pi * nf * t.reshape(len(t), 1))
+        FM = hstack([FM1, FM2, FM3])
 
         if not isempty(rw):
-            FM = FM.transpose() * (rw.reshape(rw.shape[1], 1) * np.ones((1, 3)))
+            FM = FM * (rw.T * np.ones((1, 3)))
 
-        nb = backslash(FM, Y)  # level3
+        nb = backslash(FM, Y.T)  # level3
 
         s = FM @ nb
         nerr = np.std(Y - s)
@@ -1268,10 +1272,9 @@ def fcast(sig, fs, NP, fint, *args):  # line1145
             FM = np.asarray([FM1, FM2, FM3], dtype=np.float64)
 
             if not isempty(rw):
-                temp = rw.reshape(len(rw), 1) * np.ones((1, 3), dtype=np.float64)
-                FM = FM.transpose() * temp
+                FM = FM.T * (rw.T * np.ones((1, 3)))
 
-            nb = backslash(FM, Y)  # level3
+            nb = backslash(FM, Y.T)  # level3
             nerr = np.std(Y - s)
             df = df * rr
 
@@ -1334,7 +1337,7 @@ def fcast(sig, fs, NP, fint, *args):  # line1145
         if not isempty(rw):
             FM = FM * np.ones((1, 3))
 
-        nb = backslash(FM, Y)  # level3
+        nb = backslash(FM, Y.T)  # level3
 
         s = FM @ nb
         nerr = np.std(Y - s)
@@ -1355,10 +1358,9 @@ def fcast(sig, fs, NP, fint, *args):  # line1145
             FM = np.asarray([FM1, FM2, FM3], dtype=np.float64)
 
             if not isempty(rw):
-                temp = rw.reshape(len(rw), 1) * np.ones((1, 3), dtype=np.float64)
-                FM = FM.transpose() * temp
+                FM = FM.T * (rw.T * np.ones((1, 3)))
 
-            nb = backslash(FM, Y)
+            nb = backslash(FM, Y.T)
             nerr = np.std(Y - FM @ nb)
             df = df * rr
 
@@ -1386,10 +1388,9 @@ def fcast(sig, fs, NP, fint, *args):  # line1145
             FM = np.asarray([FM1, FM2, FM3], dtype=np.float64)
 
             if not isempty(rw):
-                temp = rw.reshape(len(rw), 1) * np.ones((1, 3), dtype=np.float64)
-                FM = FM.transpose() * temp
+                FM = FM.T * (rw.T * np.ones((1, 3)))
 
-            cb[1] = backslash(FM, Y)  # level3
+            cb[1] = backslash(FM, Y.T)  # level3
             cerr[1] = np.std(Y - FM @ cb[1])
 
         while (cf[2] - cf[1] > FTol and cf[3] - cf[2] > FTol):
@@ -1401,7 +1402,7 @@ def fcast(sig, fs, NP, fint, *args):  # line1145
             terr = np.std(Y - FM * tb)
 
             if terr < cerr[2] and tf < cf[2]:  # TODO: fix all indices
-                cf = [cf(1), tf, cf(2)]
+                cf = [cf[1], tf, cf[2]]
                 cerr = [cerr(1), terr, cerr(2)]
                 cb = [cb[1], tb[:], cb[:2]]
             if terr < cerr[2] and tf > cf[2]:
@@ -1446,9 +1447,7 @@ def fcast(sig, fs, NP, fint, *args):  # line1145
         #     FM = FM.transpose() * temp
 
         if not isempty(rw):
-            temp = rw.reshape(len(rw), 1) * np.ones((1, 3), dtype=np.float64)
-            FM = FM.transpose() * temp
-            # FM = FM * (rw @ np.ones((1, 3)))
+            FM = FM.T * (rw.T * np.ones((1, 3)))
             Y = Y - FM @ cb
 
         CK = 3 * itn + 1
@@ -1466,8 +1465,8 @@ def fcast(sig, fs, NP, fint, *args):  # line1145
     v = v[1:itn]
     ic = ic[1:itn]
 
-    fsig = np.zeros(np.int(NP))
-    nt = (np.arange(T, T + (NP - 1), 1 / fs) / fs).transpose()
+    fsig = zeros(np.int(NP[0]))
+    nt = (np.arange(T, T + (np.int(NP[0]) - 1), 1 / fs) / fs).T
 
     if (sig.shape[1] if len(sig.shape) > 1 else 1) > sig.shape[0]:
         fsig = fsig.transpose()
