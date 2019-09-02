@@ -24,6 +24,7 @@ from gui.windows.base.analysis.BaseTFView import BaseTFView
 from gui.windows.base.analysis.plots.AmplitudePlot import AmplitudePlot
 from gui.windows.base.analysis.plots.SignalPlot import SignalPlot
 from gui.windows.base.analysis.plots.ColorMeshPlot import ColorMeshPlot
+from maths.utils import float_or_none
 
 
 class BaseTFWindow(MaximisedWindow, BaseTFView):
@@ -62,6 +63,10 @@ class BaseTFWindow(MaximisedWindow, BaseTFView):
         self.setup_xlim_edits()
         self.setup_progress()
 
+        self.setup_lineedit_fmax()
+        self.setup_lineedit_fmin()
+        self.setup_lineedit_res()
+
         self.get_button_calculate_all().clicked.connect(
             partial(self.presenter.calculate, True)
         )
@@ -69,6 +74,18 @@ class BaseTFWindow(MaximisedWindow, BaseTFView):
             partial(self.presenter.calculate, False)
         )
         self.presenter.init()
+
+    def setup_lineedit_fmin(self):
+        self.line_fmin.editingFinished.connect(self.on_freq_or_res_edited)
+
+    def setup_lineedit_fmax(self):
+        self.line_fmax.editingFinished.connect(self.on_freq_or_res_edited)
+
+    def setup_lineedit_res(self):
+        self.line_res.editingFinished.connect(self.on_freq_or_res_edited)
+
+    def on_freq_or_res_edited(self):
+        self.presenter.plot_preprocessed_signal()
 
     def main_plot(self) -> ColorMeshPlot:
         return self.plot_main

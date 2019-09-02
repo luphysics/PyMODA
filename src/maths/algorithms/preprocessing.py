@@ -28,7 +28,7 @@ def preprocess(sig: np.ndarray, fs: float, fmin: float, fmax: float) -> np.ndarr
         XM[:, pn] = (CX - np.mean(CX)) / np.std(CX)
 
     sig = sig.reshape(len(sig), 1)
-    new_sig = sig - np.matmul(XM, np.matmul((np.linalg.pinv(XM)), sig))
+    new_sig = sig - XM @ ((np.linalg.pinv(XM)) @ sig)
 
     # Filtering
     fx = np.fft.fft(new_sig, axis=0)
@@ -46,12 +46,7 @@ def preprocess(sig: np.ndarray, fs: float, fmin: float, fmax: float) -> np.ndarr
     if fmax is None:
         fmax = np.max(abs_ff) + 1  # Avoid error calculating ind2.
 
-    cutoff = np.max([fmin, fs / L])
-    ind1 = np.nonzero(abs_ff <= cutoff)
-    ind2 = np.nonzero(abs_ff >= fmax)
-
-    fx[ind1] = 0
-    fx[ind2] = 0
+    fx[(abs_ff <= np.max([fmin, fs / L])) | (abs_ff >= fmax)] = 0
 
     result = np.real(np.fft.ifft(fx, axis=0))
     return result

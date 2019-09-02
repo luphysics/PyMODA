@@ -161,6 +161,10 @@ class PCPresenter(BaseTFPresenter):
     def get_selected_signal_pair_data(self):
         return self.get_selected_signal_pair()[0].output_data
 
+    def plot_preprocessed_signal(self):
+        """No preprocessing plot in phase coherence window, so remove functionality."""
+        pass
+
     def on_signal_selected(self, item):
         if isinstance(item, QListWidgetItem):
             name = item.text()

@@ -15,6 +15,8 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from gui.dialogs.ErrorBox import ErrorBox
 from gui.windows.base.analysis.BaseTFView import BaseTFView
+from maths.algorithms.preprocessing import preprocess
+from maths.signals.TimeSeries import TimeSeries
 from utils import stdout_redirect, errorhandling
 
 
@@ -145,3 +147,18 @@ class BaseTFPresenter:
 
     def set_calculating_all(self, value: bool):
         self.is_calculating_all = value
+
+    def get_selected_signal(self) -> TimeSeries:
+        """Returns the currently selected signal as a TimeSeries."""
+        return self.signals.get(self.selected_signal_name)
+
+    def plot_preprocessed_signal(self):
+        """Plots the preprocessed version of the signal."""
+        sig = self.get_selected_signal()
+
+        fmin = self.view.get_fmin()
+        fmax = self.view.get_fmax()
+
+        p = preprocess(sig.signal, sig.frequency, fmin, fmax)
+        self.view.plot_preproc.clear()
+        self.view.plot_preproc.plot(sig.times, sig.signal, p)

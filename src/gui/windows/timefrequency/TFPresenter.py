@@ -19,9 +19,7 @@ from gui.dialogs.FrequencyDialog import FrequencyDialog
 from gui.windows.base.analysis.BaseTFPresenter import BaseTFPresenter
 from maths.signals.Signals import Signals
 from maths.signals.TFOutputData import TFOutputData
-from maths.signals.TimeSeries import TimeSeries
 from maths.params.TFParams import TFParams, _wt, _wft, create
-from maths.algorithms.preprocessing import preprocess
 from maths.multiprocessing.MPHelper import MPHelper
 
 
@@ -194,21 +192,11 @@ class TFPresenter(BaseTFPresenter):
         """Plots the signal on the SignalPlot."""
         self.view.plot_signal(self.get_selected_signal())
 
-    def plot_preprocessed(self):
-        """Plots the preprocessed version of the signal."""
-        sig = self.get_selected_signal()
-
-        fmin = self.view.get_fmin()
-        fmax = self.view.get_fmax()
-
-        p = preprocess(sig.signal, sig.frequency, fmin, fmax)
-        self.view.plot_preproc.plot(sig.times, sig.signal, p)
-
     def on_data_loaded(self):
         """Called when the time-series data has been loaded."""
         self.view.update_signal_listview(self.signals.names())
         self.plot_signal()
-        self.plot_preprocessed()
+        self.plot_preprocessed_signal()
 
     def on_signal_selected(self, item):
         """
@@ -229,7 +217,3 @@ class TFPresenter(BaseTFPresenter):
             self.plot_signal()
             self.view.on_xlim_edited()
             self.plot_output()
-
-    def get_selected_signal(self) -> TimeSeries:
-        """Returns the currently selected signal as a TimeSeries."""
-        return self.signals.get(self.selected_signal_name)
