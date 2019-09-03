@@ -13,7 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from PyQt5.QtWidgets import QLineEdit
+from PyQt5.QtWidgets import QLineEdit, QListWidget, QMenuBar
 
 from gui.windows.base.ViewProperties import ViewProperties
 from gui.windows.base.analysis.plots.PreprocessPlot import PreprocessPlot
@@ -22,6 +22,9 @@ from gui.windows.base.analysis.plots.PreprocessPlot import PreprocessPlot
 class BaseTFViewProperties(ViewProperties):
 
     def __init__(self):
+        # The menu bar at the top of the window.
+        self.menubar: QMenuBar = None
+
         # The plot which shows the preprocessed signal.
         self.plot_preproc: PreprocessPlot = None
 
@@ -29,3 +32,6 @@ class BaseTFViewProperties(ViewProperties):
         self.line_fmin: QLineEdit = None
         self.line_fmax: QLineEdit = None
         self.line_res: QLineEdit = None
+
+        # The QListWidget which contains the names of different signals.
+        self.list_select_data: QListWidget = None

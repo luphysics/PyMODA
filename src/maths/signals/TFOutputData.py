@@ -13,38 +13,38 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from nptyping import Array
 
 
 class TFOutputData:
     """
-    A class which contains the time-frequency output data required
-    for plotting the appropriate transform.
+    A class which contains the output data from calculations.
     """
 
-    def __init__(self,
-                 times,
-                 values,
-                 ampl,
-                 freq,
-                 powers,
-                 avg_ampl,
-                 avg_pow,
-                 transform="wt",
-                 overall_coherence=None,
-                 phase_coherence=None,
-                 phase_diff=None,
-                 ):
-        # TODO: check difference between transform and values.
-        self.times = times
-        self.transform = transform
-        self.values = values
+    def __init__(
+            self,
+            times: Array,
+            values: Array,
+            ampl: Array,
+            freq: Array,
+            powers: Array,
+            avg_ampl: Array,
+            avg_pow: Array,
+            transform: str = "wt",
+            overall_coherence: Array = None,
+            phase_coherence: Array = None,
+            phase_diff: Array = None,
+    ):
+        self.transform = transform  # The name of the transform (e.g. WT or WFT).
+        self.values = values  # The values of the transform (complex numbers).
 
         # Data plotted in main color mesh in time-frequency analysis.
-        self.ampl = ampl
+        self.times = times
         self.freq = freq
+        self.ampl = ampl
         self.powers = powers
 
-        # Data plotted on the right in time-frequency analysis.
+        # Data plotted on the RHS of the main color-mesh plot.
         self.avg_ampl = avg_ampl
         self.avg_pow = avg_pow
 

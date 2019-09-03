@@ -58,12 +58,19 @@ class REPresenter(TFPresenter):
                                          self.view,
                                          self.on_ridge_completed)
 
-    def on_ridge_completed(self, name,
-                           times, freq, values,
-                           ampl, powers,
-                           avg_ampl, avg_pow,
+    def on_ridge_completed(self,
+                           name,
+                           times,
+                           freq,
+                           values,
+                           ampl,
+                           powers,
+                           avg_ampl,
+                           avg_pow,
                            interval,
-                           filtered_signal, iphi, ifreq,
+                           filtered_signal,
+                           iphi,
+                           ifreq
                            ):
 
         sig = self.signals.get(name)
@@ -71,7 +78,7 @@ class REPresenter(TFPresenter):
         d: TFOutputData = sig.output_data
 
         d.set_ridge_data(interval, filtered_signal, ifreq, iphi)
-        d.transform = values
+        d.values = values
 
         d.ampl = ampl
         d.powers = powers
