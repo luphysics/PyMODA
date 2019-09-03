@@ -13,6 +13,8 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from typing import Union
+
 from PyQt5.QtWidgets import QDialog, QListWidgetItem
 
 from gui.dialogs.FrequencyDialog import FrequencyDialog
@@ -198,7 +200,7 @@ class TFPresenter(BaseTFPresenter):
         self.plot_signal()
         self.plot_preprocessed_signal()
 
-    def on_signal_selected(self, item):
+    def on_signal_selected(self, item: Union[QListWidgetItem, str]):
         """
         Called when a signal is selected in the QListWidget.
         Plots the new signal in the top-left plotting and, if

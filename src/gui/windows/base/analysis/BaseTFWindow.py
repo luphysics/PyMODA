@@ -22,9 +22,8 @@ from gui.dialogs.files.SelectFileDialog import SelectFileDialog
 from gui.windows.base.MaximisedWindow import MaximisedWindow
 from gui.windows.base.analysis.BaseTFView import BaseTFView
 from gui.windows.base.analysis.plots.AmplitudePlot import AmplitudePlot
-from gui.windows.base.analysis.plots.SignalPlot import SignalPlot
 from gui.windows.base.analysis.plots.ColorMeshPlot import ColorMeshPlot
-from maths.utils import float_or_none
+from gui.windows.base.analysis.plots.SignalPlot import SignalPlot
 
 
 class BaseTFWindow(MaximisedWindow, BaseTFView):
