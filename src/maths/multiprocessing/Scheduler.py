@@ -13,6 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import asyncio
 import time
 from multiprocessing import cpu_count
 from typing import List
@@ -32,18 +33,31 @@ class Scheduler(List[Task]):
     concurrently.
     """
 
-    def __init__(self, window: QWindow, delay_seconds: float = 0.05):
+    def __init__(self, window: QWindow = None, delay_seconds: float = 0.05):
         super().__init__()
         self.core_count: int = cpu_count() + 1
         self.running_tasks: List[Task] = []
 
-        self.delay = int(delay_seconds * 1000)
-        self.timer = QTimer(window)
-        self.timer.timeout.connect(self.check_results)
+        self.delay_seconds = delay_seconds
+        self.delay_millis = int(delay_seconds * 1000)
+
+        if window:
+            print("WARNING: use coroutines instead of QTimer.")
+            self.timer = QTimer(window)
+            self.timer.timeout.connect(self.check_results)
 
         self.terminated = False
         self.stopped = False
         self.time_start: float = 0
+
+    async def coro_run(self) -> List[tuple]:
+        """Run with coroutines."""
+        self.time_start = time.time()
+
+        result = await asyncio.gather(*[t.coro_run(self.delay_seconds) for t in self])
+        print(f"Time taken (coroutines): {time.time() - self.time_start:.1f} seconds.")
+
+        return result
 
     def check_results(self):
         if self.all_tasks_finished():
@@ -56,7 +70,7 @@ class Scheduler(List[Task]):
 
     def start(self):
         self.time_start = time.time()
-        self.timer.start(self.delay)
+        self.timer.start(self.delay_millis)
         self.update_tasks()
 
     def update_tasks(self):

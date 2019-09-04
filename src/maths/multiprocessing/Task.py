@@ -13,6 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import asyncio
 
 from multiprocess import Queue, Process
 
@@ -52,6 +53,13 @@ class Task:
             self.finished = True
             self.running = False
             self.on_result(*self.queue.get())
+
+    async def coro_run(self, delay: float) -> tuple:
+        self.start()
+        while True:
+            await asyncio.sleep(delay)
+            if self.has_result():
+                return self.queue.get()
 
     def has_result(self) -> bool:
         return not self.queue.empty()

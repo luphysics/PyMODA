@@ -142,12 +142,6 @@ class BaseTFPresenter:
         """Returns the total number of tasks in progress."""
         return 0
 
-    def calculating_all(self) -> bool:
-        return self.is_calculating_all
-
-    def set_calculating_all(self, value: bool):
-        self.is_calculating_all = value
-
     def get_selected_signal(self) -> TimeSeries:
         """Returns the currently selected signal as a TimeSeries."""
         return self.signals.get(self.selected_signal_name)
