@@ -15,9 +15,10 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 from gui.windows.base.analysis.BaseTFView import BaseTFView
+from gui.windows.timefrequency.TFViewProperties import TFViewProperties
 
 
-class TFView(BaseTFView):
+class TFView(TFViewProperties, BaseTFView):
     """
     A View class to be subclassed by the time-frequency window.
     """
@@ -29,6 +30,10 @@ class TFView(BaseTFView):
         ["Gaussian", "Hann", "Blackman", "Exp", "Rect", "Kaiser-a"],  # Windowed Fourier transform.
         ["Lognorm", "Morlet", "Bump"],  # Wavelet transform.
     )
+
+    def __init__(self, application, presenter):
+        TFViewProperties.__init__(self)
+        BaseTFView.__init__(self, application, presenter)
 
     def setup_radio_transform(self):
         pass

@@ -28,9 +28,12 @@ class BaseTFView(BaseTFViewProperties):
     name = ""
 
     def __init__(self, application, presenter):
-        super(BaseTFView, self).__init__()
+        BaseTFViewProperties.__init__(self)
         self.application = application
-        self.presenter = presenter
+
+        # Prevent circular imports.
+        from gui.windows.base.analysis.BaseTFPresenter import BaseTFPresenter
+        self.presenter: BaseTFPresenter = presenter
 
     def plot_signal(self, time_series):
         """Plots the signal on the SignalPlot."""
@@ -54,6 +57,15 @@ class BaseTFView(BaseTFViewProperties):
         pass
 
     def get_window(self):
+        pass
+
+    def setup_lineedit_fmin(self):
+        pass
+
+    def setup_lineedit_fmax(self):
+        pass
+
+    def setup_lineedit_res(self):
         pass
 
     def setup_radio_plot(self):

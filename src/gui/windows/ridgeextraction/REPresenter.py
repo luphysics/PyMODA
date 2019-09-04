@@ -13,7 +13,11 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from typing import Tuple, Union
+
 import numpy as np
+from PyQt5.QtWidgets import QListWidgetItem
+from nptyping import Array
 
 from gui.windows.ridgeextraction.REView import REView
 from gui.windows.timefrequency.TFPresenter import TFPresenter
@@ -54,12 +58,19 @@ class REPresenter(TFPresenter):
                                          self.on_ridge_completed,
                                          on_progress=self.on_progress_updated)
 
-    def on_ridge_completed(self, name,
-                           times, freq, values,
-                           ampl, powers,
-                           avg_ampl, avg_pow,
+    def on_ridge_completed(self,
+                           name,
+                           times,
+                           freq,
+                           values,
+                           ampl,
+                           powers,
+                           avg_ampl,
+                           avg_pow,
                            interval,
-                           filtered_signal, iphi, ifreq,
+                           filtered_signal,
+                           iphi,
+                           ifreq
                            ):
 
         sig = self.signals.get(name)
@@ -67,7 +78,7 @@ class REPresenter(TFPresenter):
         d: TFOutputData = sig.output_data
 
         d.set_ridge_data(interval, filtered_signal, ifreq, iphi)
-        d.transform = values
+        d.values = values
 
         d.ampl = ampl
         d.powers = powers
@@ -106,25 +117,45 @@ class REPresenter(TFPresenter):
             bands, phi, amp = band_data
             self.triple_plot(times, bands, amp, phi)
 
-    def triple_plot(self, x, top_y, middle_y, bottom_y, main_values=None, main_freq=None):
+    def triple_plot(
+            self,
+            x_values: Array,
+            top_y: Array,
+            middle_y: Array,
+            bottom_y: Array,
+            main_values: Array = None,
+            main_freq: Array = None
+    ):
+        """
+        Plots values on the 3 plots in the main section of the window.
+
+        :param x_values: the values plotted on the x-axes (will be time values)
+        :param top_y: the values plotted on the y-axis of the top plot
+        :param middle_y: the values plotted on the y-axis of the middle plot
+        :param bottom_y: the values plotted on the y-axis of the bottom plot
+        :param main_values: when the middle plot is showing the result of the wavelet transform,
+        these will be the amplitudes of the transform plotted on the middle plot
+        :param main_freq: when the middle plot is showing the result of the wavelet transform,
+        these will be the frequencies of the transform plotted on the middle plot
+        """
         main = self.view.main_plot()
         main.clear()
 
         if main_values is not None and main_freq is not None:
-            main.plot(x, main_values, main_freq)
+            main.plot(x_values, main_values, main_freq)
 
-        main.plot_line(x, middle_y, xlim=True)
+        main.plot_line(x_values, middle_y, xlim=True)
         main.update()
 
         top = self.view.get_re_top_plot()
         top.clear()
-        top.plot(x, top_y)
+        top.plot(x_values, top_y)
 
         bottom = self.view.get_re_bottom_plot()
         bottom.clear()
-        bottom.plot(x, bottom_y)
+        bottom.plot(x_values, bottom_y)
 
-    def on_signal_selected(self, item):
+    def on_signal_selected(self, item: Union[QListWidgetItem, str]):
         super().on_signal_selected(item)
 
         data = self.get_selected_signal().output_data
@@ -142,7 +173,8 @@ class REPresenter(TFPresenter):
             if d:
                 self.plot_band_data(data)
 
-    def on_interval_selected(self, interval: tuple):
+    def on_interval_selected(self, interval: Tuple[float, float]):
+        """Called when a frequency interval is selected."""
         if not interval:
             return
 
@@ -151,6 +183,7 @@ class REPresenter(TFPresenter):
         self.plot_band_data(self.get_selected_signal().output_data)
 
     def on_filter_clicked(self):
+        """Called when the "bandpass filter" button is clicked."""
         print("Starting filtering...")
 
         self.mp_handler.bandpass_filter(
@@ -161,7 +194,17 @@ class REPresenter(TFPresenter):
             on_progress=self.on_progress_updated
         )
 
-    def on_filter_completed(self, name, bands, phase, amp, interval):
+    def on_filter_completed(
+            self,
+            name: str,
+            bands,
+            phase,
+            amp,
+            interval: Tuple[float, float]
+    ):
+        """
+        Called when the bandpass filter completes.
+        """
         d: TFOutputData = self.signals.get(name).output_data
         d.set_band_data(interval, bands, phase, amp)
 
@@ -169,6 +212,9 @@ class REPresenter(TFPresenter):
             self.on_all_filter_completed()
 
     def on_all_filter_completed(self):
+        """
+        Called when all bandpass filter calculations have finished.
+        """
         self.view.switch_to_three_plots()
         print("All bandpass filtering completed.")
 
@@ -180,6 +226,9 @@ class REPresenter(TFPresenter):
         self.plot_band_data(data)
 
     def get_re_params(self) -> REParams:
+        """
+        Gets the ridge extraction params which are passed to the algorithm.
+        """
         return create(
             signals=self.signals,
             params_type=REParams,

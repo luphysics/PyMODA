@@ -14,6 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from functools import partial
+from typing import List
 
 from PyQt5 import uic, QtGui
 from PyQt5.QtWidgets import QDialog, QListWidget, QProgressBar, QPushButton
@@ -22,8 +23,8 @@ from gui.dialogs.files.SelectFileDialog import SelectFileDialog
 from gui.windows.base.MaximisedWindow import MaximisedWindow
 from gui.windows.base.analysis.BaseTFView import BaseTFView
 from gui.windows.base.analysis.plots.AmplitudePlot import AmplitudePlot
-from gui.windows.base.analysis.plots.SignalPlot import SignalPlot
 from gui.windows.base.analysis.plots.ColorMeshPlot import ColorMeshPlot
+from gui.windows.base.analysis.plots.SignalPlot import SignalPlot
 
 
 class BaseTFWindow(MaximisedWindow, BaseTFView):
@@ -35,7 +36,7 @@ class BaseTFWindow(MaximisedWindow, BaseTFView):
         pass
 
     def update_title(self, title=""):
-        super().update_title(title if title else self.presenter.get_window_name())
+        super().update_title(title or self.presenter.get_window_name())
 
     def select_file(self):
         dialog = SelectFileDialog()
@@ -62,6 +63,10 @@ class BaseTFWindow(MaximisedWindow, BaseTFView):
         self.setup_xlim_edits()
         self.setup_progress()
 
+        self.setup_lineedit_fmax()
+        self.setup_lineedit_fmin()
+        self.setup_lineedit_res()
+
         self.get_button_calculate_all().clicked.connect(
             partial(self.presenter.calculate, True)
         )
@@ -69,6 +74,18 @@ class BaseTFWindow(MaximisedWindow, BaseTFView):
             partial(self.presenter.calculate, False)
         )
         self.presenter.init()
+
+    def setup_lineedit_fmin(self):
+        self.line_fmin.editingFinished.connect(self.on_freq_or_res_edited)
+
+    def setup_lineedit_fmax(self):
+        self.line_fmax.editingFinished.connect(self.on_freq_or_res_edited)
+
+    def setup_lineedit_res(self):
+        self.line_res.editingFinished.connect(self.on_freq_or_res_edited)
+
+    def on_freq_or_res_edited(self):
+        self.presenter.plot_preprocessed_signal()
 
     def main_plot(self) -> ColorMeshPlot:
         return self.plot_main
@@ -88,8 +105,8 @@ class BaseTFWindow(MaximisedWindow, BaseTFView):
     def get_preprocessing(self):
         return self.radio_preproc_on.isChecked()
 
-    def update_signal_listview(self, items):
-        list_widget: QListWidget = self.list_select_data
+    def update_signal_listview(self, items: List[str]):
+        list_widget = self.list_select_data
         list_widget.clear()
         list_widget.addItems(items)
         list_widget.setCurrentRow(0)
@@ -98,7 +115,7 @@ class BaseTFWindow(MaximisedWindow, BaseTFView):
     def setup_signal_listview(self):
         self.list_select_data.itemClicked.connect(self.presenter.on_signal_selected)
 
-    def set_log_text(self, text):
+    def set_log_text(self, text: str):
         """Sets the text displayed in the log pane, and scrolls to the bottom."""
         if text != "\n":
             self.text_log.setPlainText(text.rstrip())

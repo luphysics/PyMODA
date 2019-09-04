@@ -14,6 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import math
+import asyncio
 import time
 from multiprocessing import cpu_count
 from typing import List, Callable
@@ -36,7 +37,7 @@ class Scheduler(List[Task]):
     """
 
     def __init__(self,
-                 window: QWindow,
+                 window: QWindow = None,
                  progress_callback: Callable[[int, int], None] = None,
                  delay_seconds: float = 0.05):
 
@@ -51,10 +52,13 @@ class Scheduler(List[Task]):
         # List of currently running tasks.
         self.running_tasks: List[Task] = []
 
-        # The delay between each check for finished tasks.
-        self.delay = int(delay_seconds * 1000)
-        self.timer = QTimer(window)
-        self.timer.timeout.connect(self.update)
+        self.delay_seconds = delay_seconds
+        self.delay_millis = int(delay_seconds * 1000)
+
+        if window:
+            print("WARNING: use coroutines instead of QTimer.")
+            self.timer = QTimer(window)
+            self.timer.timeout.connect(self.update)
 
         self.terminated = False
         self.stopped = False
@@ -97,7 +101,7 @@ class Scheduler(List[Task]):
 
                     print(f"CPU usage is {cpu_usage}%. Increasing concurrency"
                           f" to {self.concurrent_count} tasks.")
-
+       
         for t in self.running_tasks:
             t.update()
             if t.finished:
@@ -109,6 +113,15 @@ class Scheduler(List[Task]):
 
         if self.all_tasks_finished():
             self.on_all_tasks_completed()
+                          
+    async def coro_run(self) -> List[tuple]:
+        """Run with coroutines."""
+        self.time_start = time.time()
+
+        result = await asyncio.gather(*[t.coro_run(self.delay_seconds) for t in self])
+        print(f"Time taken (coroutines): {time.time() - self.time_start:.1f} seconds.")
+
+        return result
 
     def start(self):
         """Starts the scheduler running the assigned tasks."""
@@ -118,7 +131,7 @@ class Scheduler(List[Task]):
         self.time_cpu_checked = self.time_start
         self.report_progress(0)
 
-        self.timer.start(self.delay)
+        self.timer.start(self.delay_millis)
         self.update_tasks()
 
     def update_tasks(self):
