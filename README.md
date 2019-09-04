@@ -22,7 +22,8 @@ PyMODA uses multiprocessing for several reasons:
 - It allows long calculations to run without freezing the GUI.
 - It allows calculations for multiple signals to be executed simultaneously on different CPU cores,
 greatly improving performance.
-- It allows the circumvention of a critical issue on Linux caused by conflicting libraries used by PyQt5 and the 
+- It allows the circumvention of [a critical issue](https://stackoverflow.com/questions/56758952/matlab-generated-python-packages-conflict-with-pyqt5-on-ubuntu-possible-librar) 
+on Linux caused by conflicting libraries used by PyQt5 and the 
 MATLAB Runtime.
 
 While multithreading could be used to solve the first problem, it would not be ideal for 
