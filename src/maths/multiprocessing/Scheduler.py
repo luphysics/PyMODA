@@ -17,7 +17,7 @@ import math
 import asyncio
 import time
 from multiprocessing import cpu_count
-from typing import List, Callable
+from typing import List, Callable, Set
 
 import psutil
 from PyQt5.QtCore import QTimer
@@ -55,6 +55,8 @@ class Scheduler(List[Task]):
         self.delay_seconds = delay_seconds
         self.delay_millis = int(delay_seconds * 1000)
 
+        self.timer = None
+
         if window:
             print("WARNING: use coroutines instead of QTimer.")
             self.timer = QTimer(window)
@@ -77,6 +79,8 @@ class Scheduler(List[Task]):
         self.tasks_completed: int = 0
 
         self.progress_callback = progress_callback
+
+        self.output: List[tuple] = []
 
     def update(self):
         """Checks for any tasks that have finished."""
@@ -101,7 +105,7 @@ class Scheduler(List[Task]):
 
                     print(f"CPU usage is {cpu_usage}%. Increasing concurrency"
                           f" to {self.concurrent_count} tasks.")
-       
+
         for t in self.running_tasks:
             t.update()
             if t.finished:
@@ -113,15 +117,50 @@ class Scheduler(List[Task]):
 
         if self.all_tasks_finished():
             self.on_all_tasks_completed()
-                          
+
     async def coro_run(self) -> List[tuple]:
         """Run with coroutines."""
-        self.time_start = time.time()
+        self.start()
 
-        result = await asyncio.gather(*[t.coro_run(self.delay_seconds) for t in self])
+        while not self.all_tasks_finished():
+            await asyncio.sleep(self.delay_seconds)
+            self.coro_update()
+
         print(f"Time taken (coroutines): {time.time() - self.time_start:.1f} seconds.")
+        return self.output
 
-        return result
+    def coro_update(self):
+        should_update_tasks = False
+
+        t = time.time()
+        if t - self.time_cpu_checked > self.time_between_cpu_checks:
+            self.time_cpu_checked = t
+            total_remaining_tasks = sum([t.total_tasks() for t in self.available_tasks()])
+
+            if total_remaining_tasks > self.concurrent_count:
+                cpu_usage = psutil.cpu_percent()
+
+                if cpu_usage < self.cpu_threshold:
+                    new_count = int(self.concurrent_count * 100 / cpu_usage)
+
+                    if new_count == self.concurrent_count:
+                        new_count += 1
+
+                    self.concurrent_count = new_count
+                    should_update_tasks = True
+
+                    print(f"CPU usage is {cpu_usage}%. Increasing concurrency"
+                          f" to {self.concurrent_count} tasks.")
+
+        for t in self.running_tasks:
+            t.update()
+            if t.finished:
+                self.output.append(t.queue.get())
+                self.on_task_completed(t)
+                should_update_tasks = True
+
+        if should_update_tasks:
+            self.update_tasks()
 
     def start(self):
         """Starts the scheduler running the assigned tasks."""
@@ -131,7 +170,9 @@ class Scheduler(List[Task]):
         self.time_cpu_checked = self.time_start
         self.report_progress(0)
 
-        self.timer.start(self.delay_millis)
+        if self.timer:
+            self.timer.start(self.delay_millis)
+
         self.update_tasks()
 
     def update_tasks(self):
@@ -157,8 +198,9 @@ class Scheduler(List[Task]):
         """
         if not self.stopped:
             self.stopped = True
-            self.timer.stop()
-            self.timer.deleteLater()
+            if self.timer:
+                self.timer.stop()
+                self.timer.deleteLater()
 
     def on_task_completed(self, task):
         """Called when a task finishes."""

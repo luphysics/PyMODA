@@ -22,7 +22,7 @@ from maths.multiprocessing.mp_utils import terminate_tree
 
 class Task:
 
-    def __init__(self, process: Process, queue: Queue, on_result, subtasks=0):
+    def __init__(self, process: Process, queue: Queue, on_result=None, subtasks=0):
         self.process = process
         self.queue = queue
         self.on_result = on_result
@@ -60,14 +60,16 @@ class Task:
         if self.has_result():
             self.finished = True
             self.running = False
-            self.on_result(*self.queue.get())
+            if self.on_result:
+                self.on_result(*self.queue.get())
 
     async def coro_run(self, delay: float) -> tuple:
         self.start()
         while True:
             await asyncio.sleep(delay)
             if self.has_result():
-                return self.queue.get()
+                # return self.queue.get()
+                return ()
 
     def has_result(self) -> bool:
         """:returns whether the task has finished."""

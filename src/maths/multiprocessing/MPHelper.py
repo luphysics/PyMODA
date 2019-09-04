@@ -55,9 +55,13 @@ class MPHelper:
     def __init__(self):
         self.scheduler: Scheduler = None
 
-    async def coro_transform(self, params: TFParams) -> List[tuple]:
+    async def coro_transform(
+            self,
+            params: TFParams,
+            on_progress: Callable[[int, int], None]
+    ) -> List[tuple]:
         self.stop()
-        self.scheduler = Scheduler()
+        self.scheduler = Scheduler(progress_callback=on_progress)
 
         signals: Signals = params.signals
         params.remove_signals()  # Don't want to pass large unneeded object to other process.
@@ -86,7 +90,8 @@ class MPHelper:
         :param window: the QWindow from which the WFT is being calculated
         :param on_result: a callback which takes the result of the calculations
         on the main process/thread
-        :return:
+        :param on_progress: a callback with takes the current number of completed tasks,
+        and the total number of tasks being run
         """
         self.stop()
         self.scheduler = Scheduler(window, progress_callback=on_progress)

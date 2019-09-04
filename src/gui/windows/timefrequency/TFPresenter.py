@@ -105,7 +105,7 @@ class TFPresenter(BaseTFPresenter):
         self.view.on_calculate_started()
         self.view.update_progress(0, self.get_total_tasks_count())
 
-        all_data = await self.mp_handler.coro_transform(params)
+        all_data = await self.mp_handler.coro_transform(params, self.on_progress_updated)
 
         for d in all_data:
             self.on_transform_completed(*d)
