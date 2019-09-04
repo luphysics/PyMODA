@@ -60,6 +60,7 @@ class MPHelper:
             params: TFParams,
             on_progress: Callable[[int, int], None]
     ) -> List[tuple]:
+
         self.stop()
         self.scheduler = Scheduler(progress_callback=on_progress)
 
@@ -70,9 +71,7 @@ class MPHelper:
             q = Queue()
             p = Process(target=_time_frequency, args=(q, time_series, params,))
 
-            self.scheduler.append(
-                Task(p, q, None)
-            )
+            self.scheduler.append(Task(p, q))
 
         return await self.scheduler.coro_run()
 

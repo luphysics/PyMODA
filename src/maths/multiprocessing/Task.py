@@ -57,7 +57,7 @@ class Task:
         """
         Checks for a result, and executes the callback if finished.
         """
-        if self.has_result():
+        if self.running and self.has_result():
             self.finished = True
             self.running = False
             if self.on_result:
@@ -65,11 +65,11 @@ class Task:
 
     async def coro_run(self, delay: float) -> tuple:
         self.start()
-        while True:
+        while self.running:
             await asyncio.sleep(delay)
             if self.has_result():
-                # return self.queue.get()
-                return ()
+                break
+        return ()
 
     def has_result(self) -> bool:
         """:returns whether the task has finished."""

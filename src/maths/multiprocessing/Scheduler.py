@@ -52,9 +52,11 @@ class Scheduler(List[Task]):
         # List of currently running tasks.
         self.running_tasks: List[Task] = []
 
+        # The delay between each consecutive check for finished tasks.
         self.delay_seconds = delay_seconds
         self.delay_millis = int(delay_seconds * 1000)
 
+        # Deprecated.
         self.timer = None
 
         if window:
@@ -84,6 +86,7 @@ class Scheduler(List[Task]):
 
     def update(self):
         """Checks for any tasks that have finished."""
+        print("WARNING: use coroutines instead.")
         should_update_tasks = False
 
         t = time.time()
@@ -122,11 +125,13 @@ class Scheduler(List[Task]):
         """Run with coroutines."""
         self.start()
 
-        while not self.all_tasks_finished():
+        while not self.stopped and not self.all_tasks_finished():
             await asyncio.sleep(self.delay_seconds)
             self.coro_update()
 
-        print(f"Time taken (coroutines): {time.time() - self.time_start:.1f} seconds.")
+        if self.all_tasks_finished():
+            print(f"Time taken (coroutines): {time.time() - self.time_start:.1f} seconds.")
+
         return self.output
 
     def coro_update(self):
