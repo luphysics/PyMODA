@@ -13,15 +13,18 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import asyncio
+from typing import Union
+
+import asyncqt
 from PyQt5.QtWidgets import QDialog, QListWidgetItem
 
 from gui.dialogs.FrequencyDialog import FrequencyDialog
 from gui.windows.base.analysis.BaseTFPresenter import BaseTFPresenter
+from gui.windows.timefrequency.TFView import TFView
 from maths.signals.Signals import Signals
 from maths.signals.TFOutputData import TFOutputData
-from maths.signals.TimeSeries import TimeSeries
 from maths.params.TFParams import TFParams, _wt, _wft, create
-from maths.algorithms.preprocessing import preprocess
 from maths.multiprocessing.MPHelper import MPHelper
 
 
@@ -30,12 +33,24 @@ class TFPresenter(BaseTFPresenter):
     The presenter in control of the time-frequency window.
     """
 
+    def __init__(self, view: TFView):
+        super(TFPresenter, self).__init__(view)
+
+        self.is_calculating_all = True
+
     def get_total_tasks_count(self) -> int:
         return len(self.signals) if self.is_calculating_all else 1
 
     def calculate(self, calculate_all: bool):
         """Calculates the desired transform(s), and plots the result."""
-        self.set_calculating_all(calculate_all)
+        self.loop = asyncqt.QEventLoop(self.view.application)
+        asyncio.set_event_loop(self.loop)
+
+        # TODO: refactor
+        asyncio.ensure_future(self.coro_calculate(calculate_all))
+        return
+
+        self.is_calculating_all = calculate_all
 
         if self.mp_handler:
             self.mp_handler.stop()
@@ -64,6 +79,36 @@ class TFPresenter(BaseTFPresenter):
 
         self.view.on_calculate_started()
         print("Started calculation...")
+
+    async def coro_calculate(self, calc_all: bool):
+        """Coroutine to calculate all results."""
+        self.is_calculating_all = calc_all
+
+        self.mp_handler = MPHelper()
+        self.mp_handler.stop()
+
+        params = self.get_params(all_signals=calc_all)
+        if params.transform == _wft:
+            if self.view.get_fmin() is None:
+                # Will be caught by error handling and shown as a dialog.
+                raise Exception("Minimum frequency must be defined for WFT.")
+
+        self.is_plotted = False
+        self.view.main_plot().clear()
+        self.view.main_plot().set_in_progress(True)
+        self.invalidate_data()
+
+        log: bool = (params.transform == _wt)
+        self.view.main_plot().set_log_scale(logarithmic=log)
+        self.view.amplitude_plot().set_log_scale(logarithmic=log)
+
+        self.view.on_calculate_started()
+        self.view.update_progress(0, self.get_total_tasks_count())
+
+        all_data = await self.mp_handler.coro_transform(params, self.on_progress_updated)
+
+        for d in all_data:
+            self.on_transform_completed(*d)
 
     def on_transform_completed(self, name, times, freq, values, ampl, powers, avg_ampl, avg_pow):
         """Called when the calculation of the desired transform(s) is completed."""
@@ -193,23 +238,13 @@ class TFPresenter(BaseTFPresenter):
         """Plots the signal on the SignalPlot."""
         self.view.plot_signal(self.get_selected_signal())
 
-    def plot_preprocessed(self):
-        """Plots the preprocessed version of the signal."""
-        sig = self.get_selected_signal()
-
-        fmin = self.view.get_fmin()
-        fmax = self.view.get_fmax()
-
-        p = preprocess(sig.signal, sig.frequency, fmin, fmax)
-        self.view.plot_preproc.plot(sig.times, sig.signal, p)
-
     def on_data_loaded(self):
         """Called when the time-series data has been loaded."""
         self.view.update_signal_listview(self.signals.names())
         self.plot_signal()
-        self.plot_preprocessed()
+        self.plot_preprocessed_signal()
 
-    def on_signal_selected(self, item):
+    def on_signal_selected(self, item: Union[QListWidgetItem, str]):
         """
         Called when a signal is selected in the QListWidget.
         Plots the new signal in the top-left plotting and, if
@@ -228,7 +263,3 @@ class TFPresenter(BaseTFPresenter):
             self.plot_signal()
             self.view.on_xlim_edited()
             self.plot_output()
-
-    def get_selected_signal(self) -> TimeSeries:
-        """Returns the currently selected signal as a TimeSeries."""
-        return self.signals.get(self.selected_signal_name)

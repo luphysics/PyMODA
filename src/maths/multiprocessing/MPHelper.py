@@ -16,6 +16,7 @@
 
 import time
 from typing import Callable
+from typing import List
 
 import numpy as np
 from PyQt5.QtGui import QWindow
@@ -54,6 +55,26 @@ class MPHelper:
     def __init__(self):
         self.scheduler: Scheduler = None
 
+    async def coro_transform(
+            self,
+            params: TFParams,
+            on_progress: Callable[[int, int], None]
+    ) -> List[tuple]:
+
+        self.stop()
+        self.scheduler = Scheduler(progress_callback=on_progress)
+
+        signals: Signals = params.signals
+        params.remove_signals()  # Don't want to pass large unneeded object to other process.
+
+        for time_series in signals:
+            q = Queue()
+            p = Process(target=_time_frequency, args=(q, time_series, params,))
+
+            self.scheduler.append(Task(p, q))
+
+        return await self.scheduler.coro_run()
+
     def transform(self,
                   params: TFParams,
                   window: QWindow,
@@ -68,7 +89,8 @@ class MPHelper:
         :param window: the QWindow from which the WFT is being calculated
         :param on_result: a callback which takes the result of the calculations
         on the main process/thread
-        :return:
+        :param on_progress: a callback with takes the current number of completed tasks,
+        and the total number of tasks being run
         """
         self.stop()
         self.scheduler = Scheduler(window, progress_callback=on_progress)
