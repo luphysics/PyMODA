@@ -5,16 +5,30 @@
 PyMODA is a Python implementation of MODA (Multiscale Oscillatory Dynamics Analysis). 
 The user interface is written using PyQt5, and the algorithms are mostly packaged as Python libraries from the existing MATLAB code.
 
-## Getting Started
+## User's Guide
 
-Requirements:
+This section is aimed at users wishing to set up and run PyMODA. If you're interested in modifying or contributing to the program, you should use the [Developer's Guide](#developers-guide).
+
+#### Requirements
 - Python 3.6 or higher.
-- MATLAB Runtime (does not require a licence).
+- [MATLAB Runtime](https://www.mathworks.com/products/compiler/matlab-runtime.html), 
+newest version recommended (does not require a licence).
+
+#### Downloading the code
+To download the code, you can click the green "Clone and download" button on the top-right of the repository page, and then "Download zip". Extract the zip to your desired location.
+
+#### Preparing to run
+When the code is downloaded and Python is installed, you'll need to install the dependencies. To do this, open a terminal in the same folder as the program and run the command `pip install -r requirements.txt`.
+
+To start PyMODA, run `python src/main.py` from the same terminal.
 
 ## Developer's Guide
 
 This guide is aimed at developers wishing to modify or contribute to the program, and is 
-designed to be accessible to programmers with relatively basic knowledge of Python.
+designed to be accessible to programmers with basic-intermediate knowledge of Python.
+
+#### Downloading the code
+To be able to submit changes to PyMODA, you should [fork the repositry](https://help.github.com/en/articles/fork-a-repo).
 
 #### Multiprocessing
 
