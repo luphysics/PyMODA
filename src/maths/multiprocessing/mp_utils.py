@@ -48,8 +48,11 @@ def is_main_process() -> bool:
 def setup_matlab_runtime():
     """
     Sets the LD_LIBRARY_PATH variable to the value provided
-    in the arguments. Should NOT be executed in the main
-    process, because this will crash PyQt on Linux.
+    in the arguments. Required on Linux, but can be safely called
+    on other operating systems.
+
+    Should not be executed in the main process, because this will
+    crash PyQt on Linux.
     """
     if is_main_process():
         raise MultiProcessingException("Do not set the LD_LIBRARY_PATH environment variable on the main process; "

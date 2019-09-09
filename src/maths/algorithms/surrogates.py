@@ -26,6 +26,7 @@ _IAFFT1 = "IAAFT1"
 _IAFFT2 = "IAAFT2"
 _WIAFFT = "WIAAFT"
 _tshift = "tshift"
+_CPP = "CPP"
 
 
 def surrogate_calc(time_series: TimeSeries, N, method, pp, fs):
@@ -74,7 +75,7 @@ def surrogate_calc(time_series: TimeSeries, N, method, pp, fs):
         # Note: removed 'eta' parameter from function.
         eta = b * np.random.rand(N, L2 - 1)
 
-        ftsig = np.fft.fft(sig)
+        ftsig = np.fft.fft(sig, axis=0)
         ftrp = np.zeros((N, len(ftsig),), dtype=np.complex64)
         ftrp[:, 0] = ftsig[0]
 
@@ -84,7 +85,7 @@ def surrogate_calc(time_series: TimeSeries, N, method, pp, fs):
         ftrp[:, 1:L2] = np.multiply(F, np.exp(np.complex(0, 1) * eta))
         ftrp[:, 1 + L - L2:L] = np.conj(np.fliplr(ftrp[:, 1:L2]))
 
-        surr = np.fft.ifft(ftrp)
+        surr = np.fft.ifft(ftrp, axis=0)
         surr = np.real(surr)
 
         params.rphases = eta
@@ -102,14 +103,14 @@ def surrogate_calc(time_series: TimeSeries, N, method, pp, fs):
         for j in range(N):
             gn[j, :] = gn[j, rankind]
 
-        ftgn = np.fft.fft(gn)
+        ftgn = np.fft.fft(gn, axis=0)
         F = ftgn[:, 1:L2]
 
         surr = np.zeros((N, len(sig)), dtype=np.complex)
         surr[:, 0] = gn[:, 0]
         surr[:, 1:L2] = np.multiply(F, np.exp(np.complex(0, 1) * eta))
         surr[:, 1 + L - L2:L] = np.conj(np.fliplr(surr[:, 1:L2]))
-        surr = np.fft.ifft(surr)
+        surr = np.fft.ifft(surr, axis=0)
 
         ind2 = np.argsort(surr, axis=1)
         rrank = np.zeros((1, L), dtype=np.int)
@@ -128,6 +129,29 @@ def surrogate_calc(time_series: TimeSeries, N, method, pp, fs):
         pass
     elif method == _tshift:
         pass
+    elif method == _CPP:
+        signal = np.mod(sig, 2 * np.pi)
+
+        dcpoints = np.nonzero((signal[1:] - signal[:-1]) < -np.pi)
+        NC = len(dcpoints) - 1
+
+        if NC > 0:
+            cycles = np.zeros(NC)
+
+            for k in range(NC):
+                cycles[k] = signal[dcpoints[k] + 1: dcpoints[k + 1]]
+
+            stcycle = signal[:dcpoints[0]]
+            endcycle = signal[dcpoints[k + 1] + 1:]
+
+            for sn in range(N):
+                surr[sn, :] = np.unwrap(np.hstack([
+                    stcycle, cycles[np.random.permutation(NC), endcycle]
+                ]))
+
+        else:
+            for sn in range(N):
+                surr[sn, :] = np.unwrap(signal)
 
     params.type = method
     params.numsurr = N

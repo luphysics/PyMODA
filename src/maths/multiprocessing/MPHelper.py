@@ -27,8 +27,10 @@ import maths.multiprocessing.mp_utils
 from maths.algorithms.loop_butter import loop_butter
 from maths.algorithms.surrogates import surrogate_calc
 from maths.algorithms.wpc import wpc, wphcoh
+from maths.multiprocessing import mp_utils
 from maths.multiprocessing.Scheduler import Scheduler
 from maths.multiprocessing.Task import Task
+from maths.params.BAParams import BAParams
 from maths.params.PCParams import PCParams
 from maths.params.REParams import REParams
 from maths.params.TFParams import TFParams, _wft, _fmin, _fmax
@@ -55,11 +57,9 @@ class MPHelper:
     def __init__(self):
         self.scheduler: Scheduler = None
 
-    async def coro_transform(
-            self,
-            params: TFParams,
-            on_progress: Callable[[int, int], None]
-    ) -> List[tuple]:
+    async def coro_transform(self,
+                             params: TFParams,
+                             on_progress: Callable[[int, int], None]) -> List[tuple]:
 
         self.stop()
         self.scheduler = Scheduler(progress_callback=on_progress)
@@ -79,8 +79,7 @@ class MPHelper:
                   params: TFParams,
                   window: QWindow,
                   on_result: Callable,
-                  on_progress: Callable[[int, int], None]
-                  ):
+                  on_progress: Callable[[int, int], None]):
         """
         Performs the windowed Fourier transform in another process, returning a result
         in the main process.
@@ -210,6 +209,48 @@ class MPHelper:
             self.scheduler.terminate()
 
 
+def _bispectrum_analysis(params: BAParams):
+    from maths.algorithms import bispec_wav_new
+
+    signals: SignalPairs = params.signals
+    sig1, sig2 = signals.get_pair_by_index(0)
+    sig1 = sig1.signal.tolist()
+    sig2 = sig2.signal.tolist()
+
+    bispxxx = []
+    bispppp = []
+    bispxpp = []
+    bisppxx = []
+    surrxxx = []
+    surrppp = []
+    surrxpp = []
+    surrpxx = []
+
+    sigcheck = np.sum(np.abs(signals[0] - signals[1]))
+
+    d = params.get()
+    nv = d["nv"]
+    ns = params.surr_count
+    preprocess = d["Preprocess"]
+
+    if sigcheck != 0:
+        if preprocess:
+            bispxxx = bispec_wav_new.calculate(sig1, sig1, params)
+            bispxxx = np.abs(bispxxx[0])
+
+            bispppp = bispec_wav_new.calculate(sig2, sig2, params)
+            bispppp = np.abs(bispppp[0])
+
+            bispxpp, freq, wopt, wt1, wt2 = bispec_wav_new.calculate(sig1, sig2, params)
+            bispxpp = np.abs(bispxpp)
+
+            bisppxx = bispec_wav_new.calculate(sig2, sig1, params)
+            bisppxx = np.abs(bispppp[0])
+
+            if ns > 0:
+                pass  # TODO: continue later
+
+
 def _bandpass_filter(queue, time_series: TimeSeries, fmin, fmax, fs):
     bands, _ = loop_butter(time_series.signal, fmin, fmax, fs)
     h = hilbert(bands)
@@ -227,7 +268,7 @@ def _bandpass_filter(queue, time_series: TimeSeries, fmin, fmax, fs):
 
 
 def _ridge_extraction(queue, time_series: TimeSeries, params: REParams):
-    maths.multiprocessing.mp_utils.setup_matlab_runtime()
+    mp_utils.setup_matlab_runtime()
     import ridge_extraction
     import matlab
 

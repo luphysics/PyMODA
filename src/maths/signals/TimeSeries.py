@@ -69,7 +69,8 @@ class TimeSeries:
     def set_xlimits(self, x1, x2):
         """
         Sets the x-limits of the data (restricting the values to a certain
-        range of times).
+        range of times). The original data is saved to a variable so that
+        it can be restored.
 
         :param x1: the lower limit
         :param x2: the upper limit
@@ -84,7 +85,7 @@ class TimeSeries:
         if x2 < x1:
             x1, x2 = x2, x1  # Swap values.
 
-        indices = self.find(self.times, lambda t: x1 <= t <= x2)
+        indices = (x1 <= self.times) & (self.times <= x2)
         self.times = self.times[indices]
         self.signal = self.signal[indices]
 
@@ -111,11 +112,3 @@ class TimeSeries:
 
     def has_output_data(self):
         return self.output_data is not None
-
-    @staticmethod
-    def find(array, func):
-        """
-        Gets indices of all items in a 1D array
-        which satisfy a particular condition.
-        """
-        return [i for (i, value) in enumerate(array) if func(value)]

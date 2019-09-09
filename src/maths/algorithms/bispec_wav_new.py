@@ -18,21 +18,21 @@
 DO NOT import this module in the main process, or it will break Linux support
 due to issues with the LD_LIBRARY_PATH.
 """
-import maths.multiprocessing.mp_utils
-from maths.multiprocessing import mp_utils
-from maths.signals.TimeSeries import TimeSeries
-from utils import args
+from typing import List
 
-# This must be above the WT and matlab imports.
+from maths.multiprocessing import mp_utils
+
+
+# This must be above the matlab imports.
 mp_utils.setup_matlab_runtime()
 
-import WT
+import bispecWavNew
 import matlab
 
-package = WT.initialize()
+package = bispecWavNew.initialize()
 
 
-def calculate(signal, params):
+def calculate(signal1: List, signal2: List , params):
     """
     Calculates the windowed Fourier transform.
 
@@ -40,12 +40,10 @@ def calculate(signal, params):
     with the LD_LIBRARY_PATH on Linux. Instead, use `MPHelper` to call it
     safely in a new process.
     """
-    if isinstance(signal, TimeSeries):
-        signal = signal.signal
+    result = package.bispecWavNew(matlab.double(signal1),
+                                  matlab.double(signal2),
+                                  params.fs,
+                                  params.get(),
+                                  nargout=5)
 
-    wt, frequency = package.wt(matlab.double([signal.tolist()]),
-                               params.fs,
-                               params.get(),
-                               nargout=2)
-
-    return wt, frequency
+    return result

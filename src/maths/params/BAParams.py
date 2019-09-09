@@ -13,34 +13,36 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from maths.params.PCParams import PCParams
+from maths.params.TFParams import _wft
 from maths.signals.Signals import Signals
-from maths.params.TFParams import TFParams, _wft, _fmin, _fmax
 
 
-class REParams(TFParams):
+class BAParams(PCParams):
 
-    def __init__(self, signals: Signals,
-                 fmin=None,
+    def __init__(self,
+                 signals: Signals,
+                 fmin=0,
                  fmax=None,
                  fstep="auto",
                  f0=1,
                  padding="predictive",
                  cut_edges=False,
-                 window="Gaussian",
-                 wavelet="Lognorm",
+                 window="Gaussian",  # Just for WFT.
+                 wavelet="Lognorm",  # Just for WT.
                  preprocess=True,
                  rel_tolerance=0.01,
                  transform=_wft,
 
-                 # Added in REParams.
-                 method=2,
-                 param=None,
-                 normalize=False,
-                 path_opt=True,
-                 max_iterations=20,
-                 cache_file=None,
-                 intervals=None
-                 ):
+                 # Added in BAParams.
+                 fc: float = None,
+                 nv: float = None,
+
+                 # Added in PCParams.
+                 surr_enabled=False,
+                 surr_count=0,
+                 surr_method="RP",
+                 surr_preproc=False):
         super().__init__(signals,
                          fmin,
                          fmax,
@@ -52,34 +54,12 @@ class REParams(TFParams):
                          wavelet,
                          preprocess,
                          rel_tolerance,
-                         transform)
+                         transform,
 
-        self.intervals = intervals
+                         surr_enabled,
+                         surr_count,
+                         surr_method,
+                         surr_preproc)
 
-        # Add params not used in TFParams.
-        self.data["Method"] = method
-
-        if param:
-            self.data["Param"] = param  # Not tested, may not work.
-
-        self.data["Normalize"] = normalize
-        self.data["PathOpt"] = path_opt
-        self.data["MaxIter"] = max_iterations
-
-        if cache_file:
-            self.data["CachedDataLocation"] = cache_file
-
-        if fmin is None:
-            self.delete(_fmin)
-        else:
-            self.data[_fmin] = fmin
-
-        if fmax is None:
-            self.delete(_fmax)
-        else:
-            self.data[_fmax] = fmax
-
-        self.data["Display"] = "off"
-
-    def set_cache_file(self, file: str):
-        self.data["CachedDataLocation"] = file
+        self.data["nv"] = nv
+        self.data["fc"] = fc

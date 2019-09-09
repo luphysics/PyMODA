@@ -19,7 +19,8 @@ from maths.params.TFParams import TFParams, _wft
 
 class PCParams(TFParams):
 
-    def __init__(self, signals: Signals,
+    def __init__(self,
+                 signals: Signals,
                  fmin=0,
                  fmax=None,
                  fstep="auto",
@@ -36,8 +37,7 @@ class PCParams(TFParams):
                  surr_enabled=False,
                  surr_count=0,
                  surr_method="RP",
-                 surr_preproc=False,
-                 ):
+                 surr_preproc=False):
         if not surr_enabled:
             surr_count = 0
 
