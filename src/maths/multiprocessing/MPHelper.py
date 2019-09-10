@@ -21,9 +21,11 @@ from typing import List
 import numpy as np
 from PyQt5.QtGui import QWindow
 from multiprocess import Queue, Process
+from nptyping import Array
 from scipy.signal import hilbert
 
 import maths.multiprocessing.mp_utils
+from maths.algorithms.bayesian import bayes_main, dirc, CFprint
 from maths.algorithms.loop_butter import loop_butter
 from maths.algorithms.surrogates import surrogate_calc
 from maths.algorithms.wpc import wpc, wphcoh
@@ -191,6 +193,25 @@ class MPHelper:
 
         self.scheduler.start()
 
+    async def coro_dynamical_bayesian(self,
+                                      sig1: TimeSeries,
+                                      sig2: TimeSeries,
+                                      params: List[DBParams],
+                                      on_progress: Callable[[int, int], None]):
+
+        self.stop()
+        self.scheduler = Scheduler(progress_callback=on_progress)
+
+        for p in params:
+            q = Queue()
+
+            p.remove_signals()
+            proc = Process(target=_dynamic_bayesian_analysis, args=(q, sig1, sig2, p,))
+
+            self.scheduler.append(Task(proc, q))
+
+        return await self.scheduler.coro_run()
+
     def bispectrum_analysis(self,
                             signal_pairs: SignalPairs,
                             window: QWindow,
@@ -210,15 +231,87 @@ class MPHelper:
             self.scheduler.terminate()
 
 
-def dynamic_bayesian_analysis(signal1: TimeSeries, signal2: TimeSeries, params: DBParams):
+def _dynamic_bayesian_analysis(signal1: TimeSeries, signal2: TimeSeries, params: DBParams):
     sig = signal1.signal
     times = signal1.times
 
-    N = sig.shape[1] / 2
+    fs = params.fs
+    interval1, interval2 = params.intervals
+    bn = params.forder
 
-    for k in range(3):
-        pass
+    bands0, _ = loop_butter(sig, interval1, fs)
+    phi1 = np.angle(hilbert(bands0))
 
+    bands1, _ = loop_butter(sig, interval2, fs)
+    phi2 = np.angle(hilbert(bands1))
+
+    p1 = phi1
+    p2 = phi2
+
+    win = params.window_size
+    ovr = params.overlap
+    pr = params.propagation_constant
+    signif = params.confidence_level
+
+    ### Bayesian inference ###
+
+    tm, cc, e = bayes_main(phi1,
+                           phi2,
+                           win,
+                           1 / fs,
+                           ovr,
+                           pr,
+                           0,
+                           bn)
+
+    from maths.algorithms.matlab_utils import zeros, mean
+
+    N = len(cc)
+    cpl1 = zeros(N)
+    cpl2 = zeros(N)
+
+    q21 = zeros((N, N, N,))
+    q12 = zeros(q21.shape)
+
+    for m in range(len(cc)):
+        cpl1[m], cpl2[m] = dirc(cc[m, :], bn)
+        _, _, q21[:, :, m], q12[:, :, m] = CFprint(cc[m, :], bn)
+
+    cf1 = q21
+    cf2 = q12
+
+    mcf1 = np.squeeze(mean(q21, 2))
+    mcf2 = np.squeeze(mean(q12, 2))
+
+    ns = params.surr_count
+    surr1 = surrogate_calc(phi1, ns, "CPP", 0, fs)
+    surr2 = surrogate_calc(phi2, ns, "CPP", 0, fs)
+
+    cc_surr: List[Array] = []
+    for n in range(ns):
+        _, cc_surr = bayes_main(surr1[n, :], surr2[n, :], win, 1 / fs, ovr, pr, 1, bn)
+
+        scpl1 = zeros((ns, len(cc_surr)))
+        scpl2 = zeros(scpl1.shape)
+
+        for idx in range(len(cc_surr)):
+            scpl1[n, idx], scpl2[n, idx] = dirc(cc_surr[idx, :], bn)
+
+    alph = signif
+    alph = 1 - alph / 100
+
+    if np.floor((ns + 1) * alph) == 0:
+        surr_cpl1 = np.max(scpl1)
+        surr_cpl2 = np.max(scpl2)
+    else:
+        K = np.floor((ns + 1) * alph)
+        s1 = sorted(scpl1, reverse=True)
+        s2 = sorted(scpl2, reverse=True)
+
+        surr_cpl1 = s1[K, :]
+        surr_cpl2 = s2[K, :]
+
+    # TODO: add return statement.
 
 def _bispectrum_analysis(params: BAParams):
     from maths.algorithms import bispec_wav_new

@@ -226,3 +226,105 @@ def calculateC(E, p, v1, v2, Cpr, XIpr, M, L, phiT, h):
     Cpt[:, 1] = C[K:2 * K]
 
     return Cpt, XIpt
+
+
+def dirc(c, bn):
+    q1 = []
+    q2 = []
+    iq1 = 1
+    iq2 = 1
+    br = 2
+    K = len(c) / 2
+
+    for ii in range(bn):
+        q1[iq1] = c[br]
+        iq1 = iq1 + 1
+        q1[iq1] = c[br + 1]
+        iq1 = iq1 + 1
+        q2[iq2] = c[K + br]
+        iq2 = iq2 + 1
+        q2[iq2] = c[K + br + 1]
+        iq2 = iq2 + 1
+        br = br + 2
+
+    for ii in range(bn):
+        q1[iq1] = c[br]
+        iq1 = iq1 + 1
+        q1[iq1] = c[br + 1]
+        iq1 = iq1 + 1
+        q2[iq2] = c[K + br]
+        iq2 = iq2 + 1
+        q2[iq2] = c[K + br + 1]
+        iq2 = iq2 + 1
+        br = br + 2
+
+    for jj in range(bn):
+        for ii in range(bn):
+            q1[iq1] = c[br]
+            iq1 = iq1 + 1
+            q1[iq1] = c[br + 1]
+            iq1 = iq1 + 1
+            q2[iq2] = c[K + br]
+            iq2 = iq2 + 1
+            q2[iq2] = c[K + br + 1]
+            iq2 = iq2 + 1
+            br = br + 2
+
+    cpl1 = np.linalg.norm(q1)
+    cpl2 = np.linalg.norm(q2)
+    drc = (cpl2 - cpl1) / (cpl1 + cpl2)
+
+    return cpl1, cpl2, drc
+
+
+def CFprint(cc, bn):
+    t1 = arange(0, twopi, 0.13)
+    t2 = arange(0, twopi, 0.13)
+
+    q1 = zeros((len(t1), len(t1),))
+    q1[:len(t1), :len(t1)] = 0
+
+    q2 = np.copy(q1)
+
+    u = cc
+    K = len(u) / 2
+
+    for i1 in range(len(t1)):
+        for j1 in range(len(t2)):
+            br = 2
+
+            for ii in range(1, bn + 1):
+                q1[i1, j1] = q1[i1, j1] + u[br] * sin(ii * t1[i1]) + u[br + 1] * cos(ii * t1[i1])
+                q2[i1, j1] = q2[i1, j1] + u[K + br] * sin(ii * t2[j1]) + u[K + br + 1] * cos(ii * t2[j1])
+
+                br += 2
+
+            for ii in range(1, bn + 1):
+                q1[i1, j1] = q1[i1, j1] + u[br] * sin(ii * t2[j1]) + u[br + 1] * cos(ii * t2[j1])
+                q2[i1, j1] = q2[i1, j1] + u[K + br] * sin(ii * t1[i1]) + u[K + br + 1] * cos(ii * t1[i1])
+
+                br += 2
+
+            for ii in range(1, bn + 1):
+                for jj in range(1, bn + 1):
+                    q1[i1, j1] = q1[i1, j1] \
+                                 + u[br] * sin(ii * t1[i1] \
+                                               + jj * t2[j1]) + u[br + 1] * cos(ii * t1[i1] + jj * t2[j1])
+
+                    q2[i1, j1] = q2[i1, j1] \
+                                 + u[K + br] * sin(ii * t1[i1] + jj * t2[j1]) \
+                                 + u[K + br + 1] * cos(ii * t1[i1] + jj * t2[j1])
+
+                    br += 2
+
+                    q1[i1, j1] = q1[i1, j1] \
+                                 + u[br] * sin(ii * t1[i1] - jj * t2[j1]) \
+                                 + u[br + 1] * cos(ii * t1[i1] - jj * t2[j1])
+
+                    q2[i1, j1] = q2[i1, j1] \
+                                 + u[K + br] * sin(ii * t1[i1] - jj * t2[j1]) \
+                                 + u[K + br + 1] * cos(ii * t1[i1] - jj * t2[j1])
+
+                    br += 2
+
+    return t1, t2, q1, q2

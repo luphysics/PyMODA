@@ -13,8 +13,10 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from typing import Union
 
 import numpy as np
+from nptyping import Array
 from numpy.random import permutation as randperm
 
 from maths.signals.TimeSeries import TimeSeries
@@ -29,7 +31,7 @@ _tshift = "tshift"
 _CPP = "CPP"
 
 
-def surrogate_calc(time_series: TimeSeries, N, method, pp, fs):
+def surrogate_calc(time_series: Union[TimeSeries, Array], N, method, pp, fs):
     """
     Calculates surrogates.
 
@@ -40,7 +42,11 @@ def surrogate_calc(time_series: TimeSeries, N, method, pp, fs):
     :param fs: the sampling frequency
     :return: the surrogate signal(s) and params
     """
-    sig = time_series.signal
+    if isinstance(time_series, TimeSeries):
+        sig = time_series.signal
+    else:
+        sig = time_series
+
     surr = np.empty((N, len(sig)), dtype=np.float64)  # TODO: check this
 
     params = Params()
