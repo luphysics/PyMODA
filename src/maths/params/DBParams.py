@@ -18,7 +18,7 @@ from maths.params.TFParams import _wft
 from maths.signals.Signals import Signals
 
 
-class DBIParams(PCParams):
+class DBParams(PCParams):
 
     def __init__(self,
                  signals: Signals,

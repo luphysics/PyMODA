@@ -30,7 +30,7 @@ def bayes_main(ph1, ph2, win, h, ovr, pr, s, bn):
     Cpr = zeros((M / L, L,))
     XIpr = zeros(M)
 
-    if (max(ph1) < twopi + 0.1):
+    if max(ph1) < twopi + 0.1:
         ph1 = np.unwrap(ph1)
         ph2 = np.unwrap(ph2)
 
@@ -118,20 +118,20 @@ def calculateP(phi1, phi2, K, bn):
 
         br += 2
 
-    for i in range(1, bn):
+    for i in range(1, bn + 1):
         p[br, :] = sin(i * phi2)
         p[br + 1, :] = cos(i * phi2)
         br += 2
 
-    for i in range(1, bn):
-        for j in range(1, bn):
+    for i in range(1, bn + 1):
+        for j in range(1, bn + 1):
             p[br + 1, :] = sin(i * phi1 + j * phi2)
             p[br + 2, :] = cos(i * phi1 + j * phi2)
-            br = br + 2
+            br += 2
 
             p[br + 1, :] = sin(i * phi1 - j * phi2)
             p[br + 2, :] = cos(i * phi1 - j * phi2)
-            br = br + 2
+            br += 2
 
     return p
 
@@ -143,7 +143,86 @@ def calculateV(phi1, phi2, K, bn, mr):
     br = 1
 
     if mr == 1:
-        for i in range(1,bn):
-            pass # TODO: continue later
+        for i in range(1, bn + 1):
+            v[br, :] = i * cos(i * phi1)
+            v[br + 1, :] = -i * sin(i * phi1)
+
+            br += 2
+
+        for i in range(1, bn + 1):
+            v[br, :] = 0
+            v[br + 1, :] = 0
+            br += 2
+
+        for i in range(1, bn + 1):
+            for j in range(1, bn + 1):
+                v[br + 1, :] = i * cos(i * phi1 + j * phi2)
+                v[br + 2, :] = -i * sin(i * phi1 + j * phi2)
+                br += 2
+
+                v[br + 1, :] = i * cos(i * phi1 - j * phi2)
+                v[br + 2, :] = -i * sin(i * phi1 - j * phi2)
+                br += 2
+    else:
+        for i in range(1, bn + 1):
+            v[br, :] = 0
+            v[br + 1, :] = 0
+
+            br += 2
+
+        for i in range(1, bn + 1):
+            v[br, :] = i * cos(i * phi2)
+            v[br + 1, :] = -i * sin(i * phi2)
+
+            br += 2
+
+        for i in range(1, bn + 1):
+            for j in range(1, bn + 1):
+                v[br + 1, :] = j * cos(i * phi1 + j * phi2)
+                v[br + 2, :] = -j * sin(i * phi1 + j * phi2)
+                br += 2
+
+                v[br + 1, :] = -j * cos(i * phi1 - j * phi2)
+                v[br + 2, :] = j * sin(i * phi1 - j * phi2)
+                br += 2
 
     return v
+
+
+def calculateE(c, phiT, L, h, p):
+    E = zeros((L, L,))
+
+    E += ((phiT - c * p) ** 2).conj().T
+    E = (h / len(phiT[0, :])) * E
+
+    return E
+
+
+def calculateC(E, p, v1, v2, Cpr, XIpr, M, L, phiT, h):
+    K = M / L
+    invr = np.linalg.inv(E)
+
+    XIpt = zeros((M, M,))
+    Cpt = zeros(Cpr.shape)
+
+    XIpt[:K, :K] = XIpr[:K, :K] + h * invr[0, 0] * p * p.conj().T
+    XIpt[:K, K:2 * K] = XIpr[:K, K:2 * K] + h * invr[0, 1] * p * p.conj().T
+    XIpt[K:2 * K, :K] = XIpr[K:2 * K, :K] + h * invr[1, 1] * p * p.conj().T
+    XIpt[K:2 * K, K:2 * K] = XIpr[K:2 * K, K:2 * K] + h * invr[1, 1] * p * p.conj().T
+
+    # Evaluate from temp r.
+    r = zeros((K, L,))
+    ED = backslash(E, phiT)
+
+    r[:, 0] = XIpr[:K, :K] * Cpr[:, 0] + XIpr[:K, K:2 * K] * Cpr[:, 1] + h * (
+            p * (ED[0, :].conj().T) - 0.5 * sum(v1, axis=1)
+    )
+    r[:, 1] = XIpr[K:2 * K, :K] * Cpr[:, 0] + XIpr[K:2 * K, K:2 * K] * Cpr[:, 1] + h * (
+            p * ED[1, :].conj().T - 0.5 * sum(v1, axis=1)
+    )
+
+    C = backslash(XIpt, np.vstack([r[:, 0], r[:, 1]])).conj().T
+    Cpt[:, 0] = C[:K]
+    Cpt[:, 1] = C[K:2 * K]
+
+    return Cpt, XIpt

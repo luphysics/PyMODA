@@ -13,6 +13,8 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from typing import Type
+
 from maths.signals.Signals import Signals
 
 # Keys for the dictionary that is supplied to the Matlab function.
@@ -34,14 +36,17 @@ _wt = "wt"
 class TFParams:
     """
     A class which is used to hold the parameters for the WT and WFT functions in
-    the time-frequency window. When the calculation begins, an instance of this
+    the time-frequency window.
+
+    When the calculation begins, an instance of this
     parameters object should be created using the current settings (and therefore
-    not susceptible to issues when settings are edited in the window
-    during the calculation).
+    avoid issues when settings are edited in the window
+    while the calculation is in progress).
 
     The params object holds a dictionary of data params which are passed to the
-    Matlab functions as **kwargs. It also contains the time series and sampling
-    frequency.
+    Matlab functions as **kwargs. The dictionary can be accessed with the `get()`
+    function, which will avoid errors in Matlab by removing all `None` values
+    from the dictionary.
     """
 
     def __init__(self,
@@ -132,7 +137,7 @@ class TFParams:
             pass
 
 
-def create(signals, params_type=TFParams, **kwargs):
+def create(signals: Signals, params_type=Type[TFParams], **kwargs):
     """
     Creates a params object, taking the same **kwargs as
     the constructor. Any argument that is set to None - or not

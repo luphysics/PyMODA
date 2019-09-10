@@ -31,6 +31,7 @@ from maths.multiprocessing import mp_utils
 from maths.multiprocessing.Scheduler import Scheduler
 from maths.multiprocessing.Task import Task
 from maths.params.BAParams import BAParams
+from maths.params.DBParams import DBParams
 from maths.params.PCParams import PCParams
 from maths.params.REParams import REParams
 from maths.params.TFParams import TFParams, _wft, _fmin, _fmax
@@ -207,6 +208,16 @@ class MPHelper:
         """
         if self.scheduler:
             self.scheduler.terminate()
+
+
+def dynamic_bayesian_analysis(signal1: TimeSeries, signal2: TimeSeries, params: DBParams):
+    sig = signal1.signal
+    times = signal1.times
+
+    N = sig.shape[1] / 2
+
+    for k in range(3):
+        pass
 
 
 def _bispectrum_analysis(params: BAParams):
