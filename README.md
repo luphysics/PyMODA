@@ -50,7 +50,7 @@ PyMODA consists of 5 windows, whose names are be abbreviated in the codebase. Th
 
 PyMODA uses `multiprocess` and `asyncio`.
 
-#### multiproces
+#### multiprocess
 
 Multiprocessing is necessary for several reasons:
 - It allows long calculations to run without freezing the GUI.
@@ -68,7 +68,7 @@ PyMODA uses the `multiprocess` module rather than the `multiprocessing` module f
 the standard library, due to problems with the latter's serialization in Windows. 
 `multiprocess` has the same API as `multiprocessing`, so the only changes required are the import statements.
 
-### asyncio
+#### asyncio
 
-`asyncio` allows the `Scheduler` class, schedules the running of multiple processes, 
+`asyncio` allows the `Scheduler` class, which schedules the running of multiple processes, 
 to run on the main thread without freezing the GUI. `Scheduler` is run in a coroutine using the Qt event loop from `asyncqt`.
