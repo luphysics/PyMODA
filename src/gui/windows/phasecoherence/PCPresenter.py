@@ -13,6 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from typing import Tuple
 
 from PyQt5.QtWidgets import QDialog, QListWidgetItem
 
@@ -24,12 +25,14 @@ from maths.signals.TFOutputData import TFOutputData
 from maths.params.PCParams import PCParams
 from maths.params.TFParams import create
 from maths.multiprocessing.MPHelper import MPHelper
+from maths.signals.TimeSeries import TimeSeries
 
 
 class PCPresenter(BaseTFPresenter):
 
     def __init__(self, view: PCView):
         super().__init__(view)
+        self.view: PCView = self.view
 
     def calculate(self, calculate_all: bool):
         self.is_calculating_all = calculate_all
@@ -54,7 +57,7 @@ class PCPresenter(BaseTFPresenter):
             params=params,
             window=self.view.get_window(),
             on_result=self.on_transform_completed,
-            on_progress=self.on_progress_updated) # TODO: fix progress bar when calculating surrogates.
+            on_progress=self.on_progress_updated)  # TODO: fix progress bar when calculating surrogates.
 
         self.view.main_plot().set_log_scale(logarithmic=True)
         self.view.amplitude_plot().set_log_scale(logarithmic=True)
@@ -133,7 +136,7 @@ class PCPresenter(BaseTFPresenter):
 
     def load_data(self):
         self.signals = SignalPairs.from_file(self.open_file)
-        if not self.signals.get_signals().has_frequency():
+        if not self.signals.has_frequency():
             dialog = FrequencyDialog(self.on_freq_changed)
             code = dialog.exec()
             if code == QDialog.Accepted:
@@ -147,10 +150,10 @@ class PCPresenter(BaseTFPresenter):
     def plot_signal_pair(self):
         self.view.plot_signal_pair(self.get_selected_signal_pair())
 
-    def get_selected_signal_pair(self):
+    def get_selected_signal_pair(self) -> Tuple[TimeSeries, TimeSeries]:
         return self.signals.get_pair_by_name(self.selected_signal_name)
 
-    def get_selected_signal_pair_data(self):
+    def get_selected_signal_pair_data(self) -> TFOutputData:
         return self.get_selected_signal_pair()[0].output_data
 
     def plot_preprocessed_signal(self):
@@ -171,7 +174,7 @@ class PCPresenter(BaseTFPresenter):
             self.view.on_xlim_edited()
             self.plot_phase_coherence()
 
-    def get_params(self, all_signals=True):
+    def get_params(self, all_signals=True) -> PCParams:
         if all_signals:
             self.signals_calc = self.signals
         else:

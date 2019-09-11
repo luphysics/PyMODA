@@ -29,9 +29,6 @@ class LauncherWindow(CentredWindow):
     types of analysis.
     """
 
-    def __init__(self, application):
-        super().__init__(application)
-
     def init_ui(self):
         uic.loadUi(get("layout:window_launcher.ui"), self)
         self.load_banner_images()

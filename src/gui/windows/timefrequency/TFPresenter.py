@@ -43,8 +43,8 @@ class TFPresenter(BaseTFPresenter):
 
     def calculate(self, calculate_all: bool):
         """Calculates the desired transform(s), and plots the result."""
-        self.loop = asyncqt.QEventLoop(self.view.application)
-        asyncio.set_event_loop(self.loop)
+        # self.loop = asyncqt.QEventLoop(self.view.application)
+        # asyncio.set_event_loop(self.loop)
 
         # TODO: refactor
         asyncio.ensure_future(self.coro_calculate(calculate_all))

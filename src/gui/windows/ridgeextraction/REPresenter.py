@@ -30,6 +30,8 @@ from maths.signals.TFOutputData import TFOutputData
 class REPresenter(TFPresenter):
     """
     The presenter in control of the ridge-extraction window.
+
+    Inherits from TFPresenter because REPresenter requires much of the same functionality.
     """
 
     def __init__(self, view: REView):

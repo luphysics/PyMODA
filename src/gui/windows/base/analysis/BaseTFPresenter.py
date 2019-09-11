@@ -16,24 +16,27 @@
 from gui.dialogs.ErrorBox import ErrorBox
 from gui.windows.base.analysis.BaseTFView import BaseTFView
 from maths.algorithms.preprocessing import preprocess
+from maths.multiprocessing.MPHelper import MPHelper
+from maths.signals.Signals import Signals
 from maths.signals.TimeSeries import TimeSeries
 from utils import stdout_redirect, errorhandling
+from utils.stdout_redirect import WindowLogger
 
 
 class BaseTFPresenter:
 
     def __init__(self, view: BaseTFView):
-        self.view = view
-        self.is_plotted = False
-        self.plot_ampl = True
-        self.tasks_completed = 0
+        self.view: BaseTFView = view
+        self.is_plotted: bool = False
+        self.plot_ampl: bool = True
+        self.tasks_completed: int = 0
 
-        self.signals = None
-        self.selected_signal_name = None
-        self.open_file = None
-        self.freq = None
-        self.mp_handler = None
-        self.logger = stdout_redirect.WindowLogger(self.on_log)
+        self.signals: Signals = None
+        self.selected_signal_name: str = None
+        self.open_file: str = None
+        self.freq: float = None
+        self.mp_handler: MPHelper = None
+        self.logger: WindowLogger = stdout_redirect.WindowLogger(self.on_log)
 
         errorhandling.subscribe(self.on_error)
         stdout_redirect.subscribe(self.logger)

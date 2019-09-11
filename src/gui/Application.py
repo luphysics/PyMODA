@@ -13,12 +13,15 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import asyncio
 from typing import Type
 
 from PyQt5.QtWidgets import QApplication
+from asyncqt import QEventLoop
 
 from gui.windows.base.BaseWindow import BaseWindow
 from gui.windows.bispectrum.BAWindow import BAWindow
+from gui.windows.bayesian.DBWindow import DBWindow
 from gui.windows.phasecoherence.PCWindow import PCWindow
 from gui.windows.ridgeextraction.REWindow import REWindow
 from gui.windows.timefrequency.TFWindow import TFWindow
@@ -34,23 +37,30 @@ class Application(QApplication):
 
     def __init__(self, args):
         super(Application, self).__init__(args)
+        self.setup_event_loop()
         self.start_launcher()
 
+    def setup_event_loop(self):
+        """
+        Sets the event loop which will be used by asyncio.
+        """
+        loop = QEventLoop(self)
+        asyncio.set_event_loop(loop)
+
     def start_launcher(self):
-        """Opens the launcher window."""
-        self.launcher_window = LauncherWindow(self)
-        self.launcher_window.show()
+        """Opens the launcher window which has buttons to open the other windows."""
+        self.open_window(LauncherWindow)
 
     def start_time_frequency(self):
-        """Opens the time-frequency window."""
+        """Opens the time-frequency analysis window."""
         self.open_window(TFWindow)
 
     def start_phase_coherence(self):
-        """Opens the phase coherence window."""
+        """Opens the wavelet phase coherence window."""
         self.open_window(PCWindow)
 
     def start_ridge_extraction(self):
-        """Opens the phase coherence window."""
+        """Opens the ridge extraction and filtering window."""
         self.open_window(REWindow)
 
     def start_bispectrum(self):
@@ -58,16 +68,24 @@ class Application(QApplication):
         self.open_window(BAWindow)
 
     def start_bayesian(self):
-        """Opens the Bayesian inference window."""
-        raise Exception("Dynamical Bayesian inference is not implemented yet.")
-        # self.open_window(DBIWindow)
+        """Opens the dynamical Bayesian inference window."""
+        self.open_window(DBWindow)
 
     def open_window(self, WindowType: Type[BaseWindow]):
-        w = WindowType(self)
-        self.windows.append(w)
-        w.show()
+        """
+        Opens a window with a given type which inherits from BaseWindow.
+
+        Important: pass the class name instead of an instance of the class.
+        """
+        window = WindowType(self)
+        self.windows.append(window)
+        window.show()
 
     def notify_close_event(self, window: BaseWindow):
+        """
+        Should be called to notify the application when a window
+        is closed. This functionality is implemented in BaseWindow.
+        """
         try:
             self.windows.remove(window)
         except ValueError:

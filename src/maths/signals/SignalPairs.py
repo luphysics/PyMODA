@@ -52,14 +52,15 @@ class SignalPairs(Signals):
     def get_pair_by_index(self, index: int):
         return self.get_pairs()[index]
 
-    def get_signals(self):
-        return self
-
     def pair_count(self):
         """Returns the number of signal pairs."""
         return len(self) // 2
 
     def only(self, *pair_names):
+        """
+        Creates a new SignalPairs object containing only the signal pairs
+        with the supplied names.
+        """
         # List of tuples.
         pairs = [self.get_pair_by_name(n) for n in pair_names]
 
