@@ -23,8 +23,8 @@ def check_cwd():
     new_cwd = find_cwd()
 
     if not new_cwd:
-        print("ERROR: The script should be executed from the root "
-              "source directory or the `packages` folder.")
+        print("ERROR: The script should be executed from the "
+              "PyMODA directory or its `packages` subfolder.")
         sys.exit(1)
 
     os.chdir(new_cwd)
@@ -45,5 +45,10 @@ if __name__ == "__main__":
         os.system(f"python3 setup.py install")
         os.system(f"python setup.py install")
 
+    os.chdir(f"{wd}/..")
+    os.system("pip install -r requirements.txt")
+    os.system("pip3 install -r requirements.txt")
+
     print("\n")
     print("\n".join([f"Attempted to install package from {f}" for f in files]))
+    print("\nInstalled pip dependencies from requirements.txt")
