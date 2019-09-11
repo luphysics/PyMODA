@@ -22,6 +22,19 @@ When the code is downloaded and Python is installed, you'll need to install the 
 
 To start PyMODA, run `python src/main.py` from the same terminal.
 
+### Performance and efficiency
+
+When performing multiple discrete calculations - for example, the wavelet transform of 6 signals - PyMODA uses multiprocessing to greatly increase efficiency by allocating 
+different calculations to different CPU cores.
+
+Therefore, it is more efficient to transform multiple signals if possible. Efficiency will plateau when the number of signals is higher than the number of CPU cores.
+
+| Operation | CPU cores/threads | Total time: individually ("Transform Single" for all) | Total time: simultaneously ("Transform All") | Performance improvement |
+| ------------- | ------------- | ------------- | ------ | ------ |
+| WT on 2 signals | 4/8 | 10s | 5.4s | x1.9 |
+| WT on 6 signals | 4/8 | 30s | 8.4s | x3.6 |
+| WT on 32 signals | 4/8 | 160s | 43.1s | x3.7 |
+
 ## Developer's Guide
 
 This guide is aimed at developers wishing to modify or contribute to the program, and is 
@@ -29,6 +42,42 @@ designed to be accessible to programmers with basic to intermediate knowledge of
 
 ### Downloading the code
 To be able to submit changes to PyMODA, you should [fork the repository](https://help.github.com/en/articles/fork-a-repo). You can then clone your fork to download the code.
+
+### Project structure
+
+```
+PyMODA
+│   README.md
+|   ...
+│
+└───packages                # Folder containing the MATLAB-generated Python packages.
+│   │   install.py          # Installs the Python packages.
+│   │
+│   └───WT                  # Wavelet transform package.
+│   |
+|   ...
+│
+└───res                     # Contains resources used by the program.
+|   |
+|   └───colours             # Contains colourmaps used by the program.
+|   |
+|   └───img                 # Contains images used by the program.
+|   |
+|   └───layout              # Contains PyQt layout files.
+|   |
+|   └───test                # Contains example data for testing PyMODA.
+|
+└───src                     # Contains the Python codebase.
+    │   main.py             # The entry point of the program.
+    |
+    └───data                # Contains code related to loading data.
+    |
+    └───gui                 # Contains code related to the GUI.
+    |
+    └───maths               # Contains code related to numerical calculations.
+    |
+    └───utils               # Contains utility code used by the program, e.g. error handling.
+```
 
 ### Naming conventions and code style
 
