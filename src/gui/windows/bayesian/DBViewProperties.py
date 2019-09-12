@@ -13,7 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from PyQt5.QtWidgets import QPushButton, QLineEdit
+from PyQt5.QtWidgets import QPushButton, QLineEdit, QVBoxLayout
 
 from gui.windows.base.ViewProperties import ViewProperties
 
@@ -24,12 +24,15 @@ class DBViewProperties(ViewProperties):
         self.btn_add_paramset: QPushButton = None
         self.btn_delete_paramset: QPushButton = None
 
-        self.lineedit_freq_range1: QLineEdit = None
-        self.lineedit_freq_range2: QLineEdit = None
+        self.lineedit_freq_range1_min: QLineEdit = None
+        self.lineedit_freq_range1_max: QLineEdit = None
+        self.lineedit_freq_range2_min: QLineEdit = None
+        self.lineedit_freq_range2_max: QLineEdit = None
 
         self.lineedit_window_size: QLineEdit = None
         self.lineedit_overlap: QLineEdit = None
         self.lineedit_order: QLineEdit = None
         self.lineedit_confidence_level: QLineEdit = None
-        self.lineedit_num_surrogates: QLineEdit = None
         self.lineedit_propagation_const: QLineEdit = None
+
+        self.vbox_triple_plot: QVBoxLayout = None

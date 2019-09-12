@@ -13,10 +13,10 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from gui.plotting.MatplotlibComponent import MatplotlibComponent
+from gui.plotting.MatplotlibWidget import MatplotlibWidget
 
 
-class REPlot(MatplotlibComponent):
+class REPlot(MatplotlibWidget):
 
     def plot(self, times, values):
         self.axes.xaxis.set_label_position("top")

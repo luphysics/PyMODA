@@ -16,22 +16,15 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <layout class="QHBoxLayout" name="main_layout" stretch="9,0">
+     <layout class="QHBoxLayout" name="main_layout" stretch="10,1">
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_7" stretch="9,1">
         <property name="leftMargin">
          <number>10</number>
         </property>
         <item>
-         <layout class="QGridLayout" name="gridLayout" rowstretch="3,7" columnstretch="7,2">
-          <item row="1" column="0">
-           <layout class="QGridLayout" name="gridLayout_2">
-            <item row="0" column="0">
-             <widget class="ColorMeshPlot" name="plot_main" native="true"/>
-            </item>
-           </layout>
-          </item>
-          <item row="0" column="0">
+         <layout class="QVBoxLayout" name="verticalLayout_8">
+          <item>
            <layout class="QGridLayout" name="gridLayout_3">
             <property name="sizeConstraint">
              <enum>QLayout::SetMaximumSize</enum>
@@ -41,55 +34,8 @@
             </item>
            </layout>
           </item>
-          <item row="0" column="1">
-           <layout class="QGridLayout" name="gridLayout_4" rowstretch="2,2,2,0">
-            <item row="2" column="0" rowspan="2">
-             <layout class="QVBoxLayout" name="verticalLayout">
-              <item>
-               <widget class="QLabel" name="label_2">
-                <property name="text">
-                 <string>Select data (scroll area)</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QListWidget" name="list_select_data"/>
-              </item>
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_2"/>
-              </item>
-             </layout>
-            </item>
-            <item row="0" column="0">
-             <widget class="QGroupBox" name="groupBox">
-              <property name="title">
-               <string>Signal X-Limits</string>
-              </property>
-              <layout class="QGridLayout" name="gridLayout_7" rowstretch="0,0,0,0,0" columnstretch="0,0">
-               <item row="3" column="1">
-                <widget class="QLineEdit" name="line_xlim2"/>
-               </item>
-               <item row="4" column="0" colspan="2">
-                <widget class="QPushButton" name="btn_refresh">
-                 <property name="text">
-                  <string>Refresh</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="0">
-                <widget class="QLineEdit" name="line_xlim1"/>
-               </item>
-              </layout>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item row="1" column="1">
-           <layout class="QGridLayout" name="gridLayout_5">
-            <item row="0" column="0">
-             <widget class="AmplitudePlot" name="plot_right" native="true"/>
-            </item>
-           </layout>
+          <item>
+           <layout class="QVBoxLayout" name="vbox_triple_plot"/>
           </item>
          </layout>
         </item>
@@ -154,43 +100,164 @@
        </layout>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_6" stretch="4,4,0,0">
+       <layout class="QVBoxLayout" name="verticalLayout_6" stretch="0,4,0,0">
         <item>
-         <layout class="QHBoxLayout" name="data_section">
+         <layout class="QHBoxLayout" name="horizontalLayout_15" stretch="4,6">
           <item>
-           <widget class="QGroupBox" name="verticalGroupBox_2">
-            <property name="title">
-             <string>Freq band 1</string>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_4">
-             <item>
-              <widget class="QListWidget" name="listWidget_freq_band1"/>
-             </item>
-            </layout>
-           </widget>
+           <layout class="QVBoxLayout" name="verticalLayout_16">
+            <item>
+             <widget class="QGroupBox" name="groupBox">
+              <property name="title">
+               <string>Signal X-Limits</string>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_7" rowstretch="0,0,0,0,0" columnstretch="0,0">
+               <item row="3" column="1">
+                <widget class="QLineEdit" name="line_xlim2"/>
+               </item>
+               <item row="4" column="0" colspan="2">
+                <widget class="QPushButton" name="btn_refresh">
+                 <property name="text">
+                  <string>Refresh</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="0">
+                <widget class="QLineEdit" name="line_xlim1"/>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <layout class="QVBoxLayout" name="verticalLayout">
+              <item>
+               <widget class="QLabel" name="label_2">
+                <property name="text">
+                 <string>Select data (scroll area)</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QListWidget" name="list_select_data"/>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_2"/>
+              </item>
+             </layout>
+            </item>
+           </layout>
           </item>
           <item>
-           <widget class="QGroupBox" name="verticalGroupBox_3">
-            <property name="title">
-             <string>Freq band 2</string>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_5">
-             <item>
-              <widget class="QListWidget" name="listWidget_freq_band2"/>
-             </item>
-            </layout>
-           </widget>
+           <layout class="QVBoxLayout" name="verticalLayout_13">
+            <item>
+             <widget class="QGroupBox" name="verticalGroupBox_3">
+              <property name="title">
+               <string>Freq band 2</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_5">
+               <item>
+                <widget class="QListWidget" name="listWidget_freq_band2"/>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="verticalGroupBox_2">
+              <property name="title">
+               <string>Freq band 1</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_4">
+               <item>
+                <widget class="QListWidget" name="listWidget_freq_band1"/>
+               </item>
+              </layout>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
         </item>
         <item>
-         <layout class="QVBoxLayout" name="advanced_options_section" stretch="3,3,1">
+         <layout class="QVBoxLayout" name="advanced_options_section" stretch="0,0,0,3,1">
+          <item>
+           <widget class="QGroupBox" name="horizontalGroupBox_2">
+            <property name="title">
+             <string>Frequency range 1</string>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_11">
+             <item>
+              <widget class="QLabel" name="label_6">
+               <property name="text">
+                <string>min:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="lineedit_freq_range1_min">
+               <property name="text">
+                <string>0.081</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_12">
+               <property name="text">
+                <string>max:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="lineedit_freq_range1_max">
+               <property name="text">
+                <string>0.3</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="horizontalGroupBox_5">
+            <property name="title">
+             <string>Frequency range 2</string>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_16">
+             <item>
+              <widget class="QLabel" name="label_11">
+               <property name="text">
+                <string>min:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="lineedit_freq_range2_min">
+               <property name="text">
+                <string>0.08</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_13">
+               <property name="text">
+                <string>max:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="lineedit_freq_range2_max">
+               <property name="text">
+                <string>0.31</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_2">
             <item>
              <widget class="QGroupBox" name="groupBox">
               <property name="title">
-               <string>Advanced Options</string>
+               <string>Surrogates</string>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_3">
                <property name="topMargin">
@@ -223,7 +290,11 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="line_surrogate"/>
+                  <widget class="QLineEdit" name="line_surrogate">
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </item>
@@ -240,113 +311,118 @@
             <property name="title">
              <string>Parameters</string>
             </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_8">
-             <item>
-              <layout class="QVBoxLayout" name="verticalLayout_12">
+            <layout class="QGridLayout" name="gridLayout_4">
+             <item row="0" column="0">
+              <layout class="QHBoxLayout" name="horizontalLayout_14" stretch="3,1">
                <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_7">
-                 <item>
-                  <widget class="QLabel" name="lineedit_freq_range2">
-                   <property name="text">
-                    <string>Frequency range 1</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="lineedit_freq_range1"/>
-                 </item>
-                </layout>
+                <widget class="QLabel" name="label_10">
+                 <property name="text">
+                  <string>Window size (s)</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
+                </widget>
                </item>
                <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_11">
-                 <item>
-                  <widget class="QLabel" name="label_7">
-                   <property name="text">
-                    <string>Frequency range 2</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="lineEdit_2"/>
-                 </item>
-                </layout>
+                <widget class="QLineEdit" name="lineedit_window_size">
+                 <property name="text">
+                  <string>50</string>
+                 </property>
+                </widget>
                </item>
               </layout>
              </item>
-             <item>
-              <layout class="QVBoxLayout" name="verticalLayout_10">
+             <item row="1" column="1">
+              <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="3,1">
                <item>
-                <widget class="QLineEdit" name="lineedit_window_size"/>
+                <widget class="QLabel" name="label_4">
+                 <property name="layoutDirection">
+                  <enum>Qt::LeftToRight</enum>
+                 </property>
+                 <property name="text">
+                  <string>Order (F0)</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
+                </widget>
                </item>
                <item>
-                <widget class="QLineEdit" name="lineedit_propagation_const"/>
-               </item>
-               <item>
-                <widget class="QLineEdit" name="lineedit_num_surrogates"/>
+                <widget class="QLineEdit" name="lineedit_order">
+                 <property name="text">
+                  <string>2</string>
+                 </property>
+                </widget>
                </item>
               </layout>
              </item>
-             <item>
-              <layout class="QVBoxLayout" name="verticalLayout_8">
+             <item row="0" column="1">
+              <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="3,1">
                <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="3,1">
-                 <item>
-                  <widget class="QLabel" name="label_3">
-                   <property name="layoutDirection">
-                    <enum>Qt::LeftToRight</enum>
-                   </property>
-                   <property name="text">
-                    <string>Overlap (0-1)</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="lineedit_overlap"/>
-                 </item>
-                </layout>
+                <widget class="QLabel" name="label_3">
+                 <property name="layoutDirection">
+                  <enum>Qt::LeftToRight</enum>
+                 </property>
+                 <property name="text">
+                  <string>Overlap (0-1)</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
+                </widget>
                </item>
                <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="3,1">
-                 <item>
-                  <widget class="QLabel" name="label_4">
-                   <property name="layoutDirection">
-                    <enum>Qt::LeftToRight</enum>
-                   </property>
-                   <property name="text">
-                    <string>Order (F0)</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="lineedit_order"/>
-                 </item>
-                </layout>
+                <widget class="QLineEdit" name="lineedit_overlap">
+                 <property name="text">
+                  <string>1</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="1" column="0">
+              <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="3,1">
+               <item>
+                <widget class="QLabel" name="label">
+                 <property name="text">
+                  <string>Propagation const</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
+                </widget>
                </item>
                <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_13" stretch="3,1">
-                 <item>
-                  <widget class="QLabel" name="label_5">
-                   <property name="layoutDirection">
-                    <enum>Qt::LeftToRight</enum>
-                   </property>
-                   <property name="text">
-                    <string>Confidence level (%)</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="lineedit_confidence_level"/>
-                 </item>
-                </layout>
+                <widget class="QLineEdit" name="lineedit_propagation_const">
+                 <property name="text">
+                  <string>0.2</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="2" column="0">
+              <layout class="QHBoxLayout" name="horizontalLayout_13" stretch="3,1">
+               <item>
+                <widget class="QLabel" name="label_5">
+                 <property name="layoutDirection">
+                  <enum>Qt::LeftToRight</enum>
+                 </property>
+                 <property name="text">
+                  <string>Confidence level (%)</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="lineedit_confidence_level">
+                 <property name="text">
+                  <string>95</string>
+                 </property>
+                </widget>
                </item>
               </layout>
              </item>
@@ -417,18 +493,6 @@
    <class>SignalPlot</class>
    <extends>QWidget</extends>
    <header>gui.windows.base.analysis.plots.SignalPlot</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>ColorMeshPlot</class>
-   <extends>QWidget</extends>
-   <header>gui.windows.base.analysis.plots.ColorMeshPlot</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>AmplitudePlot</class>
-   <extends>QWidget</extends>
-   <header>gui.windows.base.analysis.plots.AmplitudePlot</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

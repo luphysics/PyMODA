@@ -22,7 +22,7 @@ from gui.plotting.Callbacks import Callbacks
 class PlotOptionsBar(QWidget, BaseUI):
     """
     An options bar which provides helpful options for interacting with
-    a MatplotlibComponent. For example, resetting the view or switching to
+    a MatplotlibWidget. For example, resetting the view or switching to
     drag-to-move mode.
     """
     layout: QHBoxLayout = None

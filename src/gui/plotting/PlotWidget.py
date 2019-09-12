@@ -13,11 +13,12 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from PyQt5.QtWidgets import QWidget
 
-from gui.plotting.BaseComponent import BaseComponent
+from gui.BaseUI import BaseUI
 
 
-class PlotComponent(BaseComponent):
+class PlotWidget(QWidget, BaseUI):
     """
     A base component for plotting. Should be independent of any
     plotting library.

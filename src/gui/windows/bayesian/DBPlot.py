@@ -13,22 +13,23 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from PyQt5.QtWidgets import QVBoxLayout
-from pyqtgraph.opengl import GLViewWidget
-
-from gui.plotting.PlotComponent import PlotComponent
+from pyqtgraph.widgets.MatplotlibWidget import MatplotlibWidget
 
 
-class PyQtGraphComponent(PlotComponent):
-    """
-    Warning: not fully implemented. Correct implementation is
-    not planned.
+class DBPlot(MatplotlibWidget):
 
-    A component which enables plotting via PyQtGraph.
-    """
+    def plot(self, times, values):
+        # self.axes.xaxis.set_label_position("top")
+        # self.update_xlabel()
+        # self.update_ylabel()
+        #
+        # self.axes.autoscale(True)
+        #
+        # self.axes.plot(times, values, linewidth=0.8)
+        # self.axes.autoscale(False)
+        # self.axes.set_xlim([times[0], times[-1]])
+        # self.on_plot_complete()
+        pass
 
-    def init_ui(self):
-        self.layout = QVBoxLayout(self)
-
-        self.plot_widget = GLViewWidget()
-        self.layout.addWidget(self.plot_widget)
+    def get_xlabel(self):
+        return "Time (s)"

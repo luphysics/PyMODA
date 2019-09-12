@@ -23,13 +23,13 @@ from matplotlib.backends.backend_qt5agg import (FigureCanvas)
 from matplotlib.figure import Figure
 from scipy.constants.codata import val
 
-from gui.plotting.PlotComponent import PlotComponent
+from gui.plotting.PlotWidget import PlotWidget
 from gui.plotting.Callbacks import Callbacks
-from gui.plotting.PlotOptionsBar import PlotOptionsBar
+from gui.plotting.PlotOptionsWidget import PlotOptionsBar
 from gui.windows.base.analysis.plots.Rect import Rect
 
 
-class MatplotlibComponent(PlotComponent):
+class MatplotlibWidget(PlotWidget):
     """
     A widget which enables plotting via matplotlib.
     """
@@ -57,7 +57,7 @@ class MatplotlibComponent(PlotComponent):
         self.max_crosshairs = 10
         self.crosshair_listeners = []
 
-        super(MatplotlibComponent, self).__init__(parent)
+        super(MatplotlibWidget, self).__init__(parent)
 
     def init_ui(self):
         super().init_ui()

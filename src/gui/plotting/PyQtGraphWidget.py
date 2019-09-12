@@ -1,5 +1,5 @@
 #  PyMODA, a Python implementation of MODA (Multiscale Oscillatory Dynamics Analysis).
-#  Copyright (C) 2019  Lancaster University
+#  Copyright (C) 2019 Lancaster University
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -13,13 +13,22 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QVBoxLayout
+from pyqtgraph.opengl import GLViewWidget
 
-from gui.BaseUI import BaseUI
+from gui.plotting.PlotWidget import PlotWidget
 
 
-class BaseComponent(QWidget, BaseUI):
+class PyQtGraphWidget(PlotWidget):
     """
-    A base UI component. Components are QWidgets.
+    Warning: not fully implemented. Correct implementation is
+    not planned.
+
+    A widget which enables plotting via PyQtGraph.
     """
-    pass
+
+    def init_ui(self):
+        self.layout = QVBoxLayout(self)
+
+        self.plot_widget = GLViewWidget()
+        self.layout.addWidget(self.plot_widget)

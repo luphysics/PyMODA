@@ -15,10 +15,10 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import numpy as np
 
-from gui.plotting.MatplotlibComponent import MatplotlibComponent
+from gui.plotting.MatplotlibWidget import MatplotlibWidget
 
 
-class PreprocessPlot(MatplotlibComponent):
+class PreprocessPlot(MatplotlibWidget):
 
     def plot(self, times: np.ndarray, original: np.ndarray, preprocessed: np.ndarray):
         self.clear()

@@ -17,11 +17,11 @@ import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
 
 from data import resources
-from gui.plotting.MatplotlibComponent import MatplotlibComponent
+from gui.plotting.MatplotlibWidget import MatplotlibWidget
 from maths.utils import subset2d, calc_subset_count
 
 
-class ColorMeshPlot(MatplotlibComponent):
+class ColorMeshPlot(MatplotlibWidget):
     """
     Plots a color mesh as a contour plot. Used for
     wavelet transforms, phase coherence, etc.

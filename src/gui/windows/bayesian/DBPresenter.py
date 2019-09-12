@@ -15,13 +15,14 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from typing import Tuple
 
-from PyQt5.QtWidgets import QDialog
+from PyQt5.QtWidgets import QDialog, QListWidgetItem
 
 from gui.dialogs.FrequencyDialog import FrequencyDialog
 from gui.windows.base.analysis.BaseTFPresenter import BaseTFPresenter
 from gui.windows.bayesian.DBView import DBView
 from maths.signals.SignalPairs import SignalPairs
 from maths.signals.TimeSeries import TimeSeries
+from maths.utils import dec_float_or_none
 
 
 class DBPresenter(BaseTFPresenter):
@@ -31,7 +32,10 @@ class DBPresenter(BaseTFPresenter):
 
     def __init__(self, view: DBView):
         BaseTFPresenter.__init__(self, view)
+
+        # Improve type hints.
         self.signals: SignalPairs = self.signals
+        self.view: DBView = view
 
     def load_data(self):
         self.signals = SignalPairs.from_file(self.open_file)
@@ -52,3 +56,20 @@ class DBPresenter(BaseTFPresenter):
 
     def get_selected_signal_pair(self) -> Tuple[TimeSeries, TimeSeries]:
         return self.signals.get_pair_by_name(self.selected_signal_name)
+
+    def on_signal_selected(self, item):
+        if isinstance(item, QListWidgetItem):
+            name = item.text()
+        else:
+            name = item
+
+        self.signals.reset()
+        if name != self.selected_signal_name:
+            print(f"Selected '{name}'")
+            self.selected_signal_name = name
+            self.plot_signal_pair()
+            self.view.on_xlim_edited()
+
+@dec_float_or_none
+def test():
+    return "5"
