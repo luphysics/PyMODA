@@ -13,10 +13,10 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from gui.windows.base.analysis.BaseTFViewProperties import BaseTFViewProperties
-from gui.windows.base.analysis.plots.AmplitudePlot import AmplitudePlot
-from gui.windows.base.analysis.plots.SignalPlot import SignalPlot
-from gui.windows.base.analysis.plots.ColorMeshPlot import ColorMeshPlot
+from gui.common.BaseTFViewProperties import BaseTFViewProperties
+from gui.plotting.plots.AmplitudePlot import AmplitudePlot
+from gui.plotting.plots.SignalPlot import SignalPlot
+from gui.plotting.plots.ColorMeshPlot import ColorMeshPlot
 
 
 class BaseTFView(BaseTFViewProperties):
@@ -32,7 +32,7 @@ class BaseTFView(BaseTFViewProperties):
         self.application = application
 
         # Prevent circular imports.
-        from gui.windows.base.analysis.BaseTFPresenter import BaseTFPresenter
+        from gui.common import BaseTFPresenter
         self.presenter: BaseTFPresenter = presenter
 
     def plot_signal(self, time_series):

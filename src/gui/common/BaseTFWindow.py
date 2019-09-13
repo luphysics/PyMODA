@@ -17,19 +17,19 @@ from functools import partial
 from typing import List
 
 from PyQt5 import uic, QtGui
-from PyQt5.QtWidgets import QDialog, QListWidget, QProgressBar, QPushButton
+from PyQt5.QtWidgets import QDialog, QProgressBar, QPushButton
 
+from gui.common.BaseTFView import BaseTFView
 from gui.dialogs.files.SelectFileDialog import SelectFileDialog
-from gui.windows.base.MaximisedWindow import MaximisedWindow
-from gui.windows.base.analysis.BaseTFView import BaseTFView
-from gui.windows.base.analysis.plots.AmplitudePlot import AmplitudePlot
-from gui.windows.base.analysis.plots.ColorMeshPlot import ColorMeshPlot
-from gui.windows.base.analysis.plots.SignalPlot import SignalPlot
+from gui.windows.MaximisedWindow import MaximisedWindow
+from gui.plotting.plots.AmplitudePlot import AmplitudePlot
+from gui.plotting.plots.ColorMeshPlot import ColorMeshPlot
+from gui.plotting.plots.SignalPlot import SignalPlot
 
 
 class BaseTFWindow(MaximisedWindow, BaseTFView):
     """
-    A base analysis window that handles Qt-related code.
+    A base common window that handles Qt-related code.
     """
 
     def get_layout_file(self) -> str:

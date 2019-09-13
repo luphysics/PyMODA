@@ -13,10 +13,9 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from PyQt5.QtWidgets import QLineEdit, QRadioButton
+from PyQt5.QtWidgets import QRadioButton
 
-from gui.windows.base.ViewProperties import ViewProperties
-from gui.windows.base.analysis.plots.PreprocessPlot import PreprocessPlot
+from gui.windows.ViewProperties import ViewProperties
 
 
 class TFViewProperties(ViewProperties):

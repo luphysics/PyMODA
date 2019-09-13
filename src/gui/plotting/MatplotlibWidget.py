@@ -21,12 +21,11 @@ from matplotlib import patches
 from matplotlib.backend_bases import MouseButton
 from matplotlib.backends.backend_qt5agg import (FigureCanvas)
 from matplotlib.figure import Figure
-from scipy.constants.codata import val
 
 from gui.plotting.PlotWidget import PlotWidget
 from gui.plotting.Callbacks import Callbacks
 from gui.plotting.PlotOptionsWidget import PlotOptionsBar
-from gui.windows.base.analysis.plots.Rect import Rect
+from gui.plotting.plots.Rect import Rect
 
 
 class MatplotlibWidget(PlotWidget):

@@ -155,7 +155,7 @@
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_5">
                <item>
-                <widget class="QListWidget" name="listWidget_freq_band2"/>
+                <widget class="QListWidget" name="listwidget_freq_band2"/>
                </item>
               </layout>
              </widget>
@@ -167,7 +167,7 @@
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_4">
                <item>
-                <widget class="QListWidget" name="listWidget_freq_band1"/>
+                <widget class="QListWidget" name="listwidget_freq_band1"/>
                </item>
               </layout>
              </widget>
@@ -483,7 +483,7 @@
      <x>0</x>
      <y>0</y>
      <width>1601</width>
-     <height>29</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>
@@ -492,7 +492,7 @@
   <customwidget>
    <class>SignalPlot</class>
    <extends>QWidget</extends>
-   <header>gui.windows.base.analysis.plots.SignalPlot</header>
+   <header>gui.plotting.plots.SignalPlot</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

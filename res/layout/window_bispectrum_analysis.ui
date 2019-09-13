@@ -489,19 +489,19 @@
   <customwidget>
    <class>SignalPlot</class>
    <extends>QWidget</extends>
-   <header>gui.windows.base.analysis.plots.SignalPlot</header>
+   <header>gui.plotting.plots.SignalPlot</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>ColorMeshPlot</class>
    <extends>QWidget</extends>
-   <header>gui.windows.base.analysis.plots.ColorMeshPlot</header>
+   <header>gui.plotting.plots.ColorMeshPlot</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>AmplitudePlot</class>
    <extends>QWidget</extends>
-   <header>gui.windows.base.analysis.plots.AmplitudePlot</header>
+   <header>gui.plotting.plots.AmplitudePlot</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -15,7 +15,6 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from typing import Tuple, Union
 
-import numpy as np
 from PyQt5.QtWidgets import QListWidgetItem
 from nptyping import Array
 

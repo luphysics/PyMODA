@@ -1,5 +1,5 @@
 #  PyMODA, a Python implementation of MODA (Multiscale Oscillatory Dynamics Analysis).
-#  Copyright (C) 2019 Lancaster University
+#  Copyright (C) 2019  Lancaster University
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -13,11 +13,17 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from gui.windows.CentredWindow import CentredWindow
+from utils import args
 
-from gui.windows.ViewProperties import ViewProperties
 
+class MaximisedWindow(CentredWindow):
+    """
+    A window which is maximised when it opens, unless overridden
+    by a command-line argument.
+    """
 
-class BAViewProperties(ViewProperties):
-
-    def __init__(self):
-        """Define properties introduced by the .ui file."""
+    def __init__(self, application):
+        super().__init__(application)
+        if args.maximise():
+            self.showMaximized()

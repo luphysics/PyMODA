@@ -20,13 +20,13 @@ from PyQt5.QtGui import QPixmap
 
 from data import resources
 from data.resources import get
-from gui.windows.base.CentredWindow import CentredWindow
+from gui.windows.CentredWindow import CentredWindow
 
 
 class LauncherWindow(CentredWindow):
     """
     The first window that opens, providing options to perform different
-    types of analysis.
+    types of common.
     """
 
     def init_ui(self):

@@ -14,7 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from data import resources
-from gui.windows.base.analysis.BaseTFWindow import BaseTFWindow
+from gui.common.BaseTFWindow import BaseTFWindow
 from gui.windows.bispectrum.BAPresenter import BAPresenter
 from gui.windows.bispectrum.BAView import BAView
 from gui.windows.phasecoherence.PCWindow import PCWindow

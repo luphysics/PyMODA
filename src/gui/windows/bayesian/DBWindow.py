@@ -16,7 +16,7 @@
 from typing import Tuple
 
 from data import resources
-from gui.windows.base.analysis.BaseTFWindow import BaseTFWindow
+from gui.common.BaseTFWindow import BaseTFWindow
 from gui.windows.bayesian.DBPresenter import DBPresenter
 from gui.windows.bayesian.DBView import DBView
 from maths.signals.TimeSeries import TimeSeries

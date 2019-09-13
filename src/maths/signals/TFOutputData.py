@@ -38,7 +38,7 @@ class TFOutputData:
         self.transform = transform  # The name of the transform (e.g. WT or WFT).
         self.values = values  # The values of the transform (complex numbers).
 
-        # Data plotted in main color mesh in time-frequency analysis.
+        # Data plotted in main color mesh in time-frequency common.
         self.times = times
         self.freq = freq
         self.ampl = ampl

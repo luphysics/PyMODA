@@ -17,20 +17,21 @@ from functools import partial
 from typing import List, Tuple
 
 from PyQt5 import sip
-from PyQt5.QtWidgets import QListWidget, QVBoxLayout, QListWidgetItem
+from PyQt5.QtWidgets import QListWidget, QVBoxLayout
 
 from data import resources
 from gui.windows.ridgeextraction.REPlot import REPlot
 from gui.windows.ridgeextraction.REPresenter import REPresenter
 from gui.windows.ridgeextraction.REView import REView
 from gui.windows.timefrequency.TFWindow import TFWindow
-from maths.utils import float_or_none
+from maths.num_utils import float_or_none
+from utils.decorators import deprecated
 
 
 class REWindow(REView, TFWindow):
     """
     The ridge extraction window. Since ridge extraction uses all of
-    the time-frequency analysis functionality (except statistics),
+    the time-frequency common functionality (except statistics),
     it inherits directly from TFWindow.
     """
 
@@ -238,18 +239,23 @@ class REWindow(REView, TFWindow):
         )
         return freq
 
+    @deprecated
     def get_btn_mark_region(self):
         return self.btn_mark_region
 
+    @deprecated
     def get_btn_add_region(self):
         return self.btn_add_region
 
+    @deprecated
     def get_btn_filter(self):
         return self.btn_filter
 
+    @deprecated
     def get_btn_ridge_extraction(self):
         return self.btn_ridges
 
+    @deprecated
     def get_intervals_listwidget(self) -> QListWidget:
         """Gets the intervals list widget."""
         return self.list_intervals

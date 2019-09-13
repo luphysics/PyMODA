@@ -40,7 +40,7 @@ from maths.params.TFParams import TFParams, _wft, _fmin, _fmax
 from maths.signals.SignalPairs import SignalPairs
 from maths.signals.Signals import Signals
 from maths.signals.TimeSeries import TimeSeries
-from maths.utils import matlab_to_numpy
+from maths.num_utils import matlab_to_numpy
 from utils import args
 
 

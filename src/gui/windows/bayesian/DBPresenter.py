@@ -17,12 +17,11 @@ from typing import Tuple
 
 from PyQt5.QtWidgets import QDialog, QListWidgetItem
 
+from gui.common.BaseTFPresenter import BaseTFPresenter
 from gui.dialogs.FrequencyDialog import FrequencyDialog
-from gui.windows.base.analysis.BaseTFPresenter import BaseTFPresenter
 from gui.windows.bayesian.DBView import DBView
 from maths.signals.SignalPairs import SignalPairs
 from maths.signals.TimeSeries import TimeSeries
-from maths.utils import dec_float_or_none
 
 
 class DBPresenter(BaseTFPresenter):
@@ -69,7 +68,3 @@ class DBPresenter(BaseTFPresenter):
             self.selected_signal_name = name
             self.plot_signal_pair()
             self.view.on_xlim_edited()
-
-@dec_float_or_none
-def test():
-    return "5"

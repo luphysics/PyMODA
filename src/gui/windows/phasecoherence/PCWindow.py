@@ -19,10 +19,10 @@ from PyQt5.QtWidgets import QSlider, QComboBox
 
 from data import resources
 from gui import Application
-from gui.windows.base.analysis.BaseTFWindow import BaseTFWindow
+from gui.common.BaseTFWindow import BaseTFWindow
 from gui.windows.phasecoherence.PCPresenter import PCPresenter
 from gui.windows.phasecoherence.PCView import PCView
-from maths.utils import int_or_none
+from utils.decorators import deprecated, inty
 
 
 class PCWindow(BaseTFWindow, PCView):
@@ -52,9 +52,6 @@ class PCWindow(BaseTFWindow, PCView):
     def get_layout_file(self) -> str:
         return resources.get("layout:window_phase_coherence.ui")
 
-    def get_window(self):
-        super().get_window()
-
     def closeEvent(self, e: QtGui.QCloseEvent) -> None:
         super().closeEvent(e)
         self.presenter.on_close()
@@ -67,19 +64,21 @@ class PCWindow(BaseTFWindow, PCView):
         for i in items:
             combo.addItem(i)
 
-    def get_slider_count(self):
+    @deprecated
+    def get_slider_surrogate_count(self):
         return self.slider_surrogate
 
+    @deprecated
     def get_line_count(self):
         return self.line_surrogate
 
     def set_slider_value(self, value: int):
         if value > 1:
             self.update_slider_maximum(value)
-            self.get_slider_count().setValue(value)
+            self.slider_surrogate.setValue(value)
 
     def update_slider_maximum(self, value: int):
-        s = self.get_slider_count()
+        s = self.slider_surrogate
 
         m = s.maximum()
         new_max = m
@@ -100,7 +99,7 @@ class PCWindow(BaseTFWindow, PCView):
         """Sets up the "surrogate count" slider."""
         default = 19
 
-        slider = self.get_slider_count()
+        slider = self.slider_surrogate
         slider.setTickInterval(1)
         slider.setTickPosition(QSlider.TicksBelow)
         slider.setSingleStep(1)
@@ -108,7 +107,7 @@ class PCWindow(BaseTFWindow, PCView):
         slider.setRange(2, self.slider_maximum(default))
         slider.setValue(default)
 
-        line = self.get_line_count()
+        line = self.line_surrogate
         line.textEdited.connect(self.on_count_line_changed)
         line.returnPressed.connect(self.on_count_line_edited)
         line.editingFinished.connect(self.on_count_line_edited)
@@ -119,11 +118,11 @@ class PCWindow(BaseTFWindow, PCView):
         c = self.get_surr_count()
         if c is None or c <= 1:
             value = 2
-            self.get_line_count().setText(str(value))
+            self.line_surrogate.setText(str(value))
             self.on_count_line_changed(value)
 
     def on_slider_change(self, value: int):
-        l = self.get_line_count()
+        l = self.line_surrogate
         l.setText(f"{value}")
 
     def setup_surr_type(self):
@@ -137,14 +136,15 @@ class PCWindow(BaseTFWindow, PCView):
     def setup_analysis_type(self):
         self.radio_analysis_max.setChecked(True)
 
-    def get_wt_wft_type(self):
+    def get_wt_wft_type(self) -> str:
         return self.combo_wavelet_type.currentText()
 
     def get_analysis_type(self) -> str:
         return super().get_analysis_type()
 
+    @inty
     def get_surr_count(self) -> int:
-        return int_or_none(self.get_line_count().text())
+        return self.get_line_count().text()
 
     def get_surr_method(self) -> str:
         combo: QComboBox = self.combo_method

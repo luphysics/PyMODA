@@ -13,8 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-from gui.windows.base.analysis.BaseTFView import BaseTFView
+from gui.common.BaseTFView import BaseTFView
 from gui.windows.timefrequency.TFViewProperties import TFViewProperties
 
 

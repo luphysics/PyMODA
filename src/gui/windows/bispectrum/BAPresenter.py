@@ -13,7 +13,6 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from gui.windows.base.analysis.BaseTFPresenter import BaseTFPresenter
 from gui.windows.bispectrum.BAView import BAView
 from gui.windows.phasecoherence.PCPresenter import PCPresenter
 from maths.multiprocessing.MPHelper import MPHelper

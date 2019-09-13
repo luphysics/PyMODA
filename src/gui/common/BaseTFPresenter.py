@@ -13,8 +13,8 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from gui.common.BaseTFView import BaseTFView
 from gui.dialogs.ErrorBox import ErrorBox
-from gui.windows.base.analysis.BaseTFView import BaseTFView
 from maths.algorithms.preprocessing import preprocess
 from maths.multiprocessing.MPHelper import MPHelper
 from maths.signals.Signals import Signals

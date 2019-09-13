@@ -16,11 +16,10 @@
 import asyncio
 from typing import Union
 
-import asyncqt
 from PyQt5.QtWidgets import QDialog, QListWidgetItem
 
+from gui.common.BaseTFPresenter import BaseTFPresenter
 from gui.dialogs.FrequencyDialog import FrequencyDialog
-from gui.windows.base.analysis.BaseTFPresenter import BaseTFPresenter
 from gui.windows.timefrequency.TFView import TFView
 from maths.signals.Signals import Signals
 from maths.signals.TFOutputData import TFOutputData

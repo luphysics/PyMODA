@@ -18,7 +18,7 @@ from matplotlib.colors import LinearSegmentedColormap
 
 from data import resources
 from gui.plotting.MatplotlibWidget import MatplotlibWidget
-from maths.utils import subset2d, calc_subset_count
+from maths.num_utils import subset2d, calc_subset_count
 
 
 class ColorMeshPlot(MatplotlibWidget):

@@ -18,10 +18,11 @@ from PyQt5 import QtGui
 from PyQt5.QtGui import QWindow
 
 from data import resources
-from gui.windows.base.analysis.BaseTFWindow import BaseTFWindow
+from gui.common.BaseTFWindow import BaseTFWindow
 from gui.windows.timefrequency.TFPresenter import TFPresenter
 from gui.windows.timefrequency.TFView import TFView
-from maths.utils import float_or_none
+from maths.num_utils import float_or_none
+from utils.decorators import floaty
 
 
 class TFWindow(BaseTFWindow, TFView):
@@ -121,26 +122,30 @@ class TFWindow(BaseTFWindow, TFView):
     def setup_radio_test(self):
         self.radio_test_ampl.setChecked(True)
 
+    @floaty
     def get_fmin(self) -> float:
         edit = self.line_fmin
         text = edit.text()
-        return float_or_none(text)
+        return text
 
+    @floaty
     def get_fmax(self) -> float:
         text = self.line_fmax.text()
-        return float_or_none(text)
+        return text
 
+    @floaty
     def get_f0(self) -> float:
         text = self.line_res.text()
-        return float_or_none(text)
+        return text
 
+    @floaty
     def get_fstep(self) -> float:
-        text = ""  # Placeholder.
-        return float_or_none(text)
+        return None  # Placeholder.
 
     def get_padding(self) -> str:
         return super().get_padding()
 
+    @floaty
     def get_rel_tolerance(self) -> float:
         return super().get_rel_tolerance()
 

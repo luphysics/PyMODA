@@ -15,7 +15,7 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from PyQt5.QtWidgets import QPushButton, QLineEdit, QVBoxLayout
 
-from gui.windows.base.ViewProperties import ViewProperties
+from gui.windows.ViewProperties import ViewProperties
 
 
 class DBViewProperties(ViewProperties):

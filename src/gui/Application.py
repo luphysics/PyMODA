@@ -19,7 +19,7 @@ from typing import Type
 from PyQt5.QtWidgets import QApplication
 from asyncqt import QEventLoop
 
-from gui.windows.base.BaseWindow import BaseWindow
+from gui.windows.BaseWindow import BaseWindow
 from gui.windows.bispectrum.BAWindow import BAWindow
 from gui.windows.bayesian.DBWindow import DBWindow
 from gui.windows.phasecoherence.PCWindow import PCWindow
@@ -52,7 +52,7 @@ class Application(QApplication):
         self.open_window(LauncherWindow)
 
     def start_time_frequency(self):
-        """Opens the time-frequency analysis window."""
+        """Opens the time-frequency common window."""
         self.open_window(TFWindow)
 
     def start_phase_coherence(self):
@@ -64,7 +64,7 @@ class Application(QApplication):
         self.open_window(REWindow)
 
     def start_bispectrum(self):
-        """Opens the wavelet bispectrum analysis window."""
+        """Opens the wavelet bispectrum common window."""
         self.open_window(BAWindow)
 
     def start_bayesian(self):

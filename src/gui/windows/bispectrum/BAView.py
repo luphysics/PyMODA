@@ -13,15 +13,14 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from data import resources
-from gui.windows.base.analysis.BaseTFView import BaseTFView
+from gui.common.BaseTFView import BaseTFView
 from gui.windows.bispectrum.BAViewProperties import BAViewProperties
 from gui.windows.phasecoherence.PCView import PCView
 
 
 class BAView(PCView, BAViewProperties):
     """
-    The View class for bispectrum analysis.
+    The View class for bispectrum common.
     """
 
     name = "Wavelet Bispectrum Analysis"

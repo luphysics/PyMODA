@@ -13,41 +13,10 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from typing import Callable, Union, Any, Tuple
+from typing import Union, Any
 
 import numpy as np
 from nptyping import Array
-
-
-def dec_float_or_none(func: Callable[[], str]) -> Callable[[], Union[Tuple[float, ...], float, None]]:
-    """
-    This decorator will ensure that a function returning one or more
-    strings returns its values as floats or None.
-
-    It is useful for functions which return user-entered data from the GUI;
-    for example, getting the float version of data in a QLineEdit. The
-    function using this decorator needs only return the text in the QLineEdit
-    as a string.
-    """
-
-    def wrapper(*args):
-        if len(args) == 1:
-            # If called in a class method.
-            result = func(args[0])
-        else:
-            # If not called in a class method.
-            result = func()
-
-        if isinstance(result, tuple) and len(result) > 0:
-            # Multiple values returned, convert them all.
-            out = tuple(float_or_none(it) for it in result)
-        else:
-            # Just one value, convert it.
-            out = float_or_none(result)
-
-        return out
-
-    return wrapper
 
 
 def float_or_none(var: Any) -> Union[float, None]:
@@ -55,7 +24,7 @@ def float_or_none(var: Any) -> Union[float, None]:
     If the variable can be represented as a float, return the float value.
     Otherwise, return None.
 
-    Note: if a boolean is passed, the function will return None.
+    Important: if a boolean is passed, the function will return None.
     """
     result = None
     try:
@@ -67,6 +36,12 @@ def float_or_none(var: Any) -> Union[float, None]:
 
 
 def int_or_none(var: Any, round_int=False) -> Union[int, None]:
+    """
+        If the variable can be represented as an int, return the int value.
+        Otherwise, return None.
+
+        Important: if a boolean is passed, the function will return None.
+    """
     result = None
     try:
         if not isinstance(var, bool):

@@ -13,11 +13,12 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from gui.windows.base.analysis.BaseTFView import BaseTFView
-from maths.utils import float_or_none
+from gui.common.BaseTFView import BaseTFView
+from gui.windows.phasecoherence.PCViewProperties import PCViewProperties
+from maths.num_utils import float_or_none
 
 
-class PCView(BaseTFView):
+class PCView(PCViewProperties, BaseTFView):
     """
     A View class to be subclassed by the phase coherence window.
     """
@@ -26,6 +27,10 @@ class PCView(BaseTFView):
 
     _wavelet_types = ["Lognorm", "Morlet", "Bump"]
     _surrogate_types = ["RP", "FT", "AAFT", "IAAFT1", "IAAFT2", "WIAAFT", "tshift"]
+
+    def __init__(self, application, presenter):
+        PCViewProperties.__init__(self)
+        BaseTFView.__init__(self, application, presenter)
 
     def setup_surr_method(self):
         pass
@@ -36,7 +41,7 @@ class PCView(BaseTFView):
     def setup_surr_type(self):
         pass
 
-    def get_slider_count(self):
+    def get_slider_surrogate_count(self):
         pass
 
     def get_line_count(self):
