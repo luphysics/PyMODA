@@ -24,9 +24,6 @@ class BaseTFView(BaseTFViewProperties):
     A base "View" class in MVP, which defines
     """
 
-    # The title of the window.
-    name = ""
-
     def __init__(self, application, presenter):
         BaseTFViewProperties.__init__(self)
         self.application = application

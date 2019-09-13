@@ -14,14 +14,14 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import inspect
-from typing import Callable, Union, Tuple, Any
+from typing import Callable, Union, Tuple, Any, Optional
 
 from maths.num_utils import float_or_none, int_or_none
 
 
 def floaty(
         func: Callable[[], Union[str, Tuple[str, ...]]]
-) -> Callable[[], Union[float, Tuple[float, ...], None, Tuple[None, ...]]]:
+) -> Callable[[], Union[Optional[float], Tuple[Optional[float], ...]]]:
     """
     This decorator will ensure that a function returning one or more
     strings returns its values as floats or None.
@@ -48,7 +48,7 @@ def floaty(
 
 def inty(
         func: Callable[[], Union[str, Tuple[str, ...]]]
-) -> Callable[[], Union[int, Tuple[int, ...], None, Tuple[None, ...]]]:
+) -> Callable[[], Union[Optional[int], Tuple[Optional[int], ...]]]:
     """
     This decorator will ensure that a function returning one or more
     strings returns its values as ints or None.
@@ -78,10 +78,9 @@ def deprecated(func):
     Decorator that marks a function as deprecated, i.e. that it should no
     longer be used and will be removed in future.
     """
-    func_name = func.__name__
 
     def wrapper(*args, **kwargs):
-        print(f"Warning: calling deprecated function '{func_name}'.")
+        print(f"Warning: calling deprecated function '{func.__name__}'.")
         return func(*args, **kwargs)
 
     return wrapper

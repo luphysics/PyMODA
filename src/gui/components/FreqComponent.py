@@ -13,28 +13,32 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from data import resources
-from gui.common.BaseTFWindow import BaseTFWindow
-from gui.windows.bispectrum.BAPresenter import BAPresenter
-from gui.windows.bispectrum.BAView import BAView
-from gui.windows.phasecoherence.PCWindow import PCWindow
+from typing import Optional
+
+from PyQt5.QtWidgets import QLineEdit
+
+from utils.decorators import floaty
 
 
-class BAWindow(BaseTFWindow, BAView):
+class FreqComponent:
 
-    def __init__(self, application):
-        BAView.__init__(self, application, BAPresenter(self))
-        BaseTFWindow.__init__(self, application)
+    """
+    A component which handles the
+    """
 
-    def init_ui(self):
-        super(BAWindow, self).init_ui()
-        self.btn_calculate_single.hide()
+    def __init__(self, lineedit_fmax: QLineEdit, lineedit_fmin: QLineEdit, lineedit_res: QLineEdit):
+        self.__res = lineedit_res
+        self.__fmin = lineedit_fmin
+        self.__fmax = lineedit_fmax
 
-    def get_layout_file(self) -> str:
-        return resources.get("layout:window_bispectrum_analysis.ui")
+    @floaty
+    def get_fmin(self) -> Optional[float]:
+        return self.__fmin.text()
 
-    def setup_surr_method(self):
-        """Override to do nothing."""
+    @floaty
+    def get_fmax(self) -> Optional[float]:
+        return self.__fmax.text()
 
-    def setup_analysis_type(self):
-        """Override to do nothing."""
+    @floaty
+    def get_f0(self) -> Optional[float]:
+        return self.__res.text()

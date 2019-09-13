@@ -13,7 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from typing import Tuple
+from typing import Tuple, Optional
 
 from gui.common.BaseTFView import BaseTFView
 from gui.windows.bayesian.DBViewProperties import DBViewProperties
@@ -36,37 +36,37 @@ class DBView(DBViewProperties, BaseTFView):
         pass
 
     @floaty
-    def get_freq_range1(self) -> Tuple[float, float]:
+    def get_freq_range1(self) -> Optional[Tuple[float, float]]:
         min = float_or_none(self.lineedit_freq_range1_min.text())
         max = float_or_none(self.lineedit_freq_range1_max.text())
         return min, max
 
     @floaty
-    def get_freq_range2(self) -> Tuple[float, float]:
+    def get_freq_range2(self) -> Optional[Tuple[float, float]]:
         min = float_or_none(self.lineedit_freq_range2_min.text())
         max = float_or_none(self.lineedit_freq_range2_max.text())
         return min, max
 
     @floaty
-    def get_window_size(self) -> float:
+    def get_window_size(self) -> Optional[float]:
         return self.lineedit_window_size.text()
 
     @floaty
-    def get_propagation_const(self) -> float:
+    def get_propagation_const(self) -> Optional[float]:
         return self.lineedit_propagation_const.text()
 
     @floaty
-    def get_num_surrogates(self) -> float:
+    def get_num_surrogates(self) -> Optional[float]:
         raise Exception("Not implemented yet.")
 
     @floaty
-    def get_overlap(self) -> float:
+    def get_overlap(self) -> Optional[float]:
         return self.lineedit_overlap.text()
 
     @floaty
-    def get_order(self) -> float:
+    def get_order(self) -> Optional[float]:
         return self.lineedit_order.text()
 
     @floaty
-    def get_confidence_level(self) -> float:
+    def get_confidence_level(self) -> Optional[float]:
         return self.lineedit_confidence_level.text()

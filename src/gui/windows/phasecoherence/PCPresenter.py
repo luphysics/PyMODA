@@ -55,7 +55,7 @@ class PCPresenter(BaseTFPresenter):
         self.mp_handler = MPHelper()
         self.mp_handler.transform(
             params=params,
-            window=self.view.get_window(),
+            window=self.view,
             on_result=self.on_transform_completed,
             on_progress=self.on_progress_updated)  # TODO: fix progress bar when calculating surrogates.
 

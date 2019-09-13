@@ -20,17 +20,30 @@ from PyQt5 import uic, QtGui
 from PyQt5.QtWidgets import QDialog, QProgressBar, QPushButton
 
 from gui.common.BaseTFView import BaseTFView
+from gui.common.BaseTFViewProperties import BaseTFViewProperties
 from gui.dialogs.files.SelectFileDialog import SelectFileDialog
 from gui.windows.MaximisedWindow import MaximisedWindow
 from gui.plotting.plots.AmplitudePlot import AmplitudePlot
 from gui.plotting.plots.ColorMeshPlot import ColorMeshPlot
 from gui.plotting.plots.SignalPlot import SignalPlot
+from maths.num_utils import float_or_none
+from utils.decorators import deprecated
 
 
-class BaseTFWindow(MaximisedWindow, BaseTFView):
+class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
     """
     A base common window that handles Qt-related code.
     """
+
+    # The title of the window.
+    name = ""
+
+    def __init__(self, application, presenter):
+        self.application = application
+        self.presenter = presenter
+
+        BaseTFViewProperties.__init__(self)
+        MaximisedWindow.__init__(self, application)
 
     def get_layout_file(self) -> str:
         pass
@@ -74,6 +87,19 @@ class BaseTFWindow(MaximisedWindow, BaseTFView):
             partial(self.presenter.calculate, False)
         )
         self.presenter.init()
+
+    def on_plot_type_toggled(self, ampl_selected):
+        """
+        Triggered when plotting type is changed from amplitude to power, or vice versa.
+        :param ampl_selected: whether the plotting type is amplitude, not power
+        """
+        self.presenter.set_plot_type(ampl_selected)
+
+    def progress_message(self, current=0, total=0):
+        """Gets the text to display under the progress bar."""
+        if current < total:
+            return f"Completed task {current} of {total}."
+        return "No tasks in progress."
 
     def setup_lineedit_fmin(self):
         self.line_fmin.editingFinished.connect(self.on_freq_or_res_edited)
@@ -170,8 +196,35 @@ class BaseTFWindow(MaximisedWindow, BaseTFView):
 
         lbl.setText(self.progress_message(current, total))
 
+    @deprecated
     def get_button_calculate_all(self) -> QPushButton:
         return self.btn_calculate_all
 
+    @deprecated
     def get_button_calculate_single(self) -> QPushButton:
         return self.btn_calculate_single
+
+    def on_xlim_edited(self):
+        """Called when the x-limits have been changed."""
+        x1 = self.line_xlim1.text()
+        x2 = self.line_xlim2.text()
+        self.signal_plot().set_xrange(x1=float_or_none(x1), x2=float_or_none(x2))
+
+    def setup_xlim_edits(self):
+        """Sets up the refresh button to trigger x-limit changes."""
+        self.btn_refresh.clicked.connect(self.on_xlim_edited)
+
+    def set_xlimits(self, x1, x2):
+        """
+        Sets the x-limits on the signal plotting, restricting the values to
+        a certain range of times.
+
+        :param x1: the lower limit
+        :param x2: the upper limit
+        """
+
+        # Format to 4 decimal places.
+        def format_4dp(x): return f"{x:.4f}"
+
+        self.line_xlim1.setText(format_4dp(x1))
+        self.line_xlim2.setText(format_4dp(x2))

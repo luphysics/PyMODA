@@ -13,30 +13,40 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-import math
+from typing import Optional
+
 from PyQt5 import QtGui
-from PyQt5.QtWidgets import QSlider, QComboBox
+from PyQt5.QtWidgets import QComboBox
 
 from data import resources
 from gui import Application
 from gui.common.BaseTFWindow import BaseTFWindow
+from gui.components.FreqComponent import FreqComponent
+from gui.components.SurrogateComponent import SurrogateComponent
 from gui.windows.phasecoherence.PCPresenter import PCPresenter
-from gui.windows.phasecoherence.PCView import PCView
-from utils.decorators import deprecated, inty
+from gui.windows.phasecoherence.PCViewProperties import PCViewProperties
+from utils.decorators import floaty
 
 
-class PCWindow(BaseTFWindow, PCView):
+class PCWindow(PCViewProperties, BaseTFWindow, SurrogateComponent, FreqComponent):
     """
     The phase coherence window.
     """
 
+    name = "Wavelet Phase Coherence"
+
+    _wavelet_types = ["Lognorm", "Morlet", "Bump"]
+    _surrogate_types = ["RP", "FT", "AAFT", "IAAFT1", "IAAFT2", "WIAAFT", "tshift"]
+
     def __init__(self, application: Application):
-        PCView.__init__(self, application, PCPresenter(self))
-        BaseTFWindow.__init__(self, application)
+        PCViewProperties.__init__(self)
+        BaseTFWindow.__init__(self, application, PCPresenter(self))
+
+        SurrogateComponent.__init__(self, self.slider_surrogate, self.line_surrogate)
+        FreqComponent.__init__(self, self.line_fmax, self.line_fmin, self.line_res)
 
     def init_ui(self):
         super().init_ui()
-        self.setup_surr_count()
         self.setup_surr_method()
         self.setup_surr_type()
         self.setup_analysis_type()
@@ -56,75 +66,6 @@ class PCWindow(BaseTFWindow, PCView):
         super().closeEvent(e)
         self.presenter.on_close()
 
-    def setup_surr_method(self):
-        combo = self.combo_method
-        combo.clear()
-
-        items = self._surrogate_types
-        for i in items:
-            combo.addItem(i)
-
-    @deprecated
-    def get_slider_surrogate_count(self):
-        return self.slider_surrogate
-
-    @deprecated
-    def get_line_count(self):
-        return self.line_surrogate
-
-    def set_slider_value(self, value: int):
-        if value > 1:
-            self.update_slider_maximum(value)
-            self.slider_surrogate.setValue(value)
-
-    def update_slider_maximum(self, value: int):
-        s = self.slider_surrogate
-
-        m = s.maximum()
-        new_max = m
-        if value >= m or m / value > 5:
-            new_max = self.slider_maximum(value)
-
-        s.setMaximum(max(19, new_max))
-
-    @staticmethod
-    def slider_maximum(value: int):
-        """
-        Gets the maximum value to use for the surrogate
-        slider, based on the currently selected value.
-        """
-        return math.ceil(value / 10.0) * 10
-
-    def setup_surr_count(self):
-        """Sets up the "surrogate count" slider."""
-        default = 19
-
-        slider = self.slider_surrogate
-        slider.setTickInterval(1)
-        slider.setTickPosition(QSlider.TicksBelow)
-        slider.setSingleStep(1)
-        slider.valueChanged.connect(self.on_slider_change)
-        slider.setRange(2, self.slider_maximum(default))
-        slider.setValue(default)
-
-        line = self.line_surrogate
-        line.textEdited.connect(self.on_count_line_changed)
-        line.returnPressed.connect(self.on_count_line_edited)
-        line.editingFinished.connect(self.on_count_line_edited)
-        line.setText(f"{default}")
-
-    def on_count_line_edited(self):
-        """Called when the surrogate count is typed manually."""
-        c = self.get_surr_count()
-        if c is None or c <= 1:
-            value = 2
-            self.line_surrogate.setText(str(value))
-            self.on_count_line_changed(value)
-
-    def on_slider_change(self, value: int):
-        l = self.line_surrogate
-        l.setText(f"{value}")
-
     def setup_surr_type(self):
         combo = self.combo_wavelet_type
         combo.clear()
@@ -142,13 +83,18 @@ class PCWindow(BaseTFWindow, PCView):
     def get_analysis_type(self) -> str:
         return super().get_analysis_type()
 
-    @inty
-    def get_surr_count(self) -> int:
-        return self.get_line_count().text()
-
     def get_surr_method(self) -> str:
         combo: QComboBox = self.combo_method
         return combo.currentText()
 
     def get_surr_enabled(self) -> bool:
         return self.checkbox_surr.isChecked()
+
+    def setup_surr_method(self):
+        combo = self.combo_method
+        combo.clear()
+
+        items = self._surrogate_types
+        for i in items:
+            combo.addItem(i)
+

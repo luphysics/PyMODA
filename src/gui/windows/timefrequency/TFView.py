@@ -22,14 +22,6 @@ class TFView(TFViewProperties, BaseTFView):
     A View class to be subclassed by the time-frequency window.
     """
 
-    name = "Time-Frequency Analysis"
-
-    # The items to be shown in the "WT / WFT Type" combobox.
-    _window_items = (
-        ["Gaussian", "Hann", "Blackman", "Exp", "Rect", "Kaiser-a"],  # Windowed Fourier transform.
-        ["Lognorm", "Morlet", "Bump"],  # Wavelet transform.
-    )
-
     def __init__(self, application, presenter):
         TFViewProperties.__init__(self)
         BaseTFView.__init__(self, application, presenter)

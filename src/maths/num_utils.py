@@ -13,13 +13,13 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from typing import Union, Any
+from typing import Union, Any, Optional
 
 import numpy as np
 from nptyping import Array
 
 
-def float_or_none(var: Any) -> Union[float, None]:
+def float_or_none(var: Any) -> Optional[float]:
     """
     If the variable can be represented as a float, return the float value.
     Otherwise, return None.
@@ -35,7 +35,7 @@ def float_or_none(var: Any) -> Union[float, None]:
     return result
 
 
-def int_or_none(var: Any, round_int=False) -> Union[int, None]:
+def int_or_none(var: Any, round_int=False) -> Optional[int]:
     """
         If the variable can be represented as an int, return the int value.
         Otherwise, return None.

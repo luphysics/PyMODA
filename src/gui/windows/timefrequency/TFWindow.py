@@ -13,28 +13,38 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from typing import Optional
 
 from PyQt5 import QtGui
 from PyQt5.QtGui import QWindow
 
 from data import resources
 from gui.common.BaseTFWindow import BaseTFWindow
+from gui.components.FreqComponent import FreqComponent
 from gui.windows.timefrequency.TFPresenter import TFPresenter
-from gui.windows.timefrequency.TFView import TFView
-from maths.num_utils import float_or_none
-from utils.decorators import floaty
+from gui.windows.timefrequency.TFViewProperties import TFViewProperties
+from utils.decorators import floaty, deprecated
 
 
-class TFWindow(BaseTFWindow, TFView):
+class TFWindow(TFViewProperties, BaseTFWindow, FreqComponent):
     """
     The time-frequency window. This class is the "View" in MVP,
     meaning that it should defer responsibility for tasks to the
     presenter.
     """
+    name = "Time-Frequency Analysis"
+
+    # The items to be shown in the "WT / WFT Type" combobox.
+    _window_items = (
+        ["Gaussian", "Hann", "Blackman", "Exp", "Rect", "Kaiser-a"],  # Windowed Fourier transform.
+        ["Lognorm", "Morlet", "Bump"],  # Wavelet transform.
+    )
 
     def __init__(self, application, presenter=None):
-        TFView.__init__(self, application, presenter or TFPresenter(self))
-        BaseTFWindow.__init__(self, application)
+        TFViewProperties.__init__(self)
+        BaseTFWindow.__init__(self, application, presenter or TFPresenter(self))
+
+        FreqComponent.__init__(self, self.__fmax, self.__fmin, self.__res)
 
     def init_ui(self):
         super().init_ui()
@@ -62,31 +72,6 @@ class TFWindow(BaseTFWindow, TFView):
 
     def get_window(self) -> QWindow:
         return self
-
-    def set_xlimits(self, x1, x2):
-        """
-        Sets the x-limits on the signal plotting, restricting the values to
-        a certain range of times.
-
-        :param x1: the lower limit
-        :param x2: the upper limit
-        """
-
-        # Format to 4 decimal places.
-        def format_4dp(x): return f"{x:.4f}"
-
-        self.line_xlim1.setText(format_4dp(x1))
-        self.line_xlim2.setText(format_4dp(x2))
-
-    def setup_xlim_edits(self):
-        """Sets up the refresh button to trigger x-limit changes."""
-        self.btn_refresh.clicked.connect(self.on_xlim_edited)
-
-    def on_xlim_edited(self):
-        """Called when the x-limits have been changed."""
-        x1 = self.line_xlim1.text()
-        x2 = self.line_xlim2.text()
-        self.signal_plot().set_xrange(x1=float_or_none(x1), x2=float_or_none(x2))
 
     def on_transform_toggled(self, is_wt):
         """Called when the type of transform (WT or WFT) is toggled."""
@@ -123,31 +108,16 @@ class TFWindow(BaseTFWindow, TFView):
         self.radio_test_ampl.setChecked(True)
 
     @floaty
-    def get_fmin(self) -> float:
-        edit = self.line_fmin
-        text = edit.text()
-        return text
-
-    @floaty
-    def get_fmax(self) -> float:
-        text = self.line_fmax.text()
-        return text
-
-    @floaty
-    def get_f0(self) -> float:
-        text = self.line_res.text()
-        return text
-
-    @floaty
-    def get_fstep(self) -> float:
+    @deprecated
+    def get_fstep(self) -> Optional[float]:
         return None  # Placeholder.
 
     def get_padding(self) -> str:
-        return super().get_padding()
+        return None
 
     @floaty
-    def get_rel_tolerance(self) -> float:
-        return super().get_rel_tolerance()
+    def get_rel_tolerance(self) -> Optional[float]:
+        return None
 
     def get_wt_wft_type(self) -> str:
         combo = self.combo_window
