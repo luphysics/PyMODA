@@ -18,11 +18,9 @@ from typing import Tuple, Union
 from PyQt5.QtWidgets import QListWidgetItem
 from nptyping import Array
 
-from gui.windows.ridgeextraction.REView import REView
 from gui.windows.timefrequency.TFPresenter import TFPresenter
 from maths.params.REParams import REParams
 from maths.params.TFParams import create
-
 from maths.signals.TFOutputData import TFOutputData
 
 
@@ -33,8 +31,11 @@ class REPresenter(TFPresenter):
     Inherits from TFPresenter because REPresenter requires much of the same functionality.
     """
 
-    def __init__(self, view: REView):
+    def __init__(self, view):
         super(REPresenter, self).__init__(view)
+
+        from gui.windows.ridgeextraction.REWindow import REWindow
+        self.view: REWindow = view
 
     def calculate(self, calculate_all: bool):
         self.view.set_ridge_filter_disabled(True)

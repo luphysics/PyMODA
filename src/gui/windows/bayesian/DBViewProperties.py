@@ -13,7 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from PyQt5.QtWidgets import QPushButton, QLineEdit, QVBoxLayout
+from PyQt5.QtWidgets import QPushButton, QLineEdit, QVBoxLayout, QSlider
 
 from gui.windows.ViewProperties import ViewProperties
 
@@ -36,3 +36,6 @@ class DBViewProperties(ViewProperties):
         self.lineedit_propagation_const: QLineEdit = None
 
         self.vbox_triple_plot: QVBoxLayout = None
+
+        self.slider_surrogate: QSlider = None
+        self.line_surrogate: QLineEdit = None

@@ -25,8 +25,8 @@ from utils.decorators import inty
 class SurrogateComponent:
 
     def __init__(self, slider: QSlider, line_edit: QLineEdit):
-        self.slider_surrogate: QSlider = slider
-        self.line_surrogate: QLineEdit = line_edit
+        self.__slider: QSlider = slider
+        self.__lineedit: QLineEdit = line_edit
 
         self.setup_surr_count()
 
@@ -39,7 +39,7 @@ class SurrogateComponent:
         return math.ceil(value / 10.0) * 10
 
     def update_slider_maximum(self, value: int):
-        s = self.slider_surrogate
+        s = self.__slider
 
         m = s.maximum()
         new_max = m
@@ -51,21 +51,21 @@ class SurrogateComponent:
     def set_slider_value(self, value: int):
         if value > 1:
             self.update_slider_maximum(value)
-            self.slider_surrogate.setValue(value)
+            self.__slider.setValue(value)
 
     def on_count_line_edited(self):
         """Called when the surrogate count is typed manually."""
         c = self.get_surr_count()
         if c is None or c <= 1:
             value = 2
-            self.line_surrogate.setText(str(value))
+            self.__lineedit.setText(str(value))
             self.on_count_line_changed(value)
 
     def setup_surr_count(self):
         """Sets up the "surrogate count" slider."""
         default = 19
 
-        slider = self.slider_surrogate
+        slider = self.__slider
         slider.setTickInterval(1)
         slider.setTickPosition(QSlider.TicksBelow)
         slider.setSingleStep(1)
@@ -73,14 +73,14 @@ class SurrogateComponent:
         slider.setRange(2, self.calc_slider_maximum(default))
         slider.setValue(default)
 
-        line = self.line_surrogate
+        line = self.__lineedit
         line.textEdited.connect(self.on_count_line_changed)
         line.returnPressed.connect(self.on_count_line_edited)
         line.editingFinished.connect(self.on_count_line_edited)
         line.setText(f"{default}")
 
     def on_slider_change(self, value: int):
-        l = self.line_surrogate
+        l = self.__lineedit
         l.setText(f"{value}")
 
     def on_count_line_changed(self, value):
@@ -90,4 +90,4 @@ class SurrogateComponent:
 
     @inty
     def get_surr_count(self) -> Optional[int]:
-        return self.line_surrogate.text()
+        return self.__lineedit.text()

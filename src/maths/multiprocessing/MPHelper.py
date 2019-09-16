@@ -15,8 +15,7 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import time
-from typing import Callable
-from typing import List
+from typing import Callable, List
 
 import numpy as np
 from PyQt5.QtGui import QWindow
@@ -24,7 +23,6 @@ from multiprocess import Queue, Process
 from nptyping import Array
 from scipy.signal import hilbert
 
-import maths.multiprocessing.mp_utils
 from maths.algorithms.bayesian import bayes_main, dirc, CFprint
 from maths.algorithms.loop_butter import loop_butter
 from maths.algorithms.surrogates import surrogate_calc
@@ -32,6 +30,7 @@ from maths.algorithms.wpc import wpc, wphcoh
 from maths.multiprocessing import mp_utils
 from maths.multiprocessing.Scheduler import Scheduler
 from maths.multiprocessing.Task import Task
+from maths.num_utils import matlab_to_numpy
 from maths.params.BAParams import BAParams
 from maths.params.DBParams import DBParams
 from maths.params.PCParams import PCParams
@@ -40,21 +39,23 @@ from maths.params.TFParams import TFParams, _wft, _fmin, _fmax
 from maths.signals.SignalPairs import SignalPairs
 from maths.signals.Signals import Signals
 from maths.signals.TimeSeries import TimeSeries
-from maths.num_utils import matlab_to_numpy
-from utils import args
+from utils.decorators import deprecated
 
 
 class MPHelper:
     """
     A class providing a simple way to perform computations in another
-    process. Another process is necessary to avoid issues related to
-    LD_LIBRARY_PATH on Linux, and prevent the UI from freezing
-    while - unlike multithreading, due to the GIL - improving
+    process.
+
+    Using another process is necessary to avoid issues related to
+    LD_LIBRARY_PATH on Linux, and prevent the UI from freezing.
+
+    Unlike multithreading (due to the GIL) multiprocessing improves
     performance when multiple tasks are running simultaneously.
 
-    IMPORTANT: you should hold a reference to each instance
-    of this class to prevent it from being garbage collected before
-    completion.
+    IMPORTANT: you should hold a reference to any instances
+    of this class to prevent them from being garbage collected
+    before completion.
     """
 
     def __init__(self):
@@ -96,6 +97,7 @@ class MPHelper:
 
         return await self.scheduler.coro_run()
 
+    @deprecated
     def transform(self,
                   params: TFParams,
                   window: QWindow,
@@ -128,6 +130,7 @@ class MPHelper:
 
         self.scheduler.start()
 
+    @deprecated
     def phase_coherence(self,
                         signals: SignalPairs,
                         params: PCParams,
@@ -153,6 +156,7 @@ class MPHelper:
 
         self.scheduler.start()
 
+    @deprecated
     def ridge_extraction(self,
                          params: REParams,
                          window: QWindow,
@@ -189,6 +193,7 @@ class MPHelper:
                 )
         self.scheduler.start()
 
+    @deprecated
     def bandpass_filter(self,
                         signals: Signals,
                         intervals: tuple,
@@ -230,6 +235,7 @@ class MPHelper:
 
         return await self.scheduler.coro_run()
 
+    @deprecated
     def bispectrum_analysis(self,
                             signal_pairs: SignalPairs,
                             window: QWindow,

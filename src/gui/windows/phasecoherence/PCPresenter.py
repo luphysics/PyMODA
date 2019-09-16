@@ -26,6 +26,7 @@ from maths.params.TFParams import create
 from maths.signals.SignalPairs import SignalPairs
 from maths.signals.TFOutputData import TFOutputData
 from maths.signals.TimeSeries import TimeSeries
+from utils.decorators import deprecated
 
 
 class PCPresenter(BaseTFPresenter):
@@ -71,8 +72,14 @@ class PCPresenter(BaseTFPresenter):
             self.on_transform_completed(*d)
 
         all_data = await self.coro_phase_coherence(self.signals_calc, params, self.on_progress_updated)
+
         for d in all_data:
             self.on_phase_coherence_completed(*d)
+
+        self.plot_phase_coherence()
+        self.view.on_calculate_stopped()
+        self.on_all_tasks_completed()
+        print("Finished calculating phase coherence.")
 
     async def coro_phase_coherence(self, signals, params, on_progress):
         print("Finished wavelet transform. Calculating phase coherence...")
@@ -92,10 +99,7 @@ class PCPresenter(BaseTFPresenter):
             avg_pow,
         )
 
-        # # Whether all signals have finished calculating.
-        # if all([s.output_data.is_valid() for s in self.signals_calc]):
-        #     self.calculate_phase_coherence()
-
+    @deprecated
     def calculate_phase_coherence(self):
         mp = self.mp_handler
         mp.phase_coherence(
@@ -117,13 +121,6 @@ class PCPresenter(BaseTFPresenter):
 
         sig = self.signals.get(s1.name)
         sig.output_data = d
-
-        # If all calculations have completed.
-        if all([s.output_data.has_phase_coherence() for s in self.signals_calc[::2]]):
-            self.plot_phase_coherence()
-            self.view.on_calculate_stopped()
-            self.on_all_tasks_completed()
-            print("Finished calculating phase coherence.")
 
     def plot_phase_coherence(self):
         data = self.get_selected_signal_pair_data()

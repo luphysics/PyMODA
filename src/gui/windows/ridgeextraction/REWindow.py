@@ -22,19 +22,19 @@ from PyQt5.QtWidgets import QListWidget, QVBoxLayout
 from data import resources
 from gui.windows.ridgeextraction.REPlot import REPlot
 from gui.windows.ridgeextraction.REPresenter import REPresenter
-from gui.windows.ridgeextraction.REView import REView
+from gui.windows.ridgeextraction.REViewProperties import REViewProperties
 from gui.windows.timefrequency.TFWindow import TFWindow
 from maths.num_utils import float_or_none
-from utils.decorators import deprecated
 
 
-class REWindow(REView, TFWindow):
+class REWindow(REViewProperties, TFWindow):
     """
     The ridge extraction window. Since ridge extraction uses all of
     the time-frequency common functionality (except statistics),
     it inherits directly from TFWindow.
     """
 
+    name = "Ridge Extraction and Filtering"
     _mark_region_text = "Mark Region"
 
     def __init__(self, parent):
@@ -42,7 +42,7 @@ class REWindow(REView, TFWindow):
         self.most_recent_changed_freq = 0
         self.single_plot_mode = True
 
-        REView.__init__(self)
+        REViewProperties.__init__(self)
         TFWindow.__init__(self, parent, REPresenter(self))
 
     def init_ui(self):
@@ -59,7 +59,7 @@ class REWindow(REView, TFWindow):
         self.main_plot().set_max_crosshair_count(2)
         self.main_plot().add_crosshair_listener(self.on_crosshair_drawn)
 
-        self.get_button_calculate_single().hide()
+        self.btn_calculate_single.hide()
         self.set_ridge_filter_disabled(True)
 
     def get_layout_file(self) -> str:
@@ -67,14 +67,14 @@ class REWindow(REView, TFWindow):
 
     def on_calculate_stopped(self):
         super(REWindow, self).on_calculate_stopped()
-        self.get_button_calculate_single().hide()
+        self.btn_calculate_single.hide()
 
     def on_calculate_started(self):
         super(REWindow, self).on_calculate_started()
         self.set_ridge_filter_disabled(True)
 
     def set_ridge_filter_disabled(self, disabled: bool):
-        buttons = (self.get_btn_filter(), self.get_btn_ridge_extraction())
+        buttons = (self.btn_filter, self.btn_ridges)
         for btn in buttons:
             btn.setDisabled(disabled)
 
@@ -150,12 +150,12 @@ class REWindow(REView, TFWindow):
             self.on_mark_region_finished()
             self.clear_freq_boxes()
 
-        btn = self.get_btn_mark_region()
+        btn = self.btn_mark_region
         btn.setText(text)
 
         self.main_plot().set_click_crosshair_enabled(True)
         self.main_plot().set_mouse_zoom_enabled(False)
-        self.get_btn_add_region().setDisabled(True)
+        self.btn_add_region.setDisabled(True)
 
     def on_mark_region_finished(self):
         plot = self.main_plot()
@@ -176,9 +176,9 @@ class REWindow(REView, TFWindow):
         self.mark_region(f1, f2)
         self.on_mark_region_finished()
 
-        self.get_btn_mark_region().setText(self._mark_region_text)
+        self.btn_mark_region.setText(self._mark_region_text)
         self.is_marking_region = False
-        self.get_btn_add_region().setDisabled(True)
+        self.btn_add_region.setDisabled(True)
 
     def switch_to_three_plots(self):
         if not self.single_plot_mode:
@@ -225,7 +225,7 @@ class REWindow(REView, TFWindow):
                 plot.clear()
 
     def mark_region(self, freq1, freq2):
-        l: QListWidget = self.get_intervals_listwidget()
+        l: QListWidget = self.list_intervals
         l.addItem(f"{freq1}, {freq2}")
         l.setCurrentRow(l.count() - 1)
 
@@ -239,30 +239,9 @@ class REWindow(REView, TFWindow):
         )
         return freq
 
-    @deprecated
-    def get_btn_mark_region(self):
-        return self.btn_mark_region
-
-    @deprecated
-    def get_btn_add_region(self):
-        return self.btn_add_region
-
-    @deprecated
-    def get_btn_filter(self):
-        return self.btn_filter
-
-    @deprecated
-    def get_btn_ridge_extraction(self):
-        return self.btn_ridges
-
-    @deprecated
-    def get_intervals_listwidget(self) -> QListWidget:
-        """Gets the intervals list widget."""
-        return self.list_intervals
-
     def get_interval_strings(self) -> list:
         """Gets the items from the intervals list widget as strings."""
-        w = self.get_intervals_listwidget()
+        w = self.list_intervals
         return [w.item(i).text() for i in range(w.count())]
 
     def get_interval_tuples(self) -> List[Tuple[float, ...]]:
@@ -277,7 +256,7 @@ class REWindow(REView, TFWindow):
         return tuple([float(i) for i in item.split(",")])
 
     def get_selected_interval(self):
-        l: QListWidget = self.get_intervals_listwidget()
+        l: QListWidget = self.list_intervals
         indices = l.selectedIndexes()
 
         tuples = self.get_interval_tuples()
@@ -286,17 +265,17 @@ class REWindow(REView, TFWindow):
         return None
 
     def setup_intervals_list(self):
-        l: QListWidget = self.get_intervals_listwidget()
+        l: QListWidget = self.list_intervals
         l.itemSelectionChanged.connect(self.on_interval_selected)
 
     def on_interval_selected(self):
         self.presenter.on_interval_selected(self.get_selected_interval())
 
     def setup_btn_mark_region(self):
-        self.get_btn_mark_region().clicked.connect(self.on_mark_region_clicked)
+        self.btn_mark_region.clicked.connect(self.on_mark_region_clicked)
 
     def setup_btn_add_marked_region(self):
-        btn = self.get_btn_add_region()
+        btn = self.btn_add_region
         btn.setDisabled(True)
         btn.clicked.connect(self.on_add_region_clicked)
 
@@ -308,7 +287,28 @@ class REWindow(REView, TFWindow):
         l2.editingFinished.connect(partial(self.on_freq_text_edited))
 
     def setup_btn_ridge_extraction(self):
-        self.get_btn_ridge_extraction().clicked.connect(self.presenter.on_ridge_extraction_clicked)
+        self.btn_ridges.clicked.connect(self.presenter.on_ridge_extraction_clicked)
 
     def setup_btn_filter(self):
-        self.get_btn_filter().clicked.connect(self.presenter.on_filter_clicked)
+        self.btn_filter.clicked.connect(self.presenter.on_filter_clicked)
+
+    def setup_radio_stats_avg(self):
+        """
+        Override method from TFView to remove functionality
+        implemented in time-frequency window.
+        """
+        pass
+
+    def setup_radio_stats_paired(self):
+        """
+        Override method from TFView to remove functionality
+        implemented in time-frequency window.
+        """
+        pass
+
+    def setup_radio_test(self):
+        """
+        Override method from TFView to remove functionality
+        implemented in time-frequency window.
+        """
+        pass

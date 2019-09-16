@@ -19,7 +19,6 @@ from PyQt5.QtWidgets import QDialog, QListWidgetItem
 
 from gui.common.BaseTFPresenter import BaseTFPresenter
 from gui.dialogs.FrequencyDialog import FrequencyDialog
-from gui.windows.bayesian.DBView import DBView
 from maths.signals.SignalPairs import SignalPairs
 from maths.signals.TimeSeries import TimeSeries
 
@@ -29,12 +28,14 @@ class DBPresenter(BaseTFPresenter):
     Presenter for the dynamical Bayesian inference window.
     """
 
-    def __init__(self, view: DBView):
+    def __init__(self, view):
         BaseTFPresenter.__init__(self, view)
+
+        from gui.windows.bayesian.DBWindow import DBWindow
 
         # Improve type hints.
         self.signals: SignalPairs = self.signals
-        self.view: DBView = view
+        self.view: DBWindow = view
 
     def load_data(self):
         self.signals = SignalPairs.from_file(self.open_file)

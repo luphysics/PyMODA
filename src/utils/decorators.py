@@ -13,15 +13,13 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-import inspect
-from typing import Callable, Union, Tuple, Any, Optional
+from typing import Callable, Union, Tuple, Optional
 
 from maths.num_utils import float_or_none, int_or_none
 
 
-def floaty(
-        func: Callable[[], Union[str, Tuple[str, ...]]]
-) -> Callable[[], Union[Optional[float], Tuple[Optional[float], ...]]]:
+def floaty(func: Callable[[], Union[str, Tuple[str, ...]]]) \
+        -> Callable[[], Union[Optional[float], Tuple[Optional[float], ...]]]:
     """
     This decorator will ensure that a function returning one or more
     strings returns its values as floats or None.
@@ -46,9 +44,8 @@ def floaty(
     return wrapper
 
 
-def inty(
-        func: Callable[[], Union[str, Tuple[str, ...]]]
-) -> Callable[[], Union[Optional[int], Tuple[Optional[int], ...]]]:
+def inty(func: Callable[[], Union[str, Tuple[str, ...]]]) \
+        -> Callable[[], Union[Optional[int], Tuple[Optional[int], ...]]]:
     """
     This decorator will ensure that a function returning one or more
     strings returns its values as ints or None.
