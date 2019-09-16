@@ -44,7 +44,8 @@ class TFWindow(TFViewProperties, BaseTFWindow, FreqComponent):
         TFViewProperties.__init__(self)
         BaseTFWindow.__init__(self, application, presenter or TFPresenter(self))
 
-        FreqComponent.__init__(self, self.__fmax, self.__fmin, self.__res)
+        FreqComponent.__init__(self, self.line_fmax, self.line_fmin, self.line_res)
+        self.presenter.init()
 
     def init_ui(self):
         super().init_ui()
@@ -108,7 +109,6 @@ class TFWindow(TFViewProperties, BaseTFWindow, FreqComponent):
         self.radio_test_ampl.setChecked(True)
 
     @floaty
-    @deprecated
     def get_fstep(self) -> Optional[float]:
         return None  # Placeholder.
 

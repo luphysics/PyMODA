@@ -13,7 +13,6 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from typing import Optional
 
 from PyQt5 import QtGui
 from PyQt5.QtWidgets import QComboBox
@@ -25,7 +24,6 @@ from gui.components.FreqComponent import FreqComponent
 from gui.components.SurrogateComponent import SurrogateComponent
 from gui.windows.phasecoherence.PCPresenter import PCPresenter
 from gui.windows.phasecoherence.PCViewProperties import PCViewProperties
-from utils.decorators import floaty
 
 
 class PCWindow(PCViewProperties, BaseTFWindow, SurrogateComponent, FreqComponent):
@@ -44,6 +42,8 @@ class PCWindow(PCViewProperties, BaseTFWindow, SurrogateComponent, FreqComponent
 
         SurrogateComponent.__init__(self, self.slider_surrogate, self.line_surrogate)
         FreqComponent.__init__(self, self.line_fmax, self.line_fmin, self.line_res)
+
+        self.presenter.init()
 
     def init_ui(self):
         super().init_ui()

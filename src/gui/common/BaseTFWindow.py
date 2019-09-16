@@ -80,13 +80,12 @@ class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
         self.setup_lineedit_fmin()
         self.setup_lineedit_res()
 
-        self.get_button_calculate_all().clicked.connect(
+        self.btn_calculate_all.clicked.connect(
             partial(self.presenter.calculate, True)
         )
-        self.get_button_calculate_single().clicked.connect(
+        self.btn_calculate_single.clicked.connect(
             partial(self.presenter.calculate, False)
         )
-        self.presenter.init()
 
     def on_plot_type_toggled(self, ampl_selected):
         """
@@ -157,12 +156,12 @@ class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
         self.main_plot().set_in_progress(True)
         self.amplitude_plot().clear()
         self.amplitude_plot().set_in_progress(True)
-        btn = self.get_button_calculate_all()
+        btn = self.btn_calculate_all
 
         btn.setText("Cancel")
         btn.setStyleSheet("color: blue;")
 
-        self.get_button_calculate_single().hide()
+        self.btn_calculate_single.hide()
 
         btn.clicked.disconnect()
         btn.clicked.connect(self.presenter.cancel_calculate)
@@ -170,11 +169,11 @@ class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
     def on_calculate_stopped(self):
         self.main_plot().set_in_progress(False)
         self.amplitude_plot().set_in_progress(False)
-        btn = self.get_button_calculate_all()
+        btn = self.btn_calculate_all
 
         btn.setText("Transform All")
         btn.setStyleSheet("color: black;")
-        self.get_button_calculate_single().show()
+        self.btn_calculate_single.show()
 
         btn.clicked.disconnect()
         btn.clicked.connect(partial(self.presenter.calculate, True))

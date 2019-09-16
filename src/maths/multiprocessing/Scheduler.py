@@ -86,7 +86,6 @@ class Scheduler(List[Task]):
 
     def update(self):
         """Checks for any tasks that have finished."""
-        print("WARNING: use coroutines instead.")
         should_update_tasks = False
 
         t = time.time()

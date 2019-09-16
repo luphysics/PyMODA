@@ -15,6 +15,7 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from gui.common.BaseTFView import BaseTFView
 from gui.windows.timefrequency.TFViewProperties import TFViewProperties
+from utils.decorators import deprecated
 
 
 class TFView(TFViewProperties, BaseTFView):
@@ -22,6 +23,7 @@ class TFView(TFViewProperties, BaseTFView):
     A View class to be subclassed by the time-frequency window.
     """
 
+    @deprecated
     def __init__(self, application, presenter):
         TFViewProperties.__init__(self)
         BaseTFView.__init__(self, application, presenter)

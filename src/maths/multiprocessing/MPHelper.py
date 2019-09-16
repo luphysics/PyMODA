@@ -78,6 +78,24 @@ class MPHelper:
 
         return await self.scheduler.coro_run()
 
+    async def coro_phase_coherence(self,
+                                   signals: SignalPairs,
+                                   params: PCParams,
+                                   on_progress: Callable[[int, int], None]):
+
+        self.stop()  # Clear lists of processes, etc.
+        self.scheduler = Scheduler(progress_callback=on_progress)
+
+        for i in range(signals.pair_count()):
+            q = Queue()
+
+            pair = signals.get_pair_by_index(i)
+            p = Process(target=_phase_coherence, args=(q, pair, params,))
+
+            self.scheduler.append(Task(p, q, subtasks=params.surr_count))
+
+        return await self.scheduler.coro_run()
+
     def transform(self,
                   params: TFParams,
                   window: QWindow,
@@ -312,6 +330,7 @@ def _dynamic_bayesian_analysis(signal1: TimeSeries, signal2: TimeSeries, params:
         surr_cpl2 = s2[K, :]
 
     # TODO: add return statement.
+
 
 def _bispectrum_analysis(params: BAParams):
     from maths.algorithms import bispec_wav_new

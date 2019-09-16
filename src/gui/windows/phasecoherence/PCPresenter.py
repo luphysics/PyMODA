@@ -13,28 +13,35 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import asyncio
 from typing import Tuple
 
 from PyQt5.QtWidgets import QDialog, QListWidgetItem
 
 from gui.common.BaseTFPresenter import BaseTFPresenter
 from gui.dialogs.FrequencyDialog import FrequencyDialog
-from gui.windows.phasecoherence.PCView import PCView
-from maths.signals.SignalPairs import SignalPairs
-from maths.signals.TFOutputData import TFOutputData
+from maths.multiprocessing.MPHelper import MPHelper
 from maths.params.PCParams import PCParams
 from maths.params.TFParams import create
-from maths.multiprocessing.MPHelper import MPHelper
+from maths.signals.SignalPairs import SignalPairs
+from maths.signals.TFOutputData import TFOutputData
 from maths.signals.TimeSeries import TimeSeries
 
 
 class PCPresenter(BaseTFPresenter):
 
-    def __init__(self, view: PCView):
+    def __init__(self, view):
         super().__init__(view)
-        self.view: PCView = self.view
+
+        from gui.windows.phasecoherence.PCWindow import PCWindow
+        self.view: PCWindow = self.view
+        self.is_calculating_all = True
 
     def calculate(self, calculate_all: bool):
+        asyncio.ensure_future(self.coro_calculate(calculate_all))
+        print("Started calculation...")
+
+    async def coro_calculate(self, calculate_all: bool):
         self.is_calculating_all = calculate_all
 
         if self.mp_handler:
@@ -53,17 +60,23 @@ class PCPresenter(BaseTFPresenter):
         self.surrogates_enabled = self.view.get_surr_enabled()
 
         self.mp_handler = MPHelper()
-        self.mp_handler.transform(
-            params=params,
-            window=self.view,
-            on_result=self.on_transform_completed,
-            on_progress=self.on_progress_updated)  # TODO: fix progress bar when calculating surrogates.
 
         self.view.main_plot().set_log_scale(logarithmic=True)
         self.view.amplitude_plot().set_log_scale(logarithmic=True)
 
         self.view.on_calculate_started()
-        print("Started calculation...")
+        data = await self.mp_handler.coro_transform(params=params, on_progress=self.on_progress_updated)
+
+        for d in data:
+            self.on_transform_completed(*d)
+
+        all_data = await self.coro_phase_coherence(self.signals_calc, params, self.on_progress_updated)
+        for d in all_data:
+            self.on_phase_coherence_completed(*d)
+
+    async def coro_phase_coherence(self, signals, params, on_progress):
+        print("Finished wavelet transform. Calculating phase coherence...")
+        return await self.mp_handler.coro_phase_coherence(signals, params, on_progress)
 
     def on_transform_completed(self, name, times, freq, values, ampl, powers, avg_ampl, avg_pow):
         print(f"Calculated wavelet transform for '{name}'")
@@ -79,16 +92,16 @@ class PCPresenter(BaseTFPresenter):
             avg_pow,
         )
 
-        # Whether all signals have finished calculating.
-        if all([s.output_data.is_valid() for s in self.signals_calc]):
-            self.calculate_phase_coherence()
+        # # Whether all signals have finished calculating.
+        # if all([s.output_data.is_valid() for s in self.signals_calc]):
+        #     self.calculate_phase_coherence()
 
     def calculate_phase_coherence(self):
         mp = self.mp_handler
         mp.phase_coherence(
             self.signals_calc,
             params=self.get_params(all_signals=self.is_calculating_all),
-            window=self.view.get_window(),
+            window=self.view,
             on_result=self.on_phase_coherence_completed,
             on_progress=self.on_progress_updated
         )

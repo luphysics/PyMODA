@@ -50,7 +50,7 @@ class BaseTFPresenter:
 
     def calculate(self, calculate_all: bool):
         """
-        Perform the main calculation. To connect as a slot,
+        Performs the main calculation. To connect as a slot,
         use functools.partial:
 
         `button.clicked.connect(partial(self.calculate, my_argument))`

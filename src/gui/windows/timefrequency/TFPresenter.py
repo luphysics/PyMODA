@@ -42,41 +42,7 @@ class TFPresenter(BaseTFPresenter):
 
     def calculate(self, calculate_all: bool):
         """Calculates the desired transform(s), and plots the result."""
-        # self.loop = asyncqt.QEventLoop(self.view.application)
-        # asyncio.set_event_loop(self.loop)
-
-        # TODO: refactor
         asyncio.ensure_future(self.coro_calculate(calculate_all))
-        return
-
-        self.is_calculating_all = calculate_all
-
-        if self.mp_handler:
-            self.mp_handler.stop()
-
-        params = self.get_params(all_signals=calculate_all)
-        if params.transform == _wft:
-            if self.view.get_fmin() is None:
-                # Will be caught by error handling and shown as a dialog.
-                raise Exception("Minimum frequency must be defined for WFT.")
-
-        self.is_plotted = False
-        self.view.main_plot().clear()
-        self.view.main_plot().set_in_progress(True)
-        self.invalidate_data()
-
-        self.mp_handler = MPHelper()
-        self.mp_handler.transform(
-            params=params,
-            window=self.view.get_window(),
-            on_result=self.on_transform_completed,
-            on_progress=self.on_progress_updated)
-
-        log: bool = (params.transform == _wt)
-        self.view.main_plot().set_log_scale(logarithmic=log)
-        self.view.amplitude_plot().set_log_scale(logarithmic=log)
-
-        self.view.on_calculate_started()
         print("Started calculation...")
 
     async def coro_calculate(self, calc_all: bool):
