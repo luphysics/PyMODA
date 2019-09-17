@@ -15,7 +15,7 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from PyQt5.QtWidgets import QWidget
 
-from gui.common.BaseUI import BaseUI
+from gui.BaseUI import BaseUI
 
 
 class PlotWidget(QWidget, BaseUI):

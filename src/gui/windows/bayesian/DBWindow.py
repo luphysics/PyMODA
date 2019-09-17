@@ -16,7 +16,7 @@
 from typing import Tuple, Optional
 
 from data import resources
-from gui.common.BaseTFWindow import BaseTFWindow
+from gui.windows.common.BaseTFWindow import BaseTFWindow
 from gui.components.SurrogateComponent import SurrogateComponent
 from gui.windows.bayesian.DBPresenter import DBPresenter
 from gui.windows.bayesian.DBViewProperties import DBViewProperties

@@ -15,7 +15,7 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QPushButton, QProgressBar
 
-from gui.common.BaseUI import BaseUI
+from gui.BaseUI import BaseUI
 from gui.plotting.Callbacks import Callbacks
 
 

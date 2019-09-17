@@ -19,11 +19,11 @@ from PyQt5 import QtGui
 from PyQt5.QtGui import QWindow
 
 from data import resources
-from gui.common.BaseTFWindow import BaseTFWindow
+from gui.windows.common.BaseTFWindow import BaseTFWindow
 from gui.components.FreqComponent import FreqComponent
 from gui.windows.timefrequency.TFPresenter import TFPresenter
 from gui.windows.timefrequency.TFViewProperties import TFViewProperties
-from utils.decorators import floaty, deprecated
+from utils.decorators import floaty
 
 
 class TFWindow(TFViewProperties, BaseTFWindow, FreqComponent):

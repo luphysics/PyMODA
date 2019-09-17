@@ -19,7 +19,7 @@ from PyQt5.QtWidgets import QDialog, QComboBox
 
 from utils import args
 from data import resources
-from gui.common.BaseUI import BaseUI
+from gui.BaseUI import BaseUI
 
 
 class FrequencyDialog(QDialog, BaseUI):

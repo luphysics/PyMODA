@@ -18,13 +18,12 @@ from typing import Union
 
 from PyQt5.QtWidgets import QDialog, QListWidgetItem
 
-from gui.common.BaseTFPresenter import BaseTFPresenter
 from gui.dialogs.FrequencyDialog import FrequencyDialog
-from gui.windows.timefrequency.TFView import TFView
+from gui.windows.common.BaseTFPresenter import BaseTFPresenter
+from maths.multiprocessing.MPHelper import MPHelper
+from maths.params.TFParams import TFParams, _wt, _wft, create
 from maths.signals.Signals import Signals
 from maths.signals.TFOutputData import TFOutputData
-from maths.params.TFParams import TFParams, _wt, _wft, create
-from maths.multiprocessing.MPHelper import MPHelper
 
 
 class TFPresenter(BaseTFPresenter):
@@ -32,9 +31,11 @@ class TFPresenter(BaseTFPresenter):
     The presenter in control of the time-frequency window.
     """
 
-    def __init__(self, view: TFView):
+    def __init__(self, view):
         super(TFPresenter, self).__init__(view)
 
+        from gui.windows.timefrequency import TFWindow
+        self.view: TFWindow = view
         self.is_calculating_all = True
 
     def get_total_tasks_count(self) -> int:

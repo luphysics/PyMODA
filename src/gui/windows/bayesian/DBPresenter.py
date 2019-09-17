@@ -17,7 +17,7 @@ from typing import Tuple
 
 from PyQt5.QtWidgets import QDialog, QListWidgetItem
 
-from gui.common.BaseTFPresenter import BaseTFPresenter
+from gui.windows.common.BaseTFPresenter import BaseTFPresenter
 from gui.dialogs.FrequencyDialog import FrequencyDialog
 from maths.signals.SignalPairs import SignalPairs
 from maths.signals.TimeSeries import TimeSeries

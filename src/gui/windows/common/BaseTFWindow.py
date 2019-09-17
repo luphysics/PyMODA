@@ -19,8 +19,7 @@ from typing import List
 from PyQt5 import uic, QtGui
 from PyQt5.QtWidgets import QDialog, QProgressBar, QPushButton
 
-from gui.common.BaseTFView import BaseTFView
-from gui.common.BaseTFViewProperties import BaseTFViewProperties
+from gui.windows.common.BaseTFViewProperties import BaseTFViewProperties
 from gui.dialogs.files.SelectFileDialog import SelectFileDialog
 from gui.windows.MaximisedWindow import MaximisedWindow
 from gui.plotting.plots.AmplitudePlot import AmplitudePlot

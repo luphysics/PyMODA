@@ -19,7 +19,7 @@ from PyQt5.QtWidgets import QComboBox
 
 from data import resources
 from gui import Application
-from gui.common.BaseTFWindow import BaseTFWindow
+from gui.windows.common.BaseTFWindow import BaseTFWindow
 from gui.components.FreqComponent import FreqComponent
 from gui.components.SurrogateComponent import SurrogateComponent
 from gui.windows.phasecoherence.PCPresenter import PCPresenter

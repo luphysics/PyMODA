@@ -14,17 +14,17 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from data import resources
-from gui.common.BaseTFWindow import BaseTFWindow
 from gui.windows.bispectrum.BAPresenter import BAPresenter
-from gui.windows.bispectrum.BAView import BAView
-from gui.windows.phasecoherence.PCWindow import PCWindow
+from gui.windows.bispectrum.BAViewProperties import BAViewProperties
+from gui.windows.common.BaseTFWindow import BaseTFWindow
 
 
-class BAWindow(BaseTFWindow, BAView):
+class BAWindow(BAViewProperties, BaseTFWindow):
+    name = "Wavelet Bispectrum Analysis"
 
     def __init__(self, application):
-        BAView.__init__(self, application, BAPresenter(self))
-        BaseTFWindow.__init__(self, application)
+        BAViewProperties.__init__(self)
+        BaseTFWindow.__init__(self, application, BAPresenter(self))
 
     def init_ui(self):
         super(BAWindow, self).init_ui()

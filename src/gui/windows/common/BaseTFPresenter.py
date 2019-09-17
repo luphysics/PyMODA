@@ -13,8 +13,8 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from gui.common.BaseTFView import BaseTFView
 from gui.dialogs.ErrorBox import ErrorBox
+from gui.windows.common.BaseTFWindow import BaseTFWindow
 from maths.algorithms.preprocessing import preprocess
 from maths.multiprocessing.MPHelper import MPHelper
 from maths.signals.Signals import Signals
@@ -25,8 +25,8 @@ from utils.stdout_redirect import WindowLogger
 
 class BaseTFPresenter:
 
-    def __init__(self, view: BaseTFView):
-        self.view: BaseTFView = view
+    def __init__(self, view: BaseTFWindow):
+        self.view: BaseTFWindow = view
         self.is_plotted: bool = False
         self.plot_ampl: bool = True
         self.tasks_completed: int = 0

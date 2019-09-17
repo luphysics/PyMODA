@@ -13,10 +13,11 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from gui.common.BaseTFViewProperties import BaseTFViewProperties
+from gui.windows.common.BaseTFViewProperties import BaseTFViewProperties
 from gui.plotting.plots.AmplitudePlot import AmplitudePlot
 from gui.plotting.plots.SignalPlot import SignalPlot
 from gui.plotting.plots.ColorMeshPlot import ColorMeshPlot
+from utils.decorators import deprecated
 
 
 class BaseTFView(BaseTFViewProperties):
@@ -24,12 +25,13 @@ class BaseTFView(BaseTFViewProperties):
     A base "View" class in MVP, which defines
     """
 
+    @deprecated
     def __init__(self, application, presenter):
         BaseTFViewProperties.__init__(self)
         self.application = application
 
         # Prevent circular imports.
-        from gui.common import BaseTFPresenter
+        from gui.windows.common import BaseTFPresenter
         self.presenter: BaseTFPresenter = presenter
 
     def plot_signal(self, time_series):

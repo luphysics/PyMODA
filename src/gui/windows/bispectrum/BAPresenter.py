@@ -13,15 +13,17 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from gui.windows.bispectrum.BAView import BAView
 from gui.windows.phasecoherence.PCPresenter import PCPresenter
 from maths.multiprocessing.MPHelper import MPHelper
 
 
 class BAPresenter(PCPresenter):
 
-    def __init__(self, view: BAView):
+    def __init__(self, view):
         super().__init__(view)
+
+        from gui.windows.bispectrum.BAWindow import BAWindow
+        self.view: BAWindow = view
 
     def calculate(self, calculate_all: bool):
         if self.mp_handler:
