@@ -13,10 +13,11 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from typing import Tuple
+from typing import Tuple, Dict
 
 from PyQt5.QtWidgets import QDialog, QListWidgetItem
 
+from gui.windows.bayesian.ParamSet import ParamSet
 from gui.windows.common.BaseTFPresenter import BaseTFPresenter
 from gui.dialogs.FrequencyDialog import FrequencyDialog
 from maths.signals.SignalPairs import SignalPairs
@@ -37,6 +38,8 @@ class DBPresenter(BaseTFPresenter):
         self.signals: SignalPairs = self.signals
         self.view: DBWindow = view
 
+        self.paramsets: Dict[str, ParamSet] = {}
+
     def load_data(self):
         self.signals = SignalPairs.from_file(self.open_file)
 
@@ -53,6 +56,18 @@ class DBPresenter(BaseTFPresenter):
 
     def plot_signal_pair(self):
         self.view.plot_signal_pair(self.get_selected_signal_pair())
+
+    def add_paramset(self, params: ParamSet):
+        for k in params.to_string():
+            self.paramsets[k] = params
+
+    def on_paramset_selected(self, item):
+        if isinstance(item, QListWidgetItem):
+            text = item.text()
+        else:
+            text = item
+
+        # TODO
 
     def get_selected_signal_pair(self) -> Tuple[TimeSeries, TimeSeries]:
         return self.signals.get_pair_by_name(self.selected_signal_name)

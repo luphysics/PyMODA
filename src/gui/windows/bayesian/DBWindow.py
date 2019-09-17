@@ -15,7 +15,10 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from typing import Tuple, Optional
 
+from PyQt5.QtWidgets import QListWidgetItem
+
 from data import resources
+from gui.windows.bayesian.ParamSet import ParamSet
 from gui.windows.common.BaseTFWindow import BaseTFWindow
 from gui.components.SurrogateComponent import SurrogateComponent
 from gui.windows.bayesian.DBPresenter import DBPresenter
@@ -33,6 +36,7 @@ class DBWindow(DBViewProperties, BaseTFWindow, SurrogateComponent):
 
         SurrogateComponent.__init__(self, self.slider_surrogate, self.line_surrogate)
 
+        self.presenter: DBPresenter = self.presenter
         self.presenter.init()
 
     def get_layout_file(self) -> str:
@@ -45,13 +49,33 @@ class DBWindow(DBViewProperties, BaseTFWindow, SurrogateComponent):
         self.btn_add_paramset.clicked.connect(self.on_add_paramset_clicked)
         self.btn_delete_paramset.clicked.connect(self.on_delete_paramset_clicked)
 
+        self.listwidget_freq_band1.itemClicked.connect(self.presenter.on_paramset_selected)
+
     def plot_signal_pair(self, pair: Tuple[TimeSeries, TimeSeries]):
         plot = self.signal_plot()
         plot.plot(pair[0], clear=True)
         plot.plot(pair[1], clear=False)
 
+    def get_param_set(self) -> ParamSet:
+        return ParamSet(
+            self.get_freq_range1(),
+            self.get_freq_range2(),
+            self.get_window_size(),
+            self.get_propagation_const(),
+            self.get_surr_count(),
+            self.get_overlap(),
+            self.get_order(),
+            self.get_confidence_level()
+        )
+
     def on_add_paramset_clicked(self):
-        pass
+        params = self.get_param_set()
+
+        band1, band2 = params.to_string()
+        self.listwidget_freq_band1.addItem(band1)
+        self.listwidget_freq_band2.addItem(band2)
+
+        self.presenter.add_paramset(params)
 
     def on_delete_paramset_clicked(self):
         pass

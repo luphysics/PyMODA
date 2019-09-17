@@ -17,7 +17,6 @@ from typing import Tuple
 
 
 class ParamSet:
-
     """
     Represents the parameter set used by the dynamical Bayesian inference window.
     """
@@ -40,3 +39,21 @@ class ParamSet:
         self.overlap = overlap
         self.order = order
         self.confidence_level = confidence_level
+
+    def to_string(self) -> Tuple[str, str]:
+        """
+        Returns a string representation of this object for each frequency band.
+        """
+        # Function to use for each frequency band.
+        def convert(freq: Tuple[float, float]) -> str:
+            freq_range_str = ",".join([str(i) for i in freq])
+            items = [freq_range_str,
+                     self.window,
+                     self.overlap,
+                     self.propagation_const,
+                     self.order,
+                     self.confidence_level]
+
+            return " | ".join([str(i) for i in items])
+
+        return convert(self.freq_range1), convert(self.freq_range2)
