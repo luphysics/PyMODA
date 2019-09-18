@@ -18,7 +18,6 @@ import time
 from typing import Callable, List
 
 import numpy as np
-from PyQt5.QtGui import QWindow
 from multiprocess import Queue, Process
 from nptyping import Array
 from scipy.signal import hilbert
@@ -33,14 +32,12 @@ from maths.multiprocessing.Scheduler import Scheduler
 from maths.multiprocessing.Task import Task
 from maths.num_utils import matlab_to_numpy
 from maths.params.BAParams import BAParams
-from maths.params.DBParams import DBParams
 from maths.params.PCParams import PCParams
 from maths.params.REParams import REParams
 from maths.params.TFParams import TFParams, _wft, _fmin, _fmax
 from maths.signals.SignalPairs import SignalPairs
 from maths.signals.Signals import Signals
 from maths.signals.TimeSeries import TimeSeries
-from utils.decorators import deprecated
 
 
 class MPHelper:
@@ -98,65 +95,6 @@ class MPHelper:
 
         return await self.scheduler.coro_run()
 
-    @deprecated
-    def transform(self,
-                  params: TFParams,
-                  window: QWindow,
-                  on_result: Callable,
-                  on_progress: Callable[[int, int], None]):
-        """
-        Performs the windowed Fourier transform in another process, returning a result
-        in the main process.
-
-        :param params: the parameters for the WFT
-        :param window: the QWindow from which the WFT is being calculated
-        :param on_result: a callback which takes the result of the calculations
-        on the main process/thread
-        :param on_progress: a callback with takes the current number of completed tasks,
-        and the total number of tasks being run
-        """
-        self.stop()
-        self.scheduler = Scheduler(window, progress_callback=on_progress)
-
-        signals: Signals = params.signals
-        params.remove_signals()  # Don't want to pass large unneeded object to other process.
-
-        for time_series in signals:
-            q = Queue()
-            p = Process(target=_time_frequency, args=(q, time_series, params,))
-
-            self.scheduler.append(
-                Task(p, q, on_result)
-            )
-
-        self.scheduler.start()
-
-    @deprecated
-    def phase_coherence(self,
-                        signals: SignalPairs,
-                        params: PCParams,
-                        window: QWindow,
-                        on_result: Callable,
-                        on_progress: Callable[[int, int], None]
-                        ):
-        """
-        Calculates the wavelet phase coherence for pairs of signals.
-        """
-        self.stop()  # Clear lists of processes, etc.
-        self.scheduler = Scheduler(window, progress_callback=on_progress)
-
-        for i in range(signals.pair_count()):
-            q = Queue()
-
-            pair = signals.get_pair_by_index(i)
-            p = Process(target=_phase_coherence, args=(q, pair, params,))
-
-            self.scheduler.append(
-                Task(p, q, on_result, subtasks=params.surr_count)
-            )
-
-        self.scheduler.start()
-
     async def coro_ridge_extraction(self,
                                     params: REParams,
                                     on_progress: Callable[[int, int], None]):
@@ -181,44 +119,6 @@ class MPHelper:
 
         return await self.scheduler.coro_run()
 
-    @deprecated
-    def ridge_extraction(self,
-                         params: REParams,
-                         window: QWindow,
-                         on_result: Callable,
-                         on_progress: Callable[[int, int], None]
-                         ):
-        """
-        Calculates transforms in required frequency interval,
-        and performs ridge extraction on transforms.
-
-        :param wavelet_transforms: the wavelet transforms to perform ridge extraction on
-        :param frequencies: a 1d array of frequencies
-        :param fs: the sampling frequency
-        :return:
-        """
-        self.stop()
-        self.scheduler = Scheduler(window, progress_callback=on_progress)
-
-        signals = params.signals
-        num_transforms = len(signals)
-        intervals = params.intervals
-
-        for i in range(num_transforms):
-            for j in range(len(intervals)):
-                fmin, fmax = intervals[j]
-                params.set_item(_fmin, fmin)
-                params.set_item(_fmax, fmax)
-
-                q = Queue()
-                p = Process(target=_ridge_extraction, args=(q, signals[i], params))
-
-                self.scheduler.append(
-                    Task(p, q, on_result)
-                )
-
-        self.scheduler.start()
-
     async def coro_bandpass_filter(self,
                                    signals: Signals,
                                    intervals: tuple,
@@ -238,29 +138,6 @@ class MPHelper:
 
         return await self.scheduler.coro_run()
 
-    @deprecated
-    def bandpass_filter(self,
-                        signals: Signals,
-                        intervals: tuple,
-                        window: QWindow,
-                        on_result: Callable,
-                        on_progress: Callable[[int, int], None]
-                        ):
-
-        self.stop()
-        self.scheduler = Scheduler(window, progress_callback=on_progress)
-
-        for s in signals:
-            fs = s.frequency
-            for i in range(len(intervals)):
-                fmin, fmax = intervals[i]
-
-                q = Queue()
-                p = Process(target=_bandpass_filter, args=(q, s, fmin, fmax, fs))
-                self.scheduler.append(Task(p, q, on_result))
-
-        self.scheduler.start()
-
     async def coro_bayesian(self,
                             signals: SignalPairs,
                             paramsets: List[ParamSet],
@@ -278,13 +155,9 @@ class MPHelper:
 
         return await self.scheduler.coro_run()
 
-    @deprecated
-    def bispectrum_analysis(self,
-                            signal_pairs: SignalPairs,
-                            window: QWindow,
-                            on_result: Callable,
-                            on_progress: Callable[[int, int], None]
-                            ):
+    async def coro_bispectrum_analysis(self,
+                                       signal_pairs: SignalPairs,
+                                       on_progress: Callable[[int, int], None]):
         pass
 
     def stop(self):

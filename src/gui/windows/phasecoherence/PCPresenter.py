@@ -99,18 +99,6 @@ class PCPresenter(BaseTFPresenter):
             avg_pow,
         )
 
-    @deprecated
-    def calculate_phase_coherence(self):
-        mp = self.mp_handler
-        mp.phase_coherence(
-            self.signals_calc,
-            params=self.get_params(all_signals=self.is_calculating_all),
-            window=self.view,
-            on_result=self.on_phase_coherence_completed,
-            on_progress=self.on_progress_updated
-        )
-        print("Finished wavelet transform. Calculating phase coherence...")
-
     def on_phase_coherence_completed(self, signal_pair, tpc, pc, pdiff, surrogate_avg):
         s1, s2 = signal_pair
 
