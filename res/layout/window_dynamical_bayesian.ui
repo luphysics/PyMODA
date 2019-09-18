@@ -23,7 +23,7 @@
          <number>10</number>
         </property>
         <item>
-         <layout class="QVBoxLayout" name="verticalLayout_8">
+         <layout class="QVBoxLayout" name="verticalLayout_8" stretch="2,7">
           <item>
            <layout class="QGridLayout" name="gridLayout_3">
             <property name="sizeConstraint">
@@ -35,7 +35,17 @@
            </layout>
           </item>
           <item>
-           <layout class="QVBoxLayout" name="vbox_triple_plot"/>
+           <layout class="QVBoxLayout" name="vbox_triple_plot">
+            <item>
+             <widget class="DBPlot" name="db_plot_top" native="true"/>
+            </item>
+            <item>
+             <widget class="DBPlot" name="db_plot_middle" native="true"/>
+            </item>
+            <item>
+             <widget class="DBPlot" name="db_plot_bottom" native="true"/>
+            </item>
+           </layout>
           </item>
          </layout>
         </item>
@@ -483,7 +493,7 @@
      <x>0</x>
      <y>0</y>
      <width>1601</width>
-     <height>26</height>
+     <height>29</height>
     </rect>
    </property>
   </widget>
@@ -493,6 +503,12 @@
    <class>SignalPlot</class>
    <extends>QWidget</extends>
    <header>gui.plotting.plots.SignalPlot</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>DBPlot</class>
+   <extends>QWidget</extends>
+   <header>gui.windows.bayesian.DBPlot</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

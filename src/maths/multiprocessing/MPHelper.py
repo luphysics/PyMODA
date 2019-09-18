@@ -23,6 +23,7 @@ from multiprocess import Queue, Process
 from nptyping import Array
 from scipy.signal import hilbert
 
+from gui.windows.bayesian.ParamSet import ParamSet
 from maths.algorithms.bayesian import bayes_main, dirc, CFprint
 from maths.algorithms.loop_butter import loop_butter
 from maths.algorithms.surrogates import surrogate_calc
@@ -216,22 +217,20 @@ class MPHelper:
 
         self.scheduler.start()
 
-    async def coro_dynamical_bayesian(self,
-                                      sig1: TimeSeries,
-                                      sig2: TimeSeries,
-                                      params: List[DBParams],
-                                      on_progress: Callable[[int, int], None]):
+    async def coro_bayesian(self,
+                            signals: SignalPairs,
+                            paramsets: List[ParamSet],
+                            on_progress: Callable[[int, int], None]):
 
         self.stop()
         self.scheduler = Scheduler(progress_callback=on_progress)
 
-        for p in params:
-            q = Queue()
+        for params in paramsets:
+            for pair in signals.get_pairs():
+                q = Queue()
+                p = Process(target=_dynamic_bayesian_analysis, args=(*pair, params,))
 
-            p.remove_signals()
-            proc = Process(target=_dynamic_bayesian_analysis, args=(q, sig1, sig2, p,))
-
-            self.scheduler.append(Task(proc, q))
+                self.scheduler.append(Task(p, q))
 
         return await self.scheduler.coro_run()
 
@@ -255,26 +254,26 @@ class MPHelper:
             self.scheduler.terminate()
 
 
-def _dynamic_bayesian_analysis(signal1: TimeSeries, signal2: TimeSeries, params: DBParams):
+def _dynamic_bayesian_analysis(signal1: TimeSeries, signal2: TimeSeries, params: ParamSet):
     sig = signal1.signal
     times = signal1.times
 
-    fs = params.fs
-    interval1, interval2 = params.intervals
-    bn = params.forder
+    fs = signal1.frequency
+    interval1, interval2 = params.freq_range1, params.freq_range2
+    bn = params.order
 
-    bands0, _ = loop_butter(sig, interval1, fs)
+    bands0, _ = loop_butter(sig, *interval1, fs)
     phi1 = np.angle(hilbert(bands0))
 
-    bands1, _ = loop_butter(sig, interval2, fs)
+    bands1, _ = loop_butter(sig, *interval2, fs)
     phi2 = np.angle(hilbert(bands1))
 
     p1 = phi1
     p2 = phi2
 
-    win = params.window_size
+    win = params.window
     ovr = params.overlap
-    pr = params.propagation_constant
+    pr = params.propagation_const
     signif = params.confidence_level
 
     ### Bayesian inference ###
@@ -335,7 +334,7 @@ def _dynamic_bayesian_analysis(signal1: TimeSeries, signal2: TimeSeries, params:
         surr_cpl1 = s1[K, :]
         surr_cpl2 = s2[K, :]
 
-    # TODO: add return statement.
+    return p1, p2, cpl1, cpl2, cf1, cf2, mcf1, mcf2, surr_cpl1, surr_cpl2
 
 
 def _bispectrum_analysis(params: BAParams):

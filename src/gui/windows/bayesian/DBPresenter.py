@@ -13,13 +13,15 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from typing import Tuple, Dict
+import asyncio
+from typing import Tuple, Dict, List
 
 from PyQt5.QtWidgets import QDialog, QListWidgetItem
 
 from gui.dialogs.FrequencyDialog import FrequencyDialog
 from gui.windows.bayesian.ParamSet import ParamSet
 from gui.windows.common.BaseTFPresenter import BaseTFPresenter
+from maths.multiprocessing.MPHelper import MPHelper
 from maths.signals.SignalPairs import SignalPairs
 from maths.signals.TimeSeries import TimeSeries
 
@@ -40,6 +42,18 @@ class DBPresenter(BaseTFPresenter):
 
         self.paramsets: Dict[Tuple[str, str], ParamSet] = {}
 
+    def calculate(self, calculate_all=True):
+        asyncio.ensure_future(self.coro_calculate())
+
+    async def coro_calculate(self):
+        if self.mp_handler:
+            self.mp_handler.stop()
+
+        self.mp_handler = MPHelper()
+        await self.mp_handler.coro_bayesian(self.signals,
+                                            self.get_paramsets(),
+                                            self.on_progress_updated)
+
     def load_data(self):
         self.signals = SignalPairs.from_file(self.open_file)
 
@@ -59,6 +73,9 @@ class DBPresenter(BaseTFPresenter):
 
     def get_paramset(self, text1, text2):
         return self.paramsets.get((text1, text2,))
+
+    def get_paramsets(self) -> List[ParamSet]:
+        return list(self.paramsets.values())
 
     def has_paramset(self, text1, text2):
         return self.get_paramset(text1, text2) is not None

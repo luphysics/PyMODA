@@ -27,24 +27,32 @@ def bayes_main(ph1, ph2, win, h, ovr, pr, s, bn):
     M = 2 + 2 * ((2 * bn + 1) ** 2 - 1)
     L = 2
 
-    Cpr = zeros((M / L, L,))
-    XIpr = zeros(M)
+    M = int(M)
+    Cpr = zeros((int(M / L), L,))
+    XIpr = zeros((M, M,))
 
     if max(ph1) < twopi + 0.1:
         ph1 = np.unwrap(ph1)
         ph2 = np.unwrap(ph2)
 
-    m, n = ph1.shape
+    if is_arraylike(ph1.shape) and len(ph1.shape) > 1:
+        m, n = ph1.shape
+    else:
+        m = ph1.shape[0]
+        n = 1
+
     if m < n:
         ph1 = ph1.conj().T
         ph2 - ph2.conj().T
 
-    s = ceil((len(ps) - win) / w)
+    s = np.int(ceil((len(ps) - win) / w))
     e = zeros((s, s, s,))
 
-    for i in range(len(np.floor((len(ps) - win) / w))):
-        phi1 = ph1[i * w: i * w * win]
-        phi2 = ph2[i * w: i * w * win]
+    w = np.int(w)
+    win = np.int(win)
+    for i in range(np.int(np.floor((len(ps) - win) / w))):
+        phi1 = ph1[i * w: i * w + win]
+        phi2 = ph2[i * w: i * w + win]
 
         Cpt, XIpt, E = bayesPhs(Cpr, XIpr, h, 500, 1e-5, phi1.conj().T, phi2.conj().T, bn)
 
@@ -105,12 +113,13 @@ def bayesPhs(Cpr, XIpr, h, max_loops, eps, phi1, phi2, bn):
 
 
 def calculateP(phi1, phi2, K, bn):
-    p = zeros((bn, bn,))
+    bn = np.int(bn)
+    K = np.int(K)
 
-    p[K, len(phi1)] = 0
+    p = zeros((K, len(phi1),))
 
     p[0, :] = 1
-    br = 1
+    br = 0
 
     for i in range(1, bn + 1):
         p[br, :] = sin(i * phi1)
@@ -137,10 +146,11 @@ def calculateP(phi1, phi2, K, bn):
 
 
 def calculateV(phi1, phi2, K, bn, mr):
-    v = zeros((bn, bn,))
+    bn = np.int(bn)
+    K = np.int(K)
+    v = zeros((K, len(phi1),))
 
-    v[K, len(phi1)] = 0
-    br = 1
+    br = 0
 
     if mr == 1:
         for i in range(1, bn + 1):
@@ -192,7 +202,9 @@ def calculateV(phi1, phi2, K, bn, mr):
 def calculateE(c, phiT, L, h, p):
     E = zeros((L, L,))
 
-    E += ((phiT - c * p) ** 2).conj().T
+    mul = np.matmul(c, p)
+    sub = phiT - mul
+    E += np.matmul(sub, sub.conj().T)
     E = (h / len(phiT[0, :])) * E
 
     return E
@@ -202,26 +214,35 @@ def calculateC(E, p, v1, v2, Cpr, XIpr, M, L, phiT, h):
     K = M / L
     invr = np.linalg.inv(E)
 
+    K = np.int(K)
+    M = np.int(M)
+
     XIpt = zeros((M, M,))
     Cpt = zeros(Cpr.shape)
 
-    XIpt[:K, :K] = XIpr[:K, :K] + h * invr[0, 0] * p * p.conj().T
-    XIpt[:K, K:2 * K] = XIpr[:K, K:2 * K] + h * invr[0, 1] * p * p.conj().T
-    XIpt[K:2 * K, :K] = XIpr[K:2 * K, :K] + h * invr[1, 1] * p * p.conj().T
-    XIpt[K:2 * K, K:2 * K] = XIpr[K:2 * K, K:2 * K] + h * invr[1, 1] * p * p.conj().T
+    mul = matmul(p, p.conj().T)
+
+    XIpt[:K, :K] = XIpr[:K, :K] + h * invr[0, 0] * mul
+    XIpt[:K, K:2 * K] = XIpr[:K, K:2 * K] + h * invr[0, 1] * mul
+    XIpt[K:2 * K, :K] = XIpr[K:2 * K, :K] + h * invr[1, 1] * mul
+    XIpt[K:2 * K, K:2 * K] = XIpr[K:2 * K, K:2 * K] + h * invr[1, 1] * mul
 
     # Evaluate from temp r.
     r = zeros((K, L,))
     ED = backslash(E, phiT)
 
-    r[:, 0] = XIpr[:K, :K] * Cpr[:, 0] + XIpr[:K, K:2 * K] * Cpr[:, 1] + h * (
-            p * (ED[0, :].conj().T) - 0.5 * sum(v1, axis=1)
-    )
-    r[:, 1] = XIpr[K:2 * K, :K] * Cpr[:, 0] + XIpr[K:2 * K, K:2 * K] * Cpr[:, 1] + h * (
-            p * ED[1, :].conj().T - 0.5 * sum(v1, axis=1)
-    )
+    sum_v1 = sum(v1, axis=1)
+    # sum_v1 = sum_v1.reshape(len(sum_v1), 1)
 
-    C = backslash(XIpt, np.vstack([r[:, 0], r[:, 1]])).conj().T
+    r[:, 0] = matmul(XIpr[:K, :K], Cpr[:, 0]) \
+              + matmul(XIpr[:K, K:2 * K], Cpr[:, 1]) \
+              + h * (matmul(p, ED[0, :].conj().T) - 0.5 * sum_v1)
+
+    r[:, 1] = matmul(XIpr[K:2 * K, :K], Cpr[:, 0]) \
+              + matmul(XIpr[K:2 * K, K:2 * K], Cpr[:, 1]) \
+              + h * (matmul(p, ED[1, :].conj().T) - 0.5 * sum_v1)
+
+    C = backslash(XIpt, concat([r[:, 0], r[:, 1]])).conj().T
     Cpt[:, 0] = C[:K]
     Cpt[:, 1] = C[K:2 * K]
 
@@ -291,7 +312,7 @@ def CFprint(cc, bn):
 
     for i1 in range(len(t1)):
         for j1 in range(len(t2)):
-            br = 2
+            br = 1
 
             for ii in range(1, bn + 1):
                 q1[i1, j1] = q1[i1, j1] + u[br] * sin(ii * t1[i1]) + u[br + 1] * cos(ii * t1[i1])

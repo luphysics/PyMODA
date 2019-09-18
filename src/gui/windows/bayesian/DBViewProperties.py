@@ -16,6 +16,7 @@
 from PyQt5.QtWidgets import QPushButton, QLineEdit, QVBoxLayout, QSlider, QListWidget
 
 from gui.windows.ViewProperties import ViewProperties
+from gui.windows.bayesian.DBPlot import DBPlot
 
 
 class DBViewProperties(ViewProperties):
@@ -42,3 +43,7 @@ class DBViewProperties(ViewProperties):
 
         self.listwidget_freq_band1: QListWidget = None
         self.listwidget_freq_band2: QListWidget = None
+
+        self.db_plot_top: DBPlot = None
+        self.db_plot_middle: DBPlot = None
+        self.db_plot_bottom: DBPlot = None

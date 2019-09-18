@@ -98,6 +98,8 @@ cumsum = np.cumsum
 vstack = np.vstack
 hstack = np.hstack
 
+matmul = np.matmul
+
 conj = np.conj
 abs = np.abs
 mean = np.mean

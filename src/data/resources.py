@@ -15,9 +15,6 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import string
 
-from data.parsing.CSVParser import CSVParser
-from data.parsing.parsing import extension
-
 """
 Helper file for getting resources related to the application.
 The path to a resource should be accessed by calling the get()
