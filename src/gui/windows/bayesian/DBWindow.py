@@ -13,17 +13,18 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from functools import partial
 from typing import Tuple, Optional
 
-from PyQt5.QtWidgets import QListWidgetItem
+from PyQt5 import sip
+from PyQt5.QtWidgets import QListWidgetItem, QListWidget
 
 from data import resources
-from gui.windows.bayesian.ParamSet import ParamSet
-from gui.windows.common.BaseTFWindow import BaseTFWindow
 from gui.components.SurrogateComponent import SurrogateComponent
 from gui.windows.bayesian.DBPresenter import DBPresenter
 from gui.windows.bayesian.DBViewProperties import DBViewProperties
-from maths.num_utils import float_or_none
+from gui.windows.bayesian.ParamSet import ParamSet
+from gui.windows.common.BaseTFWindow import BaseTFWindow
 from maths.signals.TimeSeries import TimeSeries
 from utils.decorators import floaty
 
@@ -49,7 +50,8 @@ class DBWindow(DBViewProperties, BaseTFWindow, SurrogateComponent):
         self.btn_add_paramset.clicked.connect(self.on_add_paramset_clicked)
         self.btn_delete_paramset.clicked.connect(self.on_delete_paramset_clicked)
 
-        self.listwidget_freq_band1.itemClicked.connect(self.presenter.on_paramset_selected)
+        self.listwidget_freq_band1.itemClicked.connect(partial(self.on_paramset_selected, 0))
+        self.listwidget_freq_band2.itemClicked.connect(partial(self.on_paramset_selected, 1))
 
     def plot_signal_pair(self, pair: Tuple[TimeSeries, TimeSeries]):
         plot = self.signal_plot()
@@ -68,17 +70,63 @@ class DBWindow(DBViewProperties, BaseTFWindow, SurrogateComponent):
             self.get_confidence_level()
         )
 
+    def on_paramset_selected(self, widget_index: int, _: QListWidgetItem):
+        list_widgets: Tuple[QListWidget, QListWidget] = (
+            self.listwidget_freq_band1,
+            self.listwidget_freq_band2
+        )
+
+        item_index = list_widgets[widget_index].selectedIndexes()[-1].row()
+
+        # Sets other list widget to have same selection.
+        #
+        # Since widget_index is always 0 or 1, `not widget_index`
+        # can be used to get the other list widget.
+        list_widgets[not widget_index].setCurrentRow(item_index)
+
+        text1 = list_widgets[0].selectedItems()[-1].text()
+        text2 = list_widgets[1].selectedItems()[-1].text()
+
+        self.fill_paramset_ui(text1, text2)
+
+    def fill_paramset_ui(self, text1, text2):
+        params = self.presenter.get_paramset(text1, text2)
+
+        if params:
+            self.lineedit_overlap.setText(str(params.overlap))
+            self.lineedit_window_size.setText(str(params.window))
+            self.lineedit_confidence_level.setText(str(params.confidence_level))
+            self.lineedit_propagation_const.setText(str(params.propagation_const))
+            self.lineedit_order.setText(str(params.order))
+
     def on_add_paramset_clicked(self):
         params = self.get_param_set()
 
         band1, band2 = params.to_string()
-        self.listwidget_freq_band1.addItem(band1)
-        self.listwidget_freq_band2.addItem(band2)
 
-        self.presenter.add_paramset(params)
+        if not self.presenter.has_paramset(band1, band2):
+            self.listwidget_freq_band1.addItem(band1)
+            self.listwidget_freq_band2.addItem(band2)
+
+            lastIndex = self.listwidget_freq_band1.count() - 1
+            self.listwidget_freq_band1.setCurrentRow(lastIndex)
+            self.listwidget_freq_band2.setCurrentRow(lastIndex)
+
+            self.presenter.add_paramset(params)
 
     def on_delete_paramset_clicked(self):
-        pass
+        try:
+            item1 = self.listwidget_freq_band1.selectedItems()[-1]
+            item2 = self.listwidget_freq_band2.selectedItems()[-1]
+        except IndexError:
+            return
+        self.presenter.delete_paramset(item1.text(), item2.text())
+
+        self.listwidget_freq_band1.removeItemWidget(item1)
+        self.listwidget_freq_band2.removeItemWidget(item2)
+
+        for i in (item1, item2):
+            sip.delete(i)
 
     def setup_radio_preproc(self):
         pass
@@ -100,15 +148,11 @@ class DBWindow(DBViewProperties, BaseTFWindow, SurrogateComponent):
 
     @floaty
     def get_freq_range1(self) -> Optional[Tuple[float, float]]:
-        min = float_or_none(self.lineedit_freq_range1_min.text())
-        max = float_or_none(self.lineedit_freq_range1_max.text())
-        return min, max
+        return self.lineedit_freq_range1_min.text(), self.lineedit_freq_range1_max.text()
 
     @floaty
     def get_freq_range2(self) -> Optional[Tuple[float, float]]:
-        min = float_or_none(self.lineedit_freq_range2_min.text())
-        max = float_or_none(self.lineedit_freq_range2_max.text())
-        return min, max
+        return self.lineedit_freq_range2_min.text(), self.lineedit_freq_range2_max.text()
 
     @floaty
     def get_window_size(self) -> Optional[float]:
@@ -117,10 +161,6 @@ class DBWindow(DBViewProperties, BaseTFWindow, SurrogateComponent):
     @floaty
     def get_propagation_const(self) -> Optional[float]:
         return self.lineedit_propagation_const.text()
-
-    @floaty
-    def get_num_surrogates(self) -> Optional[float]:
-        raise Exception("Not implemented yet.")
 
     @floaty
     def get_overlap(self) -> Optional[float]:

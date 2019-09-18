@@ -17,9 +17,9 @@ from typing import Tuple, Dict
 
 from PyQt5.QtWidgets import QDialog, QListWidgetItem
 
+from gui.dialogs.FrequencyDialog import FrequencyDialog
 from gui.windows.bayesian.ParamSet import ParamSet
 from gui.windows.common.BaseTFPresenter import BaseTFPresenter
-from gui.dialogs.FrequencyDialog import FrequencyDialog
 from maths.signals.SignalPairs import SignalPairs
 from maths.signals.TimeSeries import TimeSeries
 
@@ -38,7 +38,7 @@ class DBPresenter(BaseTFPresenter):
         self.signals: SignalPairs = self.signals
         self.view: DBWindow = view
 
-        self.paramsets: Dict[str, ParamSet] = {}
+        self.paramsets: Dict[Tuple[str, str], ParamSet] = {}
 
     def load_data(self):
         self.signals = SignalPairs.from_file(self.open_file)
@@ -57,17 +57,20 @@ class DBPresenter(BaseTFPresenter):
     def plot_signal_pair(self):
         self.view.plot_signal_pair(self.get_selected_signal_pair())
 
+    def get_paramset(self, text1, text2):
+        return self.paramsets.get((text1, text2,))
+
+    def has_paramset(self, text1, text2):
+        return self.get_paramset(text1, text2) is not None
+
     def add_paramset(self, params: ParamSet):
-        for k in params.to_string():
-            self.paramsets[k] = params
+        self.paramsets[params.to_string()] = params
 
-    def on_paramset_selected(self, item):
-        if isinstance(item, QListWidgetItem):
-            text = item.text()
-        else:
-            text = item
-
-        # TODO
+    def delete_paramset(self, text1: str, text2: str):
+        try:
+            del self.paramsets[(text1, text2)]
+        except KeyError:
+            pass
 
     def get_selected_signal_pair(self) -> Tuple[TimeSeries, TimeSeries]:
         return self.signals.get_pair_by_name(self.selected_signal_name)
