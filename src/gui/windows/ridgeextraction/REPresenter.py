@@ -13,6 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import asyncio
 from typing import Tuple, Union
 
 from PyQt5.QtWidgets import QListWidgetItem
@@ -55,10 +56,16 @@ class REPresenter(TFPresenter):
         self.view.clear_all()
         self.view.switch_to_three_plots()
 
-        self.mp_handler.ridge_extraction(self.get_re_params(),
-                                         self.view,
-                                         self.on_ridge_completed,
-                                         on_progress=self.on_progress_updated)
+        asyncio.ensure_future(self.coro_ridge_extraction())
+
+    async def coro_ridge_extraction(self):
+        data = await self.mp_handler.coro_ridge_extraction(self.get_re_params(),
+                                                           on_progress=self.on_progress_updated)
+
+        for d in data:
+            self.on_ridge_completed(*d)
+
+        self.on_all_ridge_completed()
 
     def on_ridge_completed(self,
                            name,
@@ -72,8 +79,7 @@ class REPresenter(TFPresenter):
                            interval,
                            filtered_signal,
                            iphi,
-                           ifreq
-                           ):
+                           ifreq):
 
         sig = self.signals.get(name)
 
@@ -90,9 +96,6 @@ class REPresenter(TFPresenter):
 
         d.freq = freq
         d.times = times
-
-        if all([i.output_data.has_ridge_data() for i in self.signals]):
-            self.on_all_ridge_completed()
 
     def on_all_ridge_completed(self):
         print("All ridge extraction completed.")
@@ -187,31 +190,19 @@ class REPresenter(TFPresenter):
     def on_filter_clicked(self):
         """Called when the "bandpass filter" button is clicked."""
         print("Starting filtering...")
+        asyncio.ensure_future(self.coro_bandpass_filter())
 
-        self.mp_handler.bandpass_filter(
-            self.signals,
-            self.view.get_interval_tuples(),
-            self.view,
-            self.on_filter_completed,
-            on_progress=self.on_progress_updated
-        )
+    async def coro_bandpass_filter(self):
+        data = await self.mp_handler.coro_bandpass_filter(self.signals,
+                                                          self.view.get_interval_tuples(),
+                                                          on_progress=self.on_progress_updated)
 
-    def on_filter_completed(
-            self,
-            name: str,
-            bands,
-            phase,
-            amp,
-            interval: Tuple[float, float]
-    ):
-        """
-        Called when the bandpass filter completes.
-        """
-        d: TFOutputData = self.signals.get(name).output_data
-        d.set_band_data(interval, bands, phase, amp)
+        for d in data:
+            name, bands, phase, amp, interval = d
+            output_data = self.signals.get(name).output_data
+            output_data.set_band_data(interval, bands, phase, amp)
 
-        if all([i.output_data.has_band_data() for i in self.signals]):
-            self.on_all_filter_completed()
+        self.on_all_filter_completed()
 
     def on_all_filter_completed(self):
         """

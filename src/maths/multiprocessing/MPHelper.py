@@ -157,6 +157,30 @@ class MPHelper:
 
         self.scheduler.start()
 
+    async def coro_ridge_extraction(self,
+                                    params: REParams,
+                                    on_progress: Callable[[int, int], None]):
+        self.stop()
+        self.scheduler = Scheduler(progress_callback=on_progress)
+
+        signals = params.signals
+        num_transforms = len(signals)
+        intervals = params.intervals
+
+        for i in range(num_transforms):
+            for j in range(len(intervals)):
+                fmin, fmax = intervals[j]
+
+                params.set_item(_fmin, fmin)
+                params.set_item(_fmax, fmax)
+
+                q = Queue()
+                p = Process(target=_ridge_extraction, args=(q, signals[i], params))
+
+                self.scheduler.append(Task(p, q))
+
+        return await self.scheduler.coro_run()
+
     @deprecated
     def ridge_extraction(self,
                          params: REParams,
@@ -192,7 +216,27 @@ class MPHelper:
                 self.scheduler.append(
                     Task(p, q, on_result)
                 )
+
         self.scheduler.start()
+
+    async def coro_bandpass_filter(self,
+                                   signals: Signals,
+                                   intervals: tuple,
+                                   on_progress: Callable[[int, int], None]):
+
+        self.stop()
+        self.scheduler = Scheduler(progress_callback=on_progress)
+
+        for s in signals:
+            fs = s.frequency
+            for i in range(len(intervals)):
+                fmin, fmax = intervals[i]
+
+                q = Queue()
+                p = Process(target=_bandpass_filter, args=(q, s, fmin, fmax, fs))
+                self.scheduler.append(Task(p, q))
+
+        return await self.scheduler.coro_run()
 
     @deprecated
     def bandpass_filter(self,
