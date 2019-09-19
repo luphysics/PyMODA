@@ -30,6 +30,7 @@ from utils.decorators import floaty
 
 
 class DBWindow(DBViewProperties, BaseTFWindow, SurrogateComponent):
+    name = "Dynamical Bayesian Inference"
 
     def __init__(self, application):
         DBViewProperties.__init__(self)

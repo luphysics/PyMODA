@@ -13,26 +13,19 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from typing import Tuple
+
 import numpy as np
+from nptyping import Array
 from scipy.signal import filtfilt, butter
 
 
-def bandpass_butter(c, n, flp, fhi, fs):
-    fnq = fs / 2
-
-    Wn = np.asarray([flp / fnq, fhi / fnq])
-    b, a = butter(n, Wn, btype="bandpass")
-
-    return filtfilt(b, a, c)
-
-
-def loop_butter(signal_in: np.ndarray, fmin, fmax, fs):
-    signal_in = signal_in
-
-    optimal_order = 1
+def loop_butter(signal_in: Array, fmin: float, fmax: float, fs: float) -> Tuple[Array, int]:
     max_out = np.max(signal_in)
+    optimal_order = 1
 
-    while max_out < 10 * np.max(signal_in):
+    _max = 10 * max_out
+    while max_out < _max:
         optimal_order += 1
 
         sig_out = bandpass_butter(signal_in, optimal_order, fmin, fmax, fs)
@@ -42,3 +35,12 @@ def loop_butter(signal_in: np.ndarray, fmin, fmax, fs):
     sig_out = bandpass_butter(signal_in, optimal_order, fmin, fmax, fs)
 
     return sig_out, optimal_order
+
+
+def bandpass_butter(c: Array, n: int, flp: float, fhi: float, fs: float) -> Array:
+    fnq = fs / 2
+
+    Wn = np.asarray([flp / fnq, fhi / fnq])
+    b, a = butter(n, Wn, btype="bandpass")[:2]
+
+    return filtfilt(b, a, c, padtype="odd", padlen=3 * (max(len(b), len(a)) - 1))

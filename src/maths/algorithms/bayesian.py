@@ -35,7 +35,7 @@ def bayes_main(ph1, ph2, win, h, ovr, pr, s, bn):
         ph1 = np.unwrap(ph1)
         ph2 = np.unwrap(ph2)
 
-    if is_arraylike(ph1.shape) and len(ph1.shape) > 1:
+    if len(ph1.shape) > 1:
         m, n = ph1.shape
     else:
         m = ph1.shape[0]
@@ -50,7 +50,7 @@ def bayes_main(ph1, ph2, win, h, ovr, pr, s, bn):
 
     w = np.int(w)
     win = np.int(win)
-    for i in range(np.int(np.floor((len(ps) - win) / w))):
+    for i in range(np.int(np.floor((len(ps) - win) / w)) + 1):
         phi1 = ph1[i * w: i * w + win]
         phi2 = ph2[i * w: i * w + win]
 
