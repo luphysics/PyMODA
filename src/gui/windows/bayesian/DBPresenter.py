@@ -54,6 +54,8 @@ class DBPresenter(BaseTFPresenter):
                                             self.get_paramsets(),
                                             self.on_progress_updated)
 
+        print("Dynamical Bayesian inference completed.")
+
     def load_data(self):
         self.signals = SignalPairs.from_file(self.open_file)
 

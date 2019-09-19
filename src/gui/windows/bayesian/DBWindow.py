@@ -26,7 +26,7 @@ from gui.windows.bayesian.DBViewProperties import DBViewProperties
 from gui.windows.bayesian.ParamSet import ParamSet
 from gui.windows.common.BaseTFWindow import BaseTFWindow
 from maths.signals.TimeSeries import TimeSeries
-from utils.decorators import floaty
+from utils.decorators import floaty, inty
 
 
 class DBWindow(DBViewProperties, BaseTFWindow, SurrogateComponent):
@@ -167,8 +167,8 @@ class DBWindow(DBViewProperties, BaseTFWindow, SurrogateComponent):
     def get_overlap(self) -> Optional[float]:
         return self.lineedit_overlap.text()
 
-    @floaty
-    def get_order(self) -> Optional[float]:
+    @inty
+    def get_order(self) -> Optional[int]:
         return self.lineedit_order.text()
 
     @floaty

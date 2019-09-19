@@ -17,7 +17,6 @@ from maths.algorithms.matlab_utils import *
 
 
 def bayes_main(ph1, ph2, win, h, ovr, pr, s, bn):
-    cc = []
     win /= h
 
     w = ovr * win
@@ -27,7 +26,7 @@ def bayes_main(ph1, ph2, win, h, ovr, pr, s, bn):
     M = 2 + 2 * ((2 * bn + 1) ** 2 - 1)
     L = 2
 
-    M = int(M)
+    M = np.int(M)
     Cpr = zeros((int(M / L), L,))
     XIpr = zeros((M, M,))
 
@@ -50,7 +49,10 @@ def bayes_main(ph1, ph2, win, h, ovr, pr, s, bn):
 
     w = np.int(w)
     win = np.int(win)
-    for i in range(np.int(np.floor((len(ps) - win) / w)) + 1):
+
+    r = np.int(np.floor((len(ps) - win) / w)) + 1
+    cc = zeros((r, Cpr.size))
+    for i in range(r):
         phi1 = ph1[i * w: i * w + win]
         phi2 = ph2[i * w: i * w + win]
 
@@ -59,7 +61,7 @@ def bayes_main(ph1, ph2, win, h, ovr, pr, s, bn):
         XIpr, Cpr = Propagation_function_XIpt(Cpt, XIpt, pw)
 
         e[i, :, :] = E
-        cc[i, :] = Cpt[:]
+        cc[i, :] = concat([Cpt[:, i] for i in range(Cpt.shape[1])])
 
     tm = arange(win / 2, len(ph1) - win / 2, w) * h
 
@@ -119,7 +121,7 @@ def calculateP(phi1, phi2, K, bn):
     p = zeros((K, len(phi1),))
 
     p[0, :] = 1
-    br = 0
+    br = 1
 
     for i in range(1, bn + 1):
         p[br, :] = sin(i * phi1)
@@ -134,12 +136,12 @@ def calculateP(phi1, phi2, K, bn):
 
     for i in range(1, bn + 1):
         for j in range(1, bn + 1):
-            p[br + 1, :] = sin(i * phi1 + j * phi2)
-            p[br + 2, :] = cos(i * phi1 + j * phi2)
+            p[br, :] = sin(i * phi1 + j * phi2)
+            p[br + 1, :] = cos(i * phi1 + j * phi2)
             br += 2
 
-            p[br + 1, :] = sin(i * phi1 - j * phi2)
-            p[br + 2, :] = cos(i * phi1 - j * phi2)
+            p[br, :] = sin(i * phi1 - j * phi2)
+            p[br + 1, :] = cos(i * phi1 - j * phi2)
             br += 2
 
     return p
@@ -150,7 +152,7 @@ def calculateV(phi1, phi2, K, bn, mr):
     K = np.int(K)
     v = zeros((K, len(phi1),))
 
-    br = 0
+    br = 1
 
     if mr == 1:
         for i in range(1, bn + 1):
@@ -166,12 +168,12 @@ def calculateV(phi1, phi2, K, bn, mr):
 
         for i in range(1, bn + 1):
             for j in range(1, bn + 1):
-                v[br + 1, :] = i * cos(i * phi1 + j * phi2)
-                v[br + 2, :] = -i * sin(i * phi1 + j * phi2)
+                v[br, :] = i * cos(i * phi1 + j * phi2)
+                v[br + 1, :] = -i * sin(i * phi1 + j * phi2)
                 br += 2
 
-                v[br + 1, :] = i * cos(i * phi1 - j * phi2)
-                v[br + 2, :] = -i * sin(i * phi1 - j * phi2)
+                v[br, :] = i * cos(i * phi1 - j * phi2)
+                v[br + 1, :] = -i * sin(i * phi1 - j * phi2)
                 br += 2
     else:
         for i in range(1, bn + 1):
@@ -188,12 +190,12 @@ def calculateV(phi1, phi2, K, bn, mr):
 
         for i in range(1, bn + 1):
             for j in range(1, bn + 1):
-                v[br + 1, :] = j * cos(i * phi1 + j * phi2)
-                v[br + 2, :] = -j * sin(i * phi1 + j * phi2)
+                v[br, :] = j * cos(i * phi1 + j * phi2)
+                v[br + 1, :] = -j * sin(i * phi1 + j * phi2)
                 br += 2
 
-                v[br + 1, :] = -j * cos(i * phi1 - j * phi2)
-                v[br + 2, :] = j * sin(i * phi1 - j * phi2)
+                v[br, :] = -j * cos(i * phi1 - j * phi2)
+                v[br + 1, :] = j * sin(i * phi1 - j * phi2)
                 br += 2
 
     return v
@@ -250,12 +252,15 @@ def calculateC(E, p, v1, v2, Cpr, XIpr, M, L, phiT, h):
 
 
 def dirc(c, bn):
-    q1 = []
-    q2 = []
-    iq1 = 1
-    iq2 = 1
-    br = 2
-    K = len(c) / 2
+    q1 = zeros((bn * 8,))
+    q2 = zeros(q1.shape)
+    iq1 = 0
+    iq2 = 0
+    br = 1
+    K = np.int(len(c) / 2)
+
+    if is_arraylike(c[0]):
+        c = c[0]
 
     for ii in range(bn):
         q1[iq1] = c[br]
@@ -308,7 +313,7 @@ def CFprint(cc, bn):
     q2 = np.copy(q1)
 
     u = cc
-    K = len(u) / 2
+    K = np.int(len(u) / 2)
 
     for i1 in range(len(t1)):
         for j1 in range(len(t2)):

@@ -25,6 +25,7 @@ from scipy.signal import hilbert
 from gui.windows.bayesian.ParamSet import ParamSet
 from maths.algorithms.bayesian import bayes_main, dirc, CFprint
 from maths.algorithms.loop_butter import loop_butter
+from maths.algorithms.matlab_utils import sort2d
 from maths.algorithms.surrogates import surrogate_calc
 from maths.algorithms.wpc import wpc, wphcoh
 from maths.multiprocessing import mp_utils
@@ -149,7 +150,7 @@ class MPHelper:
         for params in paramsets:
             for pair in signals.get_pairs():
                 q = Queue()
-                p = Process(target=_dynamic_bayesian_analysis, args=(*pair, params,))
+                p = Process(target=_dynamic_bayesian_analysis, args=(q, *pair, params,))
 
                 self.scheduler.append(Task(p, q))
 
@@ -171,9 +172,8 @@ class MPHelper:
             self.scheduler.terminate()
 
 
-def _dynamic_bayesian_analysis(signal1: TimeSeries, signal2: TimeSeries, params: ParamSet):
+def _dynamic_bayesian_analysis(queue: Queue, signal1: TimeSeries, signal2: TimeSeries, params: ParamSet):
     sig = signal1.signal
-    times = signal1.times
 
     fs = signal1.frequency
     interval1, interval2 = params.freq_range1, params.freq_range2
@@ -206,15 +206,17 @@ def _dynamic_bayesian_analysis(signal1: TimeSeries, signal2: TimeSeries, params:
 
     from maths.algorithms.matlab_utils import zeros, mean
 
-    N = len(cc)
+    N, s = cc.shape
+    s -= 1
+
     cpl1 = zeros(N)
     cpl2 = zeros(N)
 
-    q21 = zeros((N, N, N,))
+    q21 = zeros((s, s, N,))
     q12 = zeros(q21.shape)
 
-    for m in range(len(cc)):
-        cpl1[m], cpl2[m] = dirc(cc[m, :], bn)
+    for m in range(N):
+        cpl1[m], cpl2[m], _ = dirc(cc[m, :], bn)
         _, _, q21[:, :, m], q12[:, :, m] = CFprint(cc[m, :], bn)
 
     cf1 = q21
@@ -224,18 +226,19 @@ def _dynamic_bayesian_analysis(signal1: TimeSeries, signal2: TimeSeries, params:
     mcf2 = np.squeeze(mean(q12, 2))
 
     ns = params.surr_count
-    surr1 = surrogate_calc(phi1, ns, "CPP", 0, fs)
-    surr2 = surrogate_calc(phi2, ns, "CPP", 0, fs)
+    surr1, _ = surrogate_calc(phi1, ns, "CPP", 0, fs)
+    surr2, _ = surrogate_calc(phi2, ns, "CPP", 0, fs)
 
     cc_surr: List[Array] = []
+    scpl1 = zeros((ns, 2,))
+    scpl2 = zeros(scpl1.shape)
+
     for n in range(ns):
-        _, cc_surr = bayes_main(surr1[n, :], surr2[n, :], win, 1 / fs, ovr, pr, 1, bn)
+        _, _cc_surr, _ = bayes_main(surr1[n, :], surr2[n, :], win, 1 / fs, ovr, pr, 1, bn)
+        cc_surr.append(_cc_surr)
 
-        scpl1 = zeros((ns, len(cc_surr)))
-        scpl2 = zeros(scpl1.shape)
-
-        for idx in range(len(cc_surr)):
-            scpl1[n, idx], scpl2[n, idx] = dirc(cc_surr[idx, :], bn)
+        for idx in range(len(_cc_surr)):
+            scpl1[n, idx], scpl2[n, idx], _ = dirc(_cc_surr[idx], bn)
 
     alph = signif
     alph = 1 - alph / 100
@@ -245,13 +248,15 @@ def _dynamic_bayesian_analysis(signal1: TimeSeries, signal2: TimeSeries, params:
         surr_cpl2 = np.max(scpl2)
     else:
         K = np.floor((ns + 1) * alph)
-        s1 = sorted(scpl1, reverse=True)
-        s2 = sorted(scpl2, reverse=True)
+        K = np.int(K)
+
+        s1 = sort2d(scpl1, descend=True)
+        s2 = sort2d(scpl2, descend=True)
 
         surr_cpl1 = s1[K, :]
         surr_cpl2 = s2[K, :]
 
-    return p1, p2, cpl1, cpl2, cf1, cf2, mcf1, mcf2, surr_cpl1, surr_cpl2
+    queue.put((p1, p2, cpl1, cpl2, cf1, cf2, mcf1, mcf2, surr_cpl1, surr_cpl2,))
 
 
 def _bispectrum_analysis(params: BAParams):

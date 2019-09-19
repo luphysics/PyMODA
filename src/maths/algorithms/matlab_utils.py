@@ -26,6 +26,13 @@ Contains Python replicas of oft-used Matlab functions.
 """
 
 
+def sort2d(arr, descend=False):
+    for i in range(arr.shape[1]):
+        arr[:, i] = sorted(arr[:, i], reverse=descend)
+
+    return arr
+
+
 def isempty(value):
     """
     Imitates MATLAB's `isempty` function by returning whether the object

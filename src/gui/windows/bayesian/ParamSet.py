@@ -28,7 +28,7 @@ class ParamSet:
                  propagation_const: float,
                  surr_count: int,
                  overlap: float,
-                 order: float,
+                 order: int,
                  confidence_level: float
                  ):
         self.freq_range1 = freq_range1
