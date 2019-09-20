@@ -31,6 +31,7 @@ from maths.algorithms.wpc import wpc, wphcoh
 from maths.multiprocessing import mp_utils
 from maths.multiprocessing.Scheduler import Scheduler
 from maths.multiprocessing.Task import Task
+from maths.multiprocessing.mp_utils import setup_matlab_runtime
 from maths.num_utils import matlab_to_numpy
 from maths.params.BAParams import BAParams
 from maths.params.PCParams import PCParams
@@ -150,7 +151,7 @@ class MPHelper:
         for params in paramsets:
             for pair in signals.get_pairs():
                 q = Queue()
-                p = Process(target=_dynamic_bayesian_analysis, args=(q, *pair, params,))
+                p = Process(target=_moda_dynamic_bayesian_inference, args=(q, *pair, params,))
 
                 self.scheduler.append(Task(p, q))
 
@@ -172,18 +173,45 @@ class MPHelper:
             self.scheduler.terminate()
 
 
-def _dynamic_bayesian_analysis(queue: Queue, signal1: TimeSeries, signal2: TimeSeries, params: ParamSet):
-    sig = signal1.signal
+def _moda_dynamic_bayesian_inference(queue: Queue, signal1: TimeSeries, signal2: TimeSeries, params: ParamSet):
+    mp_utils.setup_matlab_runtime()
+
+    import full_bayesian
+    import matlab
+    package = full_bayesian.initialize()
+
+    sig1 = matlab.double(signal1.signal.tolist())
+    sig2 = matlab.double(signal2.signal.tolist())
+
+    int1 = list(params.freq_range1)
+    int2 = list(params.freq_range2)
+
+    fs = signal1.frequency
+    win = params.window
+    pr = params.propagation_const
+    ovr = params.overlap
+    bn = params.order
+    ns = params.surr_count
+    signif = params.confidence_level
+
+    result = package.full_bayesian(sig1, sig2, int1, int2, fs, win, pr, ovr, bn, ns, signif)
+
+    queue.put((signal1.name, *result))
+
+
+def _dynamic_bayesian_inference(queue: Queue, signal1: TimeSeries, signal2: TimeSeries, params: ParamSet):
+    sig1 = signal1.signal
+    sig2 = signal2.signal
 
     fs = signal1.frequency
     interval1, interval2 = params.freq_range1, params.freq_range2
     bn = params.order
 
-    bands0, _ = loop_butter(sig, *interval1, fs)
-    phi1 = np.angle(hilbert(bands0))
+    bands1, _ = loop_butter(sig1, *interval1, fs)
+    phi1 = np.angle(hilbert(bands1))
 
-    bands1, _ = loop_butter(sig, *interval2, fs)
-    phi2 = np.angle(hilbert(bands1))
+    bands2, _ = loop_butter(sig2, *interval2, fs)
+    phi2 = np.angle(hilbert(bands2))
 
     p1 = phi1
     p2 = phi2

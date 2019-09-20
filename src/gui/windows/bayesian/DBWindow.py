@@ -20,16 +20,16 @@ from PyQt5 import sip
 from PyQt5.QtWidgets import QListWidgetItem, QListWidget
 
 from data import resources
+from gui.components.DualSignalComponent import DualSignalComponent
 from gui.components.SurrogateComponent import SurrogateComponent
 from gui.windows.bayesian.DBPresenter import DBPresenter
 from gui.windows.bayesian.DBViewProperties import DBViewProperties
 from gui.windows.bayesian.ParamSet import ParamSet
 from gui.windows.common.BaseTFWindow import BaseTFWindow
-from maths.signals.TimeSeries import TimeSeries
 from utils.decorators import floaty, inty
 
 
-class DBWindow(DBViewProperties, BaseTFWindow, SurrogateComponent):
+class DBWindow(DBViewProperties, BaseTFWindow, SurrogateComponent, DualSignalComponent):
     name = "Dynamical Bayesian Inference"
 
     def __init__(self, application):
@@ -37,6 +37,7 @@ class DBWindow(DBViewProperties, BaseTFWindow, SurrogateComponent):
         BaseTFWindow.__init__(self, application, DBPresenter(self))
 
         SurrogateComponent.__init__(self, self.slider_surrogate, self.line_surrogate)
+        DualSignalComponent.__init__(self, self.signal_plot())
 
         self.presenter: DBPresenter = self.presenter
         self.presenter.init()
@@ -57,11 +58,6 @@ class DBWindow(DBViewProperties, BaseTFWindow, SurrogateComponent):
 
         self.listwidget_freq_band1.itemClicked.connect(partial(self.on_paramset_selected, 0))
         self.listwidget_freq_band2.itemClicked.connect(partial(self.on_paramset_selected, 1))
-
-    def plot_signal_pair(self, pair: Tuple[TimeSeries, TimeSeries]):
-        plot = self.signal_plot()
-        plot.plot(pair[0], clear=True)
-        plot.plot(pair[1], clear=False)
 
     def on_toggle_plots(self):
         triple_plot = (self.db_plot_top, self.db_plot_middle, self.db_plot_bottom)

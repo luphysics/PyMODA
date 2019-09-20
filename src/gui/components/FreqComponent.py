@@ -27,18 +27,18 @@ class FreqComponent:
     """
 
     def __init__(self, lineedit_fmax: QLineEdit, lineedit_fmin: QLineEdit, lineedit_res: QLineEdit):
-        self.__res = lineedit_res
-        self.__fmin = lineedit_fmin
-        self.__fmax = lineedit_fmax
+        self._res = lineedit_res
+        self._fmin = lineedit_fmin
+        self._fmax = lineedit_fmax
 
     @floaty
     def get_fmin(self) -> Optional[float]:
-        return self.__fmin.text()
+        return self._fmin.text()
 
     @floaty
     def get_fmax(self) -> Optional[float]:
-        return self.__fmax.text()
+        return self._fmax.text()
 
     @floaty
     def get_f0(self) -> Optional[float]:
-        return self.__res.text()
+        return self._res.text()

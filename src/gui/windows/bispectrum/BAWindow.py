@@ -26,9 +26,12 @@ class BAWindow(BAViewProperties, BaseTFWindow):
         BAViewProperties.__init__(self)
         BaseTFWindow.__init__(self, application, BAPresenter(self))
 
+        self.presenter.init()
+
     def init_ui(self):
         super(BAWindow, self).init_ui()
         self.btn_calculate_single.hide()
+
 
     def get_layout_file(self) -> str:
         return resources.get("layout:window_bispectrum_analysis.ui")

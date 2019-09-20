@@ -19,6 +19,7 @@ from PyQt5 import QtGui
 from PyQt5.QtGui import QWindow
 
 from data import resources
+from gui.components.SingleSignalComponent import SingleSignalComponent
 from gui.windows.common.BaseTFWindow import BaseTFWindow
 from gui.components.FreqComponent import FreqComponent
 from gui.windows.timefrequency.TFPresenter import TFPresenter
@@ -26,7 +27,7 @@ from gui.windows.timefrequency.TFViewProperties import TFViewProperties
 from utils.decorators import floaty
 
 
-class TFWindow(TFViewProperties, BaseTFWindow, FreqComponent):
+class TFWindow(TFViewProperties, BaseTFWindow, FreqComponent, SingleSignalComponent):
     """
     The time-frequency window. This class is the "View" in MVP,
     meaning that it should defer responsibility for tasks to the
@@ -35,7 +36,7 @@ class TFWindow(TFViewProperties, BaseTFWindow, FreqComponent):
     name = "Time-Frequency Analysis"
 
     # The items to be shown in the "WT / WFT Type" combobox.
-    _window_items = (
+    window_items = (
         ["Gaussian", "Hann", "Blackman", "Exp", "Rect", "Kaiser-a"],  # Windowed Fourier transform.
         ["Lognorm", "Morlet", "Bump"],  # Wavelet transform.
     )
@@ -45,6 +46,8 @@ class TFWindow(TFViewProperties, BaseTFWindow, FreqComponent):
         BaseTFWindow.__init__(self, application, presenter or TFPresenter(self))
 
         FreqComponent.__init__(self, self.line_fmax, self.line_fmin, self.line_res)
+        SingleSignalComponent.__init__(self, self.signal_plot())
+
         self.presenter.init()
 
     def init_ui(self):
@@ -61,10 +64,6 @@ class TFWindow(TFViewProperties, BaseTFWindow, FreqComponent):
 
     def get_layout_file(self) -> str:
         return resources.get("layout:window_time_freq.ui")
-
-    def plot_signal(self, time_series):
-        """Plots the signal in the top-left plotting."""
-        self.signal_plot().plot(time_series)
 
     def closeEvent(self, e: QtGui.QCloseEvent) -> None:
         """Called when the window closes. Cancels any calculations that are in progress."""
@@ -87,7 +86,7 @@ class TFWindow(TFViewProperties, BaseTFWindow, FreqComponent):
         combo.clear()
 
         # Gets the list of items from the tuple, since the bool evaluates to 0 or 1.
-        items = self._window_items[is_wt]
+        items = self.window_items[is_wt]
         for i in items:
             combo.addItem(i)
 
