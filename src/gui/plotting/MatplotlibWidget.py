@@ -18,9 +18,11 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPalette
 from PyQt5.QtWidgets import QVBoxLayout, QApplication
 from matplotlib import patches
+from matplotlib.axes import Axes
 from matplotlib.backend_bases import MouseButton
 from matplotlib.backends.backend_qt5agg import (FigureCanvas)
 from matplotlib.figure import Figure
+from mpl_toolkits.mplot3d import Axes3D
 
 from gui.plotting.PlotWidget import PlotWidget
 from gui.plotting.Callbacks import Callbacks
@@ -38,6 +40,7 @@ class MatplotlibWidget(PlotWidget):
         self.canvas: FigureCanvas = None
         self.layout: QVBoxLayout = None
         self.axes = None
+        self.fig: Figure = None
         self.log = False  # Whether the axes should be logarithmic.
 
         self.temp_lines = []  # Temporary crosshair plots which should be removed on each update.
@@ -56,6 +59,8 @@ class MatplotlibWidget(PlotWidget):
         self.max_crosshairs = 10
         self.crosshair_listeners = []
 
+        self.options: PlotOptionsBar = None
+
         super(MatplotlibWidget, self).__init__(parent)
 
     def init_ui(self):
@@ -72,14 +77,22 @@ class MatplotlibWidget(PlotWidget):
         self.layout.addWidget(self.canvas)
         self.layout.addWidget(self.options)
 
-        self.axes = self.canvas.figure.subplots()
+        self.fig: Figure = self.canvas.figure
+
+        if self.is_3d():
+            self.axes = Axes3D(self.fig)
+        else:
+            self.axes = self.fig.subplots()
+
         self.axes.set_xlabel(self.get_xlabel())
         self.axes.set_ylabel(self.get_ylabel())
 
-        self.fig = self.axes.get_figure()
         # self.fig.tight_layout(pad=0)
         background = self.palette().color(QPalette.Background)
         self.fig.patch.set_facecolor(background.name())
+
+    def is_3d(self) -> bool:
+        return False
 
     def init_callbacks(self):
         """

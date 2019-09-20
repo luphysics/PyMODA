@@ -13,22 +13,30 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from gui.plotting.MatplotlibWidget import MatplotlibWidget
 
 
-class DBPlot(MatplotlibWidget):
+class DBOutputData:
 
-    def plot(self, times, values):
-        self.axes.xaxis.set_label_position("top")
-        self.update_xlabel()
-        self.update_ylabel()
-
-        self.axes.autoscale(True)
-
-        self.axes.plot(times, values, linewidth=0.8)
-        self.axes.autoscale(False)
-        self.axes.set_xlim([times[0], times[-1]])
-        self.on_plot_complete()
-
-    def get_xlabel(self):
-        return "Time (s)"
+    def __init__(self,
+                 tm,
+                 p1,
+                 p2,
+                 cpl1,
+                 cpl2,
+                 cf1,
+                 cf2,
+                 mcf1,
+                 mcf2,
+                 surr_cpl1,
+                 surr_cpl2):
+        self.tm = tm
+        self.surr_cpl2 = surr_cpl2
+        self.surr_cpl1 = surr_cpl1
+        self.mcf2 = mcf2
+        self.mcf1 = mcf1
+        self.cf2 = cf2
+        self.cf1 = cf1
+        self.cpl2 = cpl2
+        self.cpl1 = cpl1
+        self.p2 = p2
+        self.p1 = p1

@@ -14,21 +14,24 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from gui.plotting.MatplotlibWidget import MatplotlibWidget
+from gui.plotting.plots.ColorMeshPlot import colormap
 
 
-class DBPlot(MatplotlibWidget):
+class DBPlot3d(MatplotlibWidget):
 
-    def plot(self, times, values):
+    def plot(self, x, y, z):
         self.axes.xaxis.set_label_position("top")
         self.update_xlabel()
         self.update_ylabel()
 
         self.axes.autoscale(True)
 
-        self.axes.plot(times, values, linewidth=0.8)
+        self.axes.plot_surface(x, y, z, cmap=colormap())
         self.axes.autoscale(False)
-        self.axes.set_xlim([times[0], times[-1]])
         self.on_plot_complete()
+
+    def is_3d(self) -> bool:
+        return True
 
     def get_xlabel(self):
         return "Time (s)"

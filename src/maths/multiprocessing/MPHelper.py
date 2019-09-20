@@ -256,7 +256,20 @@ def _dynamic_bayesian_analysis(queue: Queue, signal1: TimeSeries, signal2: TimeS
         surr_cpl1 = s1[K, :]
         surr_cpl2 = s2[K, :]
 
-    queue.put((p1, p2, cpl1, cpl2, cf1, cf2, mcf1, mcf2, surr_cpl1, surr_cpl2,))
+    queue.put((
+        signal1.name,
+        tm,
+        p1,
+        p2,
+        cpl1,
+        cpl2,
+        cf1,
+        cf2,
+        mcf1,
+        mcf2,
+        surr_cpl1,
+        surr_cpl2,
+    ))
 
 
 def _bispectrum_analysis(params: BAParams):

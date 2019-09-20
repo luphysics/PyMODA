@@ -13,10 +13,11 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from PyQt5.QtWidgets import QPushButton, QLineEdit, QVBoxLayout, QSlider, QListWidget
+from PyQt5.QtWidgets import QPushButton, QLineEdit, QVBoxLayout, QSlider, QListWidget, QHBoxLayout
 
 from gui.windows.ViewProperties import ViewProperties
 from gui.windows.bayesian.DBPlot import DBPlot
+from gui.windows.bayesian.DBPlot3d import DBPlot3d
 
 
 class DBViewProperties(ViewProperties):
@@ -36,7 +37,9 @@ class DBViewProperties(ViewProperties):
         self.lineedit_confidence_level: QLineEdit = None
         self.lineedit_propagation_const: QLineEdit = None
 
+        self.vbox_all_plots: QVBoxLayout = None
         self.vbox_triple_plot: QVBoxLayout = None
+        self.hbox_dual_plot: QHBoxLayout = None
 
         self.slider_surrogate: QSlider = None
         self.line_surrogate: QLineEdit = None
@@ -44,6 +47,14 @@ class DBViewProperties(ViewProperties):
         self.listwidget_freq_band1: QListWidget = None
         self.listwidget_freq_band2: QListWidget = None
 
+        # The plots used for phase and coupling strength.
         self.db_plot_top: DBPlot = None
         self.db_plot_middle: DBPlot = None
         self.db_plot_bottom: DBPlot = None
+
+        # The 3d plots used to show the coupling function.
+        self.db3d_plot_left: DBPlot3d = None
+        self.db3d_plot_right: DBPlot3d = None
+
+        # The button used to toggle between the 3-plot and 2-plot UI.
+        self.btn_toggle_plots: QPushButton = None

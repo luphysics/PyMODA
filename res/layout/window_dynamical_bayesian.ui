@@ -23,7 +23,7 @@
          <number>10</number>
         </property>
         <item>
-         <layout class="QVBoxLayout" name="verticalLayout_8" stretch="2,7">
+         <layout class="QVBoxLayout" name="vbox_all_plots" stretch="2,7,7,0">
           <item>
            <layout class="QGridLayout" name="gridLayout_3">
             <property name="sizeConstraint">
@@ -46,6 +46,29 @@
              <widget class="DBPlot" name="db_plot_bottom" native="true"/>
             </item>
            </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="hbox_dual_plot">
+            <item>
+             <widget class="DBPlot3d" name="db3d_plot_left" native="true"/>
+            </item>
+            <item>
+             <widget class="DBPlot3d" name="db3d_plot_right" native="true"/>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btn_toggle_plots">
+            <property name="maximumSize">
+             <size>
+              <width>200</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Toggle plots</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
@@ -509,6 +532,12 @@
    <class>DBPlot</class>
    <extends>QWidget</extends>
    <header>gui.windows.bayesian.DBPlot</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>DBPlot3d</class>
+   <extends>QWidget</extends>
+   <header>gui.windows.bayesian.DBPlot3d</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -16,9 +16,11 @@
 import asyncio
 from typing import Tuple, Dict, List
 
+import numpy as np
 from PyQt5.QtWidgets import QDialog, QListWidgetItem
 
 from gui.dialogs.FrequencyDialog import FrequencyDialog
+from gui.windows.bayesian.DBOutputData import DBOutputData
 from gui.windows.bayesian.ParamSet import ParamSet
 from gui.windows.common.BaseTFPresenter import BaseTFPresenter
 from maths.multiprocessing.MPHelper import MPHelper
@@ -40,7 +42,9 @@ class DBPresenter(BaseTFPresenter):
         self.signals: SignalPairs = self.signals
         self.view: DBWindow = view
 
-        self.paramsets: Dict[Tuple[str, str], ParamSet] = {}
+        # The parameter sets. The key for each param set is the result
+        # of `ParamSet.to_string()`.
+        self.param_sets: Dict[Tuple[str, str], ParamSet] = {}
 
     def calculate(self, calculate_all=True):
         asyncio.ensure_future(self.coro_calculate())
@@ -50,11 +54,78 @@ class DBPresenter(BaseTFPresenter):
             self.mp_handler.stop()
 
         self.mp_handler = MPHelper()
-        await self.mp_handler.coro_bayesian(self.signals,
-                                            self.get_paramsets(),
-                                            self.on_progress_updated)
+        data = await self.mp_handler.coro_bayesian(self.signals,
+                                                   self.get_paramsets(),
+                                                   self.on_progress_updated)
 
         print("Dynamical Bayesian inference completed.")
+
+        for d in data:
+            self.on_bayesian_inference_completed(*d)
+
+        self.plot_bayesian()
+
+    def on_bayesian_inference_completed(self,
+                                        signal_name: str,
+                                        tm,
+                                        p1,
+                                        p2,
+                                        cpl1,
+                                        cpl2,
+                                        cf1,
+                                        cf2,
+                                        mcf1,
+                                        mcf2,
+                                        surr_cpl1,
+                                        surr_cpl2):
+        signal = self.signals.get(signal_name)
+
+        signal.db_data = DBOutputData(tm,
+                                      p1,
+                                      p2,
+                                      cpl1,
+                                      cpl2,
+                                      cf1,
+                                      cf2,
+                                      mcf1,
+                                      mcf2,
+                                      surr_cpl1,
+                                      surr_cpl2)
+
+    def plot_bayesian(self):
+        signal = self.get_selected_signal_pair()[0]
+
+        times = signal.times
+        data: DBOutputData = signal.db_data
+
+        if self.view.is_triple_plot:
+            self.plot_bayesian2d(times, data)
+        else:
+            self.plot_bayesian3d(data)
+
+    def plot_bayesian2d(self, times, data):
+        self.view.db_plot_top.plot(times, data.p1)
+        self.view.db_plot_middle.plot(times, data.p2)
+
+        self.view.db_plot_bottom.plot(data.tm, data.cpl1)
+        self.view.db_plot_bottom.plot(data.tm, data.cpl2)
+        self.view.db_plot_bottom.plot(data.tm, data.surr_cpl1)
+        self.view.db_plot_bottom.plot(data.tm, data.surr_cpl2)
+
+        self.view.db_plot_bottom.set_xrange(times[0], times[-1])
+
+    def plot_bayesian3d(self, data):
+        x1 = np.arange(0, 2 * np.pi, 0.13)
+        y1 = x1
+
+        z1 = data.mcf1
+        z2 = data.mcf2
+
+        x1, y1 = np.meshgrid(x1, y1)
+        x2, y2 = x1, y1
+
+        self.view.db3d_plot_left.plot(x1, y1, z1)
+        self.view.db3d_plot_right.plot(x2, y2, z2)
 
     def load_data(self):
         self.signals = SignalPairs.from_file(self.open_file)
@@ -74,20 +145,20 @@ class DBPresenter(BaseTFPresenter):
         self.view.plot_signal_pair(self.get_selected_signal_pair())
 
     def get_paramset(self, text1, text2):
-        return self.paramsets.get((text1, text2,))
+        return self.param_sets.get((text1, text2,))
 
     def get_paramsets(self) -> List[ParamSet]:
-        return list(self.paramsets.values())
+        return list(self.param_sets.values())
 
     def has_paramset(self, text1, text2):
         return self.get_paramset(text1, text2) is not None
 
     def add_paramset(self, params: ParamSet):
-        self.paramsets[params.to_string()] = params
+        self.param_sets[params.to_string()] = params
 
     def delete_paramset(self, text1: str, text2: str):
         try:
-            del self.paramsets[(text1, text2)]
+            del self.param_sets[(text1, text2)]
         except KeyError:
             pass
 

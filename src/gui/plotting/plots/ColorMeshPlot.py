@@ -21,6 +21,14 @@ from gui.plotting.MatplotlibWidget import MatplotlibWidget
 from maths.num_utils import subset2d, calc_subset_count
 
 
+def colormap():
+    file = resources.get("colours:colormap.csv")
+    colours = np.loadtxt(file, dtype=float, delimiter=',')
+
+    cmap = LinearSegmentedColormap.from_list("colours", colours, N=len(colours), gamma=1.0)
+    return cmap
+
+
 class ColorMeshPlot(MatplotlibWidget):
     """
     Plots a color mesh as a contour plot. Used for
@@ -47,7 +55,7 @@ class ColorMeshPlot(MatplotlibWidget):
 
         self.mesh = self.axes.contourf(mesh1, mesh2, values, 256,
                                        vmin=np.min(finite), vmax=np.max(finite),
-                                       cmap=self.colormap())
+                                       cmap=colormap())
 
         self.apply_scale()
         # self.axes.set_title('STFT Magnitude')
@@ -60,13 +68,6 @@ class ColorMeshPlot(MatplotlibWidget):
         self.axes.plot(times, values, "#00ccff", linewidth=0.8)
         if xlim:
             self.set_xrange(times[0], times[-1])
-
-    def colormap(self):
-        file = resources.get("colours:colormap.csv")
-        colours = np.loadtxt(file, dtype=float, delimiter=',')
-
-        cmap = LinearSegmentedColormap.from_list("colours", colours, N=len(colours), gamma=1.0)
-        return cmap
 
     def colorbar(self):
         """Create the colorbar. Needs to be refactored to avoid breaking alignment with the signal plotting."""

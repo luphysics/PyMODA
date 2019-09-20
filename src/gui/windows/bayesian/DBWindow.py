@@ -41,6 +41,9 @@ class DBWindow(DBViewProperties, BaseTFWindow, SurrogateComponent):
         self.presenter: DBPresenter = self.presenter
         self.presenter.init()
 
+        self.is_triple_plot = False
+        self.on_toggle_plots()
+
     def get_layout_file(self) -> str:
         return resources.get("layout:window_dynamical_bayesian.ui")
 
@@ -50,6 +53,7 @@ class DBWindow(DBViewProperties, BaseTFWindow, SurrogateComponent):
         self.btn_calculate_single.hide()
         self.btn_add_paramset.clicked.connect(self.on_add_paramset_clicked)
         self.btn_delete_paramset.clicked.connect(self.on_delete_paramset_clicked)
+        self.btn_toggle_plots.clicked.connect(self.on_toggle_plots)
 
         self.listwidget_freq_band1.itemClicked.connect(partial(self.on_paramset_selected, 0))
         self.listwidget_freq_band2.itemClicked.connect(partial(self.on_paramset_selected, 1))
@@ -58,6 +62,31 @@ class DBWindow(DBViewProperties, BaseTFWindow, SurrogateComponent):
         plot = self.signal_plot()
         plot.plot(pair[0], clear=True)
         plot.plot(pair[1], clear=False)
+
+    def on_toggle_plots(self):
+        triple_plot = (self.db_plot_top, self.db_plot_middle, self.db_plot_bottom)
+        dual_plot = (self.db3d_plot_left, self.db3d_plot_right)
+
+        if self.is_triple_plot:
+            self.set_visible(triple_plot, False)
+            self.set_visible(dual_plot, True)
+            self.vbox_all_plots.setStretch(1, 0)
+            self.vbox_all_plots.setStretch(2, 7)
+
+        else:
+            self.set_visible(triple_plot, True)
+            self.set_visible(dual_plot, False)
+            self.vbox_all_plots.setStretch(1, 7)
+            self.vbox_all_plots.setStretch(2, 0)
+
+        self.is_triple_plot = not self.is_triple_plot
+
+    def set_visible(self, items, visible: bool):
+        for i in items:
+            if visible:
+                i.show()
+            else:
+                i.hide()
 
     def get_param_set(self) -> ParamSet:
         return ParamSet(
@@ -167,10 +196,10 @@ class DBWindow(DBViewProperties, BaseTFWindow, SurrogateComponent):
     def get_overlap(self) -> Optional[float]:
         return self.lineedit_overlap.text()
 
-    @inty
-    def get_order(self) -> Optional[int]:
-        return self.lineedit_order.text()
-
     @floaty
     def get_confidence_level(self) -> Optional[float]:
         return self.lineedit_confidence_level.text()
+
+    @inty
+    def get_order(self) -> Optional[int]:
+        return self.lineedit_order.text()
