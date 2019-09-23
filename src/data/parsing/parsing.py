@@ -22,7 +22,7 @@ def extension(filename):
 
 def get_lines(filename):
     lines = []
-    with open(filename, "r") as f:
+    with open(filename, mode="r", encoding="utf-8-sig") as f:
         for line in f:
             lines.append(line)
 
