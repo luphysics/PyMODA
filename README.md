@@ -1,9 +1,22 @@
 ## Introduction
 
-PyMODA is a Python implementation of MODA (Multiscale Oscillatory Dynamics Analysis). 
-The user interface is written using PyQt5, and the algorithms are mostly packaged as Python libraries from the existing MATLAB code.
+PyMODA is a Python implementation of MODA (Multiscale Oscillatory Dynamics Analysis). The user interface is written using PyQt5, and the algorithms are mostly packaged as Python libraries from the existing MATLAB code.
 
-PyMODA is cross-platform and does not require any paid software.
+PyMODA is cross-platform and does not require any paid software. To get started, see the [User's Guide](#users-guide) or the [Developer's Guide](#developers-guide).
+
+### Status
+
+PyMODA does not yet offer all the functionality available in MODA. This table shows the current status of different features.
+
+| Window    |   Functionality   |  MATLAB-packaged library | Python implementation |
+| ----      |   ---------       |   ---------   |  ----- |
+| Time-Frequency Analysis      |   Wavelet transform    |  Working | Mostly written |
+| Time-Frequency Analysis      |   Windowed Fourier transform    |  Working   | Partially written |
+| Wavelet Phase Coherence      |   Phase coherence    |  Working  | Surrogates written, needs testing |
+| Ridge Extraction and Filtering     |   Extract ridges    |  Working   | Not implemented |
+| Ridge Extraction and Filtering     |   Bandpass filter    |  Not implemented   | Working |
+| Wavelet Bispectrum Analysis     |   Bispectrum analysis    |  Not implemented   | Not implemented |
+| Dynamical Bayesian Inference     |   Bayesian inference    |  Not implemented   | Mostly written |
 
 # User's Guide
 
@@ -15,7 +28,7 @@ This guide is aimed at users wishing to set up and run PyMODA. If you're interes
 newest version recommended (does not require a licence).
 
 ## Downloading the code
-To download the code, you can click the green "Clone and download" button on the top-right of the repository page, and then "Download zip". Extract the zip to your desired location; for the sake of easy instructions, the folder should be called `PyMODA`.
+To download the code, you can click the green "Clone and download" button on the top-right of the repository page, and then "Download zip". Extract the zip to your desired location; for the sake of easy instructions, the folder should be renamed to `PyMODA`.
 
 ## Preparing to run
 When the code is downloaded and Python is installed, you'll need to install the dependencies. To do this, open a terminal in the `PyMODA` folder and run the command `python packages/install.py`.
@@ -36,7 +49,7 @@ Therefore, it is more efficient to transform multiple signals if possible. Effic
 | WT on 32 signals | i7-6700 (4 cores, 8 threads) | 160s | 43.1s | x3.7 |
 | WT on 32 signals | Ryzen 3700X (8 cores, 16 threads) | 157s | 34.5s | x4.55 |
 
-Note: the i7-6700 was tested on Linux, while the Ryzen 3700X was running Windows. There may be differences in performance.
+Note: the i7-6700 was tested on Linux, while the Ryzen 3700X was running Windows. This causes differences in performance.
 
 # Developer's Guide
 
@@ -89,9 +102,9 @@ PyMODA
 
 ## Naming conventions and code style
 
-PyMODA code should follow the standard guidelines and naming conventions for Python. Code may be formatted with the PyCharm auto-formatter (by default, the shortcut to format a file is `Ctrl`+`Alt`+`L` while the file is selected but no part is highlighted). 
+PyMODA code should follow the standard guidelines and naming conventions for Python. Code may be formatted with the PyCharm auto-formatter (by default, the shortcut to format a file is `Ctrl`+`Alt`+`L`). 
 
-PyMODA consists of 5 main windows, whose names are be abbreviated in the codebase. The abbreviations are as follows:
+PyMODA consists of 5 main windows, whose names are abbreviated in the codebase. The abbreviations are as follows:
 
 | Name  | Abbreviation | Example class |
 | ------------- | ------------- | ------------- |
@@ -112,8 +125,7 @@ Multiprocessing is necessary for several reasons:
 - It allows calculations for multiple signals to be executed simultaneously on different CPU cores,
 greatly improving performance.
 - It allows the circumvention of [a critical issue](https://stackoverflow.com/questions/56758952/matlab-generated-python-packages-conflict-with-pyqt5-on-ubuntu-possible-librar) 
-on Linux caused by conflicting libraries used by PyQt5 and the 
-MATLAB Runtime.
+on Linux caused by conflicting libraries used by PyQt5 and the MATLAB Runtime.
 
 While multithreading could be used to solve the first problem, it would not be ideal for 
 the second due to CPython's infamous Global Interpreter Lock. The third problem can only be solved by 
