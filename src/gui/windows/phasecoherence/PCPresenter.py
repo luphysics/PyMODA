@@ -20,7 +20,7 @@ from PyQt5.QtWidgets import QDialog, QListWidgetItem
 
 from gui.windows.common.BaseTFPresenter import BaseTFPresenter
 from gui.dialogs.FrequencyDialog import FrequencyDialog
-from maths.multiprocessing.MPHelper import MPHelper
+from maths.multiprocessing.MPHandler import MPHandler
 from maths.params.PCParams import PCParams
 from maths.params.TFParams import create
 from maths.signals.SignalPairs import SignalPairs
@@ -60,7 +60,7 @@ class PCPresenter(BaseTFPresenter):
         self.surrogate_count = self.view.get_surr_count()
         self.surrogates_enabled = self.view.get_surr_enabled()
 
-        self.mp_handler = MPHelper()
+        self.mp_handler = MPHandler()
 
         self.view.main_plot().set_log_scale(logarithmic=True)
         self.view.amplitude_plot().set_log_scale(logarithmic=True)

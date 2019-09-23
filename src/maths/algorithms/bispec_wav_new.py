@@ -37,7 +37,7 @@ def calculate(signal1: List, signal2: List , params):
     Calculates the windowed Fourier transform.
 
     IMPORTANT: this function should not be called directly due to issues
-    with the LD_LIBRARY_PATH on Linux. Instead, use `MPHelper` to call it
+    with the LD_LIBRARY_PATH on Linux. Instead, use `MPHandler` to call it
     safely in a new process.
     """
     result = package.bispecWavNew(matlab.double(signal1),

@@ -20,7 +20,7 @@ from PyQt5.QtWidgets import QDialog, QListWidgetItem
 
 from gui.dialogs.FrequencyDialog import FrequencyDialog
 from gui.windows.common.BaseTFPresenter import BaseTFPresenter
-from maths.multiprocessing.MPHelper import MPHelper
+from maths.multiprocessing.MPHandler import MPHandler
 from maths.params.TFParams import TFParams, _wt, _wft, create
 from maths.signals.Signals import Signals
 from maths.signals.TFOutputData import TFOutputData
@@ -50,7 +50,7 @@ class TFPresenter(BaseTFPresenter):
         """Coroutine to calculate all results."""
         self.is_calculating_all = calc_all
 
-        self.mp_handler = MPHelper()
+        self.mp_handler = MPHandler()
         self.mp_handler.stop()
 
         params = self.get_params(all_signals=calc_all)

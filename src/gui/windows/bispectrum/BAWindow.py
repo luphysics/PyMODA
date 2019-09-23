@@ -14,24 +14,30 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from data import resources
+from gui.components.DualSignalComponent import DualSignalComponent
+from gui.components.FreqComponent import FreqComponent
+from gui.components.SurrogateComponent import SurrogateComponent
 from gui.windows.bispectrum.BAPresenter import BAPresenter
 from gui.windows.bispectrum.BAViewProperties import BAViewProperties
 from gui.windows.common.BaseTFWindow import BaseTFWindow
 
 
-class BAWindow(BAViewProperties, BaseTFWindow):
+class BAWindow(BAViewProperties, BaseTFWindow, DualSignalComponent, FreqComponent, SurrogateComponent):
     name = "Wavelet Bispectrum Analysis"
 
     def __init__(self, application):
         BAViewProperties.__init__(self)
         BaseTFWindow.__init__(self, application, BAPresenter(self))
 
+        DualSignalComponent.__init__(self, self.signal_plot())
+        FreqComponent.__init__(self, self.line_fmax, self.line_fmin, self.line_res)
+        SurrogateComponent.__init__(self, self.slider_surrogate, self.line_surrogate)
+
         self.presenter.init()
 
     def init_ui(self):
         super(BAWindow, self).init_ui()
         self.btn_calculate_single.hide()
-
 
     def get_layout_file(self) -> str:
         return resources.get("layout:window_bispectrum_analysis.ui")

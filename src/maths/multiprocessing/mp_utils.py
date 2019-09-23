@@ -57,7 +57,7 @@ def setup_matlab_runtime():
     if is_main_process():
         raise MultiProcessingException("Do not set the LD_LIBRARY_PATH environment variable on the main process; "
                                        "it will break the program on Linux. Instead, call MATLAB code from "
-                                       "another process using Task and Scheduler. See MPHelper for examples"
+                                       "another process using Task and Scheduler. See MPHandler for examples"
                                        "of this.")
     path = matlab_runtime()
     if path:

@@ -42,7 +42,7 @@ from maths.signals.Signals import Signals
 from maths.signals.TimeSeries import TimeSeries
 
 
-class MPHelper:
+class MPHandler:
     """
     A class providing a simple way to perform computations in another
     process.
@@ -164,7 +164,7 @@ class MPHelper:
 
     def stop(self):
         """
-        Stops the tasks in progress. The MPHelper can be reused.
+        Stops the tasks in progress. The MPHandler can be reused.
 
         Removes all items from the lists of processes, queues
         and watchers.

@@ -23,7 +23,7 @@ from gui.dialogs.FrequencyDialog import FrequencyDialog
 from gui.windows.bayesian.DBOutputData import DBOutputData
 from gui.windows.bayesian.ParamSet import ParamSet
 from gui.windows.common.BaseTFPresenter import BaseTFPresenter
-from maths.multiprocessing.MPHelper import MPHelper
+from maths.multiprocessing.MPHandler import MPHandler
 from maths.signals.SignalPairs import SignalPairs
 from maths.signals.TimeSeries import TimeSeries
 
@@ -53,7 +53,7 @@ class DBPresenter(BaseTFPresenter):
         if self.mp_handler:
             self.mp_handler.stop()
 
-        self.mp_handler = MPHelper()
+        self.mp_handler = MPHandler()
         data = await self.mp_handler.coro_bayesian(self.signals,
                                                    self.get_paramsets(),
                                                    self.on_progress_updated)

@@ -36,7 +36,7 @@ def calculate(time_series, params: TFParams):
     Calculates the windowed Fourier transform.
 
     IMPORTANT: this function should not be called directly due to issues
-    with the LD_LIBRARY_PATH on Linux. Instead, use `MPHelper` to call it
+    with the LD_LIBRARY_PATH on Linux. Instead, use `MPHandler` to call it
     safely in a new process.
     """
     signal_matlab = matlab.double([time_series.signal.tolist()])

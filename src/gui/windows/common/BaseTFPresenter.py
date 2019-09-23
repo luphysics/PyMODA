@@ -16,7 +16,7 @@
 from gui.dialogs.ErrorBox import ErrorBox
 from gui.windows.common.BaseTFWindow import BaseTFWindow
 from maths.algorithms.preprocessing import preprocess
-from maths.multiprocessing.MPHelper import MPHelper
+from maths.multiprocessing.MPHandler import MPHandler
 from maths.signals.Signals import Signals
 from maths.signals.TimeSeries import TimeSeries
 from utils import stdout_redirect, errorhandling
@@ -35,7 +35,7 @@ class BaseTFPresenter:
         self.selected_signal_name: str = None
         self.open_file: str = None
         self.freq: float = None
-        self.mp_handler: MPHelper = None
+        self.mp_handler: MPHandler = None
         self.logger: WindowLogger = stdout_redirect.WindowLogger(self.on_log)
 
         errorhandling.subscribe(self.on_error)

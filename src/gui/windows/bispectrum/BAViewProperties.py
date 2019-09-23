@@ -13,6 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from PyQt5.QtWidgets import QLineEdit, QSlider
 
 from gui.windows.ViewProperties import ViewProperties
 
@@ -21,3 +22,5 @@ class BAViewProperties(ViewProperties):
 
     def __init__(self):
         """Define properties introduced by the .ui file."""
+        self.line_surrogate: QLineEdit = None
+        self.slider_surrogate: QSlider = None
