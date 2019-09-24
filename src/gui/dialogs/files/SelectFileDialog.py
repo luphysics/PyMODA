@@ -13,11 +13,13 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import asyncio
+
 from PyQt5 import uic
 from PyQt5.QtCore import QTimer
-from PyQt5.QtWidgets import QDialog, QFileDialog
+from PyQt5.QtWidgets import QDialog, QFileDialog, QComboBox
 
-from utils import args
+from utils import args, settings
 from data import resources
 from gui.BaseUI import BaseUI
 
@@ -30,14 +32,25 @@ class SelectFileDialog(QDialog, BaseUI):
     """
 
     def __init__(self):
-        self.file = None
+        self.file: str = None
+        self.combo_recent: QComboBox = None
+
         super().__init__()
 
     def init_ui(self):
         uic.loadUi(resources.get("layout:dialog_select_file.ui"), self)
         self.setup_drops()
+        self.setup_recent_files()
+
         self.btn_browse.clicked.connect(self.browse_for_file)
+        self.btn_use_recent.clicked.connect(self.use_recent_file)
+
         QTimer.singleShot(500, self.check_args)
+
+    async def coro_get(self) -> str:
+        self.exec()
+        settings.add_recent_file(self.file)
+        return self.get_file()
 
     def check_args(self):
         """
@@ -53,7 +66,7 @@ class SelectFileDialog(QDialog, BaseUI):
         """Sets up the label to accept drag-and-drop."""
         drop_target = self.lbl_drag_drop
         drop_target.setAcceptDrops(True)
-        drop_target.set_drop_callback(self.set_file)
+        drop_target.set_drop_callback(self.on_drop)
 
     def browse_for_file(self):
         """Opens a file browser dialog for selecting a file."""
@@ -65,7 +78,16 @@ class SelectFileDialog(QDialog, BaseUI):
             self.file = filenames[0]
             self.lbl_drag_drop.show_selected_file(self.file)
 
-    def set_file(self, file):
+    def setup_recent_files(self):
+        files = settings.get_recent_files()
+        self.combo_recent.addItems(files)
+
+    def use_recent_file(self):
+        file = self.combo_recent.currentText()
+        self.file = file
+        self.accept()  # Close the dialog.
+
+    def on_drop(self, file: str):
         self.file = file
 
     def get_file(self):

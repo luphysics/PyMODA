@@ -13,6 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import asyncio
 from functools import partial
 from typing import List
 
@@ -51,11 +52,16 @@ class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
         super().update_title(title or self.presenter.get_window_name())
 
     def select_file(self):
-        dialog = SelectFileDialog()
+        asyncio.ensure_future(self.coro_select_file())
 
-        code = dialog.exec()
-        if code == QDialog.Accepted:
-            self.presenter.set_open_file(dialog.get_file())
+    async def coro_select_file(self):
+        # Sleep to prevent disconcerting animation.
+        await asyncio.sleep(0.1)
+
+        file_path = await SelectFileDialog().coro_get()
+
+        if file_path:
+            self.presenter.set_open_file(file_path)
 
     def setup_menu_bar(self):
         menu = self.menubar

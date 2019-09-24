@@ -15,11 +15,10 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from typing import Tuple
 
-from PyQt5.QtWidgets import QDialog, QListWidgetItem
+from PyQt5.QtWidgets import QListWidgetItem
 
 from gui.dialogs.FrequencyDialog import FrequencyDialog
 from gui.windows.common.BaseTFPresenter import BaseTFPresenter
-from gui.windows.phasecoherence.PCPresenter import PCPresenter
 from maths.multiprocessing.MPHandler import MPHandler
 from maths.signals.SignalPairs import SignalPairs
 from maths.signals.TimeSeries import TimeSeries
@@ -45,14 +44,17 @@ class BAPresenter(BaseTFPresenter):
                                             self.view.get_window(),
                                             self.on_bispectrum_completed)
 
-    def load_data(self):
+    async def coro_load_data(self):
         self.signals = SignalPairs.from_file(self.open_file)
+
         if not self.signals.has_frequency():
-            dialog = FrequencyDialog(self.on_freq_changed)
-            code = dialog.exec()
-            if code == QDialog.Accepted:
-                self.set_frequency(self.freq)
+            freq = await FrequencyDialog().coro_get()
+
+            if freq:
+                self.set_frequency(freq)
                 self.on_data_loaded()
+            else:
+                raise Exception("Frequency was None. Perhaps it was mistyped?")
 
     def on_data_loaded(self):
         self.view.update_signal_listview(self.signals.get_pair_names())

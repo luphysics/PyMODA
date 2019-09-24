@@ -22,8 +22,11 @@ def extension(filename):
 
 def get_lines(filename):
     lines = []
-    with open(filename, mode="r", encoding="utf-8-sig") as f:
-        for line in f:
-            lines.append(line)
+    try:
+        with open(filename, mode="r", encoding="utf-8-sig") as f:
+            for line in f:
+                lines.append(line)
+    except FileNotFoundError:
+        print(f"File not found at path: '{filename}'")
 
     return lines

@@ -5,6 +5,7 @@ cache/
 **/.vscode/
 .idea/PyMODA.iml
 .idea/misc.xml
+*.conf
 
 # Created by https://www.gitignore.io/api/pycharm,code,python
 # Edit at https://www.gitignore.io/?templates=pycharm,code,python

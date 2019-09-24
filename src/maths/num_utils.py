@@ -54,6 +54,11 @@ def int_or_none(var: Any, round_int=False) -> Optional[int]:
     return result
 
 
+def float_to_str(var: float) -> str:
+    """Returns a string representation of a float, without trailing zeros."""
+    return f"{var:g}"
+
+
 def isfloat(var: Any) -> bool:
     """
     Returns whether a variable can be represented as a float.

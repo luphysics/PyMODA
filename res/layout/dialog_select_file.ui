@@ -86,7 +86,7 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="10,20">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="10,20,0">
      <property name="sizeConstraint">
       <enum>QLayout::SetFixedSize</enum>
      </property>
@@ -101,7 +101,14 @@
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="comboBox"/>
+      <widget class="QComboBox" name="combo_recent"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_use_recent">
+       <property name="text">
+        <string>Use</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

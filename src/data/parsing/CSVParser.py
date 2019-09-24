@@ -32,6 +32,9 @@ class CSVParser(BaseParser):
         """
         lines = parsing.get_lines(self.filename)
 
+        if not lines:
+            return [[]]
+
         # If each line has more values than the number of lines,
         # then each line corresponds to a separate signal.
         row_wise = len(lines) < len(lines[0].split(","))

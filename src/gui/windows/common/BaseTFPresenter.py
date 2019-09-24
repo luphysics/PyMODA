@@ -13,6 +13,8 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import asyncio
+
 from gui.dialogs.ErrorBox import ErrorBox
 from gui.windows.common.BaseTFWindow import BaseTFWindow
 from maths.algorithms.preprocessing import preprocess
@@ -114,6 +116,9 @@ class BaseTFPresenter:
         self.load_data()
 
     def load_data(self):
+        asyncio.ensure_future(self.coro_load_data())
+
+    async def coro_load_data(self):
         pass
 
     def get_window_name(self) -> str:

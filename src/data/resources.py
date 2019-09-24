@@ -51,8 +51,11 @@ def path_from_file_string(str) -> str:
     retrieved from a drag-and-drop event.
     """
     result = str.replace("file://", "")
-    if ":" == result[2]:  # This is a Windows path; remove initial forward-slash.
-        result = result[1:]
+    try:
+        if ":" == result[2]:  # This is a Windows path; remove initial forward-slash.
+            result = result[1:]
+    except IndexError:
+        result = ""
     return result
 
 

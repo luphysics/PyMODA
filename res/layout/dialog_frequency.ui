@@ -42,6 +42,13 @@
      <item>
       <widget class="QComboBox" name="combo_recent"/>
      </item>
+     <item>
+      <widget class="QPushButton" name="btn_use_recent">
+       <property name="text">
+        <string>Use</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>

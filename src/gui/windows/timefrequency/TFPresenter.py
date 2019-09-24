@@ -186,18 +186,14 @@ class TFPresenter(BaseTFPresenter):
             transform=self.view.get_transform_type(),
         )
 
-    def load_data(self):
-        """
-        Loads the time-series data from the currently
-        selected file, and allows the frequency to be set
-        via a dialog.
-        """
+    async def coro_load_data(self):
         self.signals = Signals.from_file(self.open_file)
+
         if not self.signals.has_frequency():
-            dialog = FrequencyDialog(self.on_freq_changed)
-            code = dialog.exec()
-            if code == QDialog.Accepted:
-                self.set_frequency(self.freq)
+            freq = await FrequencyDialog().coro_get()
+
+            if freq:
+                self.set_frequency(freq)
                 self.on_data_loaded()
 
     def plot_signal(self):

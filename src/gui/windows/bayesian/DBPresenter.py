@@ -127,15 +127,17 @@ class DBPresenter(BaseTFPresenter):
         self.view.db3d_plot_left.plot(x1, y1, z1)
         self.view.db3d_plot_right.plot(x2, y2, z2)
 
-    def load_data(self):
+    async def coro_load_data(self):
         self.signals = SignalPairs.from_file(self.open_file)
 
         if not self.signals.has_frequency():
-            dialog = FrequencyDialog(self.on_freq_changed)
-            code = dialog.exec()
-            if code == QDialog.Accepted:
-                self.set_frequency(self.freq)
+            freq = await FrequencyDialog().coro_get()
+
+            if freq:
+                self.set_frequency(freq)
                 self.on_data_loaded()
+            else:
+                raise Exception("Frequency was None. Perhaps it was mistyped?")
 
     def on_data_loaded(self):
         self.view.update_signal_listview(self.signals.get_pair_names())

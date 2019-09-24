@@ -29,8 +29,10 @@ class DBPlot3d(MatplotlibWidget):
         self.axes.plot_surface(x, y, z, cmap=colormap())
         self.axes.autoscale(False)
 
-        self.on_plot_complete()
+        self.axes.invert_xaxis()
         self.set_mouse_zoom_enabled(False)
+
+        self.on_plot_complete()
 
     def is_3d(self) -> bool:
         return True
