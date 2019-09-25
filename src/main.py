@@ -16,11 +16,6 @@
 
 import sys
 
-# Important: required for PyInstaller until Numpy 1.17.1 is released.
-import numpy.random.common
-import numpy.random.bounded_integers
-import numpy.random.entropy
-
 from utils import errorhandling, stdout_redirect, args, cache
 from gui.Application import Application
 
