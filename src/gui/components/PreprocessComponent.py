@@ -13,27 +13,16 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from PyQt5.QtWidgets import QPushButton
-
-from PyQt5.QtWidgets import QLineEdit, QListWidget, QMenuBar
-
-from gui.windows.ViewProperties import ViewProperties
 from gui.plotting.plots.PreprocessPlot import PreprocessPlot
 
 
-class BaseTFViewProperties(ViewProperties):
+class PreprocessComponent:
+    """
+    Component which handles the plot of the preprocessed signal on a PreprocessPlot.
+    """
 
-    def __init__(self):
-        self.btn_calculate_single: QPushButton = None
-        self.btn_calculate_all: QPushButton = None
-        
-        # The menu bar at the top of the window.
-        self.menubar: QMenuBar = None
+    def __init__(self, preproc_plot: PreprocessPlot):
+        self._preproc_plot = preproc_plot
 
-        # The QLineEdits for frequencies.
-        self.line_fmin: QLineEdit = None
-        self.line_fmax: QLineEdit = None
-        self.line_res: QLineEdit = None
-
-        # The QListWidget which contains the names of different signals.
-        self.list_select_data: QListWidget = None
+    def plot_preprocessed_signal(self, times, signal, preproc_signal):
+        self._preproc_plot.plot(times, signal, preproc_signal)

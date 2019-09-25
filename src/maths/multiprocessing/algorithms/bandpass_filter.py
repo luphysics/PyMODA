@@ -13,27 +13,25 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from PyQt5.QtWidgets import QPushButton
 
-from PyQt5.QtWidgets import QLineEdit, QListWidget, QMenuBar
+import numpy as np
+from scipy.signal import hilbert
 
-from gui.windows.ViewProperties import ViewProperties
-from gui.plotting.plots.PreprocessPlot import PreprocessPlot
+from maths.algorithms.loop_butter import loop_butter
+from maths.signals.TimeSeries import TimeSeries
 
 
-class BaseTFViewProperties(ViewProperties):
+def _bandpass_filter(queue, time_series: TimeSeries, fmin, fmax, fs):
+    bands, _ = loop_butter(time_series.signal, fmin, fmax, fs)
+    h = hilbert(bands)
 
-    def __init__(self):
-        self.btn_calculate_single: QPushButton = None
-        self.btn_calculate_all: QPushButton = None
-        
-        # The menu bar at the top of the window.
-        self.menubar: QMenuBar = None
+    phase = np.angle(h)
+    amp = np.abs(h)
 
-        # The QLineEdits for frequencies.
-        self.line_fmin: QLineEdit = None
-        self.line_fmax: QLineEdit = None
-        self.line_res: QLineEdit = None
-
-        # The QListWidget which contains the names of different signals.
-        self.list_select_data: QListWidget = None
+    queue.put((
+        time_series.name,
+        bands,
+        phase,
+        amp,
+        (fmin, fmax),
+    ))

@@ -48,8 +48,8 @@ class DBWindow(DBViewProperties, BaseTFWindow, SurrogateComponent, DualSignalCom
     def get_layout_file(self) -> str:
         return resources.get("layout:window_dynamical_bayesian.ui")
 
-    def init_ui(self):
-        super().init_ui()
+    def setup_ui(self):
+        super().setup_ui()
 
         self.btn_calculate_single.hide()
         self.btn_add_paramset.clicked.connect(self.on_add_paramset_clicked)

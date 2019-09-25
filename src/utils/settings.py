@@ -17,6 +17,10 @@ from typing import List
 
 from easysettings import EasySettings
 
+"""
+Handles saving values to a file.
+"""
+
 _settings = EasySettings("settings.conf")
 
 _key_recent_files = "recent_files"

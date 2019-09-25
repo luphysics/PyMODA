@@ -35,8 +35,8 @@ class BAWindow(BAViewProperties, BaseTFWindow, DualSignalComponent, FreqComponen
 
         self.presenter.init()
 
-    def init_ui(self):
-        super(BAWindow, self).init_ui()
+    def setup_ui(self):
+        super(BAWindow, self).setup_ui()
         self.btn_calculate_single.hide()
 
     def get_layout_file(self) -> str:

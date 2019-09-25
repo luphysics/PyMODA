@@ -13,6 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import asyncio
 from typing import Tuple
 
 from PyQt5.QtWidgets import QListWidgetItem
@@ -33,6 +34,9 @@ class BAPresenter(BaseTFPresenter):
         self.view: BAWindow = view
 
     def calculate(self, calculate_all: bool):
+        asyncio.ensure_future(self.coro_calculate())
+
+    async def coro_calculate(self):
         if self.mp_handler:
             self.mp_handler.stop()
 
@@ -40,9 +44,13 @@ class BAPresenter(BaseTFPresenter):
         self.invalidate_data()
 
         self.mp_handler = MPHandler()
-        self.mp_handler.bispectrum_analysis(self.signals,
-                                            self.view.get_window(),
-                                            self.on_bispectrum_completed)
+        data = await self.mp_handler.coro_bispectrum_analysis(self.signals,
+                                                              self.on_progress_updated)
+
+        for d in data:
+            self.on_bispectrum_completed(*d)
+
+        # TODO: plot the result.
 
     async def coro_load_data(self):
         self.signals = SignalPairs.from_file(self.open_file)
@@ -79,5 +87,6 @@ class BAPresenter(BaseTFPresenter):
     def get_selected_signal_pair(self) -> Tuple[TimeSeries, TimeSeries]:
         return self.signals.get_pair_by_name(self.selected_signal_name)
 
-    def on_bispectrum_completed(self):
+    def on_bispectrum_completed(self, *args):
+        # TODO: implement with appropriate parameters.
         pass

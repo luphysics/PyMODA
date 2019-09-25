@@ -45,8 +45,8 @@ class REWindow(REViewProperties, TFWindow):
         REViewProperties.__init__(self)
         TFWindow.__init__(self, parent, REPresenter(self))
 
-    def init_ui(self):
-        super(REWindow, self).init_ui()
+    def setup_ui(self):
+        super(REWindow, self).setup_ui()
 
         self.setup_btn_mark_region()
         self.setup_btn_add_marked_region()

@@ -35,8 +35,8 @@ class ColorMeshPlot(MatplotlibWidget):
     wavelet transforms, phase coherence, etc.
     """
 
-    def init_ui(self):
-        super().init_ui()
+    def setup_ui(self):
+        super().setup_ui()
 
     def plot(self, times, values, freq):
         self.clear()

@@ -108,7 +108,7 @@ class BaseTFPresenter:
         """Sets the frequency of the time-series."""
         self.signals.set_frequency(freq)
 
-    def set_open_file(self, file: str):
+    def on_file_selected(self, file: str):
         """Sets the name of the data file in use, and loads its data."""
         self.open_file = file
         print(f"Opening {self.open_file}...")
@@ -155,11 +155,18 @@ class BaseTFPresenter:
 
     def plot_preprocessed_signal(self):
         """Plots the preprocessed version of the signal."""
+        asyncio.ensure_future(self.coro_plot_preprocessed_signal())
+
+    async def coro_plot_preprocessed_signal(self):
+        """
+        Coroutine to preprocess the signal and plot the result.
+        """
         sig = self.get_selected_signal()
 
         fmin = self.view.get_fmin()
         fmax = self.view.get_fmax()
 
         p = preprocess(sig.signal, sig.frequency, fmin, fmax)
-        self.view.plot_preproc.clear()
-        self.view.plot_preproc.plot(sig.times, sig.signal, p)
+        self.view.plot_preprocessed_signal(sig.times, sig.signal, p)
+
+        # TODO: use MPHandler to preprocess on another process.

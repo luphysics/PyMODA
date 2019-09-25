@@ -37,7 +37,7 @@ class FrequencyDialog(QDialog, BaseUI):
         super(FrequencyDialog, self).__init__()
         self.frequency: float = None
 
-    def init_ui(self):
+    def setup_ui(self):
         uic.loadUi(resources.get("layout:dialog_frequency.ui"), self)
 
         self.edit_freq.textChanged.connect(self.on_freq_changed)

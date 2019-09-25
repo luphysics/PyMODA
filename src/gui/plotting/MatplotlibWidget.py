@@ -63,8 +63,8 @@ class MatplotlibWidget(PlotWidget):
 
         super(MatplotlibWidget, self).__init__(parent)
 
-    def init_ui(self):
-        super().init_ui()
+    def setup_ui(self):
+        super().setup_ui()
 
         self.canvas = FigureCanvas(Figure())
         self.init_callbacks()

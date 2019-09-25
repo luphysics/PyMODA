@@ -19,15 +19,20 @@ from PyQt5 import QtGui
 from PyQt5.QtGui import QWindow
 
 from data import resources
+from gui.components.PreprocessComponent import PreprocessComponent
 from gui.components.SingleSignalComponent import SingleSignalComponent
 from gui.windows.common.BaseTFWindow import BaseTFWindow
 from gui.components.FreqComponent import FreqComponent
 from gui.windows.timefrequency.TFPresenter import TFPresenter
 from gui.windows.timefrequency.TFViewProperties import TFViewProperties
-from utils.decorators import floaty
+from utils.decorators import floaty, deprecated
 
 
-class TFWindow(TFViewProperties, BaseTFWindow, FreqComponent, SingleSignalComponent):
+class TFWindow(TFViewProperties,
+               PreprocessComponent,
+               BaseTFWindow,
+               FreqComponent,
+               SingleSignalComponent):
     """
     The time-frequency window. This class is the "View" in MVP,
     meaning that it should defer responsibility for tasks to the
@@ -47,11 +52,12 @@ class TFWindow(TFViewProperties, BaseTFWindow, FreqComponent, SingleSignalCompon
 
         FreqComponent.__init__(self, self.line_fmax, self.line_fmin, self.line_res)
         SingleSignalComponent.__init__(self, self.signal_plot())
+        PreprocessComponent.__init__(self, self.plot_preproc)
 
         self.presenter.init()
 
-    def init_ui(self):
-        super().init_ui()
+    def setup_ui(self):
+        super().setup_ui()
         self.setup_radio_plot()
         self.setup_radio_transform()
         self.setup_radio_stats_avg()
@@ -70,6 +76,7 @@ class TFWindow(TFViewProperties, BaseTFWindow, FreqComponent, SingleSignalCompon
         self.presenter.on_close()
         super().closeEvent(e)
 
+    @deprecated
     def get_window(self) -> QWindow:
         return self
 

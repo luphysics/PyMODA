@@ -55,21 +55,36 @@ class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
         asyncio.ensure_future(self.coro_select_file())
 
     async def coro_select_file(self):
-        # Sleep to prevent disconcerting animation.
+        """
+        Prompts the user to select a file by opening a dialog. Suspends until
+        the user has closed the dialog. If the user does not select a file,
+        the window is unaffected.
+        """
+        # Sleep to prevent disconcerting mix of animations caused by the dialog opening
+        # immediately after the window.
         await asyncio.sleep(0.1)
 
         file_path = await SelectFileDialog().coro_get()
-
         if file_path:
-            self.presenter.set_open_file(file_path)
+            self.presenter.on_file_selected(file_path)
+
+    def plot_preprocessed_signal(self, times, signal, preproc_signal):
+        """
+        Does nothing by default. Will be overridden by the PreprocessComponent for
+        windows which need it.
+        """
+        pass
 
     def setup_menu_bar(self):
+        """
+        Sets up the toolbar at the top of the window.
+        """
         menu = self.menubar
         file = menu.addMenu("File")
         file.addAction("Load data file")
         file.triggered.connect(self.select_file)
 
-    def init_ui(self):
+    def setup_ui(self):
         uic.loadUi(self.get_layout_file(), self)
         self.update_title()
         self.setup_menu_bar()
@@ -94,12 +109,14 @@ class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
 
     def on_plot_type_toggled(self, ampl_selected):
         """
-        Triggered when plotting type is changed from amplitude to power, or vice versa.
+        Called when the plot type is changed from amplitude to power, or vice versa.
+
         :param ampl_selected: whether the plotting type is amplitude, not power
         """
         self.presenter.set_plot_type(ampl_selected)
 
-    def progress_message(self, current=0, total=0):
+    @staticmethod
+    def progress_message(current=0, total=0):
         """Gets the text to display under the progress bar."""
         if current < total:
             return f"Completed task {current} of {total}."
@@ -158,6 +175,10 @@ class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
         return self.radio_preproc_on.isChecked()
 
     def on_calculate_started(self):
+        """
+        Called when a calculation starts. Enables progress bars
+        and sets up cancel button.
+        """
         self.main_plot().set_in_progress(True)
         self.amplitude_plot().clear()
         self.amplitude_plot().set_in_progress(True)
@@ -172,6 +193,10 @@ class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
         btn.clicked.connect(self.presenter.cancel_calculate)
 
     def on_calculate_stopped(self):
+        """
+        Called when a calculation stops. Disables progress bars
+        and resets cancel button.
+        """
         self.main_plot().set_in_progress(False)
         self.amplitude_plot().set_in_progress(False)
         btn = self.btn_calculate_all

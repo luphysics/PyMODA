@@ -27,7 +27,7 @@ class PyQtGraphWidget(PlotWidget):
     A widget which enables plotting via PyQtGraph.
     """
 
-    def init_ui(self):
+    def setup_ui(self):
         self.layout = QVBoxLayout(self)
 
         self.plot_widget = GLViewWidget()

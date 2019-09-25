@@ -16,11 +16,11 @@
 from typing import Tuple
 
 import numpy as np
-from nptyping import Array
+from numpy import ndarray
 from scipy.signal import filtfilt, butter
 
 
-def loop_butter(signal_in: Array, fmin: float, fmax: float, fs: float) -> Tuple[Array, int]:
+def loop_butter(signal_in: ndarray, fmin: float, fmax: float, fs: float) -> Tuple[ndarray, int]:
     max_out = np.max(signal_in)
     optimal_order = 1
 
@@ -37,10 +37,14 @@ def loop_butter(signal_in: Array, fmin: float, fmax: float, fs: float) -> Tuple[
     return sig_out, optimal_order
 
 
-def bandpass_butter(c: Array, n: int, flp: float, fhi: float, fs: float) -> Array:
+def bandpass_butter(c: ndarray, n: int, flp: float, fhi: float, fs: float) -> ndarray:
     fnq = fs / 2
 
     Wn = np.asarray([flp / fnq, fhi / fnq])
     b, a = butter(n, Wn, btype="bandpass")[:2]
 
+    # Warning: this does not seem consistent with Matlab's filtfilt.
+    #
+    # Note: the extra parameters such as `padtype` have been added because these are the default values
+    # used in the Matlab implementation.
     return filtfilt(b, a, c, padtype="odd", padlen=3 * (max(len(b), len(a)) - 1))

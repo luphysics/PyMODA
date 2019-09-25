@@ -19,7 +19,7 @@ import numpy as np
 def preprocess(sig: np.ndarray, fs: float, fmin: float, fmax: float) -> np.ndarray:
     L = len(sig)
 
-    # Detrending
+    # De-trending.
     X = np.arange(1, len(sig) + 1).transpose() / fs
     XM = np.ones((len(X), 4,), dtype=np.float64)
 
@@ -30,7 +30,7 @@ def preprocess(sig: np.ndarray, fs: float, fmin: float, fmax: float) -> np.ndarr
     sig = sig.reshape(len(sig), 1)
     new_sig = sig - XM @ ((np.linalg.pinv(XM)) @ sig)
 
-    # Filtering
+    # Filtering.
     fx = np.fft.fft(new_sig, axis=0)
     Nq = np.ceil((L + 1) / 2)
 

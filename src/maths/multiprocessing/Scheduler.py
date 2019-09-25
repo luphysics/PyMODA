@@ -121,16 +121,17 @@ class Scheduler(List[Task]):
             self.on_all_tasks_completed()
 
     async def coro_run(self) -> List[tuple]:
-        """Run with coroutines."""
+        """
+        Runs the tasks with coroutines. Returns a list containing
+        the output of each task, after all tasks are complete.
+        """
         self.start()
 
         while not self.stopped and not self.all_tasks_finished():
             await asyncio.sleep(self.delay_seconds)
             self.coro_update()
 
-        if self.all_tasks_finished():
-            print(f"Time taken (coroutines): {time.time() - self.time_start:.1f} seconds.")
-
+        print(f"Time taken (coroutines): {time.time() - self.time_start:.1f} seconds.")
         return self.output
 
     def coro_update(self):

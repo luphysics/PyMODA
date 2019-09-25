@@ -47,8 +47,8 @@ class PCWindow(PCViewProperties, BaseTFWindow, SurrogateComponent, FreqComponent
 
         self.presenter.init()
 
-    def init_ui(self):
-        super().init_ui()
+    def setup_ui(self):
+        super().setup_ui()
         self.setup_surr_method()
         self.setup_surr_type()
         self.setup_analysis_type()

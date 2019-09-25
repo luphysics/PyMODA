@@ -37,7 +37,7 @@ class SelectFileDialog(QDialog, BaseUI):
 
         super().__init__()
 
-    def init_ui(self):
+    def setup_ui(self):
         uic.loadUi(resources.get("layout:dialog_select_file.ui"), self)
         self.setup_drops()
         self.setup_recent_files()

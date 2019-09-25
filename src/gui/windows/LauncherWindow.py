@@ -29,7 +29,7 @@ class LauncherWindow(CentredWindow):
     types of common.
     """
 
-    def init_ui(self):
+    def setup_ui(self):
         uic.loadUi(get("layout:window_launcher.ui"), self)
         self.load_banner_images()
 
