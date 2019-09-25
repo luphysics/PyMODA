@@ -18,8 +18,7 @@ from typing import Callable, Union, Tuple, Optional
 from maths.num_utils import float_or_none, int_or_none
 
 
-def floaty(func: Callable[[], Union[str, Tuple[str, ...]]]) \
-        -> Callable[[], Union[Optional[float], Tuple[Optional[float], ...]]]:
+def floaty(func):
     """
     This decorator will ensure that a function returning one or more
     strings returns its values as floats or None.
@@ -44,8 +43,7 @@ def floaty(func: Callable[[], Union[str, Tuple[str, ...]]]) \
     return wrapper
 
 
-def inty(func: Callable[[], Union[str, Tuple[str, ...]]]) \
-        -> Callable[[], Union[Optional[int], Tuple[Optional[int], ...]]]:
+def inty(func):
     """
     This decorator will ensure that a function returning one or more
     strings returns its values as ints or None.
