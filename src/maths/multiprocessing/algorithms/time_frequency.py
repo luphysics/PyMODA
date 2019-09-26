@@ -17,16 +17,18 @@
 import time
 
 import numpy as np
+from multiprocess import Queue
 
 from maths.num_utils import matlab_to_numpy
 from maths.params.TFParams import TFParams, _wft
 from maths.signals.TimeSeries import TimeSeries
 
 
-def _time_frequency(queue, time_series: TimeSeries, params: TFParams):
+def _time_frequency(queue: Queue, time_series: TimeSeries, params: TFParams):
     """Should not be called in the main process."""
     # Don't move the import statements.
-    from maths.algorithms import wt, wft
+    from maths.algorithms.matlabwrappers import wft
+    from maths.algorithms.matlabwrappers import wt
 
     if params.transform == _wft:
         func = wft

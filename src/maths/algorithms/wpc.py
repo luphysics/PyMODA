@@ -15,7 +15,9 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 """
-Wavelet phase coherence algorithm.
+Translation of the wavelet phase coherence algorithm from MODA.
+
+STATUS: Finished, apparently working.
 """
 import numpy as np
 

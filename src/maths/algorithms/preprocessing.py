@@ -15,6 +15,12 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import numpy as np
 
+"""
+Translation of the algorithm from MODA that performs preprocessing on a signal.
+
+STATUS: Apparently working.
+"""
+
 
 def preprocess(sig: np.ndarray, fs: float, fmin: float, fmax: float) -> np.ndarray:
     L = len(sig)

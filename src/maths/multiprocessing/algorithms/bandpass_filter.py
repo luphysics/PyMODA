@@ -19,9 +19,10 @@ from scipy.signal import hilbert
 
 from maths.algorithms.loop_butter import loop_butter
 from maths.signals.TimeSeries import TimeSeries
+from multiprocess import Queue, Process
 
 
-def _bandpass_filter(queue, time_series: TimeSeries, fmin, fmax, fs):
+def _bandpass_filter(queue: Queue, time_series: TimeSeries, fmin, fmax, fs):
     bands, _ = loop_butter(time_series.signal, fmin, fmax, fs)
     h = hilbert(bands)
 

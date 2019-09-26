@@ -15,6 +15,7 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import numpy as np
+from multiprocess import Queue
 
 from maths.multiprocessing import mp_utils
 from maths.num_utils import matlab_to_numpy
@@ -22,7 +23,7 @@ from maths.params.REParams import REParams
 from maths.signals.TimeSeries import TimeSeries
 
 
-def _ridge_extraction(queue, time_series: TimeSeries, params: REParams):
+def _ridge_extraction(queue: Queue, time_series: TimeSeries, params: REParams):
     mp_utils.setup_matlab_runtime()
     import ridge_extraction
     import matlab

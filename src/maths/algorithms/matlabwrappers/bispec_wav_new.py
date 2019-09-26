@@ -15,37 +15,35 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 """
-DO NOT import this module in the main process, or it will break Linux support
+Do not import this module in the main process, or it will break Linux support
 due to issues with the LD_LIBRARY_PATH.
 """
-import maths.multiprocessing.mp_utils
-from maths.params.REParams import REParams
-from utils import args
+from typing import List
+
+from maths.multiprocessing import mp_utils
+
 
 # This must be above the matlab imports.
-maths.multiprocessing.mp_utils.setup_matlab_runtime()
+mp_utils.setup_matlab_runtime()
 
-import ecurve
+import bispecWavNew
 import matlab
 
-package = ecurve.initialize()
+package = bispecWavNew.initialize()
 
 
-def calculate(freq, fs, params: REParams) -> tuple:
+def calculate(signal1: List, signal2: List , params):
     """
-    Extracts ridge curve from wavelet transform or windowed Fourier transform.
+    Calculates the windowed Fourier transform.
 
     IMPORTANT: this function should not be called directly due to issues
     with the LD_LIBRARY_PATH on Linux. Instead, use `MPHandler` to call it
     safely in a new process.
     """
+    result = package.bispecWavNew(matlab.double(signal1),
+                                  matlab.double(signal2),
+                                  params.fs,
+                                  params.get(),
+                                  nargout=5)
 
-    tfsupp = package.ecurve(
-        matlab.double([1]),  # Pass nothing; data is saved in cache.
-        matlab.double([1]),  # Pass nothing; data is saved in cache.
-        matlab.double([fs]),
-        params.get(),
-        nargout=1
-    )
-
-    return tfsupp
+    return result

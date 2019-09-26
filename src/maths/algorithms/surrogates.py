@@ -21,6 +21,12 @@ from numpy.random import permutation as randperm
 
 from maths.signals.TimeSeries import TimeSeries
 
+"""
+Translation of `surrcalc` from MODA.
+
+STATUS: Some surrogate types implemented and may be working. 
+"""
+
 _RP = "RP"
 _FT = "FT"
 _AAFT = "AAFT"

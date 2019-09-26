@@ -25,7 +25,7 @@ import matplotlib.pyplot as plt
 from maths.algorithms.matlab_utils import *
 
 """
-An attempt to convert the Matlab WFT algorithm into Python. Not in use.
+An attempt to convert the Matlab WT algorithm into Python. Not in use.
 """
 
 fwtmax = "fwtmax"

@@ -18,32 +18,35 @@
 DO NOT import this module in the main process, or it will break Linux support
 due to issues with the LD_LIBRARY_PATH.
 """
-from typing import List
-
+import maths.multiprocessing.mp_utils
 from maths.multiprocessing import mp_utils
-
+from maths.params.REParams import REParams
+from utils import args
 
 # This must be above the matlab imports.
 mp_utils.setup_matlab_runtime()
 
-import bispecWavNew
+import rectfr
 import matlab
 
-package = bispecWavNew.initialize()
+package = rectfr.initialize()
 
 
-def calculate(signal1: List, signal2: List , params):
+def calculate(tfsupp, tfr, freq, wopt, params: REParams) -> tuple:
     """
-    Calculates the windowed Fourier transform.
+    Extracts ridge curve from wavelet transform or windowed Fourier transform.
 
     IMPORTANT: this function should not be called directly due to issues
     with the LD_LIBRARY_PATH on Linux. Instead, use `MPHandler` to call it
     safely in a new process.
     """
-    result = package.bispecWavNew(matlab.double(signal1),
-                                  matlab.double(signal2),
-                                  params.fs,
-                                  params.get(),
-                                  nargout=5)
 
-    return result
+    iamp, iphi, ifreq, rtfsupp = package.rectfr(
+        tfsupp,
+        matlab.double(tfr.tolist()),  # Pass nothing; data is saved in cache.
+        matlab.double(freq.tolist()),  # Pass nothing; data is saved in cache.
+        params.get(),
+        "direct",
+    )
+
+    return iamp, iphi, ifreq

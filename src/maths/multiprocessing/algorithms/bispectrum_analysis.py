@@ -14,17 +14,15 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import numpy as np
 from multiprocess import Queue
 
+from maths.algorithms.matlab_utils import *
 from maths.params.BAParams import BAParams
 from maths.signals.SignalPairs import SignalPairs
 
-from maths.algorithms.matlab_utils import *
-
 
 def _bispectrum_analysis(queue: Queue, params: BAParams):
-    from maths.algorithms import bispec_wav_new
+    from maths.algorithms.matlabwrappers import bispec_wav_new
 
     signals: SignalPairs = params.signals
     sig1, sig2 = signals.get_pair_by_index(0)

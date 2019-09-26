@@ -15,37 +15,38 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 """
-DO NOT import this module in the main process, or it will break Linux support
+Do not import this module in the main process, or it will break Linux support
 due to issues with the LD_LIBRARY_PATH.
 """
 import maths.multiprocessing.mp_utils
 from maths.multiprocessing import mp_utils
-from maths.signals.TimeSeries import TimeSeries
+from maths.params.REParams import REParams
 from utils import args
 
-# This must be above the WT and matlab imports.
+# This must be above the matlab imports.
 mp_utils.setup_matlab_runtime()
 
-import WT
+import ecurve
 import matlab
 
-package = WT.initialize()
+package = ecurve.initialize()
 
 
-def calculate(signal, params):
+def calculate(freq, fs, params: REParams) -> tuple:
     """
-    Calculates the windowed Fourier transform.
+    Extracts ridge curve from wavelet transform or windowed Fourier transform.
 
     IMPORTANT: this function should not be called directly due to issues
     with the LD_LIBRARY_PATH on Linux. Instead, use `MPHandler` to call it
     safely in a new process.
     """
-    if isinstance(signal, TimeSeries):
-        signal = signal.signal
 
-    wt, frequency = package.wt(matlab.double([signal.tolist()]),
-                               params.fs,
-                               params.get(),
-                               nargout=2)
+    tfsupp = package.ecurve(
+        matlab.double([1]),  # Pass nothing; data is saved in cache.
+        matlab.double([1]),  # Pass nothing; data is saved in cache.
+        matlab.double([fs]),
+        params.get(),
+        nargout=1
+    )
 
-    return wt, frequency
+    return tfsupp

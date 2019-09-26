@@ -25,7 +25,9 @@ import matplotlib.pyplot as plt
 from maths.algorithms.matlab_utils import *
 
 """
-An attempt to convert the Matlab WFT algorithm into Python. Not in use.
+Translation of WFT into Python.
+
+STATUS: not finished, many errors. `wavelet_transform` is more complete.
 """
 
 fwtmax = "fwtmax"

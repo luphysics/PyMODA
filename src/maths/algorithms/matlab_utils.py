@@ -21,8 +21,11 @@ import scipy.integrate
 import scipy.interpolate
 import scipy.optimize
 
+from utils.decorators import deprecated
+
 """
-Contains Python replicas of oft-used Matlab functions.
+Contains useful Python replicas of oft-used Matlab functions. 
+Import with wildcard to make all available.
 """
 
 
@@ -130,7 +133,14 @@ NAN = np.NaN
 linspace = np.linspace
 
 
+@deprecated
 def find(arr, condition):
+    """
+    This shouldn't be used. numpy has built-in syntax for find. Examples for some array `x`:
+    >>> indices = (x < 5).nonzero()
+    >>> indices = np.nonzero(x < 5)
+    >>> indices = np.nonzero((x < 5) & (x > 1)) # The inner brackets are important!
+    """
     l = len(arr)
     indices = []
     for i in range(l):

@@ -19,6 +19,11 @@ import numpy as np
 from numpy import ndarray
 from scipy.signal import filtfilt, butter
 
+"""
+Translation of MODA's `loop_butter` algorithm into Python.
+
+STATUS: Finished, not fully working. See usage of `filtfilt` below.
+"""
 
 def loop_butter(signal_in: ndarray, fmin: float, fmax: float, fs: float) -> Tuple[ndarray, int]:
     max_out = np.max(signal_in)

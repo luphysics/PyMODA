@@ -15,23 +15,24 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 """
-DO NOT import this module in the main process, or it will break Linux support
+Do not import this module in the main process, or it will break Linux support
 due to issues with the LD_LIBRARY_PATH.
 """
 import maths.multiprocessing.mp_utils
-from maths.params.TFParams import TFParams, _f0, _fmin
+from maths.multiprocessing import mp_utils
+from maths.signals.TimeSeries import TimeSeries
 from utils import args
 
-# This must be above the WFT and matlab imports.
-maths.multiprocessing.mp_utils.setup_matlab_runtime()
+# This must be above the WT and matlab imports.
+mp_utils.setup_matlab_runtime()
 
-import WFT
+import WT
 import matlab
 
-package = WFT.initialize()
+package = WT.initialize()
 
 
-def calculate(time_series, params: TFParams):
+def calculate(signal, params):
     """
     Calculates the windowed Fourier transform.
 
@@ -39,27 +40,12 @@ def calculate(time_series, params: TFParams):
     with the LD_LIBRARY_PATH on Linux. Instead, use `MPHandler` to call it
     safely in a new process.
     """
-    signal_matlab = matlab.double([time_series.signal.tolist()])
+    if isinstance(signal, TimeSeries):
+        signal = signal.signal
 
-    """
-    The value passed for 'f0' should actually be that of 'fr' in the case
-    of WFT. In the Matlab version this is handled before passing the value 
-    to the function, so we'll do the same.
-    
-    When the value has been left blank, there is no problem because this
-    case is handled by the Matlab function.
-    """
-    params_dict = params.get()
+    wt, frequency = package.wt(matlab.double([signal.tolist()]),
+                               params.fs,
+                               params.get(),
+                               nargout=2)
 
-    f0 = params_dict.get(_f0)
-    fmin = params_dict.get(_fmin)
-
-    if f0 is not None and fmin is not None and fmin != 0:
-        params_dict[_f0] = f0 / fmin
-
-    wft, frequency = package.transform(signal_matlab,
-                                       params.fs,
-                                       params_dict,
-                                       nargout=2)
-
-    return wft, frequency
+    return wt, frequency

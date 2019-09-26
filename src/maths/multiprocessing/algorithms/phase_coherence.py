@@ -15,6 +15,7 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import numpy as np
+from multiprocess import Queue, Process
 
 from maths.algorithms.surrogates import surrogate_calc
 from maths.algorithms.wpc import wphcoh, wpc
@@ -23,7 +24,7 @@ from maths.params.PCParams import PCParams
 
 
 def _wt_surrogate_calc(queue, wt1, surrogate, params, index):
-    from maths.algorithms import wt
+    from maths.algorithms.matlabwrappers import wt
 
     transform, freq = wt.calculate(surrogate, params)
     wt_surrogate = matlab_to_numpy(transform)

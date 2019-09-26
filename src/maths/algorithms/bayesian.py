@@ -15,6 +15,12 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from maths.algorithms.matlab_utils import *
 
+"""
+Translation of the MODA Bayesian inference algorithm into Python.
+
+STATUS: Finished, but not working. Current issue: `filtfilt` in `loop_butter` is
+not giving accurate results.
+"""
 
 def bayes_main(ph1, ph2, win, h, ovr, pr, s, bn):
     win /= h
