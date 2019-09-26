@@ -61,7 +61,7 @@ This guide is aimed at developers wishing to modify or contribute to the program
 designed to be accessible to programmers with basic to intermediate knowledge of Python.
 
 ## Additional requirements
-To develop the program, you will need additional tools:
+To develop the program, you may need additional tools:
 - Git is used to download the code, save and upload your changes.
 - Qt Designer is used to edit the layout files.
 
