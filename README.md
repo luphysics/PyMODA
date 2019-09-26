@@ -12,11 +12,11 @@ PyMODA does not yet offer all the functionality available in MODA. This table sh
 | ----      |   ---------       |   ---------   |  ----- |
 | Time-Frequency Analysis      |   Wavelet transform    |  Working | Mostly written |
 | Time-Frequency Analysis      |   Windowed Fourier transform    |  Working   | Partially written |
-| Wavelet Phase Coherence      |   Phase coherence    |  Working  | Surrogates written, needs testing |
+| Wavelet Phase Coherence      |   Phase coherence    |  Working  | Some surrogates written, needs testing |
 | Ridge Extraction and Filtering     |   Extract ridges    |  Working   | Not implemented |
 | Ridge Extraction and Filtering     |   Bandpass filter    |  Not implemented   | Working |
-| Wavelet Bispectrum Analysis     |   Bispectrum analysis    |  Not implemented   | Not implemented |
-| Dynamical Bayesian Inference     |   Bayesian inference    |  Not implemented   | Mostly written |
+| Wavelet Bispectrum Analysis     |   Bispectrum analysis    |  Partially implemented   | Not implemented |
+| Dynamical Bayesian Inference     |   Bayesian inference    |  Not implemented   | Written, not working |
 
 # User's Guide
 
@@ -27,13 +27,17 @@ This guide is aimed at users wishing to set up and run PyMODA. If you're interes
 - [MATLAB Runtime](https://www.mathworks.com/products/compiler/matlab-runtime.html), 
 newest version recommended (does not require a licence).
 
+## A note on operating systems
+
+PyMODA should run on Windows, macOS and Linux. Note: on macOS and Linux, `python` should be replaced with `python3` in all commands below.
+
 ## Downloading the code
 To download the code, you can click the green "Clone and download" button on the top-right of the repository page, and then "Download zip". Extract the zip to your desired location; for the sake of easy instructions, the folder should be renamed to `PyMODA`.
 
 ## Preparing to run
-When the code is downloaded and Python is installed, you'll need to install the dependencies. To do this, open a terminal in the `PyMODA` folder and run the command `python packages/install.py`.
+When the code is downloaded and Python is installed, you'll need to install the dependencies. To do this, open a terminal in the `PyMODA` folder and run the command `python packages/install.py`. This mas require elevated permissions, e.g. "Run as adminstrator" on Windows or `sudo` on Linux.
 
-To start PyMODA, run `python src/main.py` from the same terminal.
+To start PyMODA, run `python src/main.py` from the same terminal. Linux users also need to specify the path to the MATLAB Runtime using a command-line argument (see [command-line arguments](#command-line-arguments)).
 
 ## Performance and efficiency
 
@@ -57,12 +61,30 @@ This guide is aimed at developers wishing to modify or contribute to the program
 designed to be accessible to programmers with basic to intermediate knowledge of Python.
 
 ## Additional requirements
-To develop the program, you will need additional tools:
+To develop the program, you may need additional tools:
 - Git is used to download the code, save and upload your changes.
 - Qt Designer is used to edit the layout files.
 
 ## Downloading the code
-To be able to submit changes to PyMODA, you should [fork the repository](https://help.github.com/en/articles/fork-a-repo). You can then clone your fork to download the code.
+If you are not registered as a collaborator, you should [fork the repository](https://help.github.com/en/articles/fork-a-repo). You can then clone your fork to download the code. To start running the code, see [preparing to run](#preparing-to-run).
+
+## Command-line arguments
+
+PyMODA has several command-line arguments, which can make development easier. Note that `-runtime` must be used on Linux, and should point to the `LD_LIBRARY_PATH` specified by the MATLAB Runtime installer. 
+
+| Argument | Use case | Example |
+| ------ | ------ | ------- |
+| `--no-maximise` | Prevents windows from opening in a maximised state, allowing easier viewing of console output. | `python src/main.py --no-maximise` |
+| `--debug` | Disables error handling. | `python src/main.py --debug` | 
+| `-freq` | Specifies the sampling frequency to use. This frequency will be automatically selected in dialogs. | `python src/main.py -freq 10` |
+| `-file` | Specifies a data file to use. This file will be automatically selected in dialogs. Only designed for data files in the `res/test` folder, and the file name should be prefixed by `test:`. | `python src.main.py -file "test:many_signal.csv"` | 
+| `-runtime` | Points to the `LD_LIBRARY_PATH` required by the MATLAB Runtime. | `python src/main.py -runtime "/usr/local/MATLAB/MATLAB_Runtime/v96/runtime/glnxa64:/usr/local/MATLAB/MATLAB_Runtime/v96/bin/glnxa64:/usr/local/MATLAB/MATLAB_Runtime/v96/sys/os/glnxa64:/usr/local/MATLAB/MATLAB_Runtime/v96/extern/bin/glnxa64"` |
+
+Command-line arguments can be specified in PyCharm configurations. For example, you can specify `-runtime` in all and/or create a different configuration for each data file.
+
+## Error handling
+
+By default, PyMODA attempts to catch all exceptions on the main process and display them in a dialog instead of crashing the program. This can make finding issues more difficult while developing, so the `--debug` command-line argument can be used or added to PyCharm configurations to prevent this behaviour (this may not be necessary on Windows).
 
 ## Project structure
 
