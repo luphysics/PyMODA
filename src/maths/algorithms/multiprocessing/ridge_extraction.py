@@ -17,7 +17,7 @@
 import numpy as np
 from multiprocess import Queue
 
-from maths.multiprocessing import mp_utils
+from processes import mp_utils
 from maths.num_utils import matlab_to_numpy
 from maths.params.REParams import REParams
 from maths.signals.TimeSeries import TimeSeries

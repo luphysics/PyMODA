@@ -16,11 +16,11 @@
 import asyncio
 from typing import Union
 
-from PyQt5.QtWidgets import QDialog, QListWidgetItem
+from PyQt5.QtWidgets import QListWidgetItem
 
 from gui.dialogs.FrequencyDialog import FrequencyDialog
 from gui.windows.common.BaseTFPresenter import BaseTFPresenter
-from maths.multiprocessing.MPHandler import MPHandler
+from processes.MPHandler import MPHandler
 from maths.params.TFParams import TFParams, _wt, _wft, create
 from maths.signals.Signals import Signals
 from maths.signals.TFOutputData import TFOutputData

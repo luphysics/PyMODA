@@ -26,7 +26,7 @@ from maths.algorithms.bayesian import bayes_main, dirc, CFprint
 from maths.algorithms.loop_butter import loop_butter
 from maths.algorithms.matlab_utils import sort2d
 from maths.algorithms.surrogates import surrogate_calc
-from maths.multiprocessing import mp_utils
+from processes import mp_utils
 from maths.signals.TimeSeries import TimeSeries
 
 

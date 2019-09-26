@@ -18,7 +18,7 @@ import asyncio
 from gui.dialogs.ErrorBox import ErrorBox
 from gui.windows.common.BaseTFWindow import BaseTFWindow
 from maths.algorithms.preprocessing import preprocess
-from maths.multiprocessing.MPHandler import MPHandler
+from processes.MPHandler import MPHandler
 from maths.signals.Signals import Signals
 from maths.signals.TimeSeries import TimeSeries
 from utils import stdout_redirect, errorhandling

@@ -18,10 +18,8 @@
 Do not import this module in the main process, or it will break Linux support
 due to issues with the LD_LIBRARY_PATH.
 """
-import maths.multiprocessing.mp_utils
-from maths.multiprocessing import mp_utils
+from processes import mp_utils
 from maths.params.REParams import REParams
-from utils import args
 
 # This must be above the matlab imports.
 mp_utils.setup_matlab_runtime()

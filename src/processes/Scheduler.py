@@ -13,18 +13,16 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-import math
 import asyncio
 import time
 from multiprocessing import cpu_count
-from typing import List, Callable, Set
+from typing import List, Callable
 
 import psutil
 from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import QWindow
-from psutil import cpu_percent
 
-from maths.multiprocessing.Task import Task
+from processes.Task import Task
 
 
 class Scheduler(List[Task]):

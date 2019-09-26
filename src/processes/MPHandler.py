@@ -19,14 +19,14 @@ from typing import Callable, List
 from multiprocess import Queue, Process
 
 from gui.windows.bayesian.ParamSet import ParamSet
-from maths.multiprocessing.Scheduler import Scheduler
-from maths.multiprocessing.Task import Task
-from maths.multiprocessing.algorithms.bandpass_filter import _bandpass_filter
-from maths.multiprocessing.algorithms.bayesian_inference import _dynamic_bayesian_inference
-from maths.multiprocessing.algorithms.bispectrum_analysis import _bispectrum_analysis
-from maths.multiprocessing.algorithms.phase_coherence import _phase_coherence
-from maths.multiprocessing.algorithms.ridge_extraction import _ridge_extraction
-from maths.multiprocessing.algorithms.time_frequency import _time_frequency
+from processes.Scheduler import Scheduler
+from processes.Task import Task
+from maths.algorithms.multiprocessing.bandpass_filter import _bandpass_filter
+from maths.algorithms.multiprocessing.bayesian_inference import _dynamic_bayesian_inference
+from maths.algorithms.multiprocessing.bispectrum_analysis import _bispectrum_analysis
+from maths.algorithms.multiprocessing.phase_coherence import _phase_coherence
+from maths.algorithms.multiprocessing.ridge_extraction import _ridge_extraction
+from maths.algorithms.multiprocessing.time_frequency import _time_frequency
 from maths.params.PCParams import PCParams
 from maths.params.REParams import REParams
 from maths.params.TFParams import TFParams, _fmin, _fmax

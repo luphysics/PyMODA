@@ -16,17 +16,16 @@
 import asyncio
 from typing import Tuple
 
-from PyQt5.QtWidgets import QDialog, QListWidgetItem
+from PyQt5.QtWidgets import QListWidgetItem
 
 from gui.windows.common.BaseTFPresenter import BaseTFPresenter
 from gui.dialogs.FrequencyDialog import FrequencyDialog
-from maths.multiprocessing.MPHandler import MPHandler
+from processes.MPHandler import MPHandler
 from maths.params.PCParams import PCParams
 from maths.params.TFParams import create
 from maths.signals.SignalPairs import SignalPairs
 from maths.signals.TFOutputData import TFOutputData
 from maths.signals.TimeSeries import TimeSeries
-from utils.decorators import deprecated
 
 
 class PCPresenter(BaseTFPresenter):

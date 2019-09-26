@@ -17,7 +17,7 @@ import asyncio
 
 from multiprocess import Queue, Process
 
-from maths.multiprocessing.mp_utils import terminate_tree
+from processes.mp_utils import terminate_tree
 
 
 class Task:

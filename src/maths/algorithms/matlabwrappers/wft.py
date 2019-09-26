@@ -18,12 +18,11 @@
 Do not import this module in the main process, or it will break Linux support
 due to issues with the LD_LIBRARY_PATH.
 """
-import maths.multiprocessing.mp_utils
+import processes.mp_utils
 from maths.params.TFParams import TFParams, _f0, _fmin
-from utils import args
 
 # This must be above the WFT and matlab imports.
-maths.multiprocessing.mp_utils.setup_matlab_runtime()
+processes.mp_utils.setup_matlab_runtime()
 
 import WFT
 import matlab

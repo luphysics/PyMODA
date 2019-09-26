@@ -20,8 +20,7 @@ due to issues with the LD_LIBRARY_PATH.
 """
 from typing import List
 
-from maths.multiprocessing import mp_utils
-
+from processes import mp_utils
 
 # This must be above the matlab imports.
 mp_utils.setup_matlab_runtime()
