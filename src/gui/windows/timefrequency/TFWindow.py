@@ -135,3 +135,6 @@ class TFWindow(TFViewProperties,
         else:
             transform = "wt"
         return transform
+
+    def setup_radio_cut_edges(self):
+        self.radio_cut_on.setChecked(True)

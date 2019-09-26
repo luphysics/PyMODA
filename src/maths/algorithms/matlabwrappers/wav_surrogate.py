@@ -19,21 +19,19 @@ Do not import this module in the main process, or it will break Linux support
 due to issues with the LD_LIBRARY_PATH.
 """
 
-from maths.params.BAParams import BAParams
-from maths.signals.TimeSeries import TimeSeries
 from processes import mp_utils
 
 # This must be above the matlab imports.
 mp_utils.setup_matlab_runtime()
 
-import bispecWavNew
+import wavsurrogate
 import matlab
 from numpy import ndarray
 
-package = bispecWavNew.initialize()
+package = wavsurrogate.initialize()
 
 
-def calculate(signal1: ndarray, signal2: ndarray, params: BAParams) -> tuple:
+def calculate(signal: ndarray, type: str, adj: int) -> ndarray:
     """
     Calculates the windowed Fourier transform.
 
@@ -41,9 +39,6 @@ def calculate(signal1: ndarray, signal2: ndarray, params: BAParams) -> tuple:
     with the LD_LIBRARY_PATH on Linux. Instead, use `MPHandler` to call it
     safely in a new process.
     """
-    result = package.bispecWavNew(matlab.double(signal1),
-                                  matlab.double(signal2),
-                                  params.fs,
-                                  params.get())
+    result = package.wavsurrogate(matlab.double(signal.tolist()), type, adj)
 
-    return result # TODO: fix issue where it doesn't return the 5 desired values.
+    return result

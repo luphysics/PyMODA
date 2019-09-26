@@ -146,6 +146,7 @@ class DBWindow(DBViewProperties, BaseTFWindow, SurrogateComponent, DualSignalCom
             item2 = self.listwidget_freq_band2.selectedItems()[-1]
         except IndexError:
             return
+
         self.presenter.delete_paramset(item1.text(), item2.text())
 
         self.listwidget_freq_band1.removeItemWidget(item1)
@@ -155,9 +156,6 @@ class DBWindow(DBViewProperties, BaseTFWindow, SurrogateComponent, DualSignalCom
             sip.delete(i)
 
     def setup_radio_preproc(self):
-        pass
-
-    def setup_radio_cut_edges(self):
         pass
 
     def setup_radio_plot(self):

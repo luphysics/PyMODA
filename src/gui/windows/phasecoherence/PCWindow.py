@@ -52,6 +52,7 @@ class PCWindow(PCViewProperties, BaseTFWindow, SurrogateComponent, FreqComponent
         self.setup_surr_method()
         self.setup_surr_type()
         self.setup_analysis_type()
+        self.setup_radio_cut_edges()
 
         amp = self.amplitude_plot()
         amp.set_xlabel("Overall Coherence")
@@ -94,3 +95,6 @@ class PCWindow(PCViewProperties, BaseTFWindow, SurrogateComponent, FreqComponent
         items = self._surrogate_types
         for i in items:
             combo.addItem(i)
+
+    def setup_radio_cut_edges(self):
+        self.radio_cut_on.setChecked(True)

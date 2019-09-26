@@ -23,6 +23,7 @@ from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import QWindow
 
 from processes.Task import Task
+from utils.decorators import deprecated
 
 
 class Scheduler(List[Task]):
@@ -82,6 +83,7 @@ class Scheduler(List[Task]):
 
         self.output: List[tuple] = []
 
+    @deprecated
     def update(self):
         """Checks for any tasks that have finished."""
         should_update_tasks = False
@@ -122,6 +124,10 @@ class Scheduler(List[Task]):
         """
         Runs the tasks with coroutines. Returns a list containing
         the output of each task, after all tasks are complete.
+
+        Important: the list is not ordered. Each task should return some
+        form of identifier in its results; for example, the name of the
+        signal.
         """
         self.start()
 

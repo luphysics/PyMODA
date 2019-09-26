@@ -19,6 +19,7 @@ from typing import Callable, List
 from multiprocess import Queue, Process
 
 from gui.windows.bayesian.ParamSet import ParamSet
+from maths.params.BAParams import BAParams
 from processes.Scheduler import Scheduler
 from processes.Task import Task
 from maths.algorithms.multiprocessing.bandpass_filter import _bandpass_filter
@@ -151,13 +152,17 @@ class MPHandler:
 
     async def coro_bispectrum_analysis(self,
                                        signals: SignalPairs,
+                                       params: BAParams,
                                        on_progress: Callable[[int, int], None]):
         self.stop()
         self.scheduler = Scheduler(progress_callback=on_progress)
 
+        params.remove_signals()
         for pair in signals.get_pairs():
             q = Queue()
-            p = Process(target=_bispectrum_analysis, args=(q, pair))
+            p = Process(target=_bispectrum_analysis, args=(q, *pair, params))
+
+            self.scheduler.append(Task(p, q))
 
         return await self.scheduler.coro_run()
 

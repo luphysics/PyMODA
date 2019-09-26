@@ -17,12 +17,14 @@ import asyncio
 from typing import Tuple
 
 from PyQt5.QtWidgets import QListWidgetItem
+from numpy import ndarray
 
 from gui.dialogs.FrequencyDialog import FrequencyDialog
 from gui.windows.common.BaseTFPresenter import BaseTFPresenter
-from processes.MPHandler import MPHandler
+from maths.params.BAParams import BAParams
 from maths.signals.SignalPairs import SignalPairs
 from maths.signals.TimeSeries import TimeSeries
+from processes.MPHandler import MPHandler
 
 
 class BAPresenter(BaseTFPresenter):
@@ -45,12 +47,29 @@ class BAPresenter(BaseTFPresenter):
 
         self.mp_handler = MPHandler()
         data = await self.mp_handler.coro_bispectrum_analysis(self.signals,
+                                                              self.get_params(),
                                                               self.on_progress_updated)
 
-        for d in data:
-            self.on_bispectrum_completed(*d)
+        self.on_bispectrum_completed(*data[0])
+
+        # for d in data:
+        #     self.on_bispectrum_completed(*d)
 
         # TODO: plot the result.
+
+    def on_bispectrum_completed(self,
+                                name: str,
+                                freq: ndarray,
+                                bispxxx,
+                                bispppp,
+                                bispxpp,
+                                bisppxx,
+                                surrxxx,
+                                surrppp,
+                                surrxpp,
+                                surrpxx):
+
+        self.view.plot_main.plot(freq, bispxxx, freq)
 
     async def coro_load_data(self):
         self.signals = SignalPairs.from_file(self.open_file)
@@ -87,6 +106,11 @@ class BAPresenter(BaseTFPresenter):
     def get_selected_signal_pair(self) -> Tuple[TimeSeries, TimeSeries]:
         return self.signals.get_pair_by_name(self.selected_signal_name)
 
-    def on_bispectrum_completed(self, *args):
-        # TODO: implement with appropriate parameters.
-        pass
+    def get_params(self) -> BAParams:
+        return BAParams(signals=self.signals,
+                        preprocess=self.view.get_preprocess(),
+                        fmin=self.view.get_fmin(),
+                        fmax=self.view.get_fmax(),
+                        f0=self.view.get_f0(),
+                        fc=1,
+                        nv=self.view.get_nv())

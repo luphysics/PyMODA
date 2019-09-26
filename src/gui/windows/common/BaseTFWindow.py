@@ -18,7 +18,7 @@ from functools import partial
 from typing import List
 
 from PyQt5 import uic, QtGui
-from PyQt5.QtWidgets import QDialog, QProgressBar, QPushButton
+from PyQt5.QtWidgets import QProgressBar, QPushButton
 
 from gui.windows.common.BaseTFViewProperties import BaseTFViewProperties
 from gui.dialogs.files.SelectFileDialog import SelectFileDialog
@@ -96,7 +96,6 @@ class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
 
         # Setup radio buttons and other UI elements.
         self.setup_radio_preproc()
-        self.setup_radio_cut_edges()
         self.setup_signal_listview()
         self.setup_xlim_edits()
         self.setup_progress()
@@ -150,9 +149,6 @@ class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
 
     def setup_radio_preproc(self):
         self.radio_preproc_on.setChecked(True)
-
-    def setup_radio_cut_edges(self):
-        self.radio_cut_on.setChecked(True)
 
     def get_preprocessing(self):
         return self.radio_preproc_on.isChecked()

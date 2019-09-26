@@ -58,7 +58,6 @@ class ColorMeshPlot(MatplotlibWidget):
                                        cmap=colormap())
 
         self.apply_scale()
-        # self.axes.set_title('STFT Magnitude')
         self.axes.autoscale(False)
         self.on_plot_complete()
 

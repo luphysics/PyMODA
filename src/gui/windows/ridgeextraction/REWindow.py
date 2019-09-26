@@ -51,6 +51,7 @@ class REWindow(REViewProperties, TFWindow):
         self.setup_btn_mark_region()
         self.setup_btn_add_marked_region()
         self.setup_freq_boxes()
+        self.setup_radio_cut_edges()
         self.setup_intervals_list()
 
         self.setup_btn_ridge_extraction()

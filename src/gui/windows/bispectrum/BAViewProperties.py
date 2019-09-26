@@ -24,3 +24,6 @@ class BAViewProperties(ViewProperties):
         """Define properties introduced by the .ui file."""
         self.line_surrogate: QLineEdit = None
         self.slider_surrogate: QSlider = None
+
+        self.lineedit_alpha: QLineEdit = None
+        self.lineedit_nv: QLineEdit = None

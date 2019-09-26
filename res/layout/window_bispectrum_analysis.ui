@@ -84,13 +84,6 @@
             </item>
            </layout>
           </item>
-          <item row="1" column="1">
-           <layout class="QGridLayout" name="gridLayout_5">
-            <item row="0" column="0">
-             <widget class="AmplitudePlot" name="plot_right" native="true"/>
-            </item>
-           </layout>
-          </item>
          </layout>
         </item>
         <item>
@@ -217,7 +210,50 @@
                 </layout>
                </item>
                <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_6"/>
+                <layout class="QHBoxLayout" name="horizontalLayout_6">
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="3,1">
+                   <item>
+                    <widget class="QLabel" name="label_9">
+                     <property name="text">
+                      <string>Number of voices</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLineEdit" name="lineedit_nv">
+                     <property name="text">
+                      <string>16</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="3,1">
+                   <item>
+                    <widget class="QLabel" name="label_10">
+                     <property name="text">
+                      <string>Alpha</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLineEdit" name="lineedit_alpha">
+                     <property name="text">
+                      <string>0.05</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
                </item>
               </layout>
              </widget>
@@ -309,29 +345,6 @@
             <item>
              <widget class="QGroupBox" name="groupBox">
               <property name="title">
-               <string>Cut Edges</string>
-              </property>
-              <layout class="QGridLayout" name="gridLayout_18">
-               <item row="0" column="0">
-                <widget class="QRadioButton" name="radio_cut_on">
-                 <property name="text">
-                  <string>On</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="0">
-                <widget class="QRadioButton" name="radio_cut_off">
-                 <property name="text">
-                  <string>Off</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
-             <widget class="QGroupBox" name="groupBox">
-              <property name="title">
                <string>Preprocessing</string>
               </property>
               <layout class="QGridLayout" name="gridLayout_13">
@@ -339,6 +352,9 @@
                 <widget class="QRadioButton" name="radio_preproc_on">
                  <property name="text">
                   <string>On</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
@@ -458,12 +474,18 @@
                    <height>20</height>
                   </size>
                  </property>
+                 <property name="text">
+                  <string>1</string>
+                 </property>
                 </widget>
                </item>
               </layout>
              </item>
             </layout>
            </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="PreprocessPlot" name="plot_preproc" native="true"/>
           </item>
          </layout>
         </item>
@@ -499,9 +521,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>AmplitudePlot</class>
+   <class>PreprocessPlot</class>
    <extends>QWidget</extends>
-   <header>gui.plotting.plots.AmplitudePlot</header>
+   <header>gui.plotting.plots.PreprocessPlot</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -13,6 +13,8 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from typing import Optional
+
 from data import resources
 from gui.components.DualSignalComponent import DualSignalComponent
 from gui.components.FreqComponent import FreqComponent
@@ -20,6 +22,7 @@ from gui.components.SurrogateComponent import SurrogateComponent
 from gui.windows.bispectrum.BAPresenter import BAPresenter
 from gui.windows.bispectrum.BAViewProperties import BAViewProperties
 from gui.windows.common.BaseTFWindow import BaseTFWindow
+from utils.decorators import floaty
 
 
 class BAWindow(BAViewProperties, BaseTFWindow, DualSignalComponent, FreqComponent, SurrogateComponent):
@@ -42,8 +45,10 @@ class BAWindow(BAViewProperties, BaseTFWindow, DualSignalComponent, FreqComponen
     def get_layout_file(self) -> str:
         return resources.get("layout:window_bispectrum_analysis.ui")
 
-    def setup_surr_method(self):
-        """Override to do nothing."""
+    @floaty
+    def get_nv(self) -> Optional[float]:
+        return self.lineedit_nv.text()
 
-    def setup_analysis_type(self):
-        """Override to do nothing."""
+    @floaty
+    def get_alpha(self) -> Optional[float]:
+        return self.lineedit_alpha.text()
