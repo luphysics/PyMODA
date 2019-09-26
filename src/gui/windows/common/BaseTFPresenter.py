@@ -27,6 +27,10 @@ from utils.stdout_redirect import WindowLogger
 
 class BaseTFPresenter:
 
+    """
+    A base presenter which handles controlling the window.
+    """
+
     def __init__(self, view: BaseTFWindow):
         self.view: BaseTFWindow = view
         self.is_plotted: bool = False
