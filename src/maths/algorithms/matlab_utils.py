@@ -105,7 +105,7 @@ cumsum = np.cumsum
 vstack = np.vstack
 hstack = np.hstack
 
-matmul = np.matmul
+matmul = np.matmul # Note: just use the '@' operator instead.
 
 conj = np.conj
 abs = np.abs
