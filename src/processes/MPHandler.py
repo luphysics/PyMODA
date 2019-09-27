@@ -157,12 +157,11 @@ class MPHandler:
         self.stop()
         self.scheduler = Scheduler(progress_callback=on_progress)
 
-        params.remove_signals()
         for pair in signals.get_pairs():
             q = Queue()
             p = Process(target=_bispectrum_analysis, args=(q, *pair, params))
 
-            self.scheduler.append(Task(p, q))
+            self.scheduler.append(Task(p, q, subtasks=4))
 
         return await self.scheduler.coro_run()
 

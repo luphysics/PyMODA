@@ -13,10 +13,10 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from typing import Union, Any, Optional
+from typing import Any, Optional
 
 import numpy as np
-from nptyping import Array
+from numpy import ndarray
 
 
 def float_or_none(var: Any) -> Optional[float]:
@@ -91,7 +91,7 @@ def calc_subset_count(arr):
     return 1  # TODO: add implementation.
 
 
-def matlab_to_numpy(arr) -> Array:
+def matlab_to_numpy(arr) -> ndarray:
     """
     Converts a matlab array to a numpy array.
     Can be much faster than simply calling "np.asarray()",

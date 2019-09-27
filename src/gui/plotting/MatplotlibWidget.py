@@ -41,7 +41,9 @@ class MatplotlibWidget(PlotWidget):
         self.layout: QVBoxLayout = None
         self.axes = None
         self.fig: Figure = None
-        self.log = False  # Whether the axes should be logarithmic.
+
+        self.log_y = False  # Whether the y-axis should be logarithmic.
+        self.log_x = False  # Whether the x-axis should be logarithmic.
 
         self.temp_lines = []  # Temporary crosshair plots which should be removed on each update.
         self.selected_plots = []  # Selected crosshair plots which should be kept.
@@ -153,19 +155,23 @@ class MatplotlibWidget(PlotWidget):
         super().update()
         self.canvas.draw()
 
-    def set_log_scale(self, logarithmic=False):
+    def set_log_scale(self, logarithmic=False, axis="y"):
         """
         Set whether the plotting should use a logarithmic y-scale.
         IMPORTANT: Note that the `apply_scale()` function must be called (usually in a subclass)
         for this function to have any effect.
         """
-        self.log = logarithmic
+        if axis == "y" or axis == 1:
+            self.log_y = logarithmic
+        else:
+            self.log_x = logarithmic
 
     def apply_scale(self):
         """
         Applies the scale (either logarithmic or linear) according to `self.log`.
         """
-        self.axes.set_yscale("log" if self.log else "linear")
+        self.axes.set_yscale("log" if self.log_y else "linear")
+        self.axes.set_xscale("log" if self.log_x else "linear")
 
     def set_max_crosshair_count(self, limit: int):
         self.max_crosshairs = limit

@@ -94,4 +94,11 @@ class SurrogateComponent:
 
     @inty
     def get_surr_count(self) -> Optional[int]:
-        return self._lineedit.text()
+        if self.get_surr_enabled():
+            text = self._lineedit.text()
+        else:
+            text = ""
+        return text
+
+    def get_surr_enabled(self) -> bool:
+        return False  # TODO

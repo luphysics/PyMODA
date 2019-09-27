@@ -36,11 +36,17 @@ class BAWindow(BAViewProperties, BaseTFWindow, DualSignalComponent, FreqComponen
         FreqComponent.__init__(self, self.line_fmax, self.line_fmin, self.line_res)
         SurrogateComponent.__init__(self, self.slider_surrogate, self.line_surrogate)
 
+        self.presenter: BAPresenter = self.presenter
         self.presenter.init()
 
     def setup_ui(self):
         super(BAWindow, self).setup_ui()
         self.btn_calculate_single.hide()
+
+        self.plot_main.set_log_scale(True, "x")
+        self.plot_main.set_log_scale(True, "y")
+
+        self.combo_plot_type.currentTextChanged.connect(lambda _: self.presenter.update_plots())
 
     def get_layout_file(self) -> str:
         return resources.get("layout:window_bispectrum_analysis.ui")
@@ -52,3 +58,6 @@ class BAWindow(BAViewProperties, BaseTFWindow, DualSignalComponent, FreqComponen
     @floaty
     def get_alpha(self) -> Optional[float]:
         return self.lineedit_alpha.text()
+
+    def get_plot_type(self) -> str:
+        return self.combo_plot_type.currentText()

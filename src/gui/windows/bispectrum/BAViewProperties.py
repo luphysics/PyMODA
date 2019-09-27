@@ -13,7 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from PyQt5.QtWidgets import QLineEdit, QSlider
+from PyQt5.QtWidgets import QLineEdit, QSlider, QComboBox
 
 from gui.windows.ViewProperties import ViewProperties
 
@@ -27,3 +27,5 @@ class BAViewProperties(ViewProperties):
 
         self.lineedit_alpha: QLineEdit = None
         self.lineedit_nv: QLineEdit = None
+
+        self.combo_plot_type: QComboBox = None

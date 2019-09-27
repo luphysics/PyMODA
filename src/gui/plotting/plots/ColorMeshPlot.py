@@ -35,25 +35,27 @@ class ColorMeshPlot(MatplotlibWidget):
     wavelet transforms, phase coherence, etc.
     """
 
-    def setup_ui(self):
-        super().setup_ui()
+    def __init__(self, parent):
+        MatplotlibWidget.__init__(self, parent)
+        self.mesh = None
 
-    def plot(self, times, values, freq):
+    def plot(self, x, c, y):
         self.clear()
 
         self.update_ylabel()
         self.update_xlabel()
 
-        finite = values[np.isfinite(values)]  # Remove the 'NaN' items.
-        mesh1, mesh2 = np.meshgrid(times, freq)
+        finite = c[np.isfinite(c)]  # Remove the 'NaN' items.
+        mesh1, mesh2 = np.meshgrid(x, y)
 
-        n = calc_subset_count(values)
+        # To improve performance, we could subsample the data. Not actually implemented yet.
+        n = calc_subset_count(c)
         if n > 1:
             mesh1 = subset2d(mesh1, n)
             mesh2 = subset2d(mesh2, n)
-            values = subset2d(values, n)
+            c = subset2d(c, n)
 
-        self.mesh = self.axes.contourf(mesh1, mesh2, values, 256,
+        self.mesh = self.axes.contourf(mesh1, mesh2, c, 256,
                                        vmin=np.min(finite), vmax=np.max(finite),
                                        cmap=colormap())
 

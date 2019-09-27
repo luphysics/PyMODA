@@ -42,8 +42,8 @@
            </layout>
           </item>
           <item row="0" column="1">
-           <layout class="QGridLayout" name="gridLayout_4" rowstretch="2,2,2,0">
-            <item row="2" column="0" rowspan="2">
+           <layout class="QGridLayout" name="gridLayout_4" rowstretch="2,2,2,0,0">
+            <item row="3" column="0" rowspan="2">
              <layout class="QVBoxLayout" name="verticalLayout">
               <item>
                <widget class="QLabel" name="label_2">
@@ -58,9 +58,57 @@
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_2"/>
               </item>
+              <item>
+               <widget class="QGroupBox" name="verticalGroupBox">
+                <property name="title">
+                 <string>Plot type</string>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_9">
+                 <item>
+                  <widget class="QComboBox" name="combo_plot_type">
+                   <item>
+                    <property name="text">
+                     <string>Wavelet transform 1</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Wavelet transform 2</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>b111</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>b222</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>b122</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>b211</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>All plots</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
              </layout>
             </item>
-            <item row="0" column="0">
+            <item row="1" column="0">
              <widget class="QGroupBox" name="groupBox">
               <property name="title">
                <string>Signal X-Limits</string>

@@ -22,6 +22,7 @@ from numpy import ndarray
 from gui.dialogs.FrequencyDialog import FrequencyDialog
 from gui.windows.common.BaseTFPresenter import BaseTFPresenter
 from maths.params.BAParams import BAParams
+from maths.signals.BAOutputData import BAOutputData
 from maths.signals.SignalPairs import SignalPairs
 from maths.signals.TimeSeries import TimeSeries
 from processes.MPHandler import MPHandler
@@ -50,12 +51,41 @@ class BAPresenter(BaseTFPresenter):
                                                               self.get_params(),
                                                               self.on_progress_updated)
 
-        self.on_bispectrum_completed(*data[0])
+        for d in data:
+            self.on_bispectrum_completed(*d)
 
-        # for d in data:
-        #     self.on_bispectrum_completed(*d)
+        self.update_plots()
 
-        # TODO: plot the result.
+    def update_plots(self):
+        data = self.get_selected_signal_pair()[0].output_data
+
+        x = data.freq
+        y = data.freq
+        c = self.get_plot_data(self.view.get_plot_type(), data)
+
+        if c is not None:
+            self.view.plot_main.plot(x=x, y=y, c=c)
+            self.view.plot_main.update_xlabel("Frequency (Hz)")
+            self.view.plot_main.update_ylabel("Frequency (Hz)")
+
+    @staticmethod
+    def get_plot_data(plot_type: str, data: BAOutputData):
+        if not isinstance(data, BAOutputData):
+            return None
+
+        _dict = {
+            "Wavelet transform 1": data.wt1,
+            "Wavelet transform 2": data.wt2,
+            "b111": data.bispxxx,
+            "b222": data.bispppp,
+            "b122": data.bispxpp,
+            "b211": data.bisppxx,
+        }
+        data = _dict.get(plot_type)
+        if data is None:  # All plots.
+            pass  # TODO
+
+        return data
 
     def on_bispectrum_completed(self,
                                 name: str,
@@ -69,7 +99,22 @@ class BAPresenter(BaseTFPresenter):
                                 surrxpp,
                                 surrpxx):
 
-        self.view.plot_main.plot(freq, bispxxx, freq)
+        # Attach the data to the first signal in the current pair.
+        sig = self.signals.get(name)
+
+        sig.output_data = BAOutputData(
+            None,
+            None,
+            freq,
+            bispxxx,
+            bispppp,
+            bispxpp,
+            bisppxx,
+            surrxxx,
+            surrppp,
+            surrxpp,
+            surrpxx
+        )
 
     async def coro_load_data(self):
         self.signals = SignalPairs.from_file(self.open_file)
@@ -112,5 +157,5 @@ class BAPresenter(BaseTFPresenter):
                         fmin=self.view.get_fmin(),
                         fmax=self.view.get_fmax(),
                         f0=self.view.get_f0(),
-                        fc=1,
-                        nv=self.view.get_nv())
+                        nv=self.view.get_nv(),
+                        surr_count=self.view.get_surr_count())

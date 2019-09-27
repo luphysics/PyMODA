@@ -13,26 +13,30 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from maths.params.PCParams import PCParams
-from maths.params.TFParams import _wft
-from maths.signals.Signals import Signals
 
 
-class BAParams:
+class BAOutputData:
 
     def __init__(self,
-                 signals: Signals,
-                 fmin: float,
-                 fmax: float,
-                 f0: float,
-                 preprocess: bool,
-                 nv: float,
-                 surr_count: int):
-        self.signals = signals
-        self.fmin = fmin
-        self.fmax = fmax
-        self.f0 = f0
-        self.preprocess = preprocess
-        self.nv = nv
-        self.surr_count = surr_count
-        self.fs = signals.frequency
+                 wt1,
+                 wt2,
+                 freq,
+                 bispxxx,
+                 bispppp,
+                 bispxpp,
+                 bisppxx,
+                 surrxxx=None,
+                 surrppp=None,
+                 surrxpp=None,
+                 surrpxx=None):
+        self.wt1 = wt1
+        self.wt2 = wt2
+        self.freq = freq
+        self.bispxxx = bispxxx
+        self.bispppp = bispppp
+        self.bispxpp = bispxpp
+        self.bisppxx = bisppxx
+        self.surrxxx = surrxxx
+        self.surrppp = surrppp
+        self.surrxpp = surrxpp
+        self.surrpxx = surrpxx
