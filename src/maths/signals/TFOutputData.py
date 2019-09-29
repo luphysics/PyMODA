@@ -13,7 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from nptyping import Array
+from numpy import ndarray
 
 
 class TFOutputData:
@@ -23,17 +23,17 @@ class TFOutputData:
 
     def __init__(
             self,
-            times: Array,
-            values: Array,
-            ampl: Array,
-            freq: Array,
-            powers: Array,
-            avg_ampl: Array,
-            avg_pow: Array,
+            times: ndarray,
+            values: ndarray,
+            ampl: ndarray,
+            freq: ndarray,
+            powers: ndarray,
+            avg_ampl: ndarray,
+            avg_pow: ndarray,
             transform: str = "wt",
-            overall_coherence: Array = None,
-            phase_coherence: Array = None,
-            phase_diff: Array = None,
+            overall_coherence: ndarray = None,
+            phase_coherence: ndarray = None,
+            phase_diff: ndarray = None,
     ):
         self.transform = transform  # The name of the transform (e.g. WT or WFT).
         self.values = values  # The values of the transform (complex numbers).

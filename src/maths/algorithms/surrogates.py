@@ -16,7 +16,7 @@
 from typing import Union
 
 import numpy as np
-from nptyping import Array
+from numpy import ndarray
 from numpy.random import permutation as randperm
 
 from maths.signals.TimeSeries import TimeSeries
@@ -37,7 +37,7 @@ _tshift = "tshift"
 _CPP = "CPP"
 
 
-def surrogate_calc(time_series: Union[TimeSeries, Array], N, method, pp, fs):
+def surrogate_calc(time_series: Union[TimeSeries, ndarray], N, method, pp, fs):
     """
     Calculates surrogates.
 

@@ -18,7 +18,7 @@ from typing import List
 
 import numpy as np
 from multiprocess import Queue
-from nptyping import Array
+from numpy import ndarray
 from scipy.signal import hilbert
 
 from gui.windows.bayesian.ParamSet import ParamSet
@@ -26,8 +26,8 @@ from maths.algorithms.bayesian import bayes_main, dirc, CFprint
 from maths.algorithms.loop_butter import loop_butter
 from maths.algorithms.matlab_utils import sort2d
 from maths.algorithms.surrogates import surrogate_calc
-from processes import mp_utils
 from maths.signals.TimeSeries import TimeSeries
+from processes import mp_utils
 
 
 def _moda_dynamic_bayesian_inference(queue: Queue, signal1: TimeSeries, signal2: TimeSeries, params: ParamSet):
@@ -114,7 +114,7 @@ def _dynamic_bayesian_inference(queue: Queue, signal1: TimeSeries, signal2: Time
     surr1, _ = surrogate_calc(phi1, ns, "CPP", 0, fs)
     surr2, _ = surrogate_calc(phi2, ns, "CPP", 0, fs)
 
-    cc_surr: List[Array] = []
+    cc_surr: List[ndarray] = []
     scpl1 = zeros((ns, 2,))
     scpl2 = zeros(scpl1.shape)
 

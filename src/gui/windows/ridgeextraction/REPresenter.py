@@ -17,7 +17,7 @@ import asyncio
 from typing import Tuple, Union
 
 from PyQt5.QtWidgets import QListWidgetItem
-from nptyping import Array
+from numpy import ndarray
 
 from gui.windows.timefrequency.TFPresenter import TFPresenter
 from maths.params.REParams import REParams
@@ -124,12 +124,12 @@ class REPresenter(TFPresenter):
 
     def triple_plot(
             self,
-            x_values: Array,
-            top_y: Array,
-            middle_y: Array,
-            bottom_y: Array,
-            main_values: Array = None,
-            main_freq: Array = None
+            x_values: ndarray,
+            top_y: ndarray,
+            middle_y: ndarray,
+            bottom_y: ndarray,
+            main_values: ndarray = None,
+            main_freq: ndarray = None
     ):
         """
         Plots values on the 3 plots in the main section of the window.
