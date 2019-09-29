@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-Python script which installs all the custom packages from this directory.
+Python script which installs all the custom packages from this directory and also installs dependencies via pip.
 """
 import os
 import sys
@@ -14,7 +14,7 @@ cwd = os.getcwd()
 def find_cwd():
     if packages in os.listdir("."):
         return os.path.join(cwd, packages)
-    elif cwd.split("/")[-1] == packages:
+    elif cwd.replace("\\", "/").split("/")[-1] == packages:
         return cwd
     return None
 
@@ -38,10 +38,10 @@ if __name__ == "__main__":
     for file in glob("**/setup.py", recursive=True):
         if "for_redistribution_files_only" in file:
             files.append(os.path.abspath(file))
-           
+
     for f in files:
         os.chdir(wd)
-        os.chdir("/".join(f.split("/")[:-1]))
+        os.chdir("/".join(f.replace("\\", "/").split("/")[:-1]))
         os.system(f"python3 setup.py install")
         os.system(f"python setup.py install")
 
