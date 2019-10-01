@@ -51,7 +51,6 @@ class REWindow(REViewProperties, TFWindow):
         self.setup_btn_mark_region()
         self.setup_btn_add_marked_region()
         self.setup_freq_boxes()
-        self.setup_radio_cut_edges()
         self.setup_intervals_list()
 
         self.setup_btn_ridge_extraction()
@@ -292,24 +291,3 @@ class REWindow(REViewProperties, TFWindow):
 
     def setup_btn_filter(self):
         self.btn_filter.clicked.connect(self.presenter.on_filter_clicked)
-
-    def setup_radio_stats_avg(self):
-        """
-        Override method from TFView to remove functionality
-        implemented in time-frequency window.
-        """
-        pass
-
-    def setup_radio_stats_paired(self):
-        """
-        Override method from TFView to remove functionality
-        implemented in time-frequency window.
-        """
-        pass
-
-    def setup_radio_test(self):
-        """
-        Override method from TFView to remove functionality
-        implemented in time-frequency window.
-        """
-        pass

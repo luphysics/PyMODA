@@ -19,10 +19,10 @@ from PyQt5 import QtGui
 from PyQt5.QtGui import QWindow
 
 from data import resources
+from gui.components.FreqComponent import FreqComponent
 from gui.components.PreprocessComponent import PreprocessComponent
 from gui.components.SingleSignalComponent import SingleSignalComponent
 from gui.windows.common.BaseTFWindow import BaseTFWindow
-from gui.components.FreqComponent import FreqComponent
 from gui.windows.timefrequency.TFPresenter import TFPresenter
 from gui.windows.timefrequency.TFViewProperties import TFViewProperties
 from utils.decorators import floaty, deprecated
@@ -60,9 +60,6 @@ class TFWindow(TFViewProperties,
         super().setup_ui()
         self.setup_radio_plot()
         self.setup_radio_transform()
-        self.setup_radio_stats_avg()
-        self.setup_radio_stats_paired()
-        self.setup_radio_test()
         self.setup_combo_wt()
 
         amp = self.amplitude_plot()
@@ -104,15 +101,6 @@ class TFWindow(TFViewProperties,
     def setup_radio_transform(self):
         self.radio_transform_wt.setChecked(True)
         self.radio_transform_wt.toggled.connect(self.on_transform_toggled)
-
-    def setup_radio_stats_avg(self):
-        self.radio_stat_median.setChecked(True)
-
-    def setup_radio_stats_paired(self):
-        self.radio_unpaired.setChecked(True)
-
-    def setup_radio_test(self):
-        self.radio_test_ampl.setChecked(True)
 
     @floaty
     def get_fstep(self) -> Optional[float]:

@@ -20,9 +20,9 @@ from PyQt5.QtWidgets import QComboBox
 from data import resources
 from gui import Application
 from gui.components.DualSignalComponent import DualSignalComponent
-from gui.windows.common.BaseTFWindow import BaseTFWindow
 from gui.components.FreqComponent import FreqComponent
 from gui.components.SurrogateComponent import SurrogateComponent
+from gui.windows.common.BaseTFWindow import BaseTFWindow
 from gui.windows.phasecoherence.PCPresenter import PCPresenter
 from gui.windows.phasecoherence.PCViewProperties import PCViewProperties
 
@@ -51,8 +51,6 @@ class PCWindow(PCViewProperties, BaseTFWindow, SurrogateComponent, FreqComponent
         super().setup_ui()
         self.setup_surr_method()
         self.setup_surr_type()
-        self.setup_analysis_type()
-        self.setup_radio_cut_edges()
 
         amp = self.amplitude_plot()
         amp.set_xlabel("Overall Coherence")
@@ -71,9 +69,6 @@ class PCWindow(PCViewProperties, BaseTFWindow, SurrogateComponent, FreqComponent
         items = self._wavelet_types
         for i in items:
             combo.addItem(i)
-
-    def setup_analysis_type(self):
-        self.radio_analysis_max.setChecked(True)
 
     def get_wt_wft_type(self) -> str:
         return self.combo_wavelet_type.currentText()
@@ -95,6 +90,3 @@ class PCWindow(PCViewProperties, BaseTFWindow, SurrogateComponent, FreqComponent
         items = self._surrogate_types
         for i in items:
             combo.addItem(i)
-
-    def setup_radio_cut_edges(self):
-        self.radio_cut_on.setChecked(True)

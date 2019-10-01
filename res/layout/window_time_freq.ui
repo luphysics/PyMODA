@@ -195,7 +195,7 @@
         <item row="3" column="0">
          <layout class="QVBoxLayout" name="advanced_options_section" stretch="0,0">
           <item>
-           <widget class="QGroupBox" name="">
+           <widget class="QGroupBox" name="groupBox">
             <property name="title">
              <string>Preprocessed Signal</string>
             </property>
@@ -265,6 +265,9 @@
                     <property name="text">
                      <string>Amplitude</string>
                     </property>
+                    <property name="checked">
+                     <bool>true</bool>
+                    </property>
                    </widget>
                   </item>
                  </layout>
@@ -300,6 +303,9 @@
                    <property name="text">
                     <string>Median</string>
                    </property>
+                   <property name="checked">
+                    <bool>true</bool>
+                   </property>
                   </widget>
                  </item>
                 </layout>
@@ -322,6 +328,9 @@
                   <widget class="QRadioButton" name="radio_unpaired">
                    <property name="text">
                     <string>Unpaired</string>
+                   </property>
+                   <property name="checked">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
@@ -355,6 +364,9 @@
                  <property name="text">
                   <string>Amplitude</string>
                  </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
                 </widget>
                </item>
                <item row="1" column="0">
@@ -385,6 +397,9 @@
                  <property name="text">
                   <string>On</string>
                  </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
                 </widget>
                </item>
               </layout>
@@ -400,6 +415,9 @@
                 <widget class="QRadioButton" name="radio_cut_on">
                  <property name="text">
                   <string>On</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
@@ -430,6 +448,9 @@
                 <widget class="QRadioButton" name="radio_transform_wt">
                  <property name="text">
                   <string>WT</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>

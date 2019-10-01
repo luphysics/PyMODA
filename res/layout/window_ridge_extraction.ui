@@ -314,6 +314,9 @@
                  <property name="text">
                   <string>Amplitude</string>
                  </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
                 </widget>
                </item>
                <item row="1" column="0">
@@ -344,6 +347,9 @@
                  <property name="text">
                   <string>On</string>
                  </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
                 </widget>
                </item>
               </layout>
@@ -359,6 +365,9 @@
                 <widget class="QRadioButton" name="radio_cut_on">
                  <property name="text">
                   <string>On</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
@@ -389,6 +398,9 @@
                 <widget class="QRadioButton" name="radio_transform_wt">
                  <property name="text">
                   <string>WT</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
@@ -544,15 +556,15 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>PreprocessPlot</class>
-   <extends>QWidget</extends>
-   <header>gui.plotting.plots.PreprocessPlot</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>AmplitudePlot</class>
    <extends>QWidget</extends>
    <header>gui.plotting.plots.AmplitudePlot</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>PreprocessPlot</class>
+   <extends>QWidget</extends>
+   <header>gui.plotting.plots.PreprocessPlot</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
