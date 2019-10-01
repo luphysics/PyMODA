@@ -23,7 +23,8 @@ from maths.params.BAParams import BAParams
 from processes.Scheduler import Scheduler
 from processes.Task import Task
 from maths.algorithms.multiprocessing.bandpass_filter import _bandpass_filter
-from maths.algorithms.multiprocessing.bayesian_inference import _dynamic_bayesian_inference
+from maths.algorithms.multiprocessing.bayesian_inference import _dynamic_bayesian_inference, \
+    _moda_dynamic_bayesian_inference
 from maths.algorithms.multiprocessing.bispectrum_analysis import _bispectrum_analysis
 from maths.algorithms.multiprocessing.phase_coherence import _phase_coherence
 from maths.algorithms.multiprocessing.ridge_extraction import _ridge_extraction
@@ -144,7 +145,7 @@ class MPHandler:
         for params in paramsets:
             for pair in signals.get_pairs():
                 q = Queue()
-                p = Process(target=_dynamic_bayesian_inference, args=(q, *pair, params,))
+                p = Process(target=_moda_dynamic_bayesian_inference, args=(q, *pair, params,))
 
                 self.scheduler.append(Task(p, q))
 

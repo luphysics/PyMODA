@@ -51,7 +51,7 @@ def _moda_dynamic_bayesian_inference(queue: Queue, signal1: TimeSeries, signal2:
     ns = params.surr_count
     signif = params.confidence_level
 
-    result = package.full_bayesian(sig1, sig2, int1, int2, fs, win, pr, ovr, bn, ns, signif)
+    result = package.full_bayesian(sig1, sig2, *int1, *int2, fs, win, pr, ovr, bn, ns, signif)
 
     queue.put((signal1.name, *result))
 

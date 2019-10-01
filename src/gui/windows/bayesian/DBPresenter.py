@@ -63,7 +63,10 @@ class DBPresenter(BaseTFPresenter):
         for d in data:
             self.on_bayesian_inference_completed(*d)
 
-        self.plot_bayesian()
+        if data:
+            self.plot_bayesian()
+        else:
+            print("No data returned; are any parameter sets added?")
 
     def on_bayesian_inference_completed(self,
                                         signal_name: str,

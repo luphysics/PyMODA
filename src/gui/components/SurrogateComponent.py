@@ -18,7 +18,7 @@ from typing import Optional
 
 from PyQt5.QtWidgets import QLineEdit, QSlider
 
-from maths.num_utils import float_or_none, int_or_none
+from maths.num_utils import int_or_none
 from utils.decorators import inty
 
 
@@ -98,7 +98,7 @@ class SurrogateComponent:
             text = self._lineedit.text()
         else:
             text = ""
-        return text
+        return text or 2
 
     def get_surr_enabled(self) -> bool:
         return False  # TODO
