@@ -163,6 +163,12 @@ class MPHandler:
 
             self.scheduler.append(Task(p, q, subtasks=4))
 
+            # for sig in pair:
+            #     q = Queue()
+            #     p = Process(target=_time_frequency, args=(q, sig, params,))
+            #
+            #     self.scheduler.append(Task(p, q))
+
         return await self.scheduler.coro_run()
 
     def stop(self):

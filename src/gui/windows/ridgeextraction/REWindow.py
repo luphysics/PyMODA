@@ -57,7 +57,7 @@ class REWindow(REViewProperties, TFWindow):
         self.setup_btn_ridge_extraction()
         self.setup_btn_filter()
 
-        self.main_plot().set_max_crosshair_count(2)
+        self.main_plot().set_max_line_count(2)
         self.main_plot().add_crosshair_listener(self.on_crosshair_drawn)
 
         self.btn_calculate_single.hide()
@@ -92,11 +92,11 @@ class REWindow(REViewProperties, TFWindow):
 
         if f1:
             main.draw_crosshair(1, f1)
-            main.remove_line_at(1)
+            main.remove_line_at(1)  # Make the crosshair into a single line.
 
         if f2:
             main.draw_crosshair(1, f2)
-            main.remove_line_at(1)
+            main.remove_line_at(1)  # Make the crosshair into a single line.
 
         main.update()
 
@@ -242,8 +242,8 @@ class REWindow(REViewProperties, TFWindow):
 
     def get_interval_strings(self) -> list:
         """Gets the items from the intervals list widget as strings."""
-        w = self.list_intervals
-        return [w.item(i).text() for i in range(w.count())]
+        l = self.list_intervals
+        return [l.item(i).text() for i in range(l.count())]
 
     def get_interval_tuples(self) -> List[Tuple[float, ...]]:
         """

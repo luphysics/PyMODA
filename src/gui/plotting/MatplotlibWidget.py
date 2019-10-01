@@ -32,7 +32,7 @@ from gui.plotting.plots.Rect import Rect
 
 class MatplotlibWidget(PlotWidget):
     """
-    A widget which enables plotting via matplotlib.
+    A widget which enables plot via matplotlib.
     """
 
     def __init__(self, parent):
@@ -50,7 +50,7 @@ class MatplotlibWidget(PlotWidget):
         self.crosshair_width = 0.7
         self.show_crosshair = True
 
-        self.temp_patch = None  # The actual rectangle being drawn on the plotting.
+        self.temp_patch = None  # The actual rectangle being drawn on the plot.
         self.rect: Rect = None  # The Rect object representing the coordinates of the rectangle.
         self.rect_stack = []  # A List of Rect objects corresponding to a stack of previous zoom states.
 
@@ -98,7 +98,7 @@ class MatplotlibWidget(PlotWidget):
 
     def init_callbacks(self):
         """
-        Creates the callbacks for interacting with the plotting.
+        Creates the callbacks for interacting with the plot.
         """
         move = self.canvas.mpl_connect("motion_notify_event", self.on_move)
         click = self.canvas.mpl_connect("button_press_event", self.on_click)
@@ -116,7 +116,7 @@ class MatplotlibWidget(PlotWidget):
 
     def on_plot_complete(self):
         """
-        Should be called after the first plotting is complete. It will then set the initial state
+        Should be called after the first plot is complete. It will then set the initial state
         so that the reset button can work.
         """
         self.clear_rect_states()
@@ -151,13 +151,13 @@ class MatplotlibWidget(PlotWidget):
         self.remove_temp()
 
     def update(self):
-        """Updates the plotting by redrawing the canvas."""
+        """Updates the plot by redrawing the canvas."""
         super().update()
         self.canvas.draw()
 
     def set_log_scale(self, logarithmic=False, axis="y"):
         """
-        Set whether the plotting should use a logarithmic y-scale.
+        Set whether the plot should use a logarithmic y-scale.
         IMPORTANT: Note that the `apply_scale()` function must be called (usually in a subclass)
         for this function to have any effect.
         """
@@ -174,7 +174,18 @@ class MatplotlibWidget(PlotWidget):
         self.axes.set_xscale("log" if self.log_x else "linear")
 
     def set_max_crosshair_count(self, limit: int):
+        """
+        When drawing crosshairs on a plot (for example, see bispectrum analysis),
+        this function sets the maximum number of crosshairs shown before one is removed.
+        """
         self.max_crosshairs = limit
+
+    def set_max_line_count(self, limit: int):
+        """
+        When drawing lines on a plot (for example, see ridge extraction),
+        this function sets the maximum number of lines shown before one is removed.
+        """
+        self.max_crosshairs = limit + 1
 
     def remove_crosshairs(self, all=True, max_count=None):
         """
@@ -194,9 +205,9 @@ class MatplotlibWidget(PlotWidget):
             to_remove = max(0, num - max_count) * 2
 
         for i in range(to_remove):
-            item = self.temp_lines.pop()  # Take last item and remove from list.
+            item = self.temp_lines.pop(0)  # Take last item and remove from list.
             try:
-                item.remove()  # Remove from plotting.
+                item.remove()  # Remove from plot.
             except:
                 # Line was removed in `remove_line_at(...)`. No problem.
                 pass
@@ -220,11 +231,11 @@ class MatplotlibWidget(PlotWidget):
             self.temp_patch = None
 
     def remove_temp(self):
-        """Removes all temporary items on the plotting."""
+        """Removes all temporary items on the plot."""
         self.remove_temp_rectangle()
 
     def on_move(self, event):
-        """Called when the mouse moves over the plotting."""
+        """Called when the mouse moves over the plot."""
         self.cross_cursor(True)
         if self.mouse_zoom_enabled:
             x, y = self.xy(event)
@@ -237,7 +248,7 @@ class MatplotlibWidget(PlotWidget):
                 self.update()
 
     def on_click(self, event):
-        """Called when the mouse clicks down on the plotting, but before the click is released."""
+        """Called when the mouse clicks down on the plot, but before the click is released."""
         if event.button == MouseButton.LEFT:
             x, y = self.xy(event)
             if x and y:
@@ -251,7 +262,7 @@ class MatplotlibWidget(PlotWidget):
                 self.update()
 
     def on_release(self, event):
-        """Called when the mouse releases a click on the plotting."""
+        """Called when the mouse releases a click on the plot."""
         if event.button == MouseButton.LEFT:
             x, y = self.xy(event)
             if x and y:
@@ -268,7 +279,7 @@ class MatplotlibWidget(PlotWidget):
 
     def zoom_to(self, rect, save_state=True, trigger_listeners=True):
         """
-        Zooms the plotting to the region designated by the rectangle.
+        Zooms the plot to the region designated by the rectangle.
         Adds the new state to the stack of states.
         """
         rect = rect.sorted()
@@ -284,7 +295,7 @@ class MatplotlibWidget(PlotWidget):
                 l(rect)
 
     def set_xrange(self, x1=None, x2=None, **kwargs):
-        """Set the range of x-values shown by the plotting."""
+        """Set the range of x-values shown by the plot."""
         rect = self.current_rect()
         if x1 is not None:
             rect.x1 = x1
@@ -355,10 +366,9 @@ class MatplotlibWidget(PlotWidget):
 
     def draw_crosshair(self, x, y):
         """Draws a horizontal and vertical line, intersecting at (x,y)."""
-        self.remove_crosshairs(all=False, max_count=self.max_crosshairs - 1)
-
         self.plot_hor(y)
         self.plot_ver(x)
+        self.remove_crosshairs(all=False, max_count=self.max_crosshairs - 1)
 
         for l in self.crosshair_listeners:
             l(x, y)
@@ -382,12 +392,12 @@ class MatplotlibWidget(PlotWidget):
         return self.axes.axhline(y, color="black", linewidth=self.crosshair_width)
 
     def clear(self):
-        """Clears the contents of the plotting."""
+        """Clears the contents of the plot."""
         self.axes.clear()
         self.canvas.draw()
 
     def set_in_progress(self, in_progress=True):
-        """Sets the progress bar to display whether the plotting is in progress."""
+        """Sets the progress bar to display whether the plot is in progress."""
         self.options.set_in_progress(in_progress)
 
     def update_xlabel(self, text=None):

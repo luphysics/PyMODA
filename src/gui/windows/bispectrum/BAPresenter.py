@@ -58,12 +58,15 @@ class BAPresenter(BaseTFPresenter):
 
     def update_plots(self):
         data = self.get_selected_signal_pair()[0].output_data
+        x, y, c, log = self.get_plot_data(self.view.get_plot_type(), data)
 
-        x = data.freq
-        y = data.freq
-        c = self.get_plot_data(self.view.get_plot_type(), data)
+        if self.view.is_wt_selected():
+            self.view.switch_to_dual_plot()
+        else:
+            self.view.switch_to_triple_plot()
 
         if c is not None:
+            self.view.plot_main.set_log_scale(log, axis="x")
             self.view.plot_main.plot(x=x, y=y, c=c)
             self.view.plot_main.update_xlabel("Frequency (Hz)")
             self.view.plot_main.update_ylabel("Frequency (Hz)")
@@ -71,15 +74,15 @@ class BAPresenter(BaseTFPresenter):
     @staticmethod
     def get_plot_data(plot_type: str, data: BAOutputData):
         if not isinstance(data, BAOutputData):
-            return None
+            return [None for _ in range(4)]
 
         _dict = {
-            "Wavelet transform 1": data.wt1,
-            "Wavelet transform 2": data.wt2,
-            "b111": data.bispxxx,
-            "b222": data.bispppp,
-            "b122": data.bispxpp,
-            "b211": data.bisppxx,
+            "Wavelet transform 1": (data.times, data.freq, data.wt1, False),
+            "Wavelet transform 2": (data.times, data.freq, data.wt2, False),
+            "b111": (data.freq, data.freq, data.bispxxx, True),
+            "b222": (data.freq, data.freq, data.bispppp, True),
+            "b122": (data.freq, data.freq, data.bispxpp, True),
+            "b211": (data.freq, data.freq, data.bisppxx, True),
         }
         data = _dict.get(plot_type)
         if data is None:  # All plots.
@@ -90,21 +93,24 @@ class BAPresenter(BaseTFPresenter):
     def on_bispectrum_completed(self,
                                 name: str,
                                 freq: ndarray,
-                                bispxxx,
-                                bispppp,
-                                bispxpp,
-                                bisppxx,
-                                surrxxx,
-                                surrppp,
-                                surrxpp,
-                                surrpxx):
+                                wt1: ndarray,
+                                wt2: ndarray,
+                                bispxxx: ndarray,
+                                bispppp: ndarray,
+                                bispxpp: ndarray,
+                                bisppxx: ndarray,
+                                surrxxx: ndarray,
+                                surrppp: ndarray,
+                                surrxpp: ndarray,
+                                surrpxx: ndarray):
 
         # Attach the data to the first signal in the current pair.
         sig = self.signals.get(name)
 
         sig.output_data = BAOutputData(
-            None,
-            None,
+            wt1,
+            wt2,
+            sig.times,
             freq,
             bispxxx,
             bispppp,

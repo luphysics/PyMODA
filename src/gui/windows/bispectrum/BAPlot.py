@@ -13,32 +13,20 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from numpy import ndarray
+
+from gui.plotting.MatplotlibWidget import MatplotlibWidget
 
 
-class BAOutputData:
+class BAPlot(MatplotlibWidget):
 
-    def __init__(self,
-                 wt1,
-                 wt2,
-                 times,
-                 freq,
-                 bispxxx,
-                 bispppp,
-                 bispxpp,
-                 bisppxx,
-                 surrxxx=None,
-                 surrppp=None,
-                 surrxpp=None,
-                 surrpxx=None):
-        self.wt1 = wt1
-        self.wt2 = wt2
-        self.times = times
-        self.freq = freq
-        self.bispxxx = bispxxx
-        self.bispppp = bispppp
-        self.bispxpp = bispxpp
-        self.bisppxx = bisppxx
-        self.surrxxx = surrxxx
-        self.surrppp = surrppp
-        self.surrxpp = surrxpp
-        self.surrpxx = surrpxx
+    def plot(self, x: ndarray, y: ndarray):
+        self.update_xlabel()
+        self.update_ylabel()
+
+        self.axes.autoscale(True)
+
+        self.axes.plot(x, y, linewidth=0.8)
+        self.axes.autoscale(False)
+        self.axes.set_xlim([x[0], x[-1]])
+        self.on_plot_complete()

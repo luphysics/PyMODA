@@ -91,8 +91,8 @@
            </layout>
           </item>
           <item row="1" column="1">
-           <layout class="QGridLayout" name="gridLayout_5">
-            <item row="0" column="0">
+           <layout class="QVBoxLayout" name="verticalLayout_12">
+            <item>
              <widget class="AmplitudePlot" name="plot_right" native="true"/>
             </item>
            </layout>
@@ -544,15 +544,15 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>AmplitudePlot</class>
-   <extends>QWidget</extends>
-   <header>gui.plotting.plots.AmplitudePlot</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>PreprocessPlot</class>
    <extends>QWidget</extends>
    <header>gui.plotting.plots.PreprocessPlot</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>AmplitudePlot</class>
+   <extends>QWidget</extends>
+   <header>gui.plotting.plots.AmplitudePlot</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

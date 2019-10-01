@@ -20,22 +20,22 @@ due to issues with the LD_LIBRARY_PATH.
 """
 from typing import Tuple
 
+import numpy as np
+from numpy import ndarray
+
 from maths.num_utils import matlab_to_numpy
 from processes import mp_utils
 
 # This must be above the matlab imports.
 mp_utils.setup_matlab_runtime()
 
-import bispecWavNew
+import bispecWavPython
 import matlab
-from numpy import ndarray
-import numpy as np
-from multiprocess import Queue
 
-package = bispecWavNew.initialize()
+package = bispecWavPython.initialize()
 
 
-def calculate(signal1: ndarray, signal2: ndarray, fs, params: dict, queue: Queue = None) -> Tuple[ndarray, ndarray]:
+def calculate(signal1: ndarray, signal2: ndarray, fs, params: dict) -> Tuple[ndarray, ndarray, ndarray, ndarray]:
     """
     Calculates the windowed Fourier transform.
 
@@ -43,21 +43,20 @@ def calculate(signal1: ndarray, signal2: ndarray, fs, params: dict, queue: Queue
     with the LD_LIBRARY_PATH on Linux. Instead, use `MPHandler` to call it
     safely in a new process.
     """
-    bisp, freq = package.bispecWavNew(matlab.double(signal1),
-                                      matlab.double(signal2),
-                                      fs,
-                                      *expand(params),
-                                      nargout=2)
+
+    bisp, freq, wt1, wt2 = package.bispecWavPython(matlab.double(signal1),
+                                                   matlab.double(signal2),
+                                                   fs,
+                                                   *expand(params),
+                                                   nargout=4)
 
     bisp = matlab_to_numpy(bisp)
     freq = matlab_to_numpy(freq)
+    wt1 = matlab_to_numpy(wt1)
+    wt2 = matlab_to_numpy(wt2)
 
-    output = (np.abs(bisp), freq)
-
-    if queue:
-        queue.put(output)
-    else:
-        return output
+    output = (np.abs(bisp), freq, np.abs(wt1), np.abs(wt2))
+    return output
 
 
 def expand(_dict: dict) -> tuple:

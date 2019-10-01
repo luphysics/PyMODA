@@ -56,7 +56,10 @@ def int_or_none(var: Any, round_int=False) -> Optional[int]:
 
 def float_to_str(var: float) -> str:
     """Returns a string representation of a float, without trailing zeros."""
-    return f"{var:g}"
+    try:
+        return f"{var:g}"
+    except:
+        return ""
 
 
 def isfloat(var: Any) -> bool:

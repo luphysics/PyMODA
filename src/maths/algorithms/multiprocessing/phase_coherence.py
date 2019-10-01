@@ -44,9 +44,6 @@ def _phase_coherence(queue, signal_pair, params: PCParams):
     freq = s1.output_data.freq
     fs = s1.frequency
 
-    # Calculate phase coherence.
-    tpc, pc, pdiff = wpc(wt1, wt2, freq, fs)
-
     # Calculate surrogates.
     surr_count = params.surr_count
     surr_method = params.surr_method
@@ -57,6 +54,7 @@ def _phase_coherence(queue, signal_pair, params: PCParams):
     processes = []
     queues = []
 
+    # Create processes for surrogates.
     for i in range(surr_count):
         q = Queue()
         queues.append(q)
@@ -67,8 +65,12 @@ def _phase_coherence(queue, signal_pair, params: PCParams):
             )
         )
 
+    # Start processes for surrogates.
     for p in processes:
         p.start()
+
+    # Calculate phase coherence.
+    tpc, pc, pdiff = wpc(wt1, wt2, freq, fs)
 
     # Wait for processes to calculate surrogate results.
     # This is fine since we're not running on the main process.

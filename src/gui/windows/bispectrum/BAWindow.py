@@ -22,6 +22,7 @@ from gui.components.SurrogateComponent import SurrogateComponent
 from gui.windows.bispectrum.BAPresenter import BAPresenter
 from gui.windows.bispectrum.BAViewProperties import BAViewProperties
 from gui.windows.common.BaseTFWindow import BaseTFWindow
+from maths.num_utils import float_to_str
 from utils.decorators import floaty
 
 
@@ -46,10 +47,72 @@ class BAWindow(BAViewProperties, BaseTFWindow, DualSignalComponent, FreqComponen
         self.plot_main.set_log_scale(True, "x")
         self.plot_main.set_log_scale(True, "y")
 
+        self.plot_main.set_mouse_zoom_enabled(False)
+        self.plot_main.set_max_crosshair_count(1)
+        self.plot_main.add_crosshair_listener(self.on_crosshair_drawn)
+
+        self.plot_right_bottom.options.hide()
+        self.plot_right_middle.options.hide()
+        self.plot_right_top.options.hide()
+
+        self.btn_select_point.clicked.connect(self.on_select_point_clicked)
+        self.btn_add_point.clicked.connect(self.on_add_point_clicked)
+        self.btn_clear_plots.clicked.connect(self.on_clear_plots_clicked)
+
         self.combo_plot_type.currentTextChanged.connect(lambda _: self.presenter.update_plots())
+
+    def on_select_point_clicked(self):
+        if not self.is_wt_selected():
+            self.plot_main.set_click_crosshair_enabled(True)
+
+    def on_add_point_clicked(self):
+        x = self.get_freq_x()
+        y = self.get_freq_y()
+
+        if x is not None and y is not None:
+            l = self.listwidget_freq
+            formatted = f"{float_to_str(x)}, {float_to_str(y)}"
+
+            if formatted not in [l.item(i).text() for i in range(l.count())]:
+                l.addItem(formatted)
+                l.setCurrentRow(l.count() - 1)
+
+    def on_clear_plots_clicked(self):
+        pass
+
+    def switch_to_triple_plot(self):
+        self.vbox_right.setStretch(0, 100)
+        self.vbox_right.setStretch(1, 100)
+        self.vbox_right.setStretch(2, 0)
+
+    def switch_to_dual_plot(self):
+        self.vbox_right.setStretch(0, 0)
+        self.vbox_right.setStretch(1, 0)
+        self.vbox_right.setStretch(2, 100)
+
+    def on_crosshair_drawn(self, x: float, y: float):
+        x = float_to_str(x)
+        y = float_to_str(y)
+
+        self.lineedit_freq_x.setText(x)
+        self.lineedit_freq_y.setText(y)
+
+    def is_wt_selected(self):
+        return "Wavelet transform" in self.combo_plot_type.currentText()
+
+    def switch_to_all_plots(self):
+        pass
 
     def get_layout_file(self) -> str:
         return resources.get("layout:window_bispectrum_analysis.ui")
+
+    @floaty
+    def get_freq_x(self) -> Optional[int]:
+        return self.lineedit_freq_x.text()
+
+    @floaty
+    def get_freq_y(self) -> Optional[int]:
+        return self.lineedit_freq_y.text()
 
     @floaty
     def get_nv(self) -> Optional[float]:

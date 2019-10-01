@@ -62,23 +62,15 @@ def _bispectrum_analysis(queue: Queue,
         "f0": f0,
     }
 
+    # Note: attempted to calculate bispec_wav_new in a process each. Did not work
+    # due to some strange problem with the Matlab runtime. Processes would
+    # hang at the `package.initialize()` stage for unknown reasons.
     if sigcheck != 0:
-        if not preprocess:
-            bispxxx = bispec_wav_new.calculate(sig1list, sig1list, fs, params)
-            bispxxx = matlab_to_numpy(bispxxx[0])
-            bispxxx = np.abs(bispxxx)
-
-            bispppp = bispec_wav_new.calculate(sig2list, sig2list, fs, params)
-            bispppp = matlab_to_numpy(bispppp[0])
-            bispppp = np.abs(bispppp)
-
-            bispxpp, freq = bispec_wav_new.calculate(sig1list, sig2list, fs, params)[:5]
-            bispxpp = matlab_to_numpy(bispxpp)
-            bispxpp = np.abs(bispxpp)
-
-            bisppxx = bispec_wav_new.calculate(sig2list, sig1list, fs, params)
-            bisppxx = matlab_to_numpy(bisppxx[0])
-            bisppxx = np.abs(bisppxx)
+        if not preprocess:  # TODO: check this block.
+            bispxxx, _, _, _ = bispec_wav_new.calculate(sig1list, sig1list, fs, params)
+            bispppp, _, _, _ = bispec_wav_new.calculate(sig2list, sig2list, fs, params)
+            bispxpp, freq, wt1, wt2 = bispec_wav_new.calculate(sig1list, sig2list, fs, params)
+            bisppxx, _, _, _ = bispec_wav_new.calculate(sig2list, sig1list, fs, params)
 
             if ns > 0:
                 for j in range(ns):
@@ -91,34 +83,10 @@ def _bispectrum_analysis(queue: Queue,
                     surrpxx[:, :, j] = abs(bispec_wav_new.calculate(surr2, surr1, fs, params))
 
         else:
-            queues = [Queue() for _ in range(4)]
-            proc = []
-
-            args = [
-                (sig1list, sig1list, fs, params),
-                (sig2list, sig2list, fs, params),
-                (sig1list, sig2list, fs, params),
-                (sig2list, sig1list, fs, params),
-            ]
-
-            # for i in range(4):
-            #     _args = args[i] + (queues[i],)
-            #     proc.append(Process(target=bispec_wav_new.calculate, args=_args))
-            #
-            # for p in proc:
-            #     p.start()
-            # for p in proc:
-            #     p.join()
-            #
-            # bispxxx, _ = queues[0].get()
-            # bispppp, _ = queues[1].get()
-            # bispxpp, freq = queues[2].get()
-            # bisppxx, _ = queues[3].get()
-
-            bispxxx, _ = bispec_wav_new.calculate(sig1list, sig1list, fs, params)
-            bispppp, _ = bispec_wav_new.calculate(sig2list, sig2list, fs, params)
-            bispxpp, freq = bispec_wav_new.calculate(sig1list, sig2list, fs, params)
-            bisppxx, _ = bispec_wav_new.calculate(sig2list, sig1list, fs, params)
+            bispxxx, _, _, _ = bispec_wav_new.calculate(sig1list, sig1list, fs, params)
+            bispppp, _, _, _ = bispec_wav_new.calculate(sig2list, sig2list, fs, params)
+            bispxpp, freq, wt1, wt2 = bispec_wav_new.calculate(sig1list, sig2list, fs, params)
+            bisppxx, _, _, _ = bispec_wav_new.calculate(sig2list, sig1list, fs, params)
 
             if ns > 0:
                 for j in range(ns):
@@ -137,6 +105,8 @@ def _bispectrum_analysis(queue: Queue,
     queue.put((
         name,
         freq,
+        wt1,
+        wt2,
         bispxxx,
         bispppp,
         bispxpp,

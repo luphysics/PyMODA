@@ -59,8 +59,10 @@ class REPresenter(TFPresenter):
         asyncio.ensure_future(self.coro_ridge_extraction())
 
     async def coro_ridge_extraction(self):
-        data = await self.mp_handler.coro_ridge_extraction(self.get_re_params(),
-                                                           on_progress=self.on_progress_updated)
+        data: tuple = await self.mp_handler.coro_ridge_extraction(
+            self.get_re_params(),
+            on_progress=self.on_progress_updated
+        )
 
         for d in data:
             self.on_ridge_completed(*d)
@@ -173,19 +175,17 @@ class REPresenter(TFPresenter):
             else:
                 self.view.clear_all()
 
-        if data.has_band_data():  # TODO: plot correct type
+        if data.has_band_data():
             d = data.get_band_data(self.view.get_selected_interval())
             if d:
                 self.plot_band_data(data)
 
     def on_interval_selected(self, interval: Tuple[float, float]):
         """Called when a frequency interval is selected."""
-        if not interval:
-            return
-
-        fmin, fmax = interval
-        print(f"Selected interval: {fmin}, {fmax}")
-        self.plot_band_data(self.get_selected_signal().output_data)
+        if interval:
+            fmin, fmax = interval
+            print(f"Selected interval: {fmin}, {fmax}")
+            self.plot_band_data(self.get_selected_signal().output_data)
 
     def on_filter_clicked(self):
         """Called when the "bandpass filter" button is clicked."""
@@ -209,7 +209,6 @@ class REPresenter(TFPresenter):
         Called when all bandpass filter calculations have finished.
         """
         self.view.switch_to_three_plots()
-        print("All bandpass filtering completed.")
 
         sig = self.get_selected_signal()
         data = sig.output_data

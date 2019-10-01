@@ -23,10 +23,10 @@
          <number>10</number>
         </property>
         <item>
-         <layout class="QGridLayout" name="gridLayout" rowstretch="3,7" columnstretch="7,2">
+         <layout class="QGridLayout" name="grid_main" rowstretch="3,7" columnstretch="7,2">
           <item row="1" column="0">
-           <layout class="QGridLayout" name="gridLayout_2">
-            <item row="0" column="0">
+           <layout class="QVBoxLayout" name="vbox_left">
+            <item>
              <widget class="ColorMeshPlot" name="plot_main" native="true"/>
             </item>
            </layout>
@@ -132,6 +132,19 @@
             </item>
            </layout>
           </item>
+          <item row="1" column="1">
+           <layout class="QVBoxLayout" name="vbox_right">
+            <item>
+             <widget class="AmplitudePlot" name="plot_right_top" native="true"/>
+            </item>
+            <item>
+             <widget class="BAPlot" name="plot_right_middle" native="true"/>
+            </item>
+            <item>
+             <widget class="BAPlot" name="plot_right_bottom" native="true"/>
+            </item>
+           </layout>
+          </item>
          </layout>
         </item>
         <item>
@@ -195,7 +208,7 @@
        </layout>
       </item>
       <item>
-       <layout class="QGridLayout" name="gridLayout_6" rowstretch="1,10,10">
+       <layout class="QGridLayout" name="gridLayout_6" rowstretch="1,10,5">
         <item row="0" column="0">
          <layout class="QHBoxLayout" name="data_section">
           <item alignment="Qt::AlignHCenter">
@@ -316,6 +329,9 @@
             <layout class="QHBoxLayout" name="horizontalLayout_8">
              <item>
               <layout class="QVBoxLayout" name="verticalLayout_12">
+               <property name="rightMargin">
+                <number>10</number>
+               </property>
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_7">
                  <item>
@@ -326,7 +342,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="lineEdit"/>
+                  <widget class="QLineEdit" name="lineedit_freq_x"/>
                  </item>
                 </layout>
                </item>
@@ -340,25 +356,25 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="lineEdit_2"/>
+                  <widget class="QLineEdit" name="lineedit_freq_y"/>
                  </item>
                 </layout>
                </item>
               </layout>
              </item>
              <item>
-              <layout class="QVBoxLayout" name="verticalLayout_10">
+              <layout class="QVBoxLayout" name="verticalLayout_10" stretch="1,1,0">
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_12">
                  <item>
-                  <widget class="QPushButton" name="pushButton_2">
+                  <widget class="QPushButton" name="btn_select_point">
                    <property name="text">
                     <string>Select Point</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="pushButton">
+                  <widget class="QPushButton" name="btn_clear_plots">
                    <property name="text">
                     <string>Clear Plots</string>
                    </property>
@@ -367,11 +383,14 @@
                 </layout>
                </item>
                <item>
-                <widget class="QPushButton" name="pushButton_3">
+                <widget class="QPushButton" name="btn_add_point">
                  <property name="text">
                   <string>Add Point to Frequency List</string>
                  </property>
                 </widget>
+               </item>
+               <item>
+                <widget class="QListWidget" name="listwidget_freq"/>
                </item>
               </layout>
              </item>
@@ -572,6 +591,18 @@
    <class>PreprocessPlot</class>
    <extends>QWidget</extends>
    <header>gui.plotting.plots.PreprocessPlot</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>AmplitudePlot</class>
+   <extends>QWidget</extends>
+   <header>gui.plotting.plots.AmplitudePlot</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>BAPlot</class>
+   <extends>QWidget</extends>
+   <header>gui.windows.bispectrum.BAPlot</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

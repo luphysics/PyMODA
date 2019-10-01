@@ -13,9 +13,12 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from PyQt5.QtWidgets import QLineEdit, QSlider, QComboBox
+from PyQt5.QtWidgets import QLineEdit, QSlider, QComboBox, QVBoxLayout, QWidget, QGridLayout, QPushButton, QListWidget
 
+from gui.plotting.plots.AmplitudePlot import AmplitudePlot
+from gui.plotting.plots.ColorMeshPlot import ColorMeshPlot
 from gui.windows.ViewProperties import ViewProperties
+from gui.windows.bispectrum.BAPlot import BAPlot
 
 
 class BAViewProperties(ViewProperties):
@@ -27,5 +30,24 @@ class BAViewProperties(ViewProperties):
 
         self.lineedit_alpha: QLineEdit = None
         self.lineedit_nv: QLineEdit = None
+        self.lineedit_freq_x: QLineEdit = None
+        self.lineedit_freq_y: QLineEdit = None
 
         self.combo_plot_type: QComboBox = None
+
+        self.grid_main: QGridLayout = None
+        self.vbox_left: QVBoxLayout = None
+        self.vbox_right: QVBoxLayout = None
+
+        self.plot_right_bottom: BAPlot = None
+        self.plot_right_middle: BAPlot = None
+
+        self.plot_right_top: AmplitudePlot = None  # Plots amplitude for WT.
+        self.plot_main: ColorMeshPlot = None  # Plots WT or bispectrum.
+
+        self.btn_add_point: QPushButton = None
+        self.btn_select_point: QPushButton = None
+        self.btn_clear_plots: QPushButton = None
+
+        self.listwidget_freq: QListWidget = None
+
