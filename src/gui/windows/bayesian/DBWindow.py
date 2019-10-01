@@ -26,6 +26,7 @@ from gui.windows.bayesian.DBPresenter import DBPresenter
 from gui.windows.bayesian.DBViewProperties import DBViewProperties
 from gui.windows.bayesian.ParamSet import ParamSet
 from gui.windows.common.BaseTFWindow import BaseTFWindow
+from maths.num_utils import float_to_str
 from utils.decorators import floaty, inty
 
 
@@ -119,11 +120,11 @@ class DBWindow(DBViewProperties, BaseTFWindow, SurrogateComponent, DualSignalCom
         params = self.presenter.get_paramset(text1, text2)
 
         if params:
-            self.lineedit_overlap.setText(str(params.overlap))
-            self.lineedit_window_size.setText(str(params.window))
-            self.lineedit_confidence_level.setText(str(params.confidence_level))
-            self.lineedit_propagation_const.setText(str(params.propagation_const))
-            self.lineedit_order.setText(str(params.order))
+            self.lineedit_overlap.setText(float_to_str(params.overlap))
+            self.lineedit_window_size.setText(float_to_str(params.window))
+            self.lineedit_confidence_level.setText(float_to_str(params.confidence_level))
+            self.lineedit_propagation_const.setText(float_to_str(params.propagation_const))
+            self.lineedit_order.setText(float_to_str(params.order))
 
     def on_add_paramset_clicked(self):
         params = self.get_param_set()

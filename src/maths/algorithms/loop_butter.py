@@ -25,6 +25,7 @@ Translation of MODA's `loop_butter` algorithm into Python.
 STATUS: Finished, not fully working. See usage of `filtfilt` below.
 """
 
+
 def loop_butter(signal_in: ndarray, fmin: float, fmax: float, fs: float) -> Tuple[ndarray, int]:
     max_out = np.max(signal_in)
     optimal_order = 1
@@ -51,5 +52,5 @@ def bandpass_butter(c: ndarray, n: int, flp: float, fhi: float, fs: float) -> nd
     # Warning: this does not seem consistent with Matlab's filtfilt.
     #
     # Note: the extra parameters such as `padtype` have been added because these are the default values
-    # used in the Matlab implementation.
+    # used in the Matlab implementation. Removing them does not improve the situation.
     return filtfilt(b, a, c, padtype="odd", padlen=3 * (max(len(b), len(a)) - 1))

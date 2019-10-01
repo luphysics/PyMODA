@@ -145,7 +145,7 @@ class MPHandler:
         for params in paramsets:
             for pair in signals.get_pairs():
                 q = Queue()
-                p = Process(target=_moda_dynamic_bayesian_inference, args=(q, *pair, params,))
+                p = Process(target=_dynamic_bayesian_inference, args=(q, *pair, params,))
 
                 self.scheduler.append(Task(p, q))
 

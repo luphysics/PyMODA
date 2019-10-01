@@ -326,13 +326,13 @@ def parcalc(racc, L, wp, fwt, twf, disp_mode, f0, fmax, wavelet="Lognorm"):
             AC = fwt(cx0)
 
         if AC > 10 ** -12:
-            print("""--------------------------------------------- Warning! ---------------------------------------------\n
-Wavelet does not seem to be admissible (its Fourier transform does not vanish at zero frequency)!\n
-Parameters estimated from its frequency domain form, e.g. integration constant Cpsi (which is \n
-infinite for non-admissible wavelets), cannot be estimated appropriately (the same concerns the \n
-number-of-voices ''nv'', when set to ''auto'', so frequency discretization might be also not appropriate).\n
-It is recommended to use only admissible wavelets.\n
-----------------------------------------------------------------------------------------------------\n""")
+            print("""--------------------------------------------- Warning! 
+            ---------------------------------------------\n Wavelet does not seem to be admissible (its Fourier 
+            transform does not vanish at zero frequency)!\n Parameters estimated from its frequency domain form, 
+            e.g. integration constant Cpsi (which is \n infinite for non-admissible wavelets), cannot be estimated 
+            appropriately (the same concerns the \n number-of-voices ''nv'', when set to ''auto'', so frequency 
+            discretization might be also not appropriate).\n It is recommended to use only admissible wavelets.\n 
+            ----------------------------------------------------------------------------------------------------\n""")
 
         QQ, wflag, xx, ss = sqeps(vfun, xp, lim1, lim2, racc, MIC,
                                   [log((wp.ompeak / fmax) * fs / L / 8), log(8 * (wp.ompeak / (fs / L)) * fs)]
