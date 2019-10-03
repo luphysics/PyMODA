@@ -16,7 +16,7 @@
 import math
 from typing import Optional
 
-from PyQt5.QtWidgets import QLineEdit, QSlider
+from PyQt5.QtWidgets import QLineEdit, QSlider, QCheckBox
 
 from maths.num_utils import int_or_none
 from utils.decorators import inty
@@ -28,9 +28,10 @@ class SurrogateComponent:
     require the number of surrogates to be specified.
     """
 
-    def __init__(self, slider: QSlider, line_edit: QLineEdit):
+    def __init__(self, slider: QSlider, line_edit: QLineEdit, checkbox: QCheckBox = None):
         self._slider: QSlider = slider
         self._lineedit: QLineEdit = line_edit
+        self._checkbox = checkbox
 
         self.setup_surr_count()
 
@@ -98,7 +99,7 @@ class SurrogateComponent:
             text = self._lineedit.text()
         else:
             text = ""
-        return text or 2
+        return text or 0
 
     def get_surr_enabled(self) -> bool:
-        return False  # TODO
+        return self._checkbox and self._checkbox.isChecked()

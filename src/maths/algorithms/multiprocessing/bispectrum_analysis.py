@@ -14,14 +14,14 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import math
-from math import nan
 
-from multiprocess import Queue, Process
+import numpy as np
+from multiprocess import Queue
 
 from maths.algorithms.matlab_utils import *
+from maths.algorithms.multiprocessing.time_frequency import avg_ampl_pow
 from maths.num_utils import matlab_to_numpy
 from maths.params.BAParams import BAParams
-from maths.signals.SignalPairs import SignalPairs
 from maths.signals.TimeSeries import TimeSeries
 
 
@@ -37,11 +37,6 @@ def _bispectrum_analysis(queue: Queue,
 
     sig1list = sig1.tolist()
     sig2list = sig2.tolist()
-
-    surrxxx = []  # TODO: set dimensions
-    surrppp = []
-    surrxpp = []
-    surrpxx = []
 
     sigcheck = np.sum(np.abs(sig1 - sig2))
 
@@ -69,44 +64,67 @@ def _bispectrum_analysis(queue: Queue,
         if not preprocess:  # TODO: check this block.
             bispxxx, _, _, _ = bispec_wav_new.calculate(sig1list, sig1list, fs, params)
             bispppp, _, _, _ = bispec_wav_new.calculate(sig2list, sig2list, fs, params)
-            bispxpp, freq, wt1, wt2 = bispec_wav_new.calculate(sig1list, sig2list, fs, params)
+            bispxpp, freq, amp_wt1, amp_wt2 = bispec_wav_new.calculate(sig1list, sig2list, fs, params)
             bisppxx, _, _, _ = bispec_wav_new.calculate(sig2list, sig1list, fs, params)
+
+            size = bispxxx.shape
+            surrxxx = zeros(size)
+            surrppp = zeros(size)
+            surrxpp = zeros(size)
+            surrpxx = zeros(size)
 
             if ns > 0:
                 for j in range(ns):
                     surr1 = wav_surrogate.calculate(sig1list, "IAAFT2", 1)
                     surr2 = wav_surrogate.calculate(sig2list, "IAAFT2", 1)
 
-                    surrxxx[:, :, j] = abs(bispec_wav_new.calculate(surr1, surr1, fs, params))
-                    surrppp[:, :, j] = abs(bispec_wav_new.calculate(surr2, surr2, fs, params))
-                    surrxpp[:, :, j] = abs(bispec_wav_new.calculate(surr1, surr2, fs, params))
-                    surrpxx[:, :, j] = abs(bispec_wav_new.calculate(surr2, surr1, fs, params))
+                    surrxxx[:, :, j] = abs(bispec_wav_new.calculate(surr1, surr1, fs, params)[0])
+                    surrppp[:, :, j] = abs(bispec_wav_new.calculate(surr2, surr2, fs, params)[0])
+                    surrxpp[:, :, j] = abs(bispec_wav_new.calculate(surr1, surr2, fs, params)[0])
+                    surrpxx[:, :, j] = abs(bispec_wav_new.calculate(surr2, surr1, fs, params)[0])
 
         else:
             bispxxx, _, _, _ = bispec_wav_new.calculate(sig1list, sig1list, fs, params)
             bispppp, _, _, _ = bispec_wav_new.calculate(sig2list, sig2list, fs, params)
-            bispxpp, freq, wt1, wt2 = bispec_wav_new.calculate(sig1list, sig2list, fs, params)
+            bispxpp, freq, amp_wt1, amp_wt2 = bispec_wav_new.calculate(sig1list, sig2list, fs, params)
             bisppxx, _, _, _ = bispec_wav_new.calculate(sig2list, sig1list, fs, params)
+
+            size = bispxxx.shape
+            surrxxx = zeros(size)
+            surrppp = zeros(size)
+            surrxpp = zeros(size)
+            surrpxx = zeros(size)
 
             if ns > 0:
                 for j in range(ns):
                     surr1 = wav_surrogate.calculate(sig1list, "IAAFT2", 1)
                     surr2 = wav_surrogate.calculate(sig2list, "IAAFT2", 1)
 
-                    surrxxx[:, :, j] = abs(bispec_wav_new.calculate(surr1, surr1, fs, params))
-                    surrppp[:, :, j] = abs(bispec_wav_new.calculate(surr2, surr2, fs, params))
-                    surrxpp[:, :, j] = abs(bispec_wav_new.calculate(surr1, surr2, fs, params))
-                    surrpxx[:, :, j] = abs(bispec_wav_new.calculate(surr2, surr1, fs, params))
+                    surrxxx[:, :, j] = abs(bispec_wav_new.calculate(surr1, surr1, fs, params)[0])
+                    surrppp[:, :, j] = abs(bispec_wav_new.calculate(surr2, surr2, fs, params)[0])
+                    surrxpp[:, :, j] = abs(bispec_wav_new.calculate(surr1, surr2, fs, params)[0])
+                    surrpxx[:, :, j] = abs(bispec_wav_new.calculate(surr2, surr1, fs, params)[0])
 
     else:
         raise Exception("sigcheck == 0. This case is not implemented yet.")  # TODO
 
     freq = matlab_to_numpy(freq)
+    avg_amp_wt1, avg_pow_wt1 = avg_ampl_pow(amp_wt1)
+    avg_amp_wt2, avg_pow_wt2 = avg_ampl_pow(amp_wt2)
+
+    pow_wt1, pow_wt2 = np.square(amp_wt1), np.square(amp_wt2)
+
     queue.put((
         name,
         freq,
-        wt1,
-        wt2,
+        amp_wt1,
+        pow_wt1,
+        avg_amp_wt1,
+        avg_pow_wt1,
+        amp_wt2,
+        pow_wt2,
+        avg_amp_wt2,
+        avg_pow_wt2,
         bispxxx,
         bispppp,
         bispxpp,

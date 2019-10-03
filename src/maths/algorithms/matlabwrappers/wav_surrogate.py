@@ -39,6 +39,9 @@ def calculate(signal: ndarray, type: str, adj: int) -> ndarray:
     with the LD_LIBRARY_PATH on Linux. Instead, use `MPHandler` to call it
     safely in a new process.
     """
-    result = package.wavsurrogate(matlab.double(signal.tolist()), type, adj)
+    if isinstance(signal, ndarray):
+        signal = signal.tolist()
+
+    result = package.wavsurrogate(matlab.double(signal), type, adj)
 
     return result

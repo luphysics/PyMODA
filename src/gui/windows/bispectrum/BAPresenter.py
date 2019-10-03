@@ -36,6 +36,10 @@ class BAPresenter(BaseTFPresenter):
         from gui.windows.bispectrum.BAWindow import BAWindow
         self.view: BAWindow = view
 
+    def init(self):
+        super().init()
+        self.view.switch_to_dual_plot()
+
     def calculate(self, calculate_all: bool):
         asyncio.ensure_future(self.coro_calculate())
 
@@ -58,7 +62,12 @@ class BAPresenter(BaseTFPresenter):
 
     def update_plots(self):
         data = self.get_selected_signal_pair()[0].output_data
-        x, y, c, log = self.get_plot_data(self.view.get_plot_type(), data)
+
+        self.update_main_plot(data)
+        self.update_side_plots(data)
+
+    def update_main_plot(self, data):
+        x, y, c, log = self.get_main_plot_data(self.view.get_plot_type(), data)
 
         if self.view.is_wt_selected():
             self.view.switch_to_dual_plot()
@@ -67,18 +76,24 @@ class BAPresenter(BaseTFPresenter):
 
         if c is not None:
             self.view.plot_main.set_log_scale(log, axis="x")
+            self.view.plot_main.set_log_scale(True, axis="y")
             self.view.plot_main.plot(x=x, y=y, c=c)
             self.view.plot_main.update_xlabel("Frequency (Hz)")
             self.view.plot_main.update_ylabel("Frequency (Hz)")
 
+    def update_side_plots(self, data):
+        if self.view.is_wt_selected():
+            pass # TODO
+
+
     @staticmethod
-    def get_plot_data(plot_type: str, data: BAOutputData):
+    def get_main_plot_data(plot_type: str, data: BAOutputData):
         if not isinstance(data, BAOutputData):
             return [None for _ in range(4)]
 
         _dict = {
-            "Wavelet transform 1": (data.times, data.freq, data.wt1, False),
-            "Wavelet transform 2": (data.times, data.freq, data.wt2, False),
+            "Wavelet transform 1": (data.times, data.freq, data.amp_wt1, False),
+            "Wavelet transform 2": (data.times, data.freq, data.amp_wt2, False),
             "b111": (data.freq, data.freq, data.bispxxx, True),
             "b222": (data.freq, data.freq, data.bispppp, True),
             "b122": (data.freq, data.freq, data.bispxpp, True),
@@ -93,8 +108,14 @@ class BAPresenter(BaseTFPresenter):
     def on_bispectrum_completed(self,
                                 name: str,
                                 freq: ndarray,
-                                wt1: ndarray,
-                                wt2: ndarray,
+                                amp_wt1: ndarray,
+                                pow_wt1: ndarray,
+                                avg_amp_wt1: ndarray,
+                                avg_pow_wt1: ndarray,
+                                amp_wt2: ndarray,
+                                pow_wt2: ndarray,
+                                avg_amp_wt2: ndarray,
+                                avg_pow_wt2: ndarray,
                                 bispxxx: ndarray,
                                 bispppp: ndarray,
                                 bispxpp: ndarray,
@@ -108,14 +129,26 @@ class BAPresenter(BaseTFPresenter):
         sig = self.signals.get(name)
 
         sig.output_data = BAOutputData(
-            wt1,
-            wt2,
+            amp_wt1,
+            pow_wt1,
+
+            avg_amp_wt1,
+            avg_pow_wt1,
+
+            amp_wt2,
+            pow_wt2,
+
+            avg_amp_wt2,
+            avg_pow_wt2,
+
             sig.times,
             freq,
+
             bispxxx,
             bispppp,
             bispxpp,
             bisppxx,
+
             surrxxx,
             surrppp,
             surrxpp,

@@ -40,19 +40,8 @@ def _time_frequency(queue: Queue, time_series: TimeSeries, params: TFParams):
     freq = matlab_to_numpy(freq)
 
     amplitude = np.abs(transform)
-
     power = np.square(amplitude)
-    length = len(amplitude)
-
-    avg_ampl = np.empty(length, dtype=np.float64)
-    avg_pow = np.empty(length, dtype=np.float64)
-
-    for i in range(length):
-        arr = amplitude[i]
-        row = arr[np.isfinite(arr)]
-
-        avg_ampl[i] = np.mean(row)
-        avg_pow[i] = np.mean(np.square(row))
+    avg_ampl, avg_pow = avg_ampl_pow(amplitude)
 
     print(f"Started putting items in queue at time: {time.time():.1f} seconds.")
 
@@ -71,3 +60,19 @@ def _time_frequency(queue: Queue, time_series: TimeSeries, params: TFParams):
         queue.put(out)
     else:
         return out
+
+
+def avg_ampl_pow(amplitude):
+    length = len(amplitude)
+
+    avg_ampl = np.empty(length, dtype=np.float64)
+    avg_pow = np.empty(length, dtype=np.float64)
+
+    for i in range(length):
+        arr = amplitude[i]
+        row = arr[np.isfinite(arr)]
+
+        avg_ampl[i] = np.mean(row)
+        avg_pow[i] = np.mean(np.square(row))
+
+    return avg_ampl, avg_pow

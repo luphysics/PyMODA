@@ -23,7 +23,7 @@ from utils.decorators import floaty
 class FreqComponent:
 
     """
-    A component which handles the
+    A component which handles the 3 frequency-related QLineEdits: fmin, fmax and resolution.
     """
 
     def __init__(self, lineedit_fmax: QLineEdit, lineedit_fmin: QLineEdit, lineedit_res: QLineEdit):

@@ -20,6 +20,7 @@ from PyQt5 import sip
 from PyQt5.QtWidgets import QListWidget, QVBoxLayout
 
 from data import resources
+from gui.components.VerticalMultiPlotComponent import VerticalMultiPlotComponent
 from gui.windows.ridgeextraction.REPlot import REPlot
 from gui.windows.ridgeextraction.REPresenter import REPresenter
 from gui.windows.ridgeextraction.REViewProperties import REViewProperties
@@ -27,7 +28,7 @@ from gui.windows.timefrequency.TFWindow import TFWindow
 from maths.num_utils import float_or_none
 
 
-class REWindow(REViewProperties, TFWindow):
+class REWindow(REViewProperties, TFWindow, VerticalMultiPlotComponent):
     """
     The ridge extraction window. Since ridge extraction uses all of
     the time-frequency common functionality (except statistics),
@@ -44,6 +45,7 @@ class REWindow(REViewProperties, TFWindow):
 
         REViewProperties.__init__(self)
         TFWindow.__init__(self, parent, REPresenter(self))
+        VerticalMultiPlotComponent.__init__(self, self.get_plot_layout())
 
     def setup_ui(self):
         super(REWindow, self).setup_ui()
@@ -136,7 +138,7 @@ class REWindow(REViewProperties, TFWindow):
 
         self.on_freq_region_updated()
 
-        # Transform the crosshair into a horizonal line
+        # Transform the crosshair into a horizontal line
         # by removing the vertical component.
         self.main_plot().remove_line_at(x=x)
 
@@ -184,13 +186,11 @@ class REWindow(REViewProperties, TFWindow):
         if not self.single_plot_mode:
             return
 
-        layout: QVBoxLayout = self.get_plot_layout()
-
         self.re_top = REPlot(self)
         self.re_bottom = REPlot(self)
 
-        layout.insertWidget(0, self.re_top)
-        layout.addWidget(self.re_bottom)
+        self.vplot_insert_widget(0, self.re_top)
+        self.vplot_add_plots(self.re_bottom)
 
         self.single_plot_mode = False
 
@@ -198,25 +198,20 @@ class REWindow(REViewProperties, TFWindow):
         if self.single_plot_mode:
             return
 
-        layout = self.get_plot_layout()
-        for plot in (self.re_top, self.re_bottom):
-            if plot is not None:
-                layout.removeWidget(plot)
-                plot.deleteLater()
-                sip.delete(plot)
+        self.vplot_remove_plots(self.re_top, self.re_bottom)
 
         self.re_top = None
         self.re_bottom = None
 
         self.single_plot_mode = True
 
-    def get_re_top_plot(self):
+    def get_re_top_plot(self) -> REPlot:
         return self.re_top
 
-    def get_re_bottom_plot(self):
+    def get_re_bottom_plot(self) -> REPlot:
         return self.re_bottom
 
-    def get_plot_layout(self):
+    def get_plot_layout(self) -> QVBoxLayout:
         return self.plot_layout
 
     def clear_all(self):

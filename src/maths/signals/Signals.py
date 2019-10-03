@@ -46,7 +46,7 @@ class Signals(list):
         temp = set()
 
         # Gets all duplicate names.
-        duplicates = [name for name in self.names() if name in temp or temp.add(name)]
+        duplicates = [name for name in self.names() if (name in temp) or temp.add(name)]
 
         for t in self:
             # Should rename if it has no name, or if it is a duplicate.

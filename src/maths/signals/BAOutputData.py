@@ -13,32 +13,43 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from dataclasses import dataclass
+from numpy import ndarray
 
 
+@dataclass
 class BAOutputData:
+    """
+    Data class containing data returned by bispectrum analysis.
+    """
 
-    def __init__(self,
-                 wt1,
-                 wt2,
-                 times,
-                 freq,
-                 bispxxx,
-                 bispppp,
-                 bispxpp,
-                 bisppxx,
-                 surrxxx=None,
-                 surrppp=None,
-                 surrxpp=None,
-                 surrpxx=None):
-        self.wt1 = wt1
-        self.wt2 = wt2
-        self.times = times
-        self.freq = freq
-        self.bispxxx = bispxxx
-        self.bispppp = bispppp
-        self.bispxpp = bispxpp
-        self.bisppxx = bisppxx
-        self.surrxxx = surrxxx
-        self.surrppp = surrppp
-        self.surrxpp = surrxpp
-        self.surrpxx = surrpxx
+    # Amplitude and power of wavelet transform 1.
+    amp_wt1: ndarray
+    pow_wt1: ndarray
+
+    # Average amplitude and power of wavelet transform 1.
+    avg_amp_wt1: ndarray
+    avg_pow_wt1: ndarray
+
+    # Amplitude and power of wavelet transform 2.
+    amp_wt2: ndarray
+    pow_wt2: ndarray
+
+    # Average amplitude and power of wavelet transform 2.
+    avg_amp_wt2: ndarray
+    avg_pow_wt2: ndarray
+
+    times: ndarray
+    freq: ndarray
+
+    # Bispectra.
+    bispxxx: ndarray
+    bispppp: ndarray
+    bispxpp: ndarray
+    bisppxx: ndarray
+
+    # Surrogates.
+    surrxxx: ndarray
+    surrppp: ndarray
+    surrxpp: ndarray
+    surrpxx: ndarray

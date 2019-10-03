@@ -19,6 +19,9 @@ from data import resources
 from gui.components.DualSignalComponent import DualSignalComponent
 from gui.components.FreqComponent import FreqComponent
 from gui.components.SurrogateComponent import SurrogateComponent
+from gui.components.VerticalMultiPlotComponent import VerticalMultiPlotComponent
+from gui.plotting.plots.AmplitudePlot import AmplitudePlot
+from gui.windows.bispectrum.BAPlot import BAPlot
 from gui.windows.bispectrum.BAPresenter import BAPresenter
 from gui.windows.bispectrum.BAViewProperties import BAViewProperties
 from gui.windows.common.BaseTFWindow import BaseTFWindow
@@ -26,7 +29,12 @@ from maths.num_utils import float_to_str
 from utils.decorators import floaty
 
 
-class BAWindow(BAViewProperties, BaseTFWindow, DualSignalComponent, FreqComponent, SurrogateComponent):
+class BAWindow(BAViewProperties,
+               BaseTFWindow,
+               DualSignalComponent,
+               FreqComponent,
+               SurrogateComponent,
+               VerticalMultiPlotComponent):
     name = "Wavelet Bispectrum Analysis"
 
     def __init__(self, application):
@@ -36,6 +44,7 @@ class BAWindow(BAViewProperties, BaseTFWindow, DualSignalComponent, FreqComponen
         DualSignalComponent.__init__(self, self.signal_plot())
         FreqComponent.__init__(self, self.line_fmax, self.line_fmin, self.line_res)
         SurrogateComponent.__init__(self, self.slider_surrogate, self.line_surrogate)
+        VerticalMultiPlotComponent.__init__(self, self.vbox_right)
 
         self.presenter: BAPresenter = self.presenter
         self.presenter.init()
@@ -44,16 +53,9 @@ class BAWindow(BAViewProperties, BaseTFWindow, DualSignalComponent, FreqComponen
         super(BAWindow, self).setup_ui()
         self.btn_calculate_single.hide()
 
-        self.plot_main.set_log_scale(True, "x")
-        self.plot_main.set_log_scale(True, "y")
-
         self.plot_main.set_mouse_zoom_enabled(False)
         self.plot_main.set_max_crosshair_count(1)
         self.plot_main.add_crosshair_listener(self.on_crosshair_drawn)
-
-        self.plot_right_bottom.options.hide()
-        self.plot_right_middle.options.hide()
-        self.plot_right_top.options.hide()
 
         self.btn_select_point.clicked.connect(self.on_select_point_clicked)
         self.btn_add_point.clicked.connect(self.on_add_point_clicked)
@@ -81,14 +83,22 @@ class BAWindow(BAViewProperties, BaseTFWindow, DualSignalComponent, FreqComponen
         pass
 
     def switch_to_triple_plot(self):
-        self.vbox_right.setStretch(0, 100)
-        self.vbox_right.setStretch(1, 100)
-        self.vbox_right.setStretch(2, 0)
+        self.plot_right_middle = BAPlot(self)
+        self.plot_right_bottom = BAPlot(self)
+
+        self.vplot_remove_all_plots()
+        self.vplot_add_plots(self.plot_right_middle, self.plot_right_bottom)
+
+        self.plot_right_top = None
 
     def switch_to_dual_plot(self):
-        self.vbox_right.setStretch(0, 0)
-        self.vbox_right.setStretch(1, 0)
-        self.vbox_right.setStretch(2, 100)
+        self.plot_right_top = AmplitudePlot(self)
+
+        self.vplot_remove_all_plots()
+        self.vplot_add_plots(self.plot_right_top)
+
+        self.plot_right_middle = None
+        self.plot_right_bottom = None
 
     def on_crosshair_drawn(self, x: float, y: float):
         x = float_to_str(x)
@@ -99,6 +109,9 @@ class BAWindow(BAViewProperties, BaseTFWindow, DualSignalComponent, FreqComponen
 
     def is_wt_selected(self):
         return "Wavelet transform" in self.combo_plot_type.currentText()
+
+    def is_amplitude_selected(self):
+        pass # TODO
 
     def switch_to_all_plots(self):
         pass

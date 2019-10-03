@@ -133,17 +133,7 @@
            </layout>
           </item>
           <item row="1" column="1">
-           <layout class="QVBoxLayout" name="vbox_right">
-            <item>
-             <widget class="AmplitudePlot" name="plot_right_top" native="true"/>
-            </item>
-            <item>
-             <widget class="BAPlot" name="plot_right_middle" native="true"/>
-            </item>
-            <item>
-             <widget class="BAPlot" name="plot_right_bottom" native="true"/>
-            </item>
-           </layout>
+           <layout class="QVBoxLayout" name="vbox_right"/>
           </item>
          </layout>
         </item>
@@ -245,7 +235,7 @@
                   <string>Enable surrogates</string>
                  </property>
                  <property name="checked">
-                  <bool>true</bool>
+                  <bool>false</bool>
                  </property>
                 </widget>
                </item>
@@ -591,18 +581,6 @@
    <class>PreprocessPlot</class>
    <extends>QWidget</extends>
    <header>gui.plotting.plots.PreprocessPlot</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>AmplitudePlot</class>
-   <extends>QWidget</extends>
-   <header>gui.plotting.plots.AmplitudePlot</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>BAPlot</class>
-   <extends>QWidget</extends>
-   <header>gui.windows.bispectrum.BAPlot</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
