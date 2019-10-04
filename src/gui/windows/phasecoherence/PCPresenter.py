@@ -24,7 +24,7 @@ from processes.MPHandler import MPHandler
 from maths.params.PCParams import PCParams
 from maths.params.TFParams import create
 from maths.signals.SignalPairs import SignalPairs
-from maths.signals.TFOutputData import TFOutputData
+from maths.signals.data.TFOutputData import TFOutputData
 from maths.signals.TimeSeries import TimeSeries
 
 

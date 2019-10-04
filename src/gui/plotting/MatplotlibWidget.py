@@ -18,15 +18,14 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPalette
 from PyQt5.QtWidgets import QVBoxLayout, QApplication
 from matplotlib import patches
-from matplotlib.axes import Axes
 from matplotlib.backend_bases import MouseButton
 from matplotlib.backends.backend_qt5agg import (FigureCanvas)
 from matplotlib.figure import Figure
 from mpl_toolkits.mplot3d import Axes3D
 
-from gui.plotting.PlotWidget import PlotWidget
 from gui.plotting.Callbacks import Callbacks
 from gui.plotting.PlotOptionsWidget import PlotOptionsBar
+from gui.plotting.PlotWidget import PlotWidget
 from gui.plotting.plots.Rect import Rect
 
 

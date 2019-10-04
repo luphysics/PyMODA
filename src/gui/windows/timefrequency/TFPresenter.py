@@ -23,7 +23,7 @@ from gui.windows.common.BaseTFPresenter import BaseTFPresenter
 from processes.MPHandler import MPHandler
 from maths.params.TFParams import TFParams, _wt, _wft, create
 from maths.signals.Signals import Signals
-from maths.signals.TFOutputData import TFOutputData
+from maths.signals.data.TFOutputData import TFOutputData
 
 
 class TFPresenter(BaseTFPresenter):

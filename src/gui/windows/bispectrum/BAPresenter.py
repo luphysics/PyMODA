@@ -14,7 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import asyncio
-from typing import Tuple
+from typing import Tuple, Union
 
 from PyQt5.QtWidgets import QListWidgetItem
 from numpy import ndarray
@@ -22,7 +22,7 @@ from numpy import ndarray
 from gui.dialogs.FrequencyDialog import FrequencyDialog
 from gui.windows.common.BaseTFPresenter import BaseTFPresenter
 from maths.params.BAParams import BAParams
-from maths.signals.BAOutputData import BAOutputData
+from maths.signals.data.BAOutputData import BAOutputData
 from maths.signals.SignalPairs import SignalPairs
 from maths.signals.TimeSeries import TimeSeries
 from processes.MPHandler import MPHandler
@@ -41,9 +41,11 @@ class BAPresenter(BaseTFPresenter):
         self.view.switch_to_dual_plot()
 
     def calculate(self, calculate_all: bool):
+        """Starts the coroutine which calculates the data."""
         asyncio.ensure_future(self.coro_calculate())
 
     async def coro_calculate(self):
+        """Coroutine which calculates the bispectra."""
         if self.mp_handler:
             self.mp_handler.stop()
 
@@ -61,12 +63,21 @@ class BAPresenter(BaseTFPresenter):
         self.update_plots()
 
     def update_plots(self):
+        """
+        Updates all plots according to the currently selected plot type and current data.
+        """
         data = self.get_selected_signal_pair()[0].output_data
 
         self.update_main_plot(data)
         self.update_side_plots(data)
 
     def update_main_plot(self, data):
+        """
+        Updates the main plot, plotting the wavelet transform or bispectrum depending
+        on the selected plot type.
+
+        :param data: the data object
+        """
         x, y, c, log = self.get_main_plot_data(self.view.get_plot_type(), data)
 
         if self.view.is_wt_selected():
@@ -81,13 +92,66 @@ class BAPresenter(BaseTFPresenter):
             self.view.plot_main.update_xlabel("Frequency (Hz)")
             self.view.plot_main.update_ylabel("Frequency (Hz)")
 
-    def update_side_plots(self, data):
-        if self.view.is_wt_selected():
-            pass # TODO
+    def update_side_plots(self, data: BAOutputData):
+        """
+        Updates the side plot(s). For wavelet transforms this will be
+        the average amplitude/power, but for bispectra this will be the
+        biphase and biamplitude.
 
+        :param data: the data object
+        """
+        if self.view.is_wt_selected():  # Plot average amplitude or power.
+            amp_not_power = self.view.is_amplitude_selected()
+            x, y = self.get_side_plot_data_wt(self.view.get_plot_type(), data, amp_not_power)
+
+            if x is not None and y is not None and len(x) > 0:
+                plot = self.view.plot_right_top
+                plot.set_xlabel("Average amplitude")
+                plot.set_ylabel("Frequency (Hz)")
+
+                plot.set_log_scale(True, "y")
+                plot.plot(x, y)
+        else:  # Plot biphase and biamplitude.
+            pass
 
     @staticmethod
-    def get_main_plot_data(plot_type: str, data: BAOutputData):
+    def get_side_plot_data_wt(plot_type: str, data: BAOutputData, amp_not_power: bool) -> Tuple[ndarray, ndarray]:
+        """
+        Gets the data required to plot the average amplitude/power on the side plot. Used
+        when a wavelet transform is selected.
+
+        :param plot_type: the plot type shown in the QComboBox, e.g. "Wavelet transform 1"
+        :param data: the data object
+        :param amp_not_power: whether the data should be amplitude, or power
+        :return: the x-values, the y-values
+        """
+        _dict = {
+            "Wavelet transform 1": (data.avg_amp_wt1 if amp_not_power else data.avg_pow_wt1, data.freq),
+            "Wavelet transform 2": (data.avg_amp_wt2 if amp_not_power else data.avg_pow_wt2, data.freq),
+        }
+        return _dict.get(plot_type)
+
+    @staticmethod
+    def get_side_plot_data_bispec(plot_type: str, data: BAOutputData):
+        """
+        Gets the data required to plot the biphase and biamplitude on the side plots.
+        Used when bispectrum is selected.
+
+        :param plot_type the plot type shown in the QComboBox, e.g. "b111"
+        :param data the data object
+        :return: # TODO add this
+        """
+        pass
+
+    @staticmethod
+    def get_main_plot_data(plot_type: str, data: BAOutputData) -> Tuple[ndarray, ndarray, ndarray, bool]:
+        """
+        Gets the relevant arrays to plot in the main plot (WT or bispectrum).
+
+        :param plot_type: the type of plot, as shown in the QComboBox; e.g. "Wavelet transform 1"
+        :param data: the data object with all data
+        :return: the x-values, the y-values, the c-values, and whether to use a log scale
+        """
         if not isinstance(data, BAOutputData):
             return [None for _ in range(4)]
 
@@ -156,6 +220,10 @@ class BAPresenter(BaseTFPresenter):
         )
 
     async def coro_load_data(self):
+        """
+        Loads the data from a file, showing a dialog to set the frequency of
+        the signal.
+        """
         self.signals = SignalPairs.from_file(self.open_file)
 
         if not self.signals.has_frequency():
@@ -174,7 +242,7 @@ class BAPresenter(BaseTFPresenter):
     def plot_signal_pair(self):
         self.view.plot_signal_pair(self.get_selected_signal_pair())
 
-    def on_signal_selected(self, item):
+    def on_signal_selected(self, item: Union[QListWidgetItem, str]):
         if isinstance(item, QListWidgetItem):
             name = item.text()
         else:
@@ -188,9 +256,13 @@ class BAPresenter(BaseTFPresenter):
             self.view.on_xlim_edited()
 
     def get_selected_signal_pair(self) -> Tuple[TimeSeries, TimeSeries]:
+        """
+        Gets the currently selected signal pair as a tuple containing 2 signals.
+        """
         return self.signals.get_pair_by_name(self.selected_signal_name)
 
     def get_params(self) -> BAParams:
+        """Gets data from the GUI to create the params used by the bispectrum calculation."""
         return BAParams(signals=self.signals,
                         preprocess=self.view.get_preprocess(),
                         fmin=self.view.get_fmin(),

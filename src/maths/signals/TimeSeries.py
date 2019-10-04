@@ -15,7 +15,7 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import numpy as np
 
-from maths.signals.TFOutputData import TFOutputData
+from maths.signals.data.TFOutputData import TFOutputData
 
 
 class TimeSeries:

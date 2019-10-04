@@ -20,7 +20,7 @@ import numpy as np
 from PyQt5.QtWidgets import QListWidgetItem
 
 from gui.dialogs.FrequencyDialog import FrequencyDialog
-from gui.windows.bayesian.DBOutputData import DBOutputData
+from maths.signals.data.DBOutputData import DBOutputData
 from gui.windows.bayesian.ParamSet import ParamSet
 from gui.windows.common.BaseTFPresenter import BaseTFPresenter
 from processes.MPHandler import MPHandler

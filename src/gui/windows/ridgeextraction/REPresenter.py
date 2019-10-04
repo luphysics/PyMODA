@@ -22,7 +22,7 @@ from numpy import ndarray
 from gui.windows.timefrequency.TFPresenter import TFPresenter
 from maths.params.REParams import REParams
 from maths.params.TFParams import create
-from maths.signals.TFOutputData import TFOutputData
+from maths.signals.data.TFOutputData import TFOutputData
 
 
 class REPresenter(TFPresenter):

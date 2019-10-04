@@ -111,7 +111,7 @@ class BAWindow(BAViewProperties,
         return "Wavelet transform" in self.combo_plot_type.currentText()
 
     def is_amplitude_selected(self):
-        pass # TODO
+        pass  # TODO: add checkbox for ampl/power and implement
 
     def switch_to_all_plots(self):
         pass
