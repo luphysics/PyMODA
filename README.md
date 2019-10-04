@@ -2,7 +2,7 @@
 
 PyMODA is a Python implementation of MODA (Multiscale Oscillatory Dynamics Analysis). The user interface is written using PyQt5, and the algorithms are mostly packaged as Python libraries from the existing MATLAB code.
 
-PyMODA is cross-platform and does not require any paid software. To get started, see the [User's Guide](#users-guide) or the [Developer's Guide](#developers-guide).
+PyMODA is cross-platform and does not require any paid software. To get started, see the [User Guide](#user-guide) or the [Developer Guide](#developer-guide).
 
 ### Status
 
@@ -18,24 +18,24 @@ PyMODA does not yet offer all the functionality available in MODA. This table sh
 | Wavelet Bispectrum Analysis     |   Bispectrum analysis    |  Partially implemented   | Not implemented |
 | Dynamical Bayesian Inference     |   Bayesian inference    |  Not implemented   | Written, not working |
 
-# User's Guide
+# User Guide
 
-This guide is aimed at users wishing to set up and run PyMODA. If you're interested in modifying or contributing to the program, you should use the [Developer's Guide](#developers-guide).
+This guide is aimed at users wishing to set up and run PyMODA. If you're interested in modifying or contributing to the program, you should use the [Developer Guide](#developer-guide).
 
 ## Requirements
 - Python 3.6 or higher.
 - [MATLAB Runtime](https://www.mathworks.com/products/compiler/matlab-runtime.html), 
 newest version recommended (does not require a licence).
 
-## A note on operating systems
+## Operating systems
 
-PyMODA should run on Windows, macOS and Linux. Note: on macOS and Linux, `python` should be replaced with `python3` in all commands below.
+PyMODA should run on Windows, macOS and Linux. On macOS and Linux, `python` should be replaced with `python3` in all commands below.
 
 ## Downloading the code
-To download the code, you can click the green "Clone and download" button on the top-right of the repository page, and then "Download zip". Extract the zip to your desired location; for the sake of easy instructions, the folder should be renamed to `PyMODA`.
+To download the code, you can [click here](https://github.com/luphysics/PyMODA/zipball/master). Extract the zip file to your desired location; for the sake of easy instructions, the folder should be renamed to `PyMODA`.
 
 ## Preparing to run
-When the code is downloaded and Python is installed, you'll need to install the dependencies. To do this, open a terminal in the `PyMODA` folder and run the command `python packages/install.py`. This mas require elevated permissions, e.g. "Run as adminstrator" on Windows or `sudo` on Linux.
+When the code is downloaded and Python is installed, you'll need to install the dependencies. To do this, open a terminal in the `PyMODA` folder and run the command `python packages/install.py`. This mas require elevated permissions, e.g. "Run as adminstrator" on Windows or `sudo` on macOS/Linux.
 
 To start PyMODA, run `python src/main.py` from the same terminal. Linux users also need to specify the path to the MATLAB Runtime using a command-line argument (see [command-line arguments](#command-line-arguments)).
 
@@ -55,7 +55,7 @@ Therefore, it is more efficient to transform multiple signals if possible. Effic
 
 Note: the i7-6700 was tested on Linux, while the Ryzen 3700X was running Windows. This causes differences in performance.
 
-# Developer's Guide
+# Developer Guide
 
 This guide is aimed at developers wishing to modify or contribute to the program, and is 
 designed to be accessible to programmers with basic to intermediate knowledge of Python.
