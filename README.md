@@ -70,7 +70,17 @@ If you are not registered as a collaborator, you should [fork the repository](ht
 
 ## Command-line arguments
 
-PyMODA has several command-line arguments, which can make development easier. Note that `-runtime` must be used on Linux, and should point to the `LD_LIBRARY_PATH` specified by the MATLAB Runtime installer. 
+PyMODA has several command-line arguments, which can make development easier. Note that `-runtime` *must be used on Linux*,  but should not be necessary on other operating systems.
+
+`-runtime` is used to specify the `LD_LIBRARY_PATH` for the MATLAB Runtime. The `LD_LIBRARY_PATH` is shown by the Runtime installer after installation, and should be saved but not be added to the environment variables manually. 
+
+Here is an example of PyMODA being run on Linux:
+
+```
+python3 src/main.py -runtime "/usr/local/MATLAB/MATLAB_Runtime/v96/runtime/glnxa64:/usr/local/MATLAB/MATLAB_Runtime/v96/bin/glnxa64:/usr/local/MATLAB/MATLAB_Runtime/v96/sys/os/glnxa64:/usr/local/MATLAB/MATLAB_Runtime/v96/extern/bin/glnxa64"
+```
+
+Below is a table listing the other command-line arguments.
 
 | Argument | Use case | Example |
 | ------ | ------ | ------- |
@@ -78,7 +88,6 @@ PyMODA has several command-line arguments, which can make development easier. No
 | `--debug` | Disables error handling. | `python src/main.py --debug` | 
 | `-freq` | Specifies the sampling frequency to use. This frequency will be automatically selected in dialogs. | `python src/main.py -freq 10` |
 | `-file` | Specifies a data file to use. This file will be automatically selected in dialogs. Only designed for data files in the `res/test` folder, and the file name should be prefixed by `test:`. | `python src.main.py -file "test:many_signal.csv"` | 
-| `-runtime` | Points to the `LD_LIBRARY_PATH` required by the MATLAB Runtime. | `python src/main.py -runtime "/usr/local/MATLAB/MATLAB_Runtime/v96/runtime/glnxa64:/usr/local/MATLAB/MATLAB_Runtime/v96/bin/glnxa64:/usr/local/MATLAB/MATLAB_Runtime/v96/sys/os/glnxa64:/usr/local/MATLAB/MATLAB_Runtime/v96/extern/bin/glnxa64"` |
 
 Command-line arguments can be specified in PyCharm configurations. For example, you can specify `-runtime` in all and/or create a different configuration for each data file.
 
@@ -161,3 +170,5 @@ the standard library, due to problems with the latter's serialization in Windows
 
 `asyncio` allows the `Scheduler` class, which schedules the running of multiple processes, 
 to run on the main thread without freezing the GUI. `Scheduler` is run in a coroutine using the Qt event loop from `asyncqt`.
+
+*Note: the readme is unfinished and will be continued.*
