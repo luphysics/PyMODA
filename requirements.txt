@@ -1,5 +1,6 @@
 # Run "pip3 install -r requirements.txt"
 asyncqt>=0.7.0
+dataclasses>=0.6
 EasySettings>=3.2.0
 matplotlib>=3.1.1
 multiprocess>=0.70.8
