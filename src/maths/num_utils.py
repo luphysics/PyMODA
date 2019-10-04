@@ -13,7 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from typing import Any, Optional
+from typing import Any, Optional, List
 
 import numpy as np
 from numpy import ndarray
@@ -106,3 +106,14 @@ def matlab_to_numpy(arr) -> ndarray:
     except:
         result = np.array(arr)
     return result
+
+
+def multi_matlab_to_numpy(*args) -> List[ndarray]:
+    """
+    Converts multiple matlab arrays to numpy arrays using `matlab_to_numpy()`.
+    """
+    out = []
+    for arr in args:
+        out.append(matlab_to_numpy(arr))
+
+    return out

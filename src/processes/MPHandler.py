@@ -19,21 +19,20 @@ from typing import Callable, List
 from multiprocess import Queue, Process
 
 from gui.windows.bayesian.ParamSet import ParamSet
-from maths.params.BAParams import BAParams
-from processes.Scheduler import Scheduler
-from processes.Task import Task
 from maths.algorithms.multiprocessing.bandpass_filter import _bandpass_filter
-from maths.algorithms.multiprocessing.bayesian_inference import _dynamic_bayesian_inference, \
-    _moda_dynamic_bayesian_inference
+from maths.algorithms.multiprocessing.bayesian_inference import _dynamic_bayesian_inference
 from maths.algorithms.multiprocessing.bispectrum_analysis import _bispectrum_analysis
 from maths.algorithms.multiprocessing.phase_coherence import _phase_coherence
 from maths.algorithms.multiprocessing.ridge_extraction import _ridge_extraction
 from maths.algorithms.multiprocessing.time_frequency import _time_frequency
+from maths.params.BAParams import BAParams
 from maths.params.PCParams import PCParams
 from maths.params.REParams import REParams
 from maths.params.TFParams import TFParams, _fmin, _fmax
 from maths.signals.SignalPairs import SignalPairs
 from maths.signals.Signals import Signals
+from processes.Scheduler import Scheduler
+from processes.Task import Task
 
 
 class MPHandler:
@@ -164,11 +163,22 @@ class MPHandler:
 
             self.scheduler.append(Task(p, q, subtasks=4))
 
-            # for sig in pair:
-            #     q = Queue()
-            #     p = Process(target=_time_frequency, args=(q, sig, params,))
-            #
-            #     self.scheduler.append(Task(p, q))
+        return await self.scheduler.coro_run()
+
+    async def coro_biphase(self,
+                           signals: SignalPairs,
+                           fs: float,
+                           fr: float,
+                           params: dict,
+                           on_progress: Callable[[int, int], None]):
+        self.stop()
+        self.scheduler = Scheduler(progress_callback=on_progress)
+
+        for pair in signals.get_pairs():
+            q = Queue()
+            p = Process(target=_bispectrum_analysis, args=(q, *pair, fs, fr, params))
+
+            self.scheduler.append(Task(p, q))
 
         return await self.scheduler.coro_run()
 

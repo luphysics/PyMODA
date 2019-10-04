@@ -24,9 +24,9 @@ if __name__ == '__main__':
         url='https://www.mathworks.com/',
         platforms=['Linux', 'Windows', 'MacOS'],
         packages=[
-            'bispecWavNew'
+            'biphaseWavPython'
         ],
-        package_data={'bispecWavNew': ['*.ctf']},
+        package_data={'biphaseWavPython': ['*.ctf']},
         # Executes the custom code above in order to delete the build area.
         cmdclass={'install': InstallRuntime}
     )

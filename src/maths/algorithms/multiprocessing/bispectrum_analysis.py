@@ -15,7 +15,6 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import math
 
-import numpy as np
 from multiprocess import Queue
 
 from maths.algorithms.matlab_utils import *
@@ -23,6 +22,18 @@ from maths.algorithms.multiprocessing.time_frequency import avg_ampl_pow
 from maths.num_utils import matlab_to_numpy
 from maths.params.BAParams import BAParams
 from maths.signals.TimeSeries import TimeSeries
+
+
+def _biphase(queue: Queue,
+             sig1: TimeSeries,
+             sig2: TimeSeries,
+             fs: float,
+             fr: float,
+             opt: dict):
+    from maths.algorithms.matlabwrappers import biphase_wav_new
+
+    result = biphase_wav_new.calculate(sig1.signal, sig2.signal, fs, fr, opt)
+    queue.put(result)
 
 
 def _bispectrum_analysis(queue: Queue,

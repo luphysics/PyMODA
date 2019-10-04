@@ -20,41 +20,42 @@ due to issues with the LD_LIBRARY_PATH.
 """
 from typing import Tuple
 
-import numpy as np
 from numpy import ndarray
 
-from maths.num_utils import matlab_to_numpy, multi_matlab_to_numpy
+from maths.num_utils import matlab_to_numpy
 from processes import mp_utils
 
 # This must be above the matlab imports.
 mp_utils.setup_matlab_runtime()
 
-import bispecWavPython
+import biphaseWavPython
 import matlab
 
-package = bispecWavPython.initialize()
+package = biphaseWavPython.initialize()
 
 
-def calculate(signal1: ndarray, signal2: ndarray, fs, params: dict) -> Tuple[ndarray, ndarray, ndarray, ndarray]:
+def calculate(signal1: ndarray, signal2: ndarray, fs, fr, params: dict) -> Tuple[ndarray, ndarray]:
     """
-    Calculates the bispectrum of 2 signals.
+    Calculates the biphase and biamplitude from the bispectrum.
 
     IMPORTANT: this function should not be called directly due to issues
     with the LD_LIBRARY_PATH on Linux. Instead, use `MPHandler` to call it
     safely in a new process.
     """
+    # TODO: implement this fully.
+    result = package.biphaseWavPython(matlab.double(signal1),
+                                      matlab.double(signal2),
+                                      fs,
+                                      fr,
+                                      params,
+                                      nargout=2)
 
-    result = package.bispecWavPython(matlab.double(signal1),
-                                     matlab.double(signal2),
-                                     fs,
-                                     *expand(params),
-                                     nargout=5)
+    biamp, biphase = result
 
-    bisp, freq, wt1, wt2, opt = result
-    bisp, freq, wt1, wt2 = multi_matlab_to_numpy(bisp, freq, wt1, wt2)
+    biamp = matlab_to_numpy(biamp)
+    biphase = matlab_to_numpy(biphase)
 
-    output = (np.abs(bisp), freq, np.abs(wt1), np.abs(wt2))
-    return output
+    return biamp, biphase
 
 
 def expand(_dict: dict) -> tuple:

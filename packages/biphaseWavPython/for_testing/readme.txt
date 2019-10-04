@@ -1,4 +1,4 @@
-bispecWavNew MATLAB Python Package
+biphaseWavPython MATLAB Python Package
 
 1. Prerequisites for Deployment 
 
@@ -21,11 +21,11 @@ in the MathWorks Documentation Center.
 
 Verify that a Linux version of Python 2.7, 3.5, 3.6, and/or 3.7 is installed.
 
-2. Installing the bispecWavNew Package
+2. Installing the biphaseWavPython Package
 
 A. Change to the directory that contains the file setup.py and the subdirectory 
-bispecWavNew. If you do not have write permissions, copy all its contents to a temporary 
-location and change to that directory.
+biphaseWavPython. If you do not have write permissions, copy all its contents to a 
+temporary location and change to that directory.
 
 B. Execute the command:
 
@@ -55,11 +55,11 @@ If it is defined, set it to the following:
 
 ${LD_LIBRARY_PATH}:MR/v96/runtime/glnxa64:MR/v96/bin/glnxa64:MR/v96/sys/os/glnxa64:MR/v96/sys/opengl/lib/glnxa64
 
-3. Using the bispecWavNew Package
+3. Using the biphaseWavPython Package
 
-The bispecWavNew package is on your Python path. To import it into a Python script or 
+The biphaseWavPython package is on your Python path. To import it into a Python script or 
 session, execute:
 
-    import bispecWavNew
+    import biphaseWavPython
 
 If a namespace must be specified for the package, modify the import statement accordingly.
