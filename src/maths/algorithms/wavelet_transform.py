@@ -137,11 +137,9 @@ def wft(signal,
 
     fwt = []
     twf = []
-    print(wp)
     if window == "Lognorm":
         q = twopi * f0
         wp = LognormWavelet(q)
-        print(wp)
         #fwt = lambda xi: np.exp(-(q ** 2 / 2) * log(xi) ** 2)
 
         #FIX THIS!!
@@ -168,7 +166,6 @@ def wft(signal,
     if fmin > fmax:
         print("WARNING: fmin must be smaller than fmax.")
 
-    print(wp)
     if (wp.t2e - wp.t1e) * wp.ompeak / (twopi * fmax) > L / fs:
         print("WARNING: For wavelet function params and signal time-length there are no WT coefficients...")
     elif (wp.t2e - wp.t1e) * wp.ompeak / (twopi * fmin) * fs / L > 1 + 2 * eps:
@@ -206,7 +203,6 @@ def wft(signal,
         n2 = np.ceil((NL - L) * coib1[0] / (coib1[0] + coib2[0]))
 
     # TODO: check from here.
-    pdb.set_trace()
     if padmode == "predictive":
         pow = (-(L / fs - np.arange(1, L + 1) / fs)) / (wp.t2h - wp.t1h)
         w = 2 ** pow
@@ -246,7 +242,7 @@ def wft(signal,
         # Windowed Fourier Transform by itself
     WT = np.zeros((SN, L), dtype=np.complex64) * np.NaN
     ouflag = 0
-    if wp.t2e - wp.t1e > L / fs:
+    if (wp.t2e - wp.t1e)*wp.ompeak/(2*np.pi*fmax) > L / fs:
         coib1 = 0
         coib2 = 0
 
@@ -297,6 +293,24 @@ def wft(signal,
 
         WT[sn, arange(0, L)] = out[n1: NL - n2 + 1]
 
+    if cut_edges:
+      icoib = nonzero((L-coib1-coib2) <= 0)
+      WT[icoib,:] = np.nan
+      ovL = int(np.ceil(np.sum(coib1 + coib2) - L*len(icoib)))
+      frn = np.empty((ovL,))*np.nan
+      ttn = np.empty((ovL,))*np.nan
+      qn = 0
+      for fn in range(SN):
+        cL = int(coib1[fn] + coib2[fn])
+        if cL > 0 and cL < L:
+          #pdb.set_trace()
+          frn[qn:qn+cL] = fn
+          ttn[qn:qn+cL] = concat([np.arange(int(coib1[fn])),np.arange(L-int(coib2[fn]),L)]).T
+          qn = qn + cL
+
+      frn = frn[:qn]
+      ttn = ttn[:qn]
+      WT.ravel()[np.ravel_multi_index([frn.astype(np.int),ttn.astype(np.int)],dims=WT.shape)] = np.nan
     return WT, freq
 
 
@@ -509,7 +523,6 @@ It is recommended to use only admissible wavelets.\n
                 Iest1 = CT / CL * sum(abs(Etwf[2:] - 2 * Etwf[1:-1] + Etwf[0:-2])) / 24
                 Iest2 = 1 / CT * sum(abs(Efwt[2:] - 2 * Efwt[1:-1] + Efwt[0:-2])) / 24
                 Eest = CT / CL * sum(Etwf)
-                print(Iest1, Iest2, Eest)
 
             ###END WHILE
 
@@ -529,7 +542,6 @@ It is recommended to use only admissible wavelets.\n
             idnan = nonzero(isnan(Cfwt))[0]
             if not isempty(idnan):
                     idnorm = nonzero(~isnan(Cfwt))
-                    print('LEN===',Cfwt.shape,idnorm.shape,idnan.shape)
                     Cfwt[idnan] = interp1(idnorm, Cfwt[idnorm], idnan)
 
 
@@ -600,10 +612,8 @@ It is recommended to use only admissible wavelets.\n
 
             xid = nonzero((CS[:-1] < racc / 2) & (CS[1:] >= racc / 2))[0]
             if isempty(xid):
-                print('CT %s' % ct[0])
                 wp.t1e = ct[0]
             else:
-                print('ELSE CT ')
                 a1 = CS[xid] - racc / 2
                 a2 = CS[xid + 1] - racc / 2
                 
@@ -1422,7 +1432,6 @@ def fcast(sig, fs, NP, fint, *args):  # line1145
             cerr = [0, perr, nerr]
             cb = np.array([np.zeros((len(pb), 1)), pb, nb]).squeeze()
             cf[1] = pf - df / rr / rr
-            pdb.set_trace()
             FM = np.array([np.ones((L+1, )), np.cos(2 * np.pi * cf[1] * t), np.sin(2 * np.pi * cf[1] * t)]).T
             if not isempty(rw):
                 FM = FM * (rw.T * np.ones((1, 3)))
