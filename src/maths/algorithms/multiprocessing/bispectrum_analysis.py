@@ -19,7 +19,7 @@ from multiprocess import Queue
 
 from maths.algorithms.matlab_utils import *
 from maths.algorithms.multiprocessing.time_frequency import avg_ampl_pow
-from maths.num_utils import matlab_to_numpy
+from maths.num_utils import matlab_to_numpy, multi_matlab_to_numpy
 from maths.params.BAParams import BAParams
 from maths.signals.TimeSeries import TimeSeries
 
@@ -29,11 +29,30 @@ def _biphase(queue: Queue,
              sig2: TimeSeries,
              fs: float,
              fr: float,
-             opt: dict):
+             opt: dict) -> None:
     from maths.algorithms.matlabwrappers import biphase_wav_new
 
-    result = biphase_wav_new.calculate(sig1.signal, sig2.signal, fs, fr, opt)
-    queue.put(result)
+    name = sig1.name
+    sig1list = sig1.signal.tolist()
+    sig2list = sig2.signal.tolist()
+
+    biamp1, bphase1 = biphase_wav_new.calculate(sig1list, sig1list, fs, fr, opt)
+    biamp2, bphase2 = biphase_wav_new.calculate(sig2list, sig2list, fs, fr, opt)
+    biamp3, bphase3 = biphase_wav_new.calculate(sig1list, sig2list, fs, fr, opt)
+    biamp4, bphase4 = biphase_wav_new.calculate(sig2list, sig1list, fs, fr, opt)
+
+    biamp1, bphase1 = multi_matlab_to_numpy(biamp1, bphase1)
+    biamp2, bphase2 = multi_matlab_to_numpy(biamp2, bphase2)
+    biamp3, bphase3 = multi_matlab_to_numpy(biamp3, bphase3)
+    biamp4, bphase4 = multi_matlab_to_numpy(biamp4, bphase4)
+
+    queue.put((
+        name,
+        biamp1, bphase1,
+        biamp2, bphase2,
+        biamp3, bphase3,
+        biamp4, bphase4,
+    ))
 
 
 def _bispectrum_analysis(queue: Queue,
@@ -73,10 +92,10 @@ def _bispectrum_analysis(queue: Queue,
     # hang at the `package.initialize()` stage for unknown reasons.
     if sigcheck != 0:
         if not preprocess:  # TODO: check this block.
-            bispxxx, _, _, _ = bispec_wav_new.calculate(sig1list, sig1list, fs, params)
-            bispppp, _, _, _ = bispec_wav_new.calculate(sig2list, sig2list, fs, params)
-            bispxpp, freq, amp_wt1, amp_wt2 = bispec_wav_new.calculate(sig1list, sig2list, fs, params)
-            bisppxx, _, _, _ = bispec_wav_new.calculate(sig2list, sig1list, fs, params)
+            bispxxx, _, _, _, _ = bispec_wav_new.calculate(sig1list, sig1list, fs, params)
+            bispppp, _, _, _, _ = bispec_wav_new.calculate(sig2list, sig2list, fs, params)
+            bispxpp, freq, amp_wt1, amp_wt2, opt = bispec_wav_new.calculate(sig1list, sig2list, fs, params)
+            bisppxx, _, _, _, _ = bispec_wav_new.calculate(sig2list, sig1list, fs, params)
 
             size = bispxxx.shape
             surrxxx = zeros(size)
@@ -95,10 +114,10 @@ def _bispectrum_analysis(queue: Queue,
                     surrpxx[:, :, j] = abs(bispec_wav_new.calculate(surr2, surr1, fs, params)[0])
 
         else:
-            bispxxx, _, _, _ = bispec_wav_new.calculate(sig1list, sig1list, fs, params)
-            bispppp, _, _, _ = bispec_wav_new.calculate(sig2list, sig2list, fs, params)
-            bispxpp, freq, amp_wt1, amp_wt2 = bispec_wav_new.calculate(sig1list, sig2list, fs, params)
-            bisppxx, _, _, _ = bispec_wav_new.calculate(sig2list, sig1list, fs, params)
+            bispxxx, _, _, _, _ = bispec_wav_new.calculate(sig1list, sig1list, fs, params)
+            bispppp, _, _, _, _ = bispec_wav_new.calculate(sig2list, sig2list, fs, params)
+            bispxpp, freq, amp_wt1, amp_wt2, opt = bispec_wav_new.calculate(sig1list, sig2list, fs, params)
+            bisppxx, _, _, _, _ = bispec_wav_new.calculate(sig2list, sig1list, fs, params)
 
             size = bispxxx.shape
             surrxxx = zeros(size)
@@ -125,6 +144,7 @@ def _bispectrum_analysis(queue: Queue,
 
     pow_wt1, pow_wt2 = np.square(amp_wt1), np.square(amp_wt2)
 
+    print("Adding to queue...")
     queue.put((
         name,
         freq,
@@ -144,4 +164,5 @@ def _bispectrum_analysis(queue: Queue,
         surrppp,
         surrxpp,
         surrpxx,
+        opt,
     ))

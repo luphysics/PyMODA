@@ -79,6 +79,8 @@ class BAWindow(BAViewProperties,
                 l.addItem(formatted)
                 l.setCurrentRow(l.count() - 1)
 
+            self.presenter.add_point(x, y)
+
     def on_clear_plots_clicked(self):
         pass
 
@@ -119,6 +121,9 @@ class BAWindow(BAViewProperties,
     def get_layout_file(self) -> str:
         return resources.get("layout:window_bispectrum_analysis.ui")
 
+    def get_plot_type(self) -> str:
+        return self.combo_plot_type.currentText()
+
     @floaty
     def get_freq_x(self) -> Optional[int]:
         return self.lineedit_freq_x.text()
@@ -134,6 +139,3 @@ class BAWindow(BAViewProperties,
     @floaty
     def get_alpha(self) -> Optional[float]:
         return self.lineedit_alpha.text()
-
-    def get_plot_type(self) -> str:
-        return self.combo_plot_type.currentText()

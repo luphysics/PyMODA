@@ -14,6 +14,8 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from dataclasses import dataclass
+from typing import Dict
+
 from numpy import ndarray
 
 
@@ -53,3 +55,8 @@ class BAOutputData:
     surrppp: ndarray
     surrxpp: ndarray
     surrpxx: ndarray
+
+    opt: dict
+
+    biamp: Dict[float, ndarray]
+    biphase: Dict[float, ndarray]

@@ -23,7 +23,7 @@ from typing import Tuple
 import numpy as np
 from numpy import ndarray
 
-from maths.num_utils import matlab_to_numpy, multi_matlab_to_numpy
+from maths.num_utils import multi_matlab_to_numpy
 from processes import mp_utils
 
 # This must be above the matlab imports.
@@ -35,7 +35,7 @@ import matlab
 package = bispecWavPython.initialize()
 
 
-def calculate(signal1: ndarray, signal2: ndarray, fs, params: dict) -> Tuple[ndarray, ndarray, ndarray, ndarray]:
+def calculate(signal1: ndarray, signal2: ndarray, fs, params: dict) -> Tuple[ndarray, ndarray, ndarray, ndarray, dict]:
     """
     Calculates the bispectrum of 2 signals.
 
@@ -53,7 +53,7 @@ def calculate(signal1: ndarray, signal2: ndarray, fs, params: dict) -> Tuple[nda
     bisp, freq, wt1, wt2, opt = result
     bisp, freq, wt1, wt2 = multi_matlab_to_numpy(bisp, freq, wt1, wt2)
 
-    output = (np.abs(bisp), freq, np.abs(wt1), np.abs(wt2))
+    output = (np.abs(bisp), freq, np.abs(wt1), np.abs(wt2), opt)
     return output
 
 

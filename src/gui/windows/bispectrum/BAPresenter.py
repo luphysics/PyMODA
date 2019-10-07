@@ -22,9 +22,9 @@ from numpy import ndarray
 from gui.dialogs.FrequencyDialog import FrequencyDialog
 from gui.windows.common.BaseTFPresenter import BaseTFPresenter
 from maths.params.BAParams import BAParams
-from maths.signals.data.BAOutputData import BAOutputData
 from maths.signals.SignalPairs import SignalPairs
 from maths.signals.TimeSeries import TimeSeries
+from maths.signals.data.BAOutputData import BAOutputData
 from processes.MPHandler import MPHandler
 
 
@@ -32,6 +32,7 @@ class BAPresenter(BaseTFPresenter):
 
     def __init__(self, view):
         super().__init__(view)
+        self.params: BAParams = None
 
         from gui.windows.bispectrum.BAWindow import BAWindow
         self.view: BAWindow = view
@@ -52,15 +53,38 @@ class BAPresenter(BaseTFPresenter):
         self.is_plotted = False
         self.invalidate_data()
 
+        # We need to use the same params for biphase later; save now because the UI could change.
+        self.params = self.get_params()
+
         self.mp_handler = MPHandler()
         data = await self.mp_handler.coro_bispectrum_analysis(self.signals,
-                                                              self.get_params(),
+                                                              self.params,
                                                               self.on_progress_updated)
 
         for d in data:
             self.on_bispectrum_completed(*d)
 
         self.update_plots()
+
+    def add_point(self, x: float, y: float):
+        asyncio.ensure_future(self.coro_biphase(x, y))
+
+    async def coro_biphase(self, x: float, y: float):
+        self.mp_handler.stop()
+
+        fs = self.params.fs
+        fr = self.params.f0
+        opt = self.params.opt
+        data = await self.mp_handler.coro_biphase(self.signals,
+                                                  fs,
+                                                  fr,
+                                                  opt,
+                                                  self.on_progress_updated)
+
+        for d in data:
+            self.on_biphase_completed(*d)
+
+        self.update_side_plots(self.get_selected_signal_pair()[0].output_data)
 
     def update_plots(self):
         """
@@ -112,7 +136,9 @@ class BAPresenter(BaseTFPresenter):
                 plot.set_log_scale(True, "y")
                 plot.plot(x, y)
         else:  # Plot biphase and biamplitude.
-            pass
+            biamp, biphase = self.get_side_plot_data_bispec(self.view.get_plot_type(),
+                                                            self.view.get_selected_freq_pair(),
+                                                            data)
 
     @staticmethod
     def get_side_plot_data_wt(plot_type: str, data: BAOutputData, amp_not_power: bool) -> Tuple[ndarray, ndarray]:
@@ -132,7 +158,7 @@ class BAPresenter(BaseTFPresenter):
         return _dict.get(plot_type)
 
     @staticmethod
-    def get_side_plot_data_bispec(plot_type: str, data: BAOutputData):
+    def get_side_plot_data_bispec(plot_type: str, freq_x: float, freq_y: float, data: BAOutputData):
         """
         Gets the data required to plot the biphase and biamplitude on the side plots.
         Used when bispectrum is selected.
@@ -141,7 +167,18 @@ class BAPresenter(BaseTFPresenter):
         :param data the data object
         :return: # TODO add this
         """
-        pass
+        key = f"{freq_x}, {freq_y}"
+        _dict = {
+            "b111": (data.biamp[0], data.biphase[0]),
+            "b222": (data.biamp[1], data.biphase[1]),
+            "b122": (data.biamp[2], data.biphase[2]),
+            "b211": (data.biamp[3], data.biphase[3]),
+        }
+        biamp_dict, biphase_dict = _dict.get(plot_type)
+        biamp = biamp_dict.get(key)
+        biphase = biphase_dict.get(key)
+
+        return biamp, biphase
 
     @staticmethod
     def get_main_plot_data(plot_type: str, data: BAOutputData) -> Tuple[ndarray, ndarray, ndarray, bool]:
@@ -187,7 +224,8 @@ class BAPresenter(BaseTFPresenter):
                                 surrxxx: ndarray,
                                 surrppp: ndarray,
                                 surrxpp: ndarray,
-                                surrpxx: ndarray):
+                                surrpxx: ndarray,
+                                opt: dict):
 
         # Attach the data to the first signal in the current pair.
         sig = self.signals.get(name)
@@ -216,8 +254,25 @@ class BAPresenter(BaseTFPresenter):
             surrxxx,
             surrppp,
             surrxpp,
-            surrpxx
+            surrpxx,
+
+            opt,
+            {},
+            {},
         )
+
+    def on_biphase_completed(self,
+                             name: str,
+                             freq_x: float,
+                             freq_y: float,
+                             biamp: ndarray,
+                             biphase: ndarray):
+        sig = self.signals.get(name)
+        key = f"{freq_x}, {freq_y}"
+
+        data = sig.output_data
+        data.biamp[key] = biamp
+        data.biphase[key] = biphase
 
     async def coro_load_data(self):
         """
@@ -269,4 +324,5 @@ class BAPresenter(BaseTFPresenter):
                         fmax=self.view.get_fmax(),
                         f0=self.view.get_f0(),
                         nv=self.view.get_nv(),
-                        surr_count=self.view.get_surr_count())
+                        surr_count=self.view.get_surr_count(),
+                        opt={})

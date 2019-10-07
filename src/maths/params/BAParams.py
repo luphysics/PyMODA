@@ -27,7 +27,8 @@ class BAParams:
                  f0: float,
                  preprocess: bool,
                  nv: float,
-                 surr_count: int):
+                 surr_count: int,
+                 opt:dict):
         self.signals = signals
         self.fmin = fmin
         self.fmax = fmax
@@ -36,3 +37,6 @@ class BAParams:
         self.nv = nv
         self.surr_count = surr_count
         self.fs = signals.frequency
+
+        # The MATLAB algorithm returns a struct, `opt`, which is converted to this dict.
+        self.opt = opt
