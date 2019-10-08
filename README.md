@@ -55,6 +55,27 @@ Therefore, it is more efficient to transform multiple signals if possible. Effic
 
 Note: the i7-6700 was tested on Linux, while the Ryzen 3700X was running Windows. This causes differences in performance.
 
+## Common issues
+
+This section outlines some common problems and their solutions.
+
+### No module named PyQt5.sip
+
+If you see `ModuleNotFoundError: No module named 'PyQt5.sip'` when running the program, try executing the following commands:
+```
+# Note: on macOS/Linux, replace "pip" with "pip3".
+pip install pyqt5-sip
+pip install pyqt5
+```
+
+### Could not load the Qt platform plugin "xcb" in "" even though it was found.
+
+This error is caused by conflicts between the MATLAB Runtime's libraries and libraries used by PyQt. The issue is [described in more detail here](https://stackoverflow.com/questions/56758952/matlab-generated-python-packages-conflict-with-pyqt5-on-ubuntu-possible-librar).
+
+This error will occur if you have followed the MATLAB Runtime's instruction to export the `LD_LIBRARY_PATH` in `~/.profile` or `~/.bashrc`. Save the value for later and remove it from `~/.profile` or `~/.bashrc`, then run the command `unset LD_LIBRARY_PATH`. 
+
+Now take the value of the `LD_LIBRARY_PATH` that was exported, and add it as the `-runtime` command-line argument (see [command-line arguments](#command-line-arguments)). 
+
 # Developer Guide
 
 This guide is aimed at developers wishing to modify or contribute to the program, and is 
