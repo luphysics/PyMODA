@@ -42,7 +42,25 @@ def calculate(signal1: ndarray, signal2: ndarray, fs, fr, params: dict) -> Tuple
     with the LD_LIBRARY_PATH on Linux. Instead, use `MPHandler` to call it
     safely in a new process.
     """
-    # TODO: implement this fully.
+    params["PadLR1"] = matlab.double(params["PadLR1"])
+    params["PadLR2"] = matlab.double(params["PadLR2"])
+
+    twf1 = [complex(i) for i in params["twf1"][0]]
+    twf2 = [complex(i) for i in params["twf2"][0]]
+
+    twf1r = [i.real for i in twf1]
+    twf2r = [i.real for i in twf2]
+    twf1i = [i.imag for i in twf1]
+    twf2i = [i.imag for i in twf2]
+
+    del params["twf1"]
+    del params["twf2"]
+
+    params["twf1r"] = matlab.double(twf1r)
+    params["twf2r"] = matlab.double(twf2r)
+    params["twf1i"] = matlab.double(twf1i)
+    params["twf2i"] = matlab.double(twf2i)
+
     result = package.biphaseWavPython(matlab.double(signal1),
                                       matlab.double(signal2),
                                       fs,

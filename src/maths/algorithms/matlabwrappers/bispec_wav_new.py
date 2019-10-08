@@ -53,6 +53,11 @@ def calculate(signal1: ndarray, signal2: ndarray, fs, params: dict) -> Tuple[nda
     bisp, freq, wt1, wt2, opt = result
     bisp, freq, wt1, wt2 = multi_matlab_to_numpy(bisp, freq, wt1, wt2)
 
+    opt["PadLR1"], opt["PadLR2"], opt["twf1"], opt["twf2"] = [n.tolist()[0] for n in multi_matlab_to_numpy(opt["PadLR1"],
+                                                                                   opt["PadLR2"],
+                                                                                   opt["twf1"],
+                                                                                   opt["twf2"])]
+
     output = (np.abs(bisp), freq, np.abs(wt1), np.abs(wt2), opt)
     return output
 

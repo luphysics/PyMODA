@@ -74,11 +74,9 @@ class BAPresenter(BaseTFPresenter):
 
         fs = self.params.fs
         fr = self.params.f0
-        opt = self.params.opt
         data = await self.mp_handler.coro_biphase(self.signals,
                                                   fs,
                                                   fr,
-                                                  opt,
                                                   self.on_progress_updated)
 
         for d in data:
@@ -140,6 +138,18 @@ class BAPresenter(BaseTFPresenter):
                                                             self.view.get_selected_freq_pair(),
                                                             data)
 
+            times = self.get_selected_signal().times
+
+            if biamp:
+                self.view.plot_right_middle.plot(times, biamp)
+                self.view.plot_right_middle.set_ylabel("Biamplitude")
+                self.view.plot_right_middle.set_xlabel("Time (s)")
+
+            if biphase:
+                self.view.plot_right_bottom.plot(times, biphase)
+                self.view.plot_right_bottom.set_ylabel("Biphase")
+                self.view.plot_right_bottom.set_xlabel("Time (s)")
+
     @staticmethod
     def get_side_plot_data_wt(plot_type: str, data: BAOutputData, amp_not_power: bool) -> Tuple[ndarray, ndarray]:
         """
@@ -158,16 +168,20 @@ class BAPresenter(BaseTFPresenter):
         return _dict.get(plot_type)
 
     @staticmethod
-    def get_side_plot_data_bispec(plot_type: str, freq_x: float, freq_y: float, data: BAOutputData):
+    def get_side_plot_data_bispec(plot_type: str, freq: Tuple[float, float], data: BAOutputData):
         """
         Gets the data required to plot the biphase and biamplitude on the side plots.
         Used when bispectrum is selected.
 
+        :param freq: the selected frequencies (x and y)
         :param plot_type the plot type shown in the QComboBox, e.g. "b111"
         :param data the data object
-        :return: # TODO add this
+        :return: biamplitude and biphase
         """
-        key = f"{freq_x}, {freq_y}"
+        key = ", ".join([str(freq) for f in freq])
+        if "None" in key:
+            return None, None
+
         _dict = {
             "b111": (data.biamp[0], data.biphase[0]),
             "b222": (data.biamp[1], data.biphase[1]),

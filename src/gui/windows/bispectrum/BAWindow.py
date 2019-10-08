@@ -13,7 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from typing import Optional
+from typing import Optional, Tuple
 
 from data import resources
 from gui.components.DualSignalComponent import DualSignalComponent
@@ -123,6 +123,14 @@ class BAWindow(BAViewProperties,
 
     def get_plot_type(self) -> str:
         return self.combo_plot_type.currentText()
+
+    def get_selected_freq_pair(self) -> Tuple[float, float]:
+        items = self.listwidget_freq.selectedItems()
+        if items:
+            str_freq_x, str_freq_y = items[-1].text().split(", ")
+            return float(str_freq_x), float(str_freq_y)
+
+        return None, None
 
     @floaty
     def get_freq_x(self) -> Optional[int]:

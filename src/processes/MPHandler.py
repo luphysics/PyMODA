@@ -175,7 +175,6 @@ class MPHandler:
                            signals: SignalPairs,
                            fs: float,
                            fr: float,
-                           opt: dict,
                            on_progress: Callable[[int, int], None]
                            ) -> List[tuple]:
         self.stop()
@@ -183,6 +182,8 @@ class MPHandler:
 
         for pair in signals.get_pairs():
             q = Queue()
+
+            opt = pair[0].output_data.opt
             p = Process(target=_biphase, args=(q, *pair, fs, fr, opt))
 
             self.scheduler.append(Task(p, q))

@@ -144,6 +144,11 @@ def _bispectrum_analysis(queue: Queue,
 
     pow_wt1, pow_wt2 = np.square(amp_wt1), np.square(amp_wt2)
 
+    opt["PadLR1"] = matlab_to_numpy(opt["PadLR1"])
+    opt["PadLR2"] = matlab_to_numpy(opt["PadLR2"])
+    opt["twf1"] = matlab_to_numpy(opt["twf1"])
+    opt["twf2"] = matlab_to_numpy(opt["twf2"])
+
     print("Adding to queue...")
     queue.put((
         name,
