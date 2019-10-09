@@ -181,8 +181,6 @@ class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
         and sets up cancel button.
         """
         self.main_plot().set_in_progress(True)
-        self.amplitude_plot().clear()
-        self.amplitude_plot().set_in_progress(True)
         btn = self.btn_calculate_all
 
         btn.setText("Cancel")
@@ -199,7 +197,6 @@ class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
         and resets cancel button.
         """
         self.main_plot().set_in_progress(False)
-        self.amplitude_plot().set_in_progress(False)
         btn = self.btn_calculate_all
 
         btn.setText("Transform All")

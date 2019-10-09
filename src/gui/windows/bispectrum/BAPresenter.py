@@ -44,6 +44,7 @@ class BAPresenter(BaseTFPresenter):
     def calculate(self, calculate_all: bool):
         """Starts the coroutine which calculates the data."""
         asyncio.ensure_future(self.coro_calculate())
+        self.view.on_calculate_started()
 
     async def coro_calculate(self):
         """Coroutine which calculates the bispectra."""
@@ -64,10 +65,12 @@ class BAPresenter(BaseTFPresenter):
         for d in data:
             self.on_bispectrum_completed(*d)
 
+        self.view.on_calculate_stopped()
         self.update_plots()
 
     def add_point(self, x: float, y: float):
         asyncio.ensure_future(self.coro_biphase(x, y))
+        self.view.on_calculate_started()
 
     async def coro_biphase(self, x: float, y: float):
         self.mp_handler.stop()
@@ -87,6 +90,7 @@ class BAPresenter(BaseTFPresenter):
             for d in data:
                 self.on_biphase_completed(*d)
 
+            self.view.on_calculate_stopped()
             self.update_side_plots(self.get_selected_signal_pair()[0].output_data)
 
     def update_plots(self):
@@ -185,8 +189,12 @@ class BAPresenter(BaseTFPresenter):
         """
         key = ", ".join([str(f) for f in freq])
 
-        biamp = data.biamp.get(key)
-        biphase = data.biphase.get(key)
+        try:
+            biamp = data.biamp.get(key)
+            biphase = data.biphase.get(key)
+        except AttributeError:
+            biamp = None
+            biphase = None
 
         if "None" in key or biamp is None:
             return None, None

@@ -21,6 +21,8 @@ from gui.plotting.MatplotlibWidget import MatplotlibWidget
 class BAPlot(MatplotlibWidget):
 
     def plot(self, x: ndarray, y: ndarray):
+        self.clear()
+
         self.update_xlabel()
         self.update_ylabel()
 

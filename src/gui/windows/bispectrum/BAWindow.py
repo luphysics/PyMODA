@@ -15,6 +15,8 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from typing import Optional, Tuple
 
+from PyQt5.QtWidgets import QListWidgetItem
+
 from data import resources
 from gui.components.DualSignalComponent import DualSignalComponent
 from gui.components.FreqComponent import FreqComponent
@@ -62,6 +64,7 @@ class BAWindow(BAViewProperties,
         self.btn_clear_plots.clicked.connect(self.on_clear_plots_clicked)
 
         self.combo_plot_type.currentTextChanged.connect(lambda _: self.presenter.update_plots())
+        self.listwidget_freq.itemClicked.connect(self.on_freq_selected)
 
     def on_select_point_clicked(self):
         if not self.is_wt_selected():
@@ -117,6 +120,9 @@ class BAWindow(BAViewProperties,
 
     def switch_to_all_plots(self):
         pass
+
+    def on_freq_selected(self, _: QListWidgetItem):
+        self.presenter.update_plots()
 
     def get_layout_file(self) -> str:
         return resources.get("layout:window_bispectrum_analysis.ui")

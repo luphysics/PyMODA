@@ -65,6 +65,15 @@ class TFWindow(TFViewProperties,
         amp = self.amplitude_plot()
         amp.set_xlabel("Average Amplitude")
 
+    def on_calculate_started(self):
+        super(TFWindow, self).on_calculate_started()
+        self.amplitude_plot().clear()
+        self.amplitude_plot().set_in_progress(True)
+
+    def on_calculate_stopped(self):
+        super(TFWindow, self).on_calculate_stopped()
+        self.amplitude_plot().set_in_progress(False)
+
     def get_layout_file(self) -> str:
         return resources.get("layout:window_time_freq.ui")
 
@@ -72,10 +81,6 @@ class TFWindow(TFViewProperties,
         """Called when the window closes. Cancels any calculations that are in progress."""
         self.presenter.on_close()
         super().closeEvent(e)
-
-    @deprecated
-    def get_window(self) -> QWindow:
-        return self
 
     def on_transform_toggled(self, is_wt):
         """Called when the type of transform (WT or WFT) is toggled."""
@@ -106,7 +111,7 @@ class TFWindow(TFViewProperties,
     def get_fstep(self) -> Optional[float]:
         return None  # Placeholder.
 
-    def get_padding(self) -> str:
+    def get_padding(self) -> str:  # TODO: is this actually used in the algorithm?
         return None
 
     @floaty

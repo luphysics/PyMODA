@@ -185,7 +185,8 @@ def _bispectrum_analysis(queue: Queue,
     opt["twf1"] = matlab_to_numpy(opt["twf1"])
     opt["twf2"] = matlab_to_numpy(opt["twf2"])
 
-    print("Adding to queue...")
+    import time
+    print(f"Adding to queue at time={time.time():.1f} seconds.")
     queue.put((
         name,
         freq,
