@@ -17,7 +17,11 @@
 
 class BaseUI:
     """
-    A base UI element which defines the function 'init_ui'.
+    A base UI element which defines the function 'setup_ui', which is used
+    to setup UI elements and perform tasks such as inflating the layout from
+    a .ui file.
+
+    `setup_ui` is called in the constructor.
     """
 
     def __init__(self):
