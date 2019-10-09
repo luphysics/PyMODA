@@ -28,30 +28,66 @@ def _biphase(queue: Queue,
              sig1: TimeSeries,
              sig2: TimeSeries,
              fs: float,
+             f0: float,
              fr: float,
              opt: dict) -> None:
     from maths.algorithms.matlabwrappers import biphase_wav_new
+    import matlab
 
     name = sig1.name
     sig1list = sig1.signal.tolist()
     sig2list = sig2.signal.tolist()
 
-    biamp1, bphase1 = biphase_wav_new.calculate(sig1list, sig1list, fs, fr, opt)
-    biamp2, bphase2 = biphase_wav_new.calculate(sig2list, sig2list, fs, fr, opt)
-    biamp3, bphase3 = biphase_wav_new.calculate(sig1list, sig2list, fs, fr, opt)
-    biamp4, bphase4 = biphase_wav_new.calculate(sig2list, sig1list, fs, fr, opt)
+    opt["PadLR1"] = matlab.double(opt["PadLR1"].tolist())
+    opt["PadLR2"] = matlab.double(opt["PadLR2"].tolist())
 
-    biamp1, bphase1 = multi_matlab_to_numpy(biamp1, bphase1)
-    biamp2, bphase2 = multi_matlab_to_numpy(biamp2, bphase2)
-    biamp3, bphase3 = multi_matlab_to_numpy(biamp3, bphase3)
-    biamp4, bphase4 = multi_matlab_to_numpy(biamp4, bphase4)
+    twf1 = [complex(i) for i in opt["twf1"]]
+    twf2 = [complex(i) for i in opt["twf2"]]
+
+    twf1r = [i.real for i in twf1]
+    twf2r = [i.real for i in twf2]
+    twf1i = [i.imag for i in twf1]
+    twf2i = [i.imag for i in twf2]
+
+    del opt["twf1"]
+    del opt["twf2"]
+
+    opt["twf1r"] = matlab.double(twf1r)
+    opt["twf2r"] = matlab.double(twf2r)
+    opt["twf1i"] = matlab.double(twf1i)
+    opt["twf2i"] = matlab.double(twf2i)
+
+    biamp1, biphase1 = biphase_wav_new.calculate(sig1list, sig1list, fs, f0, fr, opt)
+    biamp2, biphase2 = biphase_wav_new.calculate(sig2list, sig2list, fs, f0, fr, opt)
+    biamp3, biphase3 = biphase_wav_new.calculate(sig1list, sig2list, fs, f0, fr, opt)
+    biamp4, biphase4 = biphase_wav_new.calculate(sig2list, sig1list, fs, f0, fr, opt)
+
+    biamp1, biphase1 = multi_matlab_to_numpy(biamp1, biphase1)
+    biamp2, biphase2 = multi_matlab_to_numpy(biamp2, biphase2)
+    biamp3, biphase3 = multi_matlab_to_numpy(biamp3, biphase3)
+    biamp4, biphase4 = multi_matlab_to_numpy(biamp4, biphase4)
+
+    l = biamp1.shape[1]
+
+    biamp1 = biamp1.reshape(l)
+    biphase1 = biphase1.reshape(l)
+
+    biamp2 = biamp2.reshape(l)
+    biphase2 = biphase2.reshape(l)
+
+    biamp3 = biamp3.reshape(l)
+    biphase3 = biphase3.reshape(l)
+
+    biamp4 = biamp4.reshape(l)
+    biphase4 = biphase4.reshape(l)
 
     queue.put((
         name,
-        biamp1, bphase1,
-        biamp2, bphase2,
-        biamp3, bphase3,
-        biamp4, bphase4,
+        *fr,
+        biamp1, biphase1,
+        biamp2, biphase2,
+        biamp3, biphase3,
+        biamp4, biphase4,
     ))
 
 

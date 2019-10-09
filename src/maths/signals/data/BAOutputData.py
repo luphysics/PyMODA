@@ -13,9 +13,9 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from dataclasses import dataclass
 from typing import Dict
 
+from dataclasses import dataclass
 from numpy import ndarray
 
 
@@ -60,3 +60,26 @@ class BAOutputData:
 
     biamp: Dict[float, ndarray]
     biphase: Dict[float, ndarray]
+
+    def invalidate(self):
+        amp_wt1: ndarray = None
+        pow_wt1: ndarray = None
+        avg_amp_wt1: ndarray = None
+        avg_pow_wt1: ndarray = None
+        amp_wt2: ndarray = None
+        pow_wt2: ndarray = None
+        avg_amp_wt2: ndarray = None
+        avg_pow_wt2: ndarray = None
+        times: ndarray = None
+        freq: ndarray = None
+        bispxxx: ndarray = None
+        bispppp: ndarray = None
+        bispxpp: ndarray = None
+        bisppxx: ndarray = None
+        surrxxx: ndarray = None
+        surrppp: ndarray = None
+        surrxpp: ndarray = None
+        surrpxx: ndarray = None
+        opt: dict = None
+        biamp: Dict[float, ndarray] = None
+        biphase: Dict[float, ndarray] = None

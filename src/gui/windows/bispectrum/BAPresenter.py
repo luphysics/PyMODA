@@ -73,16 +73,21 @@ class BAPresenter(BaseTFPresenter):
         self.mp_handler.stop()
 
         fs = self.params.fs
-        fr = self.params.f0
-        data = await self.mp_handler.coro_biphase(self.signals,
-                                                  fs,
-                                                  fr,
-                                                  self.on_progress_updated)
+        f0 = self.params.f0
+        fr = self.view.get_selected_freq_pair()
+        x, y = fr
 
-        for d in data:
-            self.on_biphase_completed(*d)
+        if x is not None and y is not None:
+            data = await self.mp_handler.coro_biphase(self.signals,
+                                                      fs,
+                                                      f0,
+                                                      fr,
+                                                      self.on_progress_updated)
 
-        self.update_side_plots(self.get_selected_signal_pair()[0].output_data)
+            for d in data:
+                self.on_biphase_completed(*d)
+
+            self.update_side_plots(self.get_selected_signal_pair()[0].output_data)
 
     def update_plots(self):
         """
@@ -140,15 +145,15 @@ class BAPresenter(BaseTFPresenter):
 
             times = self.get_selected_signal().times
 
-            if biamp:
+            if biamp is not None:
+                self.view.plot_right_middle.update_ylabel("Biamplitude")
+                self.view.plot_right_middle.update_xlabel("Time (s)")
                 self.view.plot_right_middle.plot(times, biamp)
-                self.view.plot_right_middle.set_ylabel("Biamplitude")
-                self.view.plot_right_middle.set_xlabel("Time (s)")
 
-            if biphase:
+            if biphase is not None:
+                self.view.plot_right_bottom.update_ylabel("Biphase")
+                self.view.plot_right_bottom.update_xlabel("Time (s)")
                 self.view.plot_right_bottom.plot(times, biphase)
-                self.view.plot_right_bottom.set_ylabel("Biphase")
-                self.view.plot_right_bottom.set_xlabel("Time (s)")
 
     @staticmethod
     def get_side_plot_data_wt(plot_type: str, data: BAOutputData, amp_not_power: bool) -> Tuple[ndarray, ndarray]:
@@ -178,20 +183,21 @@ class BAPresenter(BaseTFPresenter):
         :param data the data object
         :return: biamplitude and biphase
         """
-        key = ", ".join([str(freq) for f in freq])
-        if "None" in key:
+        key = ", ".join([str(f) for f in freq])
+
+        biamp = data.biamp.get(key)
+        biphase = data.biphase.get(key)
+
+        if "None" in key or biamp is None:
             return None, None
 
         _dict = {
-            "b111": (data.biamp[0], data.biphase[0]),
-            "b222": (data.biamp[1], data.biphase[1]),
-            "b122": (data.biamp[2], data.biphase[2]),
-            "b211": (data.biamp[3], data.biphase[3]),
+            "b111": (biamp[0], biphase[0]),
+            "b222": (biamp[1], biphase[1]),
+            "b122": (biamp[2], biphase[2]),
+            "b211": (biamp[3], biphase[3]),
         }
-        biamp_dict, biphase_dict = _dict.get(plot_type)
-        biamp = biamp_dict.get(key)
-        biphase = biphase_dict.get(key)
-
+        biamp, biphase = _dict.get(plot_type)
         return biamp, biphase
 
     @staticmethod
@@ -279,14 +285,33 @@ class BAPresenter(BaseTFPresenter):
                              name: str,
                              freq_x: float,
                              freq_y: float,
-                             biamp: ndarray,
-                             biphase: ndarray):
+                             biamp1: ndarray,
+                             biphase1: ndarray,
+                             biamp2: ndarray,
+                             biphase2: ndarray,
+                             biamp3: ndarray,
+                             biphase3: ndarray,
+                             biamp4: ndarray,
+                             biphase4: ndarray):
         sig = self.signals.get(name)
         key = f"{freq_x}, {freq_y}"
 
         data = sig.output_data
-        data.biamp[key] = biamp
-        data.biphase[key] = biphase
+
+        data.biamp[key] = [[] for _ in range(4)]
+        data.biphase[key] = [[] for _ in range(4)]
+
+        data.biamp[key][0] = biamp1
+        data.biphase[key][0] = biphase1
+
+        data.biamp[key][1] = biamp2
+        data.biphase[key][1] = biphase2
+
+        data.biamp[key][2] = biamp3
+        data.biphase[key][2] = biphase3
+
+        data.biamp[key][3] = biamp4
+        data.biphase[key][3] = biphase4
 
     async def coro_load_data(self):
         """

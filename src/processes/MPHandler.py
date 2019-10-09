@@ -14,7 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from typing import Callable, List
+from typing import Callable, List, Tuple
 
 from multiprocess import Queue, Process
 
@@ -174,7 +174,8 @@ class MPHandler:
     async def coro_biphase(self,
                            signals: SignalPairs,
                            fs: float,
-                           fr: float,
+                           f0: float,
+                           fr: Tuple[float, float],
                            on_progress: Callable[[int, int], None]
                            ) -> List[tuple]:
         self.stop()
@@ -184,7 +185,7 @@ class MPHandler:
             q = Queue()
 
             opt = pair[0].output_data.opt
-            p = Process(target=_biphase, args=(q, *pair, fs, fr, opt))
+            p = Process(target=_biphase, args=(q, *pair, fs, f0, fr, opt))
 
             self.scheduler.append(Task(p, q))
 
