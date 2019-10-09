@@ -110,18 +110,22 @@ class BAPresenter(BaseTFPresenter):
         :param data: the data object
         """
         x, y, c, log = self.get_main_plot_data(self.view.get_plot_type(), data)
+        freq_x, freq_y = self.view.get_selected_freq_pair()
 
         if self.view.is_wt_selected():
             self.view.switch_to_dual_plot()
         else:
             self.view.switch_to_triple_plot()
 
+        if freq_x is not None and freq_y is not None:
+            self.view.plot_main.draw_crosshair(freq_x, freq_y)
+
         if c is not None:
             self.view.plot_main.set_log_scale(log, axis="x")
             self.view.plot_main.set_log_scale(True, axis="y")
-            self.view.plot_main.plot(x=x, y=y, c=c)
             self.view.plot_main.update_xlabel("Frequency (Hz)")
             self.view.plot_main.update_ylabel("Frequency (Hz)")
+            self.view.plot_main.plot(x=x, y=y, c=c)
 
     def update_side_plots(self, data: BAOutputData):
         """

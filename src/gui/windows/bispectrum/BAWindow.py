@@ -66,6 +66,14 @@ class BAWindow(BAViewProperties,
         self.combo_plot_type.currentTextChanged.connect(lambda _: self.presenter.update_plots())
         self.listwidget_freq.itemClicked.connect(self.on_freq_selected)
 
+    def on_calculate_started(self):
+        super(BAWindow, self).on_calculate_started()
+        self.btn_add_point.setEnabled(False)
+
+    def on_calculate_stopped(self):
+        super(BAWindow, self).on_calculate_stopped()
+        self.btn_add_point.setEnabled(True)
+
     def on_select_point_clicked(self):
         if not self.is_wt_selected():
             self.plot_main.set_click_crosshair_enabled(True)
