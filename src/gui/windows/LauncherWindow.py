@@ -17,10 +17,12 @@
 from PyQt5 import uic
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import QMessageBox
 
 from data import resources
 from data.resources import get
 from gui.windows.CentredWindow import CentredWindow
+from utils.shortcuts import create_shortcut
 
 
 class LauncherWindow(CentredWindow):
@@ -39,7 +41,14 @@ class LauncherWindow(CentredWindow):
         self.btn_wavelet_bispectrum.clicked.connect(self.application.start_bispectrum)
         self.btn_dynamical_bayesian.clicked.connect(self.application.start_bayesian)
 
+        self.btn_create_shortcut.clicked.connect(self.create_shortcut)
+
     def load_banner_images(self):
         physics_label = self.lbl_physics
         image = QPixmap(resources.get("image:physicslogo.png"))
         physics_label.setPixmap(image.scaled(600, 300, Qt.KeepAspectRatio))
+
+    @staticmethod
+    def create_shortcut():
+        status = create_shortcut()
+        QMessageBox(text=status).exec()

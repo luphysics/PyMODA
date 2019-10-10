@@ -13,9 +13,12 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import os
+import sys
 from argparse import ArgumentParser
 
 # Args are global and should only be modified at startup.
+from os import path
 from typing import Optional
 
 args = None
@@ -42,8 +45,18 @@ def parser() -> ArgumentParser:
     return p
 
 
-def init():
-    """Parses the args and sets the global 'args' variable."""
+def init(set_working_dir=False):
+    """
+    Parses the args, sets the global 'args' variable. Also uses the first arg
+    from sys.argv to set the program's working directory to the path to that of
+    the main file, if desired.
+
+    :param set_working_dir whether to set the working directory to the same as the
+    path to the main file.
+    """
+    if set_working_dir:
+        os.chdir(path.dirname(path.abspath(sys.argv[0])))
+
     global args
     args = parser().parse_args()
 
