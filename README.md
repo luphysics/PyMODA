@@ -29,11 +29,13 @@ newest version recommended (does not require a licence).
 
 ## Operating systems
 
-PyMODA should run on Windows, macOS and Linux. On macOS and Linux, `python` should be replaced with `python3` in all commands below.
+PyMODA should run on Windows, macOS and Linux. 
+
+> :warning: On macOS and Linux, `python` should be replaced with the appropriate command - usually `python3` - in all commands below.
 
 ## Downloading the code
 
-There are two methods to download the code: as a zip file, or by cloning the repository with Git. The advantage of cloning with Git is that you can easily update PyMODA by running `git pull` in the terminal instead of downloading a new zip file.
+There are two methods to download the code: as a zip file, or by cloning the repository with Git. The advantage of cloning with Git is that you can easily update PyMODA by running `git pull` in the terminal, preserving any added files such as shortcuts, instead of downloading a new zip file.
 
 If you prefer the zip method:
 
@@ -51,7 +53,7 @@ If you prefer the Git method:
 ## Preparing to run
 When the code is downloaded and Python is installed, you'll need to install the dependencies. To do this, open a terminal in the `PyMODA` folder and run the command `python packages/install.py`. This will require elevated permissions, e.g. "Run as adminstrator" on Windows or `sudo` on macOS/Linux.
 
-To start PyMODA, run `python src/main.py` from the same terminal. Linux users also need to specify the path to the MATLAB Runtime using a command-line argument (see [command-line arguments](docs/developer-guide#command-line-arguments)).
+To start PyMODA, run `python src/main.py` from the same terminal. Linux users also need to specify the path to the MATLAB Runtime using a command-line argument (see [command-line arguments](docs/developer-guide.md#command-line-arguments)).
 
 ## Performance and efficiency
 
@@ -67,4 +69,4 @@ Therefore, it is more efficient to transform multiple signals if possible. Effic
 | WT on 32 signals | i7-6700 (4 cores, 8 threads) | 160s | 43.1s | x3.7 |
 | WT on 32 signals | Ryzen 3700X (8 cores, 16 threads) | 157s | 34.5s | x4.55 |
 
-Note: the i7-6700 was tested on Linux, while the Ryzen 3700X was running Windows. This causes differences in performance.
+> Note: the i7-6700 was tested on Linux, while the Ryzen 3700X was running Windows. This causes differences in performance.

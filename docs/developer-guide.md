@@ -9,11 +9,13 @@ To develop the program, you may need additional tools:
 - Qt Designer is used to edit the layout files.
 
 ## Downloading the code
-If you are not registered as a collaborator, you should [fork the repository](https://help.github.com/en/articles/fork-a-repo). You can then clone your fork to download the code. To start running the code, see [preparing to run](#preparing-to-run).
+If you are not registered as a collaborator, you should [fork the repository](https://help.github.com/en/articles/fork-a-repo). You can then clone your fork to download the code. To start running the code, see [preparing to run](../README.md#preparing-to-run).
 
 ## Command-line arguments
 
-PyMODA has several command-line arguments, which can make development easier. Note that `-runtime` *must be used on Linux*,  but should not be necessary on other operating systems.
+PyMODA has several command-line arguments, which can make development easier.
+
+> :warning: `-runtime` must be used on Linux, but should not be necessary on other operating systems.
 
 `-runtime` is used to specify the `LD_LIBRARY_PATH` for the MATLAB Runtime. The `LD_LIBRARY_PATH` is shown by the Runtime installer after installation, and should be saved but not be added to the environment variables manually. 
 
@@ -22,6 +24,8 @@ Here is an example of PyMODA being run on Linux:
 ```
 python3 src/main.py -runtime "/usr/local/MATLAB/MATLAB_Runtime/v96/runtime/glnxa64:/usr/local/MATLAB/MATLAB_Runtime/v96/bin/glnxa64:/usr/local/MATLAB/MATLAB_Runtime/v96/sys/os/glnxa64:/usr/local/MATLAB/MATLAB_Runtime/v96/extern/bin/glnxa64"
 ```
+
+> Tip: You can add command-line arguments like `-runtime` to your PyCharm configuration.
 
 Below is a table listing the other command-line arguments.
 
@@ -32,7 +36,9 @@ Below is a table listing the other command-line arguments.
 | `-freq` | Specifies the sampling frequency to use. This frequency will be automatically selected in dialogs. | `python src/main.py -freq 10` |
 | `-file` | Specifies a data file to use. This file will be automatically selected in dialogs. Only designed for data files in the `res/test` folder, and the file name should be prefixed by `test:`. | `python src.main.py -file "test:many_signal.csv"` | 
 
-Command-line arguments can be specified in PyCharm configurations. For example, you can specify `-runtime` in all and/or create a different configuration for each data file.
+Command-line arguments can be specified in PyCharm configurations. 
+
+> Tip: Create multiple PyCharm configurations with different `-file` and `-freq` args to easily test different datasets. 
 
 ## Error handling
 
