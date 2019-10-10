@@ -87,3 +87,7 @@ the standard library, due to problems with the latter's serialization in Windows
 
 `asyncio` allows the `Scheduler` class, which schedules the running of multiple processes, 
 to run on the main thread without freezing the GUI. `Scheduler` is run in a coroutine using the Qt event loop from `asyncqt`.
+
+### Combining multiprocessing and asyncio
+
+![Diagram demonstrating how TFPresenter, MPHandler and Scheduler interact.](images/multiprocessing.png)
