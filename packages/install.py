@@ -75,7 +75,7 @@ if __name__ == "__main__":
     os.system(f"{pip()} install -r requirements.txt")
 
     if is_windows:
-        os.system(f"{pip()} install --user winshell pypiwin32")
+        os.system(f"{pip()} install winshell pypiwin32")
 
     print("\n")
     print(f"\nInstalled dependencies for {python}.")
