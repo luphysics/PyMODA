@@ -17,6 +17,7 @@
 import os
 import platform
 import sys
+from subprocess import Popen, PIPE
 
 system = platform.system()
 
@@ -85,15 +86,34 @@ def _create_shortcut_linux() -> str:
     Creates a command-line alias to launch PyMODA with current arguments,
     by adding it to ~/.profile.
     """
-    with open(_get_profile_abs_path(), "r") as f:
-        lines = f.readlines()
+    bashrc = _get_abs_path_in_home_folder(".bashrc")  # Bash.
+    zshrc = _get_abs_path_in_home_folder(".zshrc")  # Zsh.
+    with open(bashrc, "r") as f:
+        bash_lines = f.readlines()
+
+    try:
+        with open(zshrc, "r") as f:
+            zsh_lines = f.readlines()
+    except FileNotFoundError:
+        if _is_zsh_installed():
+            zsh_lines = []
+        else:
+            zsh_lines = None
 
     alias_pymoda = "alias pymoda="
-    lines = list(filter(lambda l: alias_pymoda not in l, lines))
+    line_to_add = f"{alias_pymoda}'{sys.executable} {_python_interpreter_arguments()}'"
+    filter_func = lambda l: alias_pymoda not in l
 
-    lines.append(f"{alias_pymoda}'{sys.executable} {_python_interpreter_arguments()}'")
-    with open(_get_profile_abs_path(), "w") as f:
-        f.writelines(lines)
+    bash_lines = list(filter(filter_func, bash_lines))
+    bash_lines.append(line_to_add)
+    with open(bashrc, "w") as f:
+        f.writelines(bash_lines)
+
+    if zsh_lines is not None:
+        zsh_lines = list(filter(filter_func, zsh_lines))
+        zsh_lines.append(line_to_add)
+        with open(zshrc, "w") as f:
+            f.writelines(zsh_lines)
 
     return "Created 'pymoda' alias to launch PyMODA with current arguments. " \
            "Open a new terminal in any folder and try typing 'pymoda'."
@@ -103,13 +123,14 @@ def _create_shortcut_mac_os() -> str:
     return "macOS shortcuts are not supported yet."
 
 
-def _get_profile_abs_path() -> str:
+def _get_abs_path_in_home_folder(file_name: str) -> str:
     """
-    Returns the absolute path to the `.profile` file on Linux.
+    Returns the absolute path to the a particular file
+    in the home folder on Linux.
     """
     from pathlib import Path
     home = str(Path.home())
-    return os.path.join(home, ".profile")
+    return os.path.join(home, file_name)
 
 
 def _python_interpreter_arguments() -> str:
@@ -123,4 +144,16 @@ def _abs_path_to_main_py() -> str:
     """
     Returns the absolute path to the main Python file, `main.py`.
     """
-    return os.path.abspath(sys.argv[0])
+    main_py_name = sys.argv[0].replace("\\", "/").split("/")[-1]
+    return os.path.abspath(main_py_name)
+
+
+def _is_zsh_installed() -> bool:
+    """
+    Returns whether the Zsh shell is installed on the system, by checking
+    whether the output of `which zsh` is empty.
+    """
+    pipe = Popen("which zsh", shell=True, stdout=PIPE).stdout
+    output = pipe.read()
+
+    return bool(output)
