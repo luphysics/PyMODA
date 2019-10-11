@@ -74,7 +74,7 @@ def _create_shortcut_windows() -> str:
     path = os.path.join(winshell.desktop(), "PyMODA.lnk")
     with winshell.shortcut(path) as s:
         # Path to Python interpreter.
-        s.path = sys.executable
+        s.path = _get_python_interpreter_executable()
         s.description = "Shortcut to launch PyMODA."
         s.arguments = _python_interpreter_arguments()
 
@@ -84,7 +84,7 @@ def _create_shortcut_windows() -> str:
 def _create_shortcut_linux() -> str:
     """
     Creates a command-line alias to launch PyMODA with current arguments,
-    by adding it to ~/.profile.
+    by adding it to ~/.bashrc and ~/.zshrc if it exists or zsh is installed.
     """
     bashrc = _get_abs_path_in_home_folder(".bashrc")  # Bash.
     zshrc = _get_abs_path_in_home_folder(".zshrc")  # Zsh.
@@ -101,8 +101,8 @@ def _create_shortcut_linux() -> str:
             zsh_lines = None
 
     alias_pymoda = "alias pymoda="
-    line_to_add = f"{alias_pymoda}'{sys.executable} {_python_interpreter_arguments()}'"
-    filter_func = lambda l: alias_pymoda not in l
+    filter_func = lambda line: alias_pymoda not in line
+    line_to_add = f"{alias_pymoda}'{_get_python_interpreter_executable()} {_python_interpreter_arguments()}'"
 
     bash_lines = list(filter(filter_func, bash_lines))
     bash_lines.append(line_to_add)
@@ -112,11 +112,17 @@ def _create_shortcut_linux() -> str:
     if zsh_lines is not None:
         zsh_lines = list(filter(filter_func, zsh_lines))
         zsh_lines.append(line_to_add)
+
         with open(zshrc, "w") as f:
             f.writelines(zsh_lines)
 
     return "Created 'pymoda' alias to launch PyMODA with current arguments. " \
            "Open a new terminal in any folder and try typing 'pymoda'."
+
+
+def _get_python_interpreter_executable() -> str:
+    # On Windows, use `pythonw.exe` to keep console window hidden.
+    return sys.executable.replace(".exe", "w.exe")
 
 
 def _create_shortcut_mac_os() -> str:
