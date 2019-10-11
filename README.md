@@ -55,6 +55,8 @@ When the code is downloaded and Python is installed, you'll need to install the 
 
 To start PyMODA, run `python src/main.py` from the same terminal. Linux users also need to specify the path to the MATLAB Runtime using a command-line argument (see [command-line arguments](docs/developer-guide.md#command-line-arguments)).
 
+> Tip: If you experience any problems, check the [Common Issues](docs/common-issues.md) document.
+
 ## Performance and efficiency
 
 When performing multiple discrete calculations - for example, the wavelet transform of 6 signals - PyMODA uses multiprocessing to greatly increase efficiency by allocating 
