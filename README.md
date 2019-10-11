@@ -51,11 +51,43 @@ If you prefer the Git method:
 - Whenever you want to update, open a terminal in `PyMODA` and run `git pull`.
 
 ## Preparing to run
-When the code is downloaded and Python is installed, you'll need to install the dependencies. To do this, open a terminal in the `PyMODA` folder and run the command `python packages/install.py`. This will require elevated permissions, e.g. "Run as adminstrator" on Windows or `sudo` on macOS/Linux.
 
-To start PyMODA, run `python src/main.py` from the same terminal. Linux users also need to specify the path to the MATLAB Runtime using a command-line argument (see [command-line arguments](docs/developer-guide.md#command-line-arguments)).
+When the code is downloaded and Python is installed, you'll need to install the dependencies. 
+
+#### Windows
+
+Open an administrator terminal in the `PyMODA` folder, and run the command `python packages/install.py`.
+
+#### macOS/Linux
+
+Open a terminal in the `PyMODA` folder. Run the command `sudo python3 packages/install.py`.
+
+> :warning: When using a particular Python version, the python command/path must be added as a command-line argument. For example, 
+run `sudo python3.7 packages/install.py python3.7` to install dependencies for `python3.7`.
+
+## Running PyMODA
+
+To start PyMODA, run `python src/main.py` from the same terminal.
+
+> :warning: Linux users also need to specify the path to the MATLAB Runtime using a command-line argument (see [command-line arguments](docs/developer-guide.md#command-line-arguments)).
 
 > Tip: If you experience any problems, check the [Common Issues](docs/common-issues.md) document.
+
+## Creating a shortcut
+
+In the launcher window, press "Create shortcut" to create a shortcut to easily open PyMODA. This has different behaviour on different operating systems:
+
+#### Windows
+
+A desktop shortcut will be created.
+
+#### macOS/Linux
+
+An alias will be added, which provides the `pymoda` command to launch PyMODA. The alias will be added to `~/.bashrc`, and if Zsh is installed, to `~/.zshrc`.
+
+> :warning: This will not take effect in currently open shells. Open a new terminal to try it out. 
+
+> Tip: The `-runtime` argument does not need to be specified when using the `pymoda` command, as long as it was provided to the instance of PyMODA which created the alias. 
 
 ## Performance and efficiency
 
