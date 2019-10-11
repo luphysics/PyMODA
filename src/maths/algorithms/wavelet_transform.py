@@ -294,7 +294,7 @@ def wft(signal,
         WT[sn, arange(0, L)] = out[n1: NL - n2 + 1]
 
     if cut_edges:
-      icoib = nonzero((L-coib1-coib2) <= 0)
+      icoib = nonzero((L-coib1-coib2) <= 0)[0]
       WT[icoib,:] = np.nan
       ovL = int(np.ceil(np.sum(coib1 + coib2) - L*len(icoib)))
       frn = np.empty((ovL,))*np.nan
