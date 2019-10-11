@@ -13,15 +13,15 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-import asyncio
 
 from PyQt5 import uic
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QDialog, QFileDialog, QComboBox
 
-from utils import args, settings
 from data import resources
 from gui.BaseUI import BaseUI
+from utils import args
+from utils.settings import Settings
 
 
 class SelectFileDialog(QDialog, BaseUI):
@@ -34,7 +34,7 @@ class SelectFileDialog(QDialog, BaseUI):
     def __init__(self):
         self.file: str = None
         self.combo_recent: QComboBox = None
-
+        self.settings = Settings()
         super().__init__()
 
     def setup_ui(self):
@@ -49,7 +49,7 @@ class SelectFileDialog(QDialog, BaseUI):
 
     async def coro_get(self) -> str:
         self.exec()
-        settings.add_recent_file(self.file)
+        self.settings.add_recent_file(self.file)
         return self.get_file()
 
     def check_args(self):
@@ -79,7 +79,7 @@ class SelectFileDialog(QDialog, BaseUI):
             self.lbl_drag_drop.show_selected_file(self.file)
 
     def setup_recent_files(self):
-        files = settings.get_recent_files()
+        files = self.settings.get_recent_files()
         self.combo_recent.addItems(files)
 
     def use_recent_file(self):

@@ -13,16 +13,17 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from typing import Callable
+
 
 from PyQt5 import uic
 from PyQt5.QtCore import QTimer
-from PyQt5.QtWidgets import QDialog, QComboBox
+from PyQt5.QtWidgets import QDialog
 
-from maths.num_utils import float_or_none, float_to_str
-from utils import args, settings
 from data import resources
 from gui.BaseUI import BaseUI
+from maths.num_utils import float_or_none, float_to_str
+from utils import args
+from utils.settings import Settings
 
 
 class FrequencyDialog(QDialog, BaseUI):
@@ -34,8 +35,9 @@ class FrequencyDialog(QDialog, BaseUI):
     current_selected = None
 
     def __init__(self):
-        super(FrequencyDialog, self).__init__()
         self.frequency: float = None
+        self.settings = Settings()
+        super(FrequencyDialog, self).__init__()
 
     def setup_ui(self):
         uic.loadUi(resources.get("layout:dialog_frequency.ui"), self)
@@ -48,11 +50,11 @@ class FrequencyDialog(QDialog, BaseUI):
 
     async def coro_get(self):
         self.exec()
-        settings.add_recent_freq(self.frequency)
+        self.settings.add_recent_freq(self.frequency)
         return self.frequency
 
     def setup_combo(self):
-        values = settings.get_recent_freq()
+        values = self.settings.get_recent_freq()
         self.combo_recent.addItems([float_to_str(f) for f in values])
 
     def check_args(self):

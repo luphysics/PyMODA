@@ -16,8 +16,8 @@
 
 import sys
 
-from utils import errorhandling, stdout_redirect, args, cache
 from gui.Application import Application
+from utils import errorhandling, stdout_redirect, args
 
 # The entry-point of the program.
 if __name__ == "__main__":

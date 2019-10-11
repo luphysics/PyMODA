@@ -17,47 +17,46 @@ from typing import List
 
 from easysettings import EasySettings
 
-"""
-Handles saving values to a file.
-"""
-
-_settings = EasySettings("settings.conf")
-
 _key_recent_files = "recent_files"
 _key_recent_frequencies = "recent_freq"
 
 
-def get_recent_files() -> List[str]:
-    files = _settings.get(_key_recent_files)
-    return files or []
+class Settings:
+    """
+    Class which handles saving values to a preferences file.
+    """
 
+    def __init__(self):
+        self._settings = EasySettings("settings.conf")
 
-def add_recent_file(new_file: str):
-    files = get_recent_files()
+    def get_recent_files(self) -> List[str]:
+        files = self._settings.get(_key_recent_files)
+        return files or []
 
-    if new_file:
-        if new_file in files:
-            files.remove(new_file)
+    def add_recent_file(self, new_file: str):
+        files = self.get_recent_files()
 
-        files.insert(0, new_file)
+        if new_file:
+            if new_file in files:
+                files.remove(new_file)
 
-    _settings.set(_key_recent_files, files)
-    _settings.save()
+            files.insert(0, new_file)
 
+        self._settings.set(_key_recent_files, files)
+        self._settings.save()
 
-def get_recent_freq() -> List[float]:
-    freq = _settings.get(_key_recent_frequencies)
-    return freq or []
+    def get_recent_freq(self) -> List[float]:
+        freq = self._settings.get(_key_recent_frequencies)
+        return freq or []
 
+    def add_recent_freq(self, new_freq: float):
+        freq = self.get_recent_freq()
 
-def add_recent_freq(new_freq: float):
-    freq = get_recent_freq()
+        if new_freq is not None:
+            if new_freq in freq:
+                freq.remove(new_freq)
 
-    if new_freq is not None:
-        if new_freq in freq:
-            freq.remove(new_freq)
+            freq.insert(0, new_freq)
 
-        freq.insert(0, new_freq)
-
-    _settings.set(_key_recent_frequencies, freq)
-    _settings.save()
+        self._settings.set(_key_recent_frequencies, freq)
+        self._settings.save()
