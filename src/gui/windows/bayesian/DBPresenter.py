@@ -112,8 +112,10 @@ class DBPresenter(BaseTFPresenter):
 
         self.view.db_plot_bottom.plot(data.tm, data.cpl1)
         self.view.db_plot_bottom.plot(data.tm, data.cpl2)
-        self.view.db_plot_bottom.plot(data.tm, data.surr_cpl1)
-        self.view.db_plot_bottom.plot(data.tm, data.surr_cpl2)
+
+        if data.surr_cpl1 is not None and data.surr_cpl2 is not None:
+            self.view.db_plot_bottom.plot(data.tm, data.surr_cpl1)
+            self.view.db_plot_bottom.plot(data.tm, data.surr_cpl2)
 
         self.view.db_plot_bottom.set_xrange(times[0], times[-1])
 

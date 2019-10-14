@@ -27,33 +27,6 @@ from maths.algorithms.loop_butter import loop_butter
 from maths.algorithms.matlab_utils import sort2d
 from maths.algorithms.surrogates import surrogate_calc
 from maths.signals.TimeSeries import TimeSeries
-from processes import mp_utils
-
-
-def _moda_dynamic_bayesian_inference(queue: Queue, signal1: TimeSeries, signal2: TimeSeries, params: ParamSet):
-    mp_utils.setup_matlab_runtime()
-
-    import full_bayesian
-    import matlab
-    package = full_bayesian.initialize()
-
-    sig1 = matlab.double(signal1.signal.tolist())
-    sig2 = matlab.double(signal2.signal.tolist())
-
-    int1 = list(params.freq_range1)
-    int2 = list(params.freq_range2)
-
-    fs = signal1.frequency
-    win = params.window
-    pr = params.propagation_const
-    ovr = params.overlap
-    bn = params.order
-    ns = params.surr_count
-    signif = params.confidence_level
-
-    result = package.full_bayesian(sig1, sig2, *int1, *int2, fs, win, pr, ovr, bn, ns, signif)
-
-    queue.put((signal1.name, *result))
 
 
 def _dynamic_bayesian_inference(queue: Queue, signal1: TimeSeries, signal2: TimeSeries, params: ParamSet):
@@ -128,18 +101,22 @@ def _dynamic_bayesian_inference(queue: Queue, signal1: TimeSeries, signal2: Time
     alph = signif
     alph = 1 - alph / 100
 
-    if np.floor((ns + 1) * alph) == 0:
-        surr_cpl1 = np.max(scpl1)
-        surr_cpl2 = np.max(scpl2)
+    if scpl1.size > 0:
+        if np.floor((ns + 1) * alph) == 0:
+            surr_cpl1 = np.max(scpl1)
+            surr_cpl2 = np.max(scpl2)
+        else:
+            K = np.floor((ns + 1) * alph)
+            K = np.int(K)
+
+            s1 = sort2d(scpl1, descend=True)
+            s2 = sort2d(scpl2, descend=True)
+
+            surr_cpl1 = s1[K, :]
+            surr_cpl2 = s2[K, :]
     else:
-        K = np.floor((ns + 1) * alph)
-        K = np.int(K)
-
-        s1 = sort2d(scpl1, descend=True)
-        s2 = sort2d(scpl2, descend=True)
-
-        surr_cpl1 = s1[K, :]
-        surr_cpl2 = s2[K, :]
+        surr_cpl1 = None
+        surr_cpl2 = None
 
     queue.put((
         signal1.name,
