@@ -4,7 +4,7 @@ This document outlines some common problems and their solutions.
 
 ---
 
-### ImportError: DLL load failed: The specified module could not be found.
+### "ImportError: DLL load failed: The specified module could not be found."
 
 #### Problem
 
@@ -16,7 +16,7 @@ Uninstalling Python 3.7 and installing Python 3.6 appears to fix the issue. Pyth
 
 ---
 
-### No module named PyQt5.sip
+### "No module named PyQt5.sip"
 
 #### Problem
 
@@ -32,7 +32,7 @@ pip install pyqt5
 
 ---
 
-### Could not load the Qt platform plugin "xcb" in "" even though it was found.
+### "Could not load the Qt platform plugin "xcb" in "" even though it was found."
 
 #### Problem 
 
@@ -48,7 +48,7 @@ Now take the value of the `LD_LIBRARY_PATH` that was exported, and add it as the
 
 ---
 
-### qt.qpa.xcb: QXcbConnection: XCB error: 13 (BadGC)
+### "qt.qpa.xcb: QXcbConnection: XCB error: 13 (BadGC)"
 
 #### Problem
 
@@ -57,3 +57,19 @@ This issue appears to be a bug in the `xcb` plugin which is used when running Py
 #### Solution
 
 This problem usually seems to appear when running bispectrum analysis in PyMODA via PyCharm. PyMODA normally runs from the terminal without issues.
+
+---
+
+### Windows: desktop shortcut does not work
+
+#### Problem
+
+Clicking the desktop shortcut has no effect, or opens a black terminal window for a split-second. This is probably due to the path to the Python interpreter or the PyMODA folder being changed (e.g. if Python is updated or PyMODA or one of its parent folders is renamed). If the path to the Python interpreter or PyMODA contains spaces, this may also cause issues.
+
+You may be able to diagnose other issues by selecting the shortcut, pressing `Alt`+`Enter`, copying the `Target` field and running it in a terminal. 
+
+#### Solution
+
+If the problem is due to the path to the Python interpreter or the PyMODA folder being changed, launching PyMODA manually and creating the shortcut again should fix the issue.
+
+--- 

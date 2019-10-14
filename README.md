@@ -22,6 +22,8 @@ PyMODA does not yet offer all the functionality available in MODA. This table sh
 
 This guide is aimed at users wishing to set up and run PyMODA. If you're interested in modifying or contributing to the program, you should use the [Developer Guide](docs/developer-guide.md).
 
+> Tip: If you experience any problems, check the [Common Issues](docs/common-issues.md) document.
+
 ## Requirements
 - Python 3.6 or higher.
 - [MATLAB Runtime](https://www.mathworks.com/products/compiler/matlab-runtime.html), 
@@ -45,7 +47,7 @@ If you prefer the zip method:
 
 If you prefer the Git method:
 
-- Install Git.
+- [Install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
 - Open a terminal in a desired folder and run `git clone https://github.com/luphysics/PyMODA.git`.
 - The code will download as a folder named `PyMODA-master`. For simplicity of instructions, rename the folder to `PyMODA`.
 - Whenever you want to update, open a terminal in `PyMODA` and run `git pull`.
@@ -71,19 +73,19 @@ To start PyMODA, run `python src/main.py` from the same terminal.
 
 > :warning: Linux users also need to specify the path to the MATLAB Runtime using a command-line argument (see [command-line arguments](docs/developer-guide.md#command-line-arguments)).
 
-> Tip: If you experience any problems, check the [Common Issues](docs/common-issues.md) document.
-
 ## Creating a shortcut
 
 In the launcher window, press "Create shortcut" to create a shortcut to easily open PyMODA. This has different behaviour on different operating systems:
 
 #### Windows
 
-A desktop shortcut will be created.
+A desktop shortcut will be created, which launches PyMODA with the current Python interpreter.
+
+> :warning: The shortcut will need to be recreated if the path to the PyMODA folder is changed, if the folder is renamed, or if the path to the Python interpreter changes.
 
 #### macOS/Linux
 
-An alias will be added, which provides the `pymoda` command to launch PyMODA. The alias will be added to `~/.bashrc`, and if Zsh is installed, to `~/.zshrc`.
+An alias will be created, which adds the terminal command `pymoda` to launch PyMODA. The alias will be added to `~/.bashrc` for Bash, and if Zsh is installed, to `~/.zshrc`.
 
 > :warning: This will not take effect in currently open shells. Open a new terminal to try it out. 
 
