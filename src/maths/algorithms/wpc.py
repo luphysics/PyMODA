@@ -20,6 +20,7 @@ Translation of the wavelet phase coherence algorithm from MODA.
 STATUS: Finished, apparently working.
 """
 import numpy as np
+import pdb
 
 
 def wpc(wt1, wt2, freq, fs, wsize=10):
@@ -70,16 +71,16 @@ def wphcoh(wt1, wt2):  # TODO: check that indices are correctly translated from 
     return phcoh, phdiff
 
 
-def tlphcoh(wt1, wt2, freq, fs, wsize):  # TODO: check that indices are correctly translated from matlab version
+def tlphcoh(wt1, wt2, freq, fs, wsize=10):  # TODO: check that indices are correctly translated from matlab version
     """
     Time-localized phase coherence.
 
-    :param wt1:
-    :param wt2:
-    :param freq:
-    :param fs:
-    :param wsize:
-    :return:
+    :param wt1: Wavelet transform of the first signal
+    :param wt2: Wavelet transform og the second signal with the same shape as wt1
+    :param freq: Frequencies at which the wavelet transforms wt1 and wt2 were calculated
+    :param fs: Sampling frequency
+    :param wsize: Window size, default is 10 samples
+    :return: time-localized wavelet phase coherence with the same shape as wt1
     """
     NF, L = wt1.shape
 
@@ -98,8 +99,7 @@ def tlphcoh(wt1, wt2, freq, fs, wsize):  # TODO: check that indices are correctl
         cumcs = cum_pc[fn]
 
         f = np.nonzero(~np.isnan(cs))[0]
-
-        window = np.round(wsize / freq[fn] * fs)[0]
+        window = np.round(wsize / freq[fn] * fs)#[0]
         window += 1 - np.mod(window, 2)
 
         hw = np.floor(window / 2)
