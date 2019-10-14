@@ -1,3 +1,26 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+## Table of Contents
+
+- [Common Issues](#common-issues)
+  - ["ImportError: DLL load failed: The specified module could not be found."](#importerror-dll-load-failed-the-specified-module-could-not-be-found)
+    - [Problem](#problem)
+    - [Solution](#solution)
+  - ["No module named PyQt5.sip"](#no-module-named-pyqt5sip)
+    - [Problem](#problem-1)
+    - [Solution](#solution-1)
+  - ["Could not load the Qt platform plugin "xcb" in "" even though it was found."](#could-not-load-the-qt-platform-plugin-xcb-in--even-though-it-was-found)
+    - [Problem](#problem-2)
+    - [Solution](#solution-2)
+  - ["qt.qpa.xcb: QXcbConnection: XCB error: 13 (BadGC)"](#qtqpaxcb-qxcbconnection-xcb-error-13-badgc)
+    - [Problem](#problem-3)
+    - [Solution](#solution-3)
+  - [Windows: desktop shortcut does not work](#windows-desktop-shortcut-does-not-work)
+    - [Problem](#problem-4)
+    - [Solution](#solution-4)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## Common Issues
 
 This document outlines some common problems and their solutions.

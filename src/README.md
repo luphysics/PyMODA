@@ -1,3 +1,13 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+## Table of Contents
+
+- [src](#src)
+  - [main.py](#mainpy)
+  - [Subfolders](#subfolders)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## src
 
 The `src` folder is the folder containing PyMODA's source code. 

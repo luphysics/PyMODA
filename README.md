@@ -1,3 +1,24 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+## Table of Contents
+
+  - [Introduction](#introduction)
+    - [Status](#status)
+- [User Guide](#user-guide)
+  - [Requirements](#requirements)
+  - [Operating systems](#operating-systems)
+  - [Downloading the code](#downloading-the-code)
+  - [Preparing to run](#preparing-to-run)
+      - [Windows](#windows)
+      - [macOS/Linux](#macoslinux)
+  - [Running PyMODA](#running-pymoda)
+  - [Creating a shortcut](#creating-a-shortcut)
+      - [Windows](#windows-1)
+      - [macOS/Linux](#macoslinux-1)
+  - [Performance and efficiency](#performance-and-efficiency)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## Introduction
 
 PyMODA is a Python implementation of MODA (Multiscale Oscillatory Dynamics Analysis). The user interface is written using PyQt5, and the algorithms are mostly packaged as Python libraries from the existing MATLAB code.
@@ -87,7 +108,7 @@ A desktop shortcut will be created, which launches PyMODA with the current Pytho
 
 An alias will be created, which adds the terminal command `pymoda` to launch PyMODA. The alias will be added to `~/.bashrc` for Bash, and if Zsh is installed, to `~/.zshrc`.
 
-> :warning: This will not take effect in currently open shells. Open a new terminal to try it out. 
+> Note: This will not take effect in currently open shells. Open a new terminal to try it out. 
 
 > Tip: The `-runtime` argument does not need to be specified when using the `pymoda` command, as long as it was provided to the instance of PyMODA which created the alias. 
 

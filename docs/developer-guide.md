@@ -1,3 +1,21 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+## Table of Contents
+
+- [Developer Guide](#developer-guide)
+  - [Additional requirements](#additional-requirements)
+  - [Downloading the code](#downloading-the-code)
+  - [Command-line arguments](#command-line-arguments)
+  - [Error handling](#error-handling)
+  - [Project structure](#project-structure)
+  - [Naming conventions and code style](#naming-conventions-and-code-style)
+  - [Concurrency](#concurrency)
+    - [multiprocess](#multiprocess)
+    - [asyncio](#asyncio)
+    - [Combining multiprocessing and asyncio](#combining-multiprocessing-and-asyncio)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Developer Guide
 
 This guide is aimed at developers wishing to modify or contribute to the program, and is 
