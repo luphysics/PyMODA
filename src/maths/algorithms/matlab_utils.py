@@ -71,7 +71,8 @@ def quadgk(func, x0, x1, limit, epsabs, epsrel):
 
 def interp1(x, y, xq):
     # TODO: check this is consistent with Matlab
-    scipy.interpolate.interp1d(x, y, kind="slinear", fill_value="extrapolate")
+    f = scipy.interpolate.interp1d(x, y, kind="slinear", fill_value="extrapolate")
+    return f(xq)
 
 
 def sqrt(n): return np.sqrt(n)
