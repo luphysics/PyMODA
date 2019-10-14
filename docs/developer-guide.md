@@ -5,6 +5,7 @@
 - [Developer Guide](#developer-guide)
   - [Additional requirements](#additional-requirements)
   - [Downloading the code](#downloading-the-code)
+  - [Git hooks](#git-hooks)
   - [Command-line arguments](#command-line-arguments)
   - [Error handling](#error-handling)
   - [Project structure](#project-structure)
@@ -21,13 +22,23 @@
 This guide is aimed at developers wishing to modify or contribute to the program, and is 
 designed to be accessible to programmers with basic to intermediate knowledge of Python.
 
+> :warning: On macOS and Linux, `python` should be replaced with the appropriate command - usually `python3` - in all commands below.
+
 ## Additional requirements
-To develop the program, you may need additional tools:
+To develop the program, you may need to install additional tools:
 - Git is used to download the code, save and upload your changes.
 - Qt Designer is used to edit the layout files.
 
 ## Downloading the code
-If you are not registered as a collaborator, you should [fork the repository](https://help.github.com/en/articles/fork-a-repo). You can then clone your fork to download the code. To start running the code, see [preparing to run](../README.md#preparing-to-run).
+If you are not registered as a collaborator, you should [fork the repository](https://help.github.com/en/articles/fork-a-repo). You can then clone your fork to download the code. 
+
+To start running the code, see [preparing to run](../README.md#preparing-to-run).
+
+## Git hooks
+
+Git hooks are used to automatically add the table of contents to markdown files when they are modified.
+
+Ensure that `pre-commit` is installed by running `pre-commit --version`; if it is not, install it with `pip install pre-commit` (may require an administrator terminal or `sudo`). Then run `pre-commit install` in the `PyMODA` folder.
 
 ## Command-line arguments
 

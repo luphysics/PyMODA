@@ -70,7 +70,7 @@ If you prefer the Git method:
 
 - [Install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
 - Open a terminal in a desired folder and run `git clone https://github.com/luphysics/PyMODA.git`.
-- The code will download as a folder named `PyMODA-master`. For simplicity of instructions, rename the folder to `PyMODA`.
+- The code will download as a folder named `PyMODA`.
 - Whenever you want to update, open a terminal in `PyMODA` and run `git pull`.
 
 ## Preparing to run
