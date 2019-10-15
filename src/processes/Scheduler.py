@@ -37,8 +37,8 @@ class Scheduler:
         progress_callback: Callable[[int, int], None] = None,
         delay_seconds: float = 0.05,
     ):
-
         self.tasks: List[Task] = []
+        self.output: List[tuple] = []
 
         # Minimum number of tasks to run concurrently.
         self.min_concurrent_count: int = cpu_count() + 1
@@ -74,10 +74,10 @@ class Scheduler:
         # the total number of tasks.
         self.progress_callback: Callable[[int, int], None] = progress_callback
 
-        # List which will contain one tuple for each task's output.
-        self.output: List[tuple] = []
-
-    def add_task(self, task: Task):
+    def add_task(self, task: Task) -> None:
+        """
+        Adds a task to the Scheduler.
+        """
         self.tasks.append(task)
 
     async def coro_run(self) -> List[tuple]:
@@ -89,6 +89,8 @@ class Scheduler:
         form of identifier in its results; for example, the name of the
         signal.
         """
+        # Initialize `self.output` so that it can be indexed into.
+        self.output = [() for _ in self.tasks]
         self.start()
 
         while not self.stopped and not self.all_tasks_finished():
@@ -128,7 +130,9 @@ class Scheduler:
         for t in self.running_tasks:
             t.update()
             if t.finished:
-                self.output.append(t.queue.get())
+                index = self.tasks.index(t)
+                self.output[index] = t.queue.get()
+
                 self.on_task_completed(t)
                 should_update_tasks = True
 
