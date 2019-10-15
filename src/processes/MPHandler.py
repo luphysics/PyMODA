@@ -20,8 +20,13 @@ from multiprocess import Queue, Process
 
 from gui.windows.bayesian.ParamSet import ParamSet
 from maths.algorithms.multiprocessing.bandpass_filter import _bandpass_filter
-from maths.algorithms.multiprocessing.bayesian_inference import _dynamic_bayesian_inference
-from maths.algorithms.multiprocessing.bispectrum_analysis import _bispectrum_analysis, _biphase
+from maths.algorithms.multiprocessing.bayesian_inference import (
+    _dynamic_bayesian_inference,
+)
+from maths.algorithms.multiprocessing.bispectrum_analysis import (
+    _bispectrum_analysis,
+    _biphase,
+)
 from maths.algorithms.multiprocessing.phase_coherence import _phase_coherence
 from maths.algorithms.multiprocessing.ridge_extraction import _ridge_extraction
 from maths.algorithms.multiprocessing.time_frequency import _time_frequency
@@ -54,10 +59,9 @@ class MPHandler:
     def __init__(self):
         self.scheduler: Scheduler = None
 
-    async def coro_transform(self,
-                             params: TFParams,
-                             on_progress: Callable[[int, int], None]
-                             ) -> List[tuple]:
+    async def coro_transform(
+        self, params: TFParams, on_progress: Callable[[int, int], None]
+    ) -> List[tuple]:
 
         self.stop()
         self.scheduler = Scheduler(progress_callback=on_progress)
@@ -67,17 +71,18 @@ class MPHandler:
 
         for time_series in signals:
             q = Queue()
-            p = Process(target=_time_frequency, args=(q, time_series, params,))
+            p = Process(target=_time_frequency, args=(q, time_series, params))
 
-            self.scheduler.append(Task(p, q))
+            self.scheduler.add_task(Task(p, q))
 
         return await self.scheduler.coro_run()
 
-    async def coro_phase_coherence(self,
-                                   signals: SignalPairs,
-                                   params: PCParams,
-                                   on_progress: Callable[[int, int], None]
-                                   ) -> List[tuple]:
+    async def coro_phase_coherence(
+        self,
+        signals: SignalPairs,
+        params: PCParams,
+        on_progress: Callable[[int, int], None],
+    ) -> List[tuple]:
 
         self.stop()  # Clear lists of processes, etc.
         self.scheduler = Scheduler(progress_callback=on_progress)
@@ -86,16 +91,16 @@ class MPHandler:
             q = Queue()
 
             pair = signals.get_pair_by_index(i)
-            p = Process(target=_phase_coherence, args=(q, pair, params,))
+            p = Process(target=_phase_coherence, args=(q, pair, params))
 
-            self.scheduler.append(Task(p, q, subtasks=params.surr_count))
+            self.scheduler.add_task(Task(p, q, subtasks=params.surr_count))
 
         return await self.scheduler.coro_run()
 
-    async def coro_ridge_extraction(self,
-                                    params: REParams,
-                                    on_progress: Callable[[int, int], None]
-                                    ) -> List[tuple]:
+    async def coro_ridge_extraction(
+        self, params: REParams, on_progress: Callable[[int, int], None]
+    ) -> List[tuple]:
+
         self.stop()
         self.scheduler = Scheduler(progress_callback=on_progress)
 
@@ -113,15 +118,16 @@ class MPHandler:
                 q = Queue()
                 p = Process(target=_ridge_extraction, args=(q, signals[i], params))
 
-                self.scheduler.append(Task(p, q))
+                self.scheduler.add_task(Task(p, q))
 
         return await self.scheduler.coro_run()
 
-    async def coro_bandpass_filter(self,
-                                   signals: Signals,
-                                   intervals: tuple,
-                                   on_progress: Callable[[int, int], None]
-                                   ) -> List[tuple]:
+    async def coro_bandpass_filter(
+        self,
+        signals: Signals,
+        intervals: tuple,
+        on_progress: Callable[[int, int], None],
+    ) -> List[tuple]:
 
         self.stop()
         self.scheduler = Scheduler(progress_callback=on_progress)
@@ -133,15 +139,16 @@ class MPHandler:
 
                 q = Queue()
                 p = Process(target=_bandpass_filter, args=(q, s, fmin, fmax, fs))
-                self.scheduler.append(Task(p, q))
+                self.scheduler.add_task(Task(p, q))
 
         return await self.scheduler.coro_run()
 
-    async def coro_bayesian(self,
-                            signals: SignalPairs,
-                            paramsets: List[ParamSet],
-                            on_progress: Callable[[int, int], None]
-                            ) -> List[tuple]:
+    async def coro_bayesian(
+        self,
+        signals: SignalPairs,
+        paramsets: List[ParamSet],
+        on_progress: Callable[[int, int], None],
+    ) -> List[tuple]:
 
         self.stop()
         self.scheduler = Scheduler(progress_callback=on_progress)
@@ -149,17 +156,19 @@ class MPHandler:
         for params in paramsets:
             for pair in signals.get_pairs():
                 q = Queue()
-                p = Process(target=_dynamic_bayesian_inference, args=(q, *pair, params,))
+                p = Process(target=_dynamic_bayesian_inference, args=(q, *pair, params))
 
-                self.scheduler.append(Task(p, q))
+                self.scheduler.add_task(Task(p, q))
 
         return await self.scheduler.coro_run()
 
-    async def coro_bispectrum_analysis(self,
-                                       signals: SignalPairs,
-                                       params: BAParams,
-                                       on_progress: Callable[[int, int], None]
-                                       ) -> List[tuple]:
+    async def coro_bispectrum_analysis(
+        self,
+        signals: SignalPairs,
+        params: BAParams,
+        on_progress: Callable[[int, int], None],
+    ) -> List[tuple]:
+
         self.stop()
         self.scheduler = Scheduler(progress_callback=on_progress)
 
@@ -167,17 +176,19 @@ class MPHandler:
             q = Queue()
             p = Process(target=_bispectrum_analysis, args=(q, *pair, params))
 
-            self.scheduler.append(Task(p, q, subtasks=4))
+            self.scheduler.add_task(Task(p, q, subtasks=4))
 
         return await self.scheduler.coro_run()
 
-    async def coro_biphase(self,
-                           signals: SignalPairs,
-                           fs: float,
-                           f0: float,
-                           fr: Tuple[float, float],
-                           on_progress: Callable[[int, int], None]
-                           ) -> List[tuple]:
+    async def coro_biphase(
+        self,
+        signals: SignalPairs,
+        fs: float,
+        f0: float,
+        fr: Tuple[float, float],
+        on_progress: Callable[[int, int], None],
+    ) -> List[tuple]:
+
         self.stop()
         self.scheduler = Scheduler(progress_callback=on_progress)
 
@@ -187,7 +198,7 @@ class MPHandler:
             opt = pair[0].output_data.opt
             p = Process(target=_biphase, args=(q, *pair, fs, f0, fr, opt))
 
-            self.scheduler.append(Task(p, q))
+            self.scheduler.add_task(Task(p, q))
 
         return await self.scheduler.coro_run()
 
