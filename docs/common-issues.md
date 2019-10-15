@@ -3,21 +3,24 @@
 ## Table of Contents
 
 - [Common Issues](#common-issues)
-  - ["ImportError: DLL load failed: The specified module could not be found."](#importerror-dll-load-failed-the-specified-module-could-not-be-found)
+  - ["SyntaxError: invalid syntax"](#syntaxerror-invalid-syntax)
     - [Problem](#problem)
     - [Solution](#solution)
-  - ["No module named PyQt5.sip"](#no-module-named-pyqt5sip)
+  - ["ImportError: DLL load failed: The specified module could not be found."](#importerror-dll-load-failed-the-specified-module-could-not-be-found)
     - [Problem](#problem-1)
     - [Solution](#solution-1)
-  - ["Could not load the Qt platform plugin "xcb" in "" even though it was found."](#could-not-load-the-qt-platform-plugin-xcb-in--even-though-it-was-found)
+  - ["No module named PyQt5.sip"](#no-module-named-pyqt5sip)
     - [Problem](#problem-2)
     - [Solution](#solution-2)
-  - ["qt.qpa.xcb: QXcbConnection: XCB error: 13 (BadGC)"](#qtqpaxcb-qxcbconnection-xcb-error-13-badgc)
+  - ["Could not load the Qt platform plugin "xcb" in "" even though it was found."](#could-not-load-the-qt-platform-plugin-xcb-in--even-though-it-was-found)
     - [Problem](#problem-3)
     - [Solution](#solution-3)
-  - [Windows: desktop shortcut does not work](#windows-desktop-shortcut-does-not-work)
+  - ["qt.qpa.xcb: QXcbConnection: XCB error: 13 (BadGC)"](#qtqpaxcb-qxcbconnection-xcb-error-13-badgc)
     - [Problem](#problem-4)
     - [Solution](#solution-4)
+  - [Windows: desktop shortcut does not work](#windows-desktop-shortcut-does-not-work)
+    - [Problem](#problem-5)
+    - [Solution](#solution-5)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -27,6 +30,21 @@ This document outlines some common problems and their solutions.
 
 ---
 
+### "SyntaxError: invalid syntax"
+
+#### Problem
+
+```
+  File "PyMODA/src/main.py", line 28
+    Application(sys.argv).exec()
+                             ^
+SyntaxError: invalid syntax
+```
+
+#### Solution
+
+You may be using Python 2.7 accidentally. On many macOS/Linux systems, `python` is Python 2.7 whereas `python3` is Python 3.x; you can check by running `python --version` and `python3 --version`. If this is the case, repeat all previous commands using `python3` instead of `python` and `pip3` or `python3 -m pip` instead of `pip`.
+
 ### "ImportError: DLL load failed: The specified module could not be found."
 
 #### Problem
@@ -35,7 +53,7 @@ This document outlines some common problems and their solutions.
 
 #### Solution
 
-Uninstalling Python 3.7 and installing Python 3.6 appears to fix the issue. Python 3.8 may also solve the problem when scipy adds support for it.
+Uninstalling Python 3.7 and installing Python 3.6 appears to fix the issue. Python 3.8 may also solve the problem when numpy/scipy add support for it.
 
 ---
 

@@ -11,9 +11,14 @@
   - [Project structure](#project-structure)
   - [Naming conventions and code style](#naming-conventions-and-code-style)
   - [Concurrency](#concurrency)
-    - [multiprocess](#multiprocess)
-    - [asyncio](#asyncio)
-    - [Combining multiprocessing and asyncio](#combining-multiprocessing-and-asyncio)
+    - [Libraries](#libraries)
+      - [multiprocess](#multiprocess)
+      - [asyncio](#asyncio)
+      - [asyncqt](#asyncqt)
+    - [Implementation](#implementation)
+      - [Task](#task)
+      - [Scheduler](#scheduler)
+      - [MPHandler](#mphandler)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -22,7 +27,7 @@
 This guide is aimed at developers wishing to modify or contribute to the program, and is 
 designed to be accessible to programmers with basic to intermediate knowledge of Python.
 
-> :warning: On macOS and Linux, `python` should be replaced with the appropriate command - usually `python3` - in all commands below.
+> :warning: On macOS and Linux, `python` should be replaced with the appropriate command - usually `python3` - in all commands below. `pip` should be replaced with `pip3`, `python3 -m pip`, or `python3.7 -m pip` etc.
 
 ## Additional requirements
 To develop the program, you may need to install additional tools:
@@ -84,11 +89,11 @@ By default, PyMODA attempts to catch all exceptions on the main process and disp
 
 ## Project structure
 
-Subfolders contain their own README files. When you click on a subfolder, GitHub will render the README below the file structure.
+Many subfolders contain their own README files, describing their contents. When you click on a subfolder, GitHub will render the README below the file structure.
 
 ## Naming conventions and code style
 
-PyMODA code should follow the standard guidelines and naming conventions for Python. Code may be formatted with the PyCharm auto-formatter (by default, the shortcut to format a file is `Ctrl`+`Alt`+`L`). 
+PyMODA code should follow the standard guidelines and naming conventions for Python. To ensure that the codebase uses a similar style, Git hooks will automatically format code when it is committed.
 
 PyMODA consists of 5 main windows, whose names are abbreviated in the codebase. The abbreviations are as follows:
 
@@ -102,30 +107,66 @@ PyMODA consists of 5 main windows, whose names are abbreviated in the codebase. 
 
 ## Concurrency
 
+### Libraries
+
 PyMODA uses `multiprocess` and `asyncio`.
 
-### multiprocess
+#### multiprocess
 
-Multiprocessing is necessary for several reasons:
-- It allows long calculations to run without freezing the GUI.
-- It allows calculations for multiple signals to be executed simultaneously on different CPU cores,
+Python offers multiprocessing, which allows a program to create multiple processes which operate like independent programs. Data cannot be directly passed between processes, but it is possible to pass data via a `Queue`.
+
+Multiprocessing is used in PyMODA for several reasons:
+
+- Long calculations can run without freezing the GUI.
+- Calculations for multiple signals can be executed simultaneously on different CPU cores,
 greatly improving performance.
-- It allows the circumvention of [a critical issue](https://stackoverflow.com/questions/56758952/matlab-generated-python-packages-conflict-with-pyqt5-on-ubuntu-possible-librar) 
-on Linux caused by conflicting libraries used by PyQt5 and the MATLAB Runtime.
+- [A critical issue](https://stackoverflow.com/questions/56758952/matlab-generated-python-packages-conflict-with-pyqt5-on-ubuntu-possible-librar) 
+on Linux - caused by conflicting libraries used by PyQt5 and the MATLAB Runtime - can be mitigated.
 
 While multithreading could be used to solve the first problem, it would not be ideal for 
 the second due to CPython's infamous Global Interpreter Lock. The third problem can only be solved by 
 using multiple processes.
 
-PyMODA uses the `multiprocess` module rather than the `multiprocessing` module found in 
-the standard library, due to problems with the latter's serialization in Windows. 
-`multiprocess` has the same API as `multiprocessing`, so the only changes required are the import statements.
+PyMODA uses the `multiprocess` library rather than the standard library's `multiprocessing`, due to problems with the latter's serialization in Windows. `multiprocess` has the same API as `multiprocessing`, so all documentation and tutorials are still directly applicable; the only changes required are the import statements.
 
-### asyncio
+> Note: `from multiprocess import Process, Queue` is falsely reported as an error in PyCharm.
 
-`asyncio` allows the `Scheduler` class, which schedules the running of multiple processes, 
-to run on the main thread without freezing the GUI. `Scheduler` is run in a coroutine using the Qt event loop from `asyncqt`.
+#### asyncio
 
-### Combining multiprocessing and asyncio
+`asyncio` is part of the standard library. `asyncio` adds coroutines, which provide the ability to run asynchronous code on the main thread. 
+
+Coroutines shouldn't be used to run intensive code on the main thread, because it will still be blocked. However, they are very useful for lightweight tasks. 
+
+> Note: Names of async functions, and functions designed to be used in coroutines, are usually prefixed by `coro_` in PyMODA. 
+
+#### asyncqt
+
+`asyncqt` is a library which allows the `asyncio` event loop to be set to a Qt event loop. Coroutines running on this event loop are able to safely interact with the GUI.
+
+### Implementation
+
+PyMODA's concurrency is centred around the `Scheduler`, `Task` and `MPHandler` classes. 
+
+#### Task
+
+`Task` is a simple class which contains a process and a queue. The queue should have been passed to the process when it was instantiated, and the process should put data in the queue instead of returning it. 
+
+Task is able to determine whether it has finished by checking if the queue is empty.
+
+#### Scheduler
+
+`Scheduler` provides an abstract way to execute and receive results from multiple processes. A key feature of `Scheduler` is that it can return results from `Task` objects directly in a coroutine, which greatly simplifies the data flow over a callback-based design. 
+
+A scheduler instance contains a list of `Task` objects, and when started it will handle scheduling the tasks to run efficiently based on CPU core count and CPU usage. A scheduler is started by calling the async function `coro_run()`, which schedules all tasks until complete and then returns the results as a list of tuples. Each tuple in the list corresponds to the result of one task. 
+
+> Note: `coro_run()` now returns ordered results, i.e. the i-th item in the returned list was produced by the i-th task added to the Scheduler.
+
+![Diagram demonstrating how Scheduler operates.](images/scheduler.png)
+
+#### MPHandler
+
+`MPHandler` is an intermediary between GUI code and `Scheduler`. It contains functions which create a Scheduler and use it to run mathematical operations in a coroutine.
+
+> Note: A reference to an `MPHandler` must be stored in GUI-related code to prevent it from being garbage-collected, and allow the processes to be terminated.
 
 ![Diagram demonstrating how TFPresenter, MPHandler and Scheduler interact.](images/multiprocessing.png)
