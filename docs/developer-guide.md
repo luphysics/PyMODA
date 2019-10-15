@@ -5,7 +5,7 @@
 - [Developer Guide](#developer-guide)
   - [Additional requirements](#additional-requirements)
   - [Downloading the code](#downloading-the-code)
-  - [Git hooks](#git-hooks)
+  - [Installing Git hooks](#installing-git-hooks)
   - [Command-line arguments](#command-line-arguments)
   - [Error handling](#error-handling)
   - [Project structure](#project-structure)
@@ -26,19 +26,28 @@ designed to be accessible to programmers with basic to intermediate knowledge of
 
 ## Additional requirements
 To develop the program, you may need to install additional tools:
-- Git is used to download the code, save and upload your changes.
-- Qt Designer is used to edit the layout files.
+- Git is required to download the code, save and upload your changes.
+- Qt Designer is required to edit the layout files.
 
 ## Downloading the code
 If you are not registered as a collaborator, you should [fork the repository](https://help.github.com/en/articles/fork-a-repo). You can then clone your fork to download the code. 
 
 To start running the code, see [preparing to run](../README.md#preparing-to-run).
 
-## Git hooks
+## Installing Git hooks
 
-Git hooks are used to automatically add the table of contents to markdown files when they are modified.
+Git hooks are used to automatically perform tasks when a commit is made. PyMODA uses `doctoc` to add the table of contents to markdown files, and `black` to format Python files to follow a consistent style.
 
-Ensure that `pre-commit` is installed by running `pre-commit --version`; if it is not, install it with `pip install pre-commit` (may require an administrator terminal or `sudo`). Then run `pre-commit install` in the `PyMODA` folder.
+Commit your current work, if there are changes. Then open a terminal in the `PyMODA` folder and run:
+
+```
+pip install pre-commit --user   # Installs the pre-commit tool.
+pre-commit install              # Adds the Git hooks to the repository.
+```
+
+Now that the Git hooks are installed, they will automatically run every time a commit changes relevant files.
+
+> :warning: When a hook runs, you may need to add the files and commit again.
 
 ## Command-line arguments
 
