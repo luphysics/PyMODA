@@ -2,41 +2,37 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 ## Table of Contents
 
-  - [Introduction](#introduction)
-    - [Status](#status)
+- [Introduction](#introduction)
+  - [Status](#status)
 - [User Guide](#user-guide)
   - [Requirements](#requirements)
   - [Operating systems](#operating-systems)
   - [Downloading the code](#downloading-the-code)
   - [Preparing to run](#preparing-to-run)
-      - [Windows](#windows)
-      - [macOS/Linux](#macoslinux)
   - [Running PyMODA](#running-pymoda)
   - [Creating a shortcut](#creating-a-shortcut)
-      - [Windows](#windows-1)
-      - [macOS/Linux](#macoslinux-1)
   - [Performance and efficiency](#performance-and-efficiency)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-## Introduction
+# Introduction
 
 PyMODA is a Python implementation of MODA (Multiscale Oscillatory Dynamics Analysis). The user interface is written using PyQt5, and the algorithms are mostly packaged as Python libraries from the existing MATLAB code.
 
 PyMODA is cross-platform and does not require any paid software. To get started, see the [User Guide](#user-guide) or the [Developer Guide](docs/developer-guide.md).
 
-### Status
+## Status
 
 PyMODA does not yet offer all the functionality available in MODA. This table shows the current status of different features.
 
 | Window    |   Functionality   |  MATLAB-packaged library | Python implementation |
 | ----      |   ---------       |   ---------   |  ----- |
-| Time-Frequency Analysis      |   Wavelet transform    |  Working :heavy_check_mark: | Mostly written |
-| Time-Frequency Analysis      |   Windowed Fourier transform    |  Working :heavy_check_mark:   | Partially written |
-| Wavelet Phase Coherence      |   Phase coherence    |  Working :heavy_check_mark:  | Some surrogates written, needs testing |
-| Ridge Extraction and Filtering     |   Extract ridges    |  Working :heavy_check_mark:  | Not implemented |
-| Ridge Extraction and Filtering     |   Bandpass filter    |  Not implemented   | Working :heavy_check_mark: |
-| Wavelet Bispectrum Analysis     |   Bispectrum analysis    |  Working :heavy_check_mark:  | Not implemented |
+| Time-Frequency Analysis      |   Wavelet transform    |  :heavy_check_mark: | Mostly written |
+| Time-Frequency Analysis      |   Windowed Fourier transform    |  :heavy_check_mark:   | Partially written |
+| Wavelet Phase Coherence      |   Phase coherence    |  :heavy_check_mark:  | Some surrogates written, needs testing |
+| Ridge Extraction and Filtering     |   Extract ridges    |  :heavy_check_mark:  | Not implemented |
+| Ridge Extraction and Filtering     |   Bandpass filter    |  Not implemented   | :heavy_check_mark: |
+| Wavelet Bispectrum Analysis     |   Bispectrum analysis    |  :heavy_check_mark:  | Not implemented |
 | Dynamical Bayesian Inference     |   Bayesian inference    |  Not implemented   | Written, not working |
 
 # User Guide
@@ -54,7 +50,7 @@ newest version recommended (does not require a licence).
 
 PyMODA should run on Windows, macOS and Linux. 
 
-> :warning: On macOS and Linux, `python` should be replaced with the appropriate command - usually `python3` - in all commands below.
+> :warning: You should ensure that you are familiar with the [core knowledge](docs/core-knowledge.md) document before proceeding.
 
 ## Downloading the code
 

@@ -11,23 +11,14 @@
   - [Project structure](#project-structure)
   - [Naming conventions and code style](#naming-conventions-and-code-style)
   - [Concurrency](#concurrency)
-    - [Libraries](#libraries)
-      - [multiprocess](#multiprocess)
-      - [asyncio](#asyncio)
-      - [asyncqt](#asyncqt)
-    - [Implementation](#implementation)
-      - [Task](#task)
-      - [Scheduler](#scheduler)
-      - [MPHandler](#mphandler)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Developer Guide
 
-This guide is aimed at developers wishing to modify or contribute to the program, and is 
-designed to be accessible to programmers with basic to intermediate knowledge of Python.
+This guide is aimed at developers wishing to modify or contribute to the program, and is designed to be accessible to programmers with basic to intermediate knowledge of Python.
 
-> :warning: On macOS and Linux, `python` should be replaced with the appropriate command - usually `python3` - in all commands below. `pip` should be replaced with `pip3`, `python3 -m pip`, or `python3.7 -m pip` etc.
+> :warning: You should ensure that you are familiar with the [core knowledge](/docs/core-knowledge.md) document before proceeding.
 
 ## Additional requirements
 To develop the program, you may need to install additional tools:
@@ -37,7 +28,7 @@ To develop the program, you may need to install additional tools:
 ## Downloading the code
 If you are not registered as a collaborator, you should [fork the repository](https://help.github.com/en/articles/fork-a-repo). You can then clone your fork to download the code. 
 
-To start running the code, see [preparing to run](../README.md#preparing-to-run).
+To start running the code, see [preparing to run](/README.md#preparing-to-run).
 
 ## Installing Git hooks
 
@@ -161,7 +152,7 @@ A scheduler instance contains a list of `Task` objects, and when started it will
 
 > Note: `coro_run()` now returns ordered results, i.e. the i-th item in the returned list was produced by the i-th task added to the Scheduler.
 
-![Diagram demonstrating how Scheduler operates.](images/scheduler.png)
+![Diagram demonstrating how Scheduler operates.](/docs/images/scheduler.png)
 
 #### MPHandler
 
@@ -169,4 +160,8 @@ A scheduler instance contains a list of `Task` objects, and when started it will
 
 > Note: A reference to an `MPHandler` must be stored in GUI-related code to prevent it from being garbage-collected, and allow the processes to be terminated.
 
-![Diagram demonstrating how TFPresenter, MPHandler and Scheduler interact.](images/multiprocessing.png)
+#### Overview
+
+This diagram demonstrates how the GUI code in `TFPresenter`, the class controlling the time-frequency window, interacts with `MPHandler` and `Scheduler`.
+
+![Diagram demonstrating how TFPresenter, MPHandler and Scheduler interact.](/docs/images/multiprocessing.png)

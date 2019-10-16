@@ -3,7 +3,6 @@
 ## Table of Contents
 
 - [packages](#packages)
-  - [install.py](#installpy)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 

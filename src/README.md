@@ -3,8 +3,6 @@
 ## Table of Contents
 
 - [src](#src)
-  - [main.py](#mainpy)
-  - [Subfolders](#subfolders)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 

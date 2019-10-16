@@ -3,30 +3,36 @@
 ## Table of Contents
 
 - [Common Issues](#common-issues)
-  - ["SyntaxError: invalid syntax"](#syntaxerror-invalid-syntax)
-    - [Problem](#problem)
-    - [Solution](#solution)
-  - ["ImportError: DLL load failed: The specified module could not be found."](#importerror-dll-load-failed-the-specified-module-could-not-be-found)
-    - [Problem](#problem-1)
-    - [Solution](#solution-1)
-  - ["No module named PyQt5.sip"](#no-module-named-pyqt5sip)
-    - [Problem](#problem-2)
-    - [Solution](#solution-2)
-  - ["Could not load the Qt platform plugin "xcb" in "" even though it was found."](#could-not-load-the-qt-platform-plugin-xcb-in--even-though-it-was-found)
-    - [Problem](#problem-3)
-    - [Solution](#solution-3)
-  - ["qt.qpa.xcb: QXcbConnection: XCB error: 13 (BadGC)"](#qtqpaxcb-qxcbconnection-xcb-error-13-badgc)
-    - [Problem](#problem-4)
-    - [Solution](#solution-4)
-  - [Windows: desktop shortcut does not work](#windows-desktop-shortcut-does-not-work)
-    - [Problem](#problem-5)
-    - [Solution](#solution-5)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-## Common Issues
+# Common Issues
 
-This document outlines some common problems and their solutions.
+This document outlines some common problems and their solutions. If your problem is not described here, you could check the [issues page](https://github.com/luphysics/PyMODA/issues) and open a new issue.
+
+---
+
+### "'python' is not recognised as ..."
+
+#### Problem
+
+```
+python : The term 'python' is not recognized as the name of a cmdlet, function, script file, or operable program. Check
+the spelling of the name, or if a path was included, verify that the path is correct and try again.
+```
+
+or 
+
+```
+'python' is not recognized as an internal or external command,
+operable program or batch file.
+```
+
+Assuming that python is installed, this issue is caused by Python not being added to the path.
+
+#### Solution
+
+If you know where Python is installed, you can add its folder to the system path. Otherwise, the easiest fix is to uninstall Python, and when installing again, tick the checkbox "Add Python to PATH". 
 
 ---
 
