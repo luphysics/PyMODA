@@ -3,7 +3,7 @@ repos:
     rev: v1.4.0
     hooks:
     -   id: doctoc
-        args: [".", '--title=## Table of Contents', "--github"]
+        args: [".", '--title=## Table of Contents', "--maxlevel=2", "--github"]
 -   repo: https://github.com/ambv/black
     rev: stable
     hooks:
