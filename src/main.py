@@ -14,6 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+import signal
 import sys
 
 from gui.Application import Application
@@ -21,6 +22,9 @@ from utils import errorhandling, stdout_redirect, args
 
 # The entry-point of the program.
 if __name__ == "__main__":
+    # Ensures that Ctrl-C still works.
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
+
     args.init(set_working_dir=True)
     errorhandling.init()
     stdout_redirect.init()
