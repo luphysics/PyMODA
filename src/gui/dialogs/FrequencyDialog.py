@@ -39,7 +39,7 @@ class FrequencyDialog(QDialog, BaseUI):
         self.settings = Settings()
         super(FrequencyDialog, self).__init__()
 
-    def setup_ui(self):
+    def setup_ui(self) -> None:
         uic.loadUi(resources.get("layout:dialog_frequency.ui"), self)
 
         self.edit_freq.textChanged.connect(self.on_freq_changed)
@@ -48,7 +48,7 @@ class FrequencyDialog(QDialog, BaseUI):
 
         QTimer.singleShot(500, self.check_args)
 
-    async def coro_get(self):
+    def run_and_get(self) -> float:
         self.exec()
         self.settings.add_recent_freq(self.frequency)
         return self.frequency

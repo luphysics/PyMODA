@@ -29,12 +29,12 @@ from processes.MPHandler import MPHandler
 
 
 class BAPresenter(BaseTFPresenter):
-
     def __init__(self, view):
         super().__init__(view)
         self.params: BAParams = None
 
         from gui.windows.bispectrum.BAWindow import BAWindow
+
         self.view: BAWindow = view
 
     def init(self):
@@ -58,9 +58,9 @@ class BAPresenter(BaseTFPresenter):
         self.params = self.get_params()
 
         self.mp_handler = MPHandler()
-        data = await self.mp_handler.coro_bispectrum_analysis(self.signals,
-                                                              self.params,
-                                                              self.on_progress_updated)
+        data = await self.mp_handler.coro_bispectrum_analysis(
+            self.signals, self.params, self.on_progress_updated
+        )
 
         for d in data:
             self.on_bispectrum_completed(*d)
@@ -81,11 +81,9 @@ class BAPresenter(BaseTFPresenter):
         x, y = fr
 
         if x is not None and y is not None:
-            data = await self.mp_handler.coro_biphase(self.signals,
-                                                      fs,
-                                                      f0,
-                                                      fr,
-                                                      self.on_progress_updated)
+            data = await self.mp_handler.coro_biphase(
+                self.signals, fs, f0, fr, self.on_progress_updated
+            )
 
             for d in data:
                 self.on_biphase_completed(*d)
@@ -137,7 +135,9 @@ class BAPresenter(BaseTFPresenter):
         """
         if self.view.is_wt_selected():  # Plot average amplitude or power.
             amp_not_power = self.view.is_amplitude_selected()
-            x, y = self.get_side_plot_data_wt(self.view.get_plot_type(), data, amp_not_power)
+            x, y = self.get_side_plot_data_wt(
+                self.view.get_plot_type(), data, amp_not_power
+            )
 
             if x is not None and y is not None and len(x) > 0:
                 plot = self.view.plot_right_top
@@ -147,9 +147,9 @@ class BAPresenter(BaseTFPresenter):
                 plot.set_log_scale(True, "y")
                 plot.plot(x, y)
         else:  # Plot biphase and biamplitude.
-            biamp, biphase = self.get_side_plot_data_bispec(self.view.get_plot_type(),
-                                                            self.view.get_selected_freq_pair(),
-                                                            data)
+            biamp, biphase = self.get_side_plot_data_bispec(
+                self.view.get_plot_type(), self.view.get_selected_freq_pair(), data
+            )
 
             times = self.get_selected_signal().times
 
@@ -164,7 +164,9 @@ class BAPresenter(BaseTFPresenter):
                 self.view.plot_right_bottom.plot(times, biphase)
 
     @staticmethod
-    def get_side_plot_data_wt(plot_type: str, data: BAOutputData, amp_not_power: bool) -> Tuple[ndarray, ndarray]:
+    def get_side_plot_data_wt(
+        plot_type: str, data: BAOutputData, amp_not_power: bool
+    ) -> Tuple[ndarray, ndarray]:
         """
         Gets the data required to plot the average amplitude/power on the side plot. Used
         when a wavelet transform is selected.
@@ -175,13 +177,21 @@ class BAPresenter(BaseTFPresenter):
         :return: the x-values, the y-values
         """
         _dict = {
-            "Wavelet transform 1": (data.avg_amp_wt1 if amp_not_power else data.avg_pow_wt1, data.freq),
-            "Wavelet transform 2": (data.avg_amp_wt2 if amp_not_power else data.avg_pow_wt2, data.freq),
+            "Wavelet transform 1": (
+                data.avg_amp_wt1 if amp_not_power else data.avg_pow_wt1,
+                data.freq,
+            ),
+            "Wavelet transform 2": (
+                data.avg_amp_wt2 if amp_not_power else data.avg_pow_wt2,
+                data.freq,
+            ),
         }
         return _dict.get(plot_type)
 
     @staticmethod
-    def get_side_plot_data_bispec(plot_type: str, freq: Tuple[float, float], data: BAOutputData):
+    def get_side_plot_data_bispec(
+        plot_type: str, freq: Tuple[float, float], data: BAOutputData
+    ):
         """
         Gets the data required to plot the biphase and biamplitude on the side plots.
         Used when bispectrum is selected.
@@ -213,7 +223,9 @@ class BAPresenter(BaseTFPresenter):
         return biamp, biphase
 
     @staticmethod
-    def get_main_plot_data(plot_type: str, data: BAOutputData) -> Tuple[ndarray, ndarray, ndarray, bool]:
+    def get_main_plot_data(
+        plot_type: str, data: BAOutputData
+    ) -> Tuple[ndarray, ndarray, ndarray, bool]:
         """
         Gets the relevant arrays to plot in the main plot (WT or bispectrum).
 
@@ -238,26 +250,28 @@ class BAPresenter(BaseTFPresenter):
 
         return data
 
-    def on_bispectrum_completed(self,
-                                name: str,
-                                freq: ndarray,
-                                amp_wt1: ndarray,
-                                pow_wt1: ndarray,
-                                avg_amp_wt1: ndarray,
-                                avg_pow_wt1: ndarray,
-                                amp_wt2: ndarray,
-                                pow_wt2: ndarray,
-                                avg_amp_wt2: ndarray,
-                                avg_pow_wt2: ndarray,
-                                bispxxx: ndarray,
-                                bispppp: ndarray,
-                                bispxpp: ndarray,
-                                bisppxx: ndarray,
-                                surrxxx: ndarray,
-                                surrppp: ndarray,
-                                surrxpp: ndarray,
-                                surrpxx: ndarray,
-                                opt: dict):
+    def on_bispectrum_completed(
+        self,
+        name: str,
+        freq: ndarray,
+        amp_wt1: ndarray,
+        pow_wt1: ndarray,
+        avg_amp_wt1: ndarray,
+        avg_pow_wt1: ndarray,
+        amp_wt2: ndarray,
+        pow_wt2: ndarray,
+        avg_amp_wt2: ndarray,
+        avg_pow_wt2: ndarray,
+        bispxxx: ndarray,
+        bispppp: ndarray,
+        bispxpp: ndarray,
+        bisppxx: ndarray,
+        surrxxx: ndarray,
+        surrppp: ndarray,
+        surrxpp: ndarray,
+        surrpxx: ndarray,
+        opt: dict,
+    ):
 
         # Attach the data to the first signal in the current pair.
         sig = self.signals.get(name)
@@ -265,46 +279,41 @@ class BAPresenter(BaseTFPresenter):
         sig.output_data = BAOutputData(
             amp_wt1,
             pow_wt1,
-
             avg_amp_wt1,
             avg_pow_wt1,
-
             amp_wt2,
             pow_wt2,
-
             avg_amp_wt2,
             avg_pow_wt2,
-
             sig.times,
             freq,
-
             bispxxx,
             bispppp,
             bispxpp,
             bisppxx,
-
             surrxxx,
             surrppp,
             surrxpp,
             surrpxx,
-
             opt,
             {},
             {},
         )
 
-    def on_biphase_completed(self,
-                             name: str,
-                             freq_x: float,
-                             freq_y: float,
-                             biamp1: ndarray,
-                             biphase1: ndarray,
-                             biamp2: ndarray,
-                             biphase2: ndarray,
-                             biamp3: ndarray,
-                             biphase3: ndarray,
-                             biamp4: ndarray,
-                             biphase4: ndarray):
+    def on_biphase_completed(
+        self,
+        name: str,
+        freq_x: float,
+        freq_y: float,
+        biamp1: ndarray,
+        biphase1: ndarray,
+        biamp2: ndarray,
+        biphase2: ndarray,
+        biamp3: ndarray,
+        biphase3: ndarray,
+        biamp4: ndarray,
+        biphase4: ndarray,
+    ):
         sig = self.signals.get(name)
         key = f"{freq_x}, {freq_y}"
 
@@ -325,7 +334,7 @@ class BAPresenter(BaseTFPresenter):
         data.biamp[key][3] = biamp4
         data.biphase[key][3] = biphase4
 
-    async def coro_load_data(self):
+    def load_data(self):
         """
         Loads the data from a file, showing a dialog to set the frequency of
         the signal.
@@ -333,7 +342,7 @@ class BAPresenter(BaseTFPresenter):
         self.signals = SignalPairs.from_file(self.open_file)
 
         if not self.signals.has_frequency():
-            freq = await FrequencyDialog().coro_get()
+            freq = FrequencyDialog().run_and_get()
 
             if freq:
                 self.set_frequency(freq)
@@ -369,11 +378,13 @@ class BAPresenter(BaseTFPresenter):
 
     def get_params(self) -> BAParams:
         """Gets data from the GUI to create the params used by the bispectrum calculation."""
-        return BAParams(signals=self.signals,
-                        preprocess=self.view.get_preprocess(),
-                        fmin=self.view.get_fmin(),
-                        fmax=self.view.get_fmax(),
-                        f0=self.view.get_f0(),
-                        nv=self.view.get_nv(),
-                        surr_count=self.view.get_surr_count(),
-                        opt={})
+        return BAParams(
+            signals=self.signals,
+            preprocess=self.view.get_preprocess(),
+            fmin=self.view.get_fmin(),
+            fmax=self.view.get_fmax(),
+            f0=self.view.get_f0(),
+            nv=self.view.get_nv(),
+            surr_count=self.view.get_surr_count(),
+            opt={},
+        )

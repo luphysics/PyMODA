@@ -29,11 +29,11 @@ from maths.signals.TimeSeries import TimeSeries
 
 
 class PCPresenter(BaseTFPresenter):
-
     def __init__(self, view):
         super().__init__(view)
 
         from gui.windows.phasecoherence.PCWindow import PCWindow
+
         self.view: PCWindow = self.view
         self.is_calculating_all = True
 
@@ -65,12 +65,16 @@ class PCPresenter(BaseTFPresenter):
         self.view.amplitude_plot().set_log_scale(logarithmic=True)
 
         self.view.on_calculate_started()
-        data = await self.mp_handler.coro_transform(params=params, on_progress=self.on_progress_updated)
+        data = await self.mp_handler.coro_transform(
+            params=params, on_progress=self.on_progress_updated
+        )
 
         for d in data:
             self.on_transform_completed(*d)
 
-        all_data = await self.coro_phase_coherence(self.signals_calc, params, self.on_progress_updated)
+        all_data = await self.coro_phase_coherence(
+            self.signals_calc, params, self.on_progress_updated
+        )
 
         for d in all_data:
             self.on_phase_coherence_completed(*d)
@@ -84,18 +88,14 @@ class PCPresenter(BaseTFPresenter):
         print("Finished wavelet transform. Calculating phase coherence...")
         return await self.mp_handler.coro_phase_coherence(signals, params, on_progress)
 
-    def on_transform_completed(self, name, times, freq, values, ampl, powers, avg_ampl, avg_pow):
+    def on_transform_completed(
+        self, name, times, freq, values, ampl, powers, avg_ampl, avg_pow
+    ):
         print(f"Calculated wavelet transform for '{name}'")
 
         t = self.signals.get(name)
         t.output_data = TFOutputData(
-            times,
-            values,
-            ampl,
-            freq,
-            powers,
-            avg_ampl,
-            avg_pow,
+            times, values, ampl, freq, powers, avg_ampl, avg_pow
         )
 
     def on_phase_coherence_completed(self, signal_pair, tpc, pc, pdiff, surrogate_avg):
@@ -131,11 +131,11 @@ class PCPresenter(BaseTFPresenter):
         ampl.update_ylabel("Frequency (Hz)")
         ampl.plot(data.overall_coherence, freq, surrogates=data.surrogate_avg)
 
-    async def coro_load_data(self):
+    def load_data(self):
         self.signals = SignalPairs.from_file(self.open_file)
 
         if not self.signals.has_frequency():
-            freq = await FrequencyDialog().coro_get()
+            freq = FrequencyDialog().run_and_get()
 
             if freq:
                 self.set_frequency(freq)

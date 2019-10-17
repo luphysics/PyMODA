@@ -20,10 +20,10 @@ from PyQt5.QtWidgets import QListWidgetItem
 
 from gui.dialogs.FrequencyDialog import FrequencyDialog
 from gui.windows.common.BaseTFPresenter import BaseTFPresenter
-from processes.MPHandler import MPHandler
 from maths.params.TFParams import TFParams, _wt, _wft, create
 from maths.signals.Signals import Signals
 from maths.signals.data.TFOutputData import TFOutputData
+from processes.MPHandler import MPHandler
 
 
 class TFPresenter(BaseTFPresenter):
@@ -35,6 +35,7 @@ class TFPresenter(BaseTFPresenter):
         super(TFPresenter, self).__init__(view)
 
         from gui.windows.timefrequency import TFWindow
+
         self.view: TFWindow = view
         self.is_calculating_all = True
 
@@ -71,24 +72,22 @@ class TFPresenter(BaseTFPresenter):
         self.view.on_calculate_started()
         self.view.update_progress(0, self.get_total_tasks_count())
 
-        all_data = await self.mp_handler.coro_transform(params, self.on_progress_updated)
+        all_data = await self.mp_handler.coro_transform(
+            params, self.on_progress_updated
+        )
 
         for d in all_data:
             self.on_transform_completed(*d)
 
-    def on_transform_completed(self, name, times, freq, values, ampl, powers, avg_ampl, avg_pow):
+    def on_transform_completed(
+        self, name, times, freq, values, ampl, powers, avg_ampl, avg_pow
+    ):
         """Called when the calculation of the desired transform(s) is completed."""
         self.view.on_calculate_stopped()
 
         t = self.signals.get(name)
         t.output_data = TFOutputData(
-            times,
-            values,
-            ampl,
-            freq,
-            powers,
-            avg_ampl,
-            avg_pow
+            times, values, ampl, freq, powers, avg_ampl, avg_pow
         )
 
         print(f"Finished calculation for '{name}'.")
@@ -175,22 +174,20 @@ class TFPresenter(BaseTFPresenter):
             f0=self.view.get_f0(),
             fstep=self.view.get_fstep(),
             padding=self.view.get_padding(),
-
             # Only one of these two will be used, depending on the selected transform.
             window=self.view.get_wt_wft_type(),
             wavelet=self.view.get_wt_wft_type(),
-
             rel_tolerance=self.view.get_rel_tolerance(),
             cut_edges=self.view.get_cut_edges(),
             preprocess=self.view.get_preprocess(),
             transform=self.view.get_transform_type(),
         )
 
-    async def coro_load_data(self):
+    def load_data(self):
         self.signals = Signals.from_file(self.open_file)
 
         if not self.signals.has_frequency():
-            freq = await FrequencyDialog().coro_get()
+            freq = FrequencyDialog().run_and_get()
 
             if freq:
                 self.set_frequency(freq)

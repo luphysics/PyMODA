@@ -18,15 +18,14 @@ import asyncio
 from gui.dialogs.ErrorBox import ErrorBox
 from gui.windows.common.BaseTFWindow import BaseTFWindow
 from maths.algorithms.preprocessing import preprocess
-from processes.MPHandler import MPHandler
 from maths.signals.Signals import Signals
 from maths.signals.TimeSeries import TimeSeries
+from processes.MPHandler import MPHandler
 from utils import stdout_redirect, errorhandling
 from utils.stdout_redirect import WindowLogger
 
 
 class BaseTFPresenter:
-
     """
     A base presenter which handles controlling the window.
     """
@@ -120,9 +119,6 @@ class BaseTFPresenter:
         self.load_data()
 
     def load_data(self):
-        asyncio.ensure_future(self.coro_load_data())
-
-    async def coro_load_data(self):
         pass
 
     def get_window_name(self) -> str:

@@ -54,9 +54,9 @@ class DBPresenter(BaseTFPresenter):
             self.mp_handler.stop()
 
         self.mp_handler = MPHandler()
-        data = await self.mp_handler.coro_bayesian(self.signals,
-                                                   self.get_paramsets(),
-                                                   self.on_progress_updated)
+        data = await self.mp_handler.coro_bayesian(
+            self.signals, self.get_paramsets(), self.on_progress_updated
+        )
 
         print("Dynamical Bayesian inference completed.")
 
@@ -68,32 +68,26 @@ class DBPresenter(BaseTFPresenter):
         else:
             print("No data returned; are any parameter sets added?")
 
-    def on_bayesian_inference_completed(self,
-                                        signal_name: str,
-                                        tm,
-                                        p1,
-                                        p2,
-                                        cpl1,
-                                        cpl2,
-                                        cf1,
-                                        cf2,
-                                        mcf1,
-                                        mcf2,
-                                        surr_cpl1,
-                                        surr_cpl2):
+    def on_bayesian_inference_completed(
+        self,
+        signal_name: str,
+        tm,
+        p1,
+        p2,
+        cpl1,
+        cpl2,
+        cf1,
+        cf2,
+        mcf1,
+        mcf2,
+        surr_cpl1,
+        surr_cpl2,
+    ):
         signal = self.signals.get(signal_name)
 
-        signal.db_data = DBOutputData(tm,
-                                      p1,
-                                      p2,
-                                      cpl1,
-                                      cpl2,
-                                      cf1,
-                                      cf2,
-                                      mcf1,
-                                      mcf2,
-                                      surr_cpl1,
-                                      surr_cpl2)
+        signal.db_data = DBOutputData(
+            tm, p1, p2, cpl1, cpl2, cf1, cf2, mcf1, mcf2, surr_cpl1, surr_cpl2
+        )
 
     def plot_bayesian(self):
         signal = self.get_selected_signal_pair()[0]
@@ -132,11 +126,11 @@ class DBPresenter(BaseTFPresenter):
         self.view.db3d_plot_left.plot(x1, y1, z1)
         self.view.db3d_plot_right.plot(x2, y2, z2)
 
-    async def coro_load_data(self):
+    def load_data(self):
         self.signals = SignalPairs.from_file(self.open_file)
 
         if not self.signals.has_frequency():
-            freq = await FrequencyDialog().coro_get()
+            freq = FrequencyDialog().run_and_get()
 
             if freq:
                 self.set_frequency(freq)
@@ -152,7 +146,7 @@ class DBPresenter(BaseTFPresenter):
         self.view.plot_signal_pair(self.get_selected_signal_pair())
 
     def get_paramset(self, text1, text2):
-        return self.param_sets.get((text1, text2,))
+        return self.param_sets.get((text1, text2))
 
     def get_paramsets(self) -> List[ParamSet]:
         return list(self.param_sets.values())
