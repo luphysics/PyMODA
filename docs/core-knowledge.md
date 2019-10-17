@@ -14,7 +14,7 @@
 
 # Core knowledge
 
-This document contains core knowledge which you should be familiar with before starting to set up PyMODA.
+This document contains core knowledge which you should be familiar with before starting to set up PyMODA. 
 
 ---
 
@@ -26,7 +26,7 @@ On Windows 10, press `Win`+`X` to open the menu over the start button. Then pres
 
 On older versions of Windows, press `Win`+`R`, type `powershell` and press enter. If this doesn't work, use `cmd` instead of `powershell`.
 
-> Note: You can use either Cmd or Powershell, but Powershell is - for good reason - the default in recent versions of Windows 10. 
+> Note: You can use either Cmd or Powershell, but Powershell is the default in recent versions of Windows 10. Powershell is preferred, since it is more powerful and user-friendly.
 
 ### macOS
 
@@ -40,11 +40,11 @@ This varies between distributions, but `Ctrl`+`Alt`+`T` is a common shortcut to 
 
 ## Administrator/elevated terminal
 
-For some tasks, such as installing Python packages, you may require you to open an "administrator" or "elevated" terminal. If instructed to run a command with elevated or administrator privileges, use the appropriate method for your operating system.
+Some tasks, such as installing Python packages, may require you to run a command with elevated or administrator privileges.
 
 ### Windows
 
-On Windows 10, press `Win`+`X` to open the menu over the start button. Then press `A` to open an administrator Powershell.
+On Windows 10, press `Win`+`X` to open the menu over the start button. Then press `A` to open an administrator Powershell. Any command executed in this window will run with elevated permissions.
 
 On previous versions of Windows, search for Powershell, right-click on it and click "Run as administrator". If Powershell is not available, replace with Command Prompt.
 
@@ -68,7 +68,7 @@ The terminal always has a working directory. Unless you provide a relative or ab
 
 To change your working directory, use the `cd` command followed by the relative or absolute path to the target directory. 
 
-> Tip: On most operating systems, you can easily get the path to a folder in the file explorer by pressing `Ctrl`+`L`, then copying the text.
+> Tip: On most operating systems, you can easily get the path to a folder in the file explorer by pressing `Ctrl`+`L`, then copying the text. You can then paste this after the `cd` command to go to that directory.
 
 > :warning: Avoid paths with spaces, if possible. However, you can include quotes around folder names with spaces, e.g. `cd "python/Test folder"`.
 

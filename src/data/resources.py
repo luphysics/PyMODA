@@ -25,21 +25,6 @@ For example, get("layout:my_window.ui") or get("img:my_image.png").
 """
 
 
-def _get_base_path():
-    """Returns the path to the resources folder."""
-    return "../res/"
-
-
-def _get_img_path():
-    """Returns the path to the image folder."""
-    return _get_base_path() + "img/"
-
-
-def _get_layout_path():
-    """Returns the path to the layout folder."""
-    return _get_base_path() + "layout/"
-
-
 def get_program_name() -> str:
     """Returns the name of the program."""
     return "PyMODA"
@@ -67,19 +52,41 @@ def get(resource: string) -> str:
     """
     split = resource.split(":")
     if len(split) != 2:
-        raise ResourceException(f"Error finding resource type for '{resource}'. Wrong number of colon separators.")
+        raise ResourceException(
+            f"Error finding resource type for '{resource}'. Wrong number of colon separators."
+        )
 
     res_type = split[0]
     name = split[-1]
 
+    if res_type == "test":
+        print("Warning: using deprecated prefix 'test' instead of 'data'.")
+
     folder = resources_dict.get(res_type)
     if not folder:
-        raise ResourceException(f"Requested resource type '{res_type}' has no associated folder.")
+        raise ResourceException(
+            f"Requested resource type '{res_type}' has no associated folder."
+        )
     return folder + name
 
 
-def _get_test_path():
-    return _get_base_path() + "test/"
+def _get_base_path():
+    """Returns the path to the resources folder."""
+    return "../res/"
+
+
+def _get_img_path():
+    """Returns the path to the image folder."""
+    return _get_base_path() + "img/"
+
+
+def _get_layout_path():
+    """Returns the path to the layout folder."""
+    return _get_base_path() + "layout/"
+
+
+def _get_data_path():
+    return _get_base_path() + "data/"
 
 
 def _get_colour_path():
@@ -91,7 +98,8 @@ resources_dict = {
     "layout": _get_layout_path(),
     "img": _get_img_path(),
     "image": _get_img_path(),
-    "test": _get_test_path(),
+    "test": _get_data_path(),
+    "data": _get_data_path(),
     "colours": _get_colour_path(),
 }
 

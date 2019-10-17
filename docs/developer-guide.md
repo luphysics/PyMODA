@@ -68,7 +68,7 @@ Below is a table listing the other command-line arguments.
 | `--no-maximise` | Prevents windows from opening in a maximised state, allowing easier viewing of console output. | `python src/main.py --no-maximise` |
 | `--debug` | Disables error handling. | `python src/main.py --debug` | 
 | `-freq` | Specifies the sampling frequency to use. This frequency will be automatically selected in dialogs. | `python src/main.py -freq 10` |
-| `-file` | Specifies a data file to use. This file will be automatically selected in dialogs. Only designed for data files in the `res/test` folder, and the file name should be prefixed by `test:`. | `python src.main.py -file "test:many_signal.csv"` | 
+| `-file` | Specifies a data file to use. This file will be automatically selected in dialogs. Only designed for data files in the `res/data` folder, and the file name should be prefixed by `data:`. | `python src.main.py -file "data:many_signal.csv"` | 
 
 Command-line arguments can be specified in PyCharm configurations. 
 
