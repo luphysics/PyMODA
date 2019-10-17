@@ -18,8 +18,6 @@
 
 This guide is aimed at developers wishing to modify or contribute to the program, and is designed to be accessible to programmers with basic to intermediate knowledge of Python.
 
-> :warning: You should ensure that you are familiar with the [core knowledge](/docs/core-knowledge.md) document before proceeding.
-
 ## Additional requirements
 To develop the program, you may need to install additional tools:
 - Git is required to download the code, save and upload your changes.
@@ -44,6 +42,10 @@ pre-commit install              # Adds the Git hooks to the repository.
 Now that the Git hooks are installed, they will automatically run every time a commit changes relevant files.
 
 > :warning: When a hook runs, you may need to add the files and commit again.
+
+Here is an example of committing with the hooks installed. Black formats a Python file, so the commit must be run again.
+
+![Screenshot demonstrating Git hooks.](/docs/images/git_hooks.png)
 
 ## Command-line arguments
 
@@ -148,11 +150,96 @@ Task is able to determine whether it has finished by checking if the queue is em
 
 `Scheduler` provides an abstract way to execute and receive results from multiple processes. A key feature of `Scheduler` is that it can return results from `Task` objects directly in a coroutine, which greatly simplifies the data flow over a callback-based design. 
 
-A scheduler instance contains a list of `Task` objects, and when started it will handle scheduling the tasks to run efficiently based on CPU core count and CPU usage. A scheduler is started by calling the async function `coro_run()`, which schedules all tasks until complete and then returns the results as a list of tuples. Each tuple in the list corresponds to the result of one task. 
+A `Scheduler` instance contains a list of `Task` objects, and when started it will handle scheduling the tasks to run efficiently based on CPU core count and CPU usage. A scheduler is started by calling the async function `coro_run()`, which schedules all tasks until complete and then returns the results as a list of tuples. Each tuple in the list corresponds to the result of one task. 
 
-> Note: `coro_run()` now returns ordered results, i.e. the i-th item in the returned list was produced by the i-th task added to the Scheduler.
+> Note: `coro_run()` now returns ordered results; i.e. the `i`-th item in the returned list will be the result of the `i`-th task added to the Scheduler.
 
 ![Diagram demonstrating how Scheduler operates.](/docs/images/scheduler.png)
+
+Below is a simplified code sample demonstrating the basic usage of the Scheduler class. Points to note:
+
+- For simplicity, the code sample makes no reference to PyQt. The `MyWindow` class is not actually a window.
+- In PyMODA, code in the window class should not be responsible for handling calculations. This is the presenter's job.
+- In PyMODA, the presenter doesn't directly interact with `Scheduler`; it uses `MPHandler`.
+- For `asyncio` to work in PyQt, the event loop must be set in the application. This only needs to be done once in the program's lifecycle, and it is already implemented in `Application.py`.
+
+```
+class MyWindow:
+
+    def do_calculation(self):
+        """
+        Starts the coroutine to perform the calculation.
+        """
+        asyncio.ensure_future(self.coro_calculate())
+
+    async def coro_calculate(self):
+        """
+        Performs the calculation and plots the result.
+        """
+        # Store to prevent garbage collection.
+        self.scheduler = Scheduler(self.on_progress)
+
+        num_tasks = 16  # The number of processes to run.
+
+        # Generate some random data to supply to the processes.
+        inputs = [random.randint(2, 7) for _ in range(num_tasks)]
+
+        for i in range(num_tasks):
+            queue = Queue()
+
+            # Tuple containing the arguments which are passed to the process.
+            _args = (queue, inputs[i])
+
+            process = Process(target=long_function, args=_args)
+            self.scheduler.add_task(Task(process, queue))
+
+        # Now we can start the scheduler and wait for the results without blocking the main thread.
+        data: List[tuple] = await self.scheduler.coro_run()
+
+        # Note: `data` is a list containing one tuple from each process.
+
+        # The result from the first process.
+        first_result = data[0]
+        x, y, status = first_result
+
+        self.plot(x, y) # Plot the result in the GUI. 
+
+    def on_progress(self, num_completed: int, num_total: int):
+        """
+        This function takes the number of tasks completed 
+        and the total number of tasks being run. 
+        
+        Pretend that it is used to update a progress bar.
+        """
+
+    def plot(self, x, y):
+        """
+        Pretend that this function plots the results.
+        """
+
+def long_function(queue: Queue, n: int):
+    """
+    Function which simulates a long-running calculation.
+
+    This function will be called in another process.
+    """
+    # Pretend that this is a long, useful calculation.
+    time.sleep(n + 1)
+
+    # Pretend that this is a useful result of the calculation.
+    x, y, status = 4, 8, "success"
+    
+    # Instead of returning values, add them to the queue.
+    queue.put((
+        x,
+        y,
+        status,
+    ))
+
+if __name__ == "__main__":
+    window = MyWindow()
+    window.do_calculation()
+```
 
 #### MPHandler
 

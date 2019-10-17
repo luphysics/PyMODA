@@ -42,15 +42,20 @@ This guide is aimed at users wishing to set up and run PyMODA. If you're interes
 > Tip: If you experience any problems, check the [Common Issues](docs/common-issues.md) document.
 
 ## Requirements
+
 - Python 3.6 or higher.
 - [MATLAB Runtime](https://www.mathworks.com/products/compiler/matlab-runtime.html), 
-newest version recommended (does not require a licence).
+version R2019a (9.6). A license is not required.
+
+> :warning: Do not use a newer version of the MATLAB Runtime.
+
+> :warning: Do not use the Microsoft Store release of Python.
 
 ## Operating systems
 
 PyMODA should run on Windows, macOS and Linux. 
 
-> :warning: You should ensure that you are familiar with the [core knowledge](docs/core-knowledge.md) document before proceeding.
+> :warning: You should ensure that you are familiar with the [core knowledge](docs/core-knowledge.md) before proceeding.
 
 ## Downloading the code
 
@@ -71,47 +76,37 @@ If you prefer the Git method:
 
 ## Preparing to run
 
-When the code is downloaded and Python is installed, you'll need to install the dependencies. 
+When the code is downloaded and Python is installed, you'll need to install the dependencies. Run the command `python packages/install.py` with elevated permissions in the `PyMODA` folder.
 
-#### Windows
-
-Open an administrator terminal in the `PyMODA` folder, and run the command `python packages/install.py`.
-
-#### macOS/Linux
-
-Open a terminal in the `PyMODA` folder. Run the command `sudo python3 packages/install.py`.
-
-> :warning: When using a particular Python version, the python command/path must be added as a command-line argument. For example, 
-run `sudo python3.7 packages/install.py python3.7` to install dependencies for `python3.7`.
+> :warning: When using a special Python command, the python command/path must be added as a command-line argument. For example, run `sudo python3.8 packages/install.py python3.8` to install dependencies for `python3.8`.
 
 ## Running PyMODA
 
-To start PyMODA, run `python src/main.py` from the same terminal.
+To start PyMODA, run `python src/main.py` in the PyMODA folder.
 
-> :warning: Linux users also need to specify the path to the MATLAB Runtime using a command-line argument (see [command-line arguments](docs/developer-guide.md#command-line-arguments)).
+> :warning: Linux users also need to specify the path to the MATLAB Runtime using a command-line argument (see [command-line arguments](/docs/developer-guide.md#command-line-arguments)).
 
 ## Creating a shortcut
 
-In the launcher window, press "Create shortcut" to create a shortcut to easily open PyMODA. This has different behaviour on different operating systems:
-
-#### Windows
-
-A desktop shortcut will be created, which launches PyMODA with the current Python interpreter.
+In the launcher window, click "Create shortcut" to create a shortcut to easily open PyMODA. This has different behaviour on different operating systems:
 
 > :warning: The shortcut will need to be recreated if the path to the PyMODA folder is changed, if the folder is renamed, or if the path to the Python interpreter changes.
 
+#### Windows
+
+A desktop shortcut will be created, which launches PyMODA with the current Python interpreter. If it exists, it will be replaced.
+
 #### macOS/Linux
 
-An alias will be created, which adds the terminal command `pymoda` to launch PyMODA. The alias will be added to `~/.bashrc` for Bash, and if Zsh is installed, to `~/.zshrc`.
+An alias will be created, which adds the terminal command `pymoda` to launch PyMODA with the current Python interpreter. The alias will be added to `~/.bashrc` for Bash, and if Zsh is installed, to `~/.zshrc`. If the alias already exists, it will be replaced.
 
 > Note: This will not take effect in currently open shells. Open a new terminal to try it out. 
 
-> Tip: The `-runtime` argument does not need to be specified when using the `pymoda` command, as long as it was provided to the instance of PyMODA which created the alias. 
+> Tip: If the `-runtime` argument was provided to the instance of PyMODA which created the alias, it does not need to specified when using the `pymoda` command. 
 
 ## Performance and efficiency
 
-When performing multiple discrete calculations - for example, the wavelet transform of 6 signals - PyMODA uses multiprocessing to greatly increase efficiency by allocating 
-different calculations to different CPU cores.
+When performing multiple discrete calculations - for example, the wavelet transform of 6 signals - PyMODA uses multiprocessing to greatly increase efficiency by allocating different calculations to different CPU cores.
 
 Therefore, it is more efficient to transform multiple signals if possible. Efficiency will plateau when the number of signals is higher than the number of CPU cores.
 
@@ -123,3 +118,14 @@ Therefore, it is more efficient to transform multiple signals if possible. Effic
 | WT on 32 signals | Ryzen 3700X (8 cores, 16 threads) | 157s | 34.5s | x4.55 |
 
 > Note: the i7-6700 was tested on Linux, while the Ryzen 3700X was running Windows. This causes differences in performance.
+
+### Windows vs Linux
+
+Linux performs similarly to Windows with 6 signals, but significantly better with 32 signals.
+
+| Operation | Time (Windows) | Time (Linux) | 
+| -----     | -----     | -----     |
+| WT on 6 signals | 17.5s | 17.4s | 
+| WT on 32 signals | 82s | 74s | 
+
+> Note: These tests were performed with a Windows 10 virtual machine and a Manjaro Linux virtual machine. Both were running in Virtualbox with 4 cores and 14GB of memory allocated, on a physical system with an i7-6700.

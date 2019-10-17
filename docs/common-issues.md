@@ -5,6 +5,7 @@
 - [Common Issues](#common-issues)
   - ["'python' is not recognised as ..."](#python-is-not-recognised-as-)
   - ["SyntaxError: invalid syntax"](#syntaxerror-invalid-syntax)
+  - ["RuntimeError: Could not find an appropriate directory for MATLAB..."](#runtimeerror-could-not-find-an-appropriate-directory-for-matlab)
   - ["ImportError: DLL load failed: The specified module could not be found."](#importerror-dll-load-failed-the-specified-module-could-not-be-found)
   - ["No module named PyQt5.sip"](#no-module-named-pyqt5sip)
   - ["Could not load the Qt platform plugin "xcb" in "" even though it was found."](#could-not-load-the-qt-platform-plugin-xcb-in--even-though-it-was-found)
@@ -57,6 +58,22 @@ SyntaxError: invalid syntax
 ### Solution
 
 You may be using Python 2.7 accidentally. On many macOS/Linux systems, `python` is Python 2.7 whereas `python3` is Python 3.x; you can check by running `python --version` and `python3 --version`. If this is the case, repeat all previous commands using `python3` instead of `python` and `pip3` or `python3 -m pip` instead of `pip`.
+
+---
+
+## "RuntimeError: Could not find an appropriate directory for MATLAB..."
+
+### Problem
+
+```
+RuntimeError: Could not find an appropriate directory for MATLAB or the MATLAB runtime in LD_LIBRARY_PATH.
+```
+
+### Solution
+
+This may occur because the `-runtime` command-line argument was not provided. However, it can also occur when the MATLAB Runtime is a newer or older version than the required version. See the [requirements](/docs/README.md#requirements).
+
+---
 
 ## "ImportError: DLL load failed: The specified module could not be found."
 
