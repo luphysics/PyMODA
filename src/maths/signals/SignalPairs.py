@@ -14,6 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import itertools
+from typing import List, Tuple
 
 from maths.signals.Signals import Signals, get_parser
 from maths.signals.TimeSeries import TimeSeries
@@ -27,36 +28,38 @@ class SignalPairs(Signals):
     def __init__(self, *args: TimeSeries):
         super().__init__(*args)
 
-    def get_pairs(self):
+    def get_pairs(self) -> List[Tuple[TimeSeries, TimeSeries]]:
         if len(self) < 2:
             return []
 
-        def mapper(index): return self[index], self[index + 1]
+        def mapper(index):
+            return self[index], self[index + 1]
 
         # 0, 2, 4, 6 etc.
         pair_indices = range(0, len(self), 2)
         return list(map(mapper, pair_indices))
 
-    def get_pair_names(self):
-        def mapper(index): return f"Signal Pair {index + 1}"
+    def get_pair_names(self) -> List[str]:
+        def mapper(index):
+            return f"Signal Pair {index + 1}"
 
         return list(map(mapper, range(len(self.get_pairs()))))
 
-    def get_pair_by_name(self, name: str):
+    def get_pair_by_name(self, name: str) -> Tuple[TimeSeries, TimeSeries]:
         pairs = self.get_pairs()
         names = self.get_pair_names()
 
         index = names.index(name)
         return pairs[index]
 
-    def get_pair_by_index(self, index: int):
+    def get_pair_by_index(self, index: int) -> Tuple[TimeSeries, TimeSeries]:
         return self.get_pairs()[index]
 
-    def pair_count(self):
+    def pair_count(self) -> int:
         """Returns the number of signal pairs."""
         return len(self) // 2
 
-    def only(self, *pair_names):
+    def only(self, *pair_names) -> "SignalPairs":
         """
         Creates a new SignalPairs object containing only the signal pairs
         with the supplied names.
@@ -72,7 +75,7 @@ class SignalPairs(Signals):
         return signals
 
     @staticmethod
-    def from_file(file: str):
+    def from_file(file: str) -> "SignalPairs":
         parser = get_parser(file)
         args = [TimeSeries(d) for d in parser.parse()]
         return SignalPairs(*args)

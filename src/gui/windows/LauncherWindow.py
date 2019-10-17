@@ -27,28 +27,34 @@ from utils.shortcuts import create_shortcut
 
 class LauncherWindow(CentredWindow):
     """
-    The first window that opens, providing options to perform different
-    types of common.
+    The first window that opens, providing buttons to open the important windows.
     """
 
-    def setup_ui(self):
+    def setup_ui(self) -> None:
         uic.loadUi(get("layout:window_launcher.ui"), self)
         self.load_banner_images()
 
         self.btn_time_freq.clicked.connect(self.application.start_time_frequency)
         self.btn_wavelet_phase.clicked.connect(self.application.start_phase_coherence)
-        self.btn_ridge_extraction.clicked.connect(self.application.start_ridge_extraction)
+        self.btn_ridge_extraction.clicked.connect(
+            self.application.start_ridge_extraction
+        )
         self.btn_wavelet_bispectrum.clicked.connect(self.application.start_bispectrum)
         self.btn_dynamical_bayesian.clicked.connect(self.application.start_bayesian)
 
         self.btn_create_shortcut.clicked.connect(self.create_shortcut)
 
-    def load_banner_images(self):
-        physics_label = self.lbl_physics
+    def load_banner_images(self) -> None:
+        """
+        Loads the banner images and displays them at the top of the window.
+        """
         image = QPixmap(resources.get("image:physicslogo.png"))
-        physics_label.setPixmap(image.scaled(600, 300, Qt.KeepAspectRatio))
+        self.lbl_physics.setPixmap(image.scaled(600, 300, Qt.KeepAspectRatio))
 
     @staticmethod
-    def create_shortcut():
+    def create_shortcut() -> None:
+        """
+        Calls `create_shortcut()` and shows a message box with the result.
+        """
         status = create_shortcut()
         QMessageBox(text=status).exec()

@@ -14,6 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import numpy as np
+from numpy import ndarray
 
 from maths.signals.data.TFOutputData import TFOutputData
 
@@ -40,11 +41,11 @@ class TimeSeries:
 
         self.output_data = TFOutputData.empty()
 
-    def has_frequency(self):
+    def has_frequency(self) -> bool:
         """Returns whether a frequency has been set."""
         return self.frequency is not None
 
-    def set_frequency(self, freq: float):
+    def set_frequency(self, freq: float) -> None:
         """
         Sets the frequency. This will trigger a regeneration
         of the time values.
@@ -52,13 +53,13 @@ class TimeSeries:
         self.frequency = freq
         self.times = self._generate_times()
 
-    def has_name(self):
+    def has_name(self) -> bool:
         return self.name is not None
 
-    def has_times(self):
+    def has_times(self) -> bool:
         return self.times is not None
 
-    def _generate_times(self):
+    def _generate_times(self) -> ndarray:
         """Generates the time values associated with the data."""
         times = np.empty(self.signal.shape, dtype=np.float)
         for i in range(0, len(self.signal)):
@@ -66,7 +67,7 @@ class TimeSeries:
 
         return times
 
-    def set_xlimits(self, x1, x2):
+    def set_xlimits(self, x1, x2) -> None:
         """
         Sets the x-limits of the data (restricting the values to a certain
         range of times). The original data is saved to a variable so that
@@ -89,13 +90,13 @@ class TimeSeries:
         self.times = self.times[indices]
         self.signal = self.signal[indices]
 
-    def reset_xlimits(self):
+    def reset_xlimits(self) -> None:
         """Resets the x-limits by restoring the original data."""
         if self.contains_original_data():
             self.signal = self.original_signal.copy()
             self.times = self.original_times.copy()
 
-    def save_original_data(self):
+    def save_original_data(self) -> None:
         """
         Saves the original data,so that it can be restored later
         even if the x-limits are changed.
@@ -103,12 +104,12 @@ class TimeSeries:
         self.original_signal = self.signal.copy()
         self.original_times = self.times.copy()
 
-    def contains_original_data(self):
+    def contains_original_data(self) -> bool:
         """Returns whether the original data has been saved."""
         return self.original_signal is not None and self.original_times is not None
 
-    def get_output_data(self):
+    def get_output_data(self) -> TFOutputData:
         return self.output_data
 
-    def has_output_data(self):
+    def has_output_data(self) -> bool:
         return self.output_data is not None

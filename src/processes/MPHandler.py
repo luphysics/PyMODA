@@ -42,14 +42,8 @@ from processes.Task import Task
 
 class MPHandler:
     """
-    A class providing a simple way to perform computations in another
-    process.
-
-    Using another process is necessary to avoid issues related to
-    LD_LIBRARY_PATH on Linux, and prevent the UI from freezing.
-
-    Unlike multithreading (due to the GIL) multiprocessing improves
-    performance when multiple tasks are running simultaneously.
+    A class providing functions which perform mathematical computations
+    using a Scheduler.
 
     IMPORTANT: you should hold a reference to any instances
     of this class to prevent them from being garbage collected

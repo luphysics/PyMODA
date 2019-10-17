@@ -20,19 +20,20 @@ from PyQt5.QtWidgets import QApplication
 from asyncqt import QEventLoop
 
 from gui.windows.BaseWindow import BaseWindow
-from gui.windows.bispectrum.BAWindow import BAWindow
+from gui.windows.LauncherWindow import LauncherWindow
 from gui.windows.bayesian.DBWindow import DBWindow
+from gui.windows.bispectrum.BAWindow import BAWindow
 from gui.windows.phasecoherence.PCWindow import PCWindow
 from gui.windows.ridgeextraction.REWindow import REWindow
 from gui.windows.timefrequency.TFWindow import TFWindow
-from gui.windows.LauncherWindow import LauncherWindow
 from utils import cache
 
 
 class Application(QApplication):
-    """The base application."""
+    """
+    The base application class.
+    """
 
-    launcher_window = None
     windows = []
 
     def __init__(self, args):
@@ -91,5 +92,5 @@ class Application(QApplication):
         except ValueError:
             pass
 
-        if len(self.windows) == 0:
+        if not self.windows:
             cache.clear()

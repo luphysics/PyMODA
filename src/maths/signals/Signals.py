@@ -19,11 +19,12 @@ from data.parsing.CSVParser import CSVParser
 from maths.signals.TimeSeries import TimeSeries
 
 
-class Signals(list):
+class Signals(List[TimeSeries]):
     """
-    A class inheriting from `list`, which contains a collection of
-    TimeSeries instances. Each Signals instance should have a frequency
-    which is shared across all contained TimeSeries instances.
+    A class which contains a collection of TimeSeries instances.
+
+    Each Signals instance should have a frequency which is shared
+    across all contained TimeSeries instances.
     """
 
     def __init__(self, *args: TimeSeries):
@@ -38,7 +39,7 @@ class Signals(list):
         self.generate_names()
         self.frequency = None
 
-    def generate_names(self):
+    def generate_names(self) -> None:
         """
         Generates a unique name for every TimeSeries in the dataset. If multiple
         items have the same name, then all instances with the name will be renamed.
@@ -67,30 +68,30 @@ class Signals(list):
 
         return name
 
-    def append(self, object: TimeSeries, generate_name=True) -> None:
+    def append(self, signal: TimeSeries, generate_name=True) -> None:
         """
         Overrides the append function, ensuring that any signal added
         has a unique name.
         """
-        super(Signals, self).append(object)
+        super(Signals, self).append(signal)
         if generate_name:
             self.generate_names()
 
-    def names(self) -> List:
+    def names(self) -> List[str]:
         """
         Returns a list containing the name of every TimeSeries respectively.
         May contain duplicates if names have not been generated safely.
         """
         return [t.name for t in self]
 
-    def set_frequency(self, freq: float):
+    def set_frequency(self, freq: float) -> None:
         """Sets the frequency. This affects all TimeSeries contained within this instance."""
         freq = float(freq)
         self.frequency = freq
         for t in self:
             t.set_frequency(freq)
 
-    def has_frequency(self):
+    def has_frequency(self) -> bool:
         """Returns whether the frequency has been set."""
         return self.frequency is not None
 
@@ -108,7 +109,7 @@ class Signals(list):
         for t in self:
             t.reset_xlimits()
 
-    def set_xlimits(self, x1, x2):
+    def set_xlimits(self, x1, x2) -> None:
         """
         Sets the x-limits of all data (restricting the values to a certain
         range of times).
@@ -119,7 +120,7 @@ class Signals(list):
         for t in self:
             t.set_xlimits(x1, x2)
 
-    def only(self, *signal_names):
+    def only(self, *signal_names) -> "Signals":
         """
         Creates a new Signals object containing only
         the desired signals.
@@ -129,7 +130,7 @@ class Signals(list):
         return signals
 
     @staticmethod
-    def from_file(file: str):
+    def from_file(file: str) -> "Signals":
         """Creates a Signals instance from a provided file."""
         parser = get_parser(file)
         args = [TimeSeries(d) for d in parser.parse()]

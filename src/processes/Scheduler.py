@@ -30,6 +30,10 @@ class Scheduler:
     As an example, a 4-core, 8-thread machine will run 9 processes
     concurrently and an 8-core, 16-thread CPU will run 17 processes
     concurrently.
+
+    If CPU usage is found to be below the threshold, the number of
+    simultaneous processes will be increased. CPU usage is checked
+    every 5 seconds.
     """
 
     def __init__(
@@ -54,6 +58,7 @@ class Scheduler:
         self.delay_millis = int(delay_seconds * 1000)
 
         self.time_start: float = 0
+        self.started = False
         self.stopped = False
         self.terminated = False
 
@@ -78,6 +83,9 @@ class Scheduler:
         """
         Adds a task to the Scheduler.
         """
+        if self.started:
+            raise SchedulerException("Do not add tasks to an running Scheduler.")
+
         self.tasks.append(task)
 
     async def coro_run(self) -> List[tuple]:
@@ -141,6 +149,7 @@ class Scheduler:
 
     def start(self):
         """Starts the scheduler running the assigned tasks."""
+        self.started = True
         self.total_task_count = sum([t.total_tasks() for t in self.tasks])
 
         self.time_start = time.time()
@@ -232,3 +241,9 @@ class Scheduler:
             final_task_index += 1
 
         return available[:final_task_index]
+
+
+class SchedulerException(Exception):
+    """
+    Exception raised when an error occurs with using Scheduler.
+    """

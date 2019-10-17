@@ -27,7 +27,7 @@ class BaseUI:
     def __init__(self):
         self.setup_ui()
 
-    def setup_ui(self):
+    def setup_ui(self) -> None:
         """
         A function which should be overridden and used to setup
         UI components.

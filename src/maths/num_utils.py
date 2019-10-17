@@ -18,13 +18,17 @@ from typing import Any, Optional, List
 import numpy as np
 from numpy import ndarray
 
+"""
+File containing useful numerical functions.
+"""
+
 
 def float_or_none(var: Any) -> Optional[float]:
     """
     If the variable can be represented as a float, return the float value.
     Otherwise, return None.
 
-    Important: if a boolean is passed, the function will return None.
+    Note: if a boolean is passed, the function will return None.
     """
     result = None
     try:
@@ -37,10 +41,10 @@ def float_or_none(var: Any) -> Optional[float]:
 
 def int_or_none(var: Any, round_int=False) -> Optional[int]:
     """
-        If the variable can be represented as an int, return the int value.
-        Otherwise, return None.
+    If the variable can be represented as an int, return the int value.
+    Otherwise, return None.
 
-        Important: if a boolean is passed, the function will return None.
+    Note: if a boolean is passed, the function will return None.
     """
     result = None
     try:
@@ -55,7 +59,9 @@ def int_or_none(var: Any, round_int=False) -> Optional[int]:
 
 
 def float_to_str(var: float) -> str:
-    """Returns a string representation of a float, without trailing zeros."""
+    """
+    Returns a string representation of a float, without trailing zeros.
+    """
     try:
         return f"{var:g}"
     except:
@@ -72,10 +78,7 @@ def isfloat(var: Any) -> bool:
 
 def subset2d(arr, count):
     shape = arr.shape
-    new_shape = (
-        np.int(np.ceil(shape[0] / count)),
-        np.int(np.ceil(shape[1] / count)),
-    )
+    new_shape = (np.int(np.ceil(shape[0] / count)), np.int(np.ceil(shape[1] / count)))
     result = np.empty(shape=new_shape, dtype=arr.dtype)
 
     for i in range(new_shape[0]):

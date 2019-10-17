@@ -20,6 +20,11 @@ from processes.mp_utils import terminate_tree
 
 
 class Task:
+    """
+    A simple class containing a process and an associated queue. The queue should have been
+    passed to the process, the process should put its output in the queue.
+    """
+
     def __init__(self, process: Process, queue: Queue, subtasks=0):
         self.process = process
         self.queue = queue
