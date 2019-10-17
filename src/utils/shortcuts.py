@@ -23,7 +23,6 @@ system = platform.system()
 
 
 class OS:
-
     @staticmethod
     def is_windows() -> bool:
         """
@@ -116,13 +115,14 @@ def _create_shortcut_linux() -> str:
         with open(zshrc, "w") as f:
             f.writelines(zsh_lines)
 
-    return "Created 'pymoda' alias to launch PyMODA with current arguments. " \
-           "Open a new terminal in any folder and try typing 'pymoda'."
+    return (
+        "Created 'pymoda' alias to launch PyMODA with current arguments. "
+        "Open a new terminal in any folder and try typing 'pymoda'."
+    )
 
 
 def _get_python_interpreter_executable() -> str:
-    # On Windows, use `pythonw.exe` to keep console window hidden.
-    return sys.executable.replace(".exe", "w.exe")
+    return sys.executable
 
 
 def _create_shortcut_mac_os() -> str:
@@ -135,6 +135,7 @@ def _get_abs_path_in_home_folder(file_name: str) -> str:
     in the home folder on Linux.
     """
     from pathlib import Path
+
     home = str(Path.home())
     return os.path.join(home, file_name)
 
