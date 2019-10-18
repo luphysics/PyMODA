@@ -49,11 +49,11 @@ version R2019a (9.6). A license is not required.
 
 > :warning: Do not use a newer version of the MATLAB Runtime.
 
-> :warning: Do not use the Microsoft Store release of Python.
+> Note: The Microsoft Store release of Python is incompatible with PyMODA due to the permissions on its folders.
 
 ## Operating systems
 
-PyMODA should run on Windows, macOS and Linux. 
+PyMODA should run on Windows, macOS and Linux. Linux performs slightly better than Windows ([see comparison](#windows-vs-linux)).
 
 > :warning: You should ensure that you are familiar with the [core knowledge](docs/core-knowledge.md) before proceeding.
 
@@ -78,7 +78,7 @@ If you prefer the Git method:
 
 When the code is downloaded and Python is installed, you'll need to install the dependencies. Run the command `python packages/install.py` with elevated permissions in the `PyMODA` folder.
 
-> :warning: When using a special Python command, the python command/path must be added as a command-line argument. For example, run `sudo python3.8 packages/install.py python3.8` to install dependencies for `python3.8`.
+> Tip: To diagnose any problems, the `-v` command-line argument can be used to print console output.
 
 ## Running PyMODA
 
