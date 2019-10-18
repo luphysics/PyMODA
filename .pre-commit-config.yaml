@@ -1,9 +1,16 @@
 repos:
+
+# Doctoc generates the table of contents for each markdown file.
 -   repo: https://github.com/thlorenz/doctoc
     rev: v1.4.0
     hooks:
     -   id: doctoc
-        args: [".", '--title=## Table of Contents', "--maxlevel=2", "--github"]
+        args: [".",                             # Apply to everything inside the root of the repository.
+        '--title=## Table of Contents',         # Set the title of the table of contents.
+        "--maxlevel=2",                         # Only add sections with `#` or `##`.
+        "--github"]                             # Use GitHub formatting.
+
+# Black formats Python files.
 -   repo: https://github.com/ambv/black
     rev: stable
     hooks:
