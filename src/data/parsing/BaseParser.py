@@ -14,18 +14,19 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from abc import ABC, abstractmethod
+from typing import List
+
+from numpy import ndarray
 
 
 class BaseParser(ABC):
     """
-    A base parser. The parser is intended to retrieve data from
-    a file.
+    A base parser. The parser is intended to load data from a file.
     """
 
-    def __init__(self, filename):
-        self.filename = filename
+    def __init__(self, filename: str):
+        self.filename: str = filename
 
     @abstractmethod
-    def parse(self):
+    def parse(self) -> List[ndarray]:
         pass
-

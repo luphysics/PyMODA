@@ -13,11 +13,11 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import os
 
-
-def extension(filename):
-    """Gets the file extension for a given file."""
-    return filename.split(".")[-1]
+from data.parsing.BaseParser import BaseParser
+from data.parsing.CsvParser import CsvParser
+from data.parsing.MatParser import MatParser
 
 
 def get_lines(filename):
@@ -30,3 +30,22 @@ def get_lines(filename):
         print(f"File not found at path: '{filename}'")
 
     return lines
+
+
+def get_parser(filename) -> BaseParser:
+    """Gets the appropriate parser for a given file."""
+    _, extension = os.path.splitext(filename)
+    extension = extension.lower()
+
+    if extension == ".mat":
+        return MatParser(filename)
+    elif extension == ".csv":
+        return CsvParser(filename)
+
+    raise ParsingException(f"Cannot parse a file with the extension: {extension}")
+
+
+class ParsingException(Exception):
+    """
+    Exception raised when errors are encountered during parsing.
+    """

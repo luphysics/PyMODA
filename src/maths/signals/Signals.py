@@ -15,7 +15,7 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from typing import List
 
-from data.parsing.CSVParser import CSVParser
+from data.parsing.parsing import get_parser
 from maths.signals.TimeSeries import TimeSeries
 
 
@@ -135,8 +135,3 @@ class Signals(List[TimeSeries]):
         parser = get_parser(file)
         args = [TimeSeries(d) for d in parser.parse()]
         return Signals(*args)
-
-
-def get_parser(filename):
-    """Gets the appropriate parser for a given file."""
-    return CSVParser(filename)  # Test implementation.

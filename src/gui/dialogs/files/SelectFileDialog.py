@@ -47,10 +47,10 @@ class SelectFileDialog(QDialog, BaseUI):
 
         QTimer.singleShot(500, self.check_args)
 
-    async def coro_get(self) -> str:
+    def get_result(self) -> str:
         self.exec()
         self.settings.add_recent_file(self.file)
-        return self.get_file()
+        return self.get_file_path()
 
     def check_args(self):
         """
@@ -88,8 +88,13 @@ class SelectFileDialog(QDialog, BaseUI):
         self.accept()  # Close the dialog.
 
     def on_drop(self, file: str):
+        if not file:
+            raise Exception(
+                "Cannot load file: ''. This may be an issue specific to your OS."
+            )
+
         self.file = file
 
-    def get_file(self):
+    def get_file_path(self):
         """Gets the file path for the selected file."""
         return resources.path_from_file_string(self.file)

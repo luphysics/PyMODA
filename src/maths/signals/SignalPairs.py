@@ -16,7 +16,8 @@
 import itertools
 from typing import List, Tuple
 
-from maths.signals.Signals import Signals, get_parser
+from data.parsing.parsing import get_parser
+from maths.signals.Signals import Signals
 from maths.signals.TimeSeries import TimeSeries
 
 
@@ -64,11 +65,12 @@ class SignalPairs(Signals):
         Creates a new SignalPairs object containing only the signal pairs
         with the supplied names.
         """
-        # List of tuples.
-        pairs = [self.get_pair_by_name(n) for n in pair_names]
+        pairs: List[Tuple[TimeSeries, TimeSeries]] = [
+            self.get_pair_by_name(n) for n in pair_names
+        ]
 
         # Expand tuples to list of all signals.
-        pairs_list = list(itertools.chain.from_iterable(pairs))
+        pairs_list: List[TimeSeries] = list(itertools.chain.from_iterable(pairs))
 
         signals = SignalPairs(*pairs_list)
         signals.set_frequency(self.frequency)

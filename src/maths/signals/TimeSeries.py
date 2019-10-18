@@ -13,6 +13,8 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from typing import List, Union
+
 import numpy as np
 from numpy import ndarray
 
@@ -28,10 +30,14 @@ class TimeSeries:
     each datum point in the series.
     """
 
-    def __init__(self, data, frequency=None, name=None):
+    def __init__(self, data: Union[List, ndarray], frequency=None, name=None):
         self.name = name
         self.frequency = frequency
-        self.signal = np.asarray(data, dtype=np.float64)
+
+        if isinstance(data, list):
+            self.signal = np.asarray(data, dtype=np.float64)
+        else:
+            self.signal = data
 
         self.initial_time = 0
         self.times = None

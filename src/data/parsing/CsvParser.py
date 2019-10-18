@@ -13,19 +13,19 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-import numpy as np
+from typing import List
 
 from data.parsing import parsing
 from data.parsing.BaseParser import BaseParser
 
 
-class CSVParser(BaseParser):
+class CsvParser(BaseParser):
     """
     A class which can parse CSV data (comma-separated-values),
     either row-wise or column-wise.
     """
 
-    def parse(self):
+    def parse(self) -> List[List[float]]:
         """
         Parses the file, returning a list whose items are a list of
         the values in every signal respectively.

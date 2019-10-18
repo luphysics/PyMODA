@@ -69,7 +69,7 @@ class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
         # immediately after the window.
         await asyncio.sleep(0.1)
 
-        file_path = await SelectFileDialog().coro_get()
+        file_path = SelectFileDialog().get_result()
         if file_path:
             self.presenter.on_file_selected(file_path)
 
@@ -104,9 +104,7 @@ class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
         self.setup_lineedit_fmin()
         self.setup_lineedit_res()
 
-        self.btn_calculate_all.clicked.connect(
-            partial(self.presenter.calculate, True)
-        )
+        self.btn_calculate_all.clicked.connect(partial(self.presenter.calculate, True))
         self.btn_calculate_single.clicked.connect(
             partial(self.presenter.calculate, False)
         )
@@ -251,7 +249,8 @@ class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
         """
 
         # Format to 4 decimal places.
-        def format_4dp(x): return f"{x:.4f}"
+        def format_4dp(x):
+            return f"{x:.4f}"
 
         self.line_xlim1.setText(format_4dp(x1))
         self.line_xlim2.setText(format_4dp(x2))
