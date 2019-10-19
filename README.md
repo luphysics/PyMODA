@@ -76,9 +76,9 @@ If you prefer the Git method:
 
 ## Preparing to run
 
-When the code is downloaded and Python is installed, you'll need to install the dependencies. Run the command `python packages/install.py` with elevated permissions in the `PyMODA` folder.
+When the code is downloaded and Python is installed, you'll need to install the dependencies. Open a terminal in the `PyMODA` folder and run `python packages/install.py`.
 
-> Tip: To diagnose any problems, the `-v` command-line argument can be used to print console output.
+> :warning: Do not run `install.py` with elevated permissions.
 
 ## Running PyMODA
 

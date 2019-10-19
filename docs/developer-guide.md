@@ -39,9 +39,11 @@ pip install pre-commit --user   # Installs the pre-commit tool.
 pre-commit install              # Adds the Git hooks to the repository.
 ```
 
+On Windows, also run `git config core.safecrlf false` in the `PyMODA` folder. This prevents a circular problem where Git cannot commit because it converts line endings to CRLF but doctoc converts line endings back to LF.
+
 Now that the Git hooks are installed, they will automatically run every time a commit changes relevant files.
 
-> :warning: When a hook runs, you may need to add the files and commit again.
+> :warning: When a hook changes a file, you'll need to add the files and commit again.
 
 Here is an example of committing with the hooks installed. Black formats a Python file, so the commit must be run again.
 
