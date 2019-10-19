@@ -165,7 +165,7 @@ Below is a simplified code sample demonstrating the basic usage of the Scheduler
 - In PyMODA, the presenter doesn't directly interact with `Scheduler`; it uses `MPHandler`.
 - For `asyncio` to work in PyQt, the event loop must be set in the application. This only needs to be done once in the program's lifecycle, and it is already implemented in `Application.py`.
 
-```
+```python
 class MyWindow:
 
     def do_calculation(self):
