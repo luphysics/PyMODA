@@ -37,7 +37,8 @@ def check_cwd() -> str:
 
 
 def run_command(command: str, verbose=False) -> Tuple[str, str]:
-    print(f"Running command: {command}")
+    print(f"Working directory: {os.getcwd()}")
+    print(f"Running command: {command}", end="\n\n")
 
     result = subprocess.run(
         command,
@@ -61,7 +62,7 @@ def fatal_error(message: str):
     # ANSI codes to make the text red.
     red, endc = "\033[91m", "\033[0m"
 
-    print(f"\n{red}Error: {message}{endc}")
+    print(f"{red}\n\nError: {message}\n\n{endc}")
     sys.exit(1)
 
 
@@ -85,7 +86,9 @@ if __name__ == "__main__":
     pip = f"{python} -m pip"  # Pip command for current interpreter.
 
     if " " in python:
-        python = f'"{python}"'  # If Python path contains spaces, use quotes.
+        fatal_error(
+            f"Please reinstall Python so that its path does not contain spaces. The current Python path is '{python}'."
+        )
 
     wd = check_cwd()
     files = []
@@ -94,22 +97,19 @@ if __name__ == "__main__":
     for file in glob("**/setup.py", recursive=True):
         if "for_redistribution_files_only" in file:
             files.append(os.path.abspath(file))
- 
+
     for f in files:
         os.chdir(wd)
         os.chdir("/".join(f.replace("\\", "/").split("/")[:-1]))
 
-        out, err = run_command(f"{python} setup.py install", verbose=verbose)
-        if "Permission denied" in err:
-            fatal_error(
-                "Install script must be run with elevated permissions. "
-                "Use an administrator terminal on Windows or prefix the command with 'sudo' on macOS/Linux."
-            )
+        out, err = run_command(f"{python} setup.py install --user", verbose=verbose)
+        if verbose:
+            time.sleep(1)
 
     os.chdir(f"{wd}/..")
-    run_command(f"{pip} install -r requirements.txt", verbose=verbose)
+    run_command(f"{pip} install -r requirements.txt --user", verbose=verbose)
 
     if is_windows:
-        run_command(f"{pip} install winshell pypiwin32", verbose=verbose)
+        run_command(f"{pip} install winshell pypiwin32 --user", verbose=verbose)
 
     print("\nInstall script has finished.")
