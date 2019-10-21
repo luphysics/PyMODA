@@ -17,6 +17,8 @@
 from typing import Callable, List, Tuple
 
 from multiprocess import Queue, Process
+from scheduler.Scheduler import Scheduler
+from scheduler.Task import Task
 
 from gui.windows.bayesian.ParamSet import ParamSet
 from maths.algorithms.multiprocessing.bandpass_filter import _bandpass_filter
@@ -36,8 +38,6 @@ from maths.params.REParams import REParams
 from maths.params.TFParams import TFParams, _fmin, _fmax
 from maths.signals.SignalPairs import SignalPairs
 from maths.signals.Signals import Signals
-from processes.Scheduler import Scheduler
-from processes.Task import Task
 
 
 class MPHandler:
@@ -69,7 +69,7 @@ class MPHandler:
 
             self.scheduler.add_task(Task(p, q))
 
-        return await self.scheduler.coro_run()
+        return await self.scheduler.run()
 
     async def coro_phase_coherence(
         self,
@@ -89,7 +89,7 @@ class MPHandler:
 
             self.scheduler.add_task(Task(p, q, subtasks=params.surr_count))
 
-        return await self.scheduler.coro_run()
+        return await self.scheduler.run()
 
     async def coro_ridge_extraction(
         self, params: REParams, on_progress: Callable[[int, int], None]
@@ -114,7 +114,7 @@ class MPHandler:
 
                 self.scheduler.add_task(Task(p, q))
 
-        return await self.scheduler.coro_run()
+        return await self.scheduler.run()
 
     async def coro_bandpass_filter(
         self,
@@ -135,7 +135,7 @@ class MPHandler:
                 p = Process(target=_bandpass_filter, args=(q, s, fmin, fmax, fs))
                 self.scheduler.add_task(Task(p, q))
 
-        return await self.scheduler.coro_run()
+        return await self.scheduler.run()
 
     async def coro_bayesian(
         self,
@@ -154,7 +154,7 @@ class MPHandler:
 
                 self.scheduler.add_task(Task(p, q))
 
-        return await self.scheduler.coro_run()
+        return await self.scheduler.run()
 
     async def coro_bispectrum_analysis(
         self,
@@ -172,7 +172,7 @@ class MPHandler:
 
             self.scheduler.add_task(Task(p, q, subtasks=4))
 
-        return await self.scheduler.coro_run()
+        return await self.scheduler.run()
 
     async def coro_biphase(
         self,
@@ -194,7 +194,7 @@ class MPHandler:
 
             self.scheduler.add_task(Task(p, q))
 
-        return await self.scheduler.coro_run()
+        return await self.scheduler.run()
 
     def stop(self):
         """
