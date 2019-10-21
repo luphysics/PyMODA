@@ -13,19 +13,18 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-import asyncio
 from functools import partial
 from typing import List
 
 from PyQt5 import uic, QtGui
 from PyQt5.QtWidgets import QProgressBar, QPushButton
 
-from gui.windows.common.BaseTFViewProperties import BaseTFViewProperties
 from gui.dialogs.files.SelectFileDialog import SelectFileDialog
-from gui.windows.MaximisedWindow import MaximisedWindow
 from gui.plotting.plots.AmplitudePlot import AmplitudePlot
 from gui.plotting.plots.ColorMeshPlot import ColorMeshPlot
 from gui.plotting.plots.SignalPlot import SignalPlot
+from gui.windows.MaximisedWindow import MaximisedWindow
+from gui.windows.common.BaseTFViewProperties import BaseTFViewProperties
 from maths.num_utils import float_or_none
 from utils.decorators import deprecated
 
@@ -57,18 +56,6 @@ class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
         super().update_title(title or self.presenter.get_window_name())
 
     def select_file(self):
-        asyncio.ensure_future(self.coro_select_file())
-
-    async def coro_select_file(self):
-        """
-        Prompts the user to select a file by opening a dialog. Suspends until
-        the user has closed the dialog. If the user does not select a file,
-        the window is unaffected.
-        """
-        # Sleep to prevent disconcerting mix of animations caused by the dialog opening
-        # immediately after the window.
-        await asyncio.sleep(0.1)
-
         file_path = SelectFileDialog().get_result()
         if file_path:
             self.presenter.on_file_selected(file_path)

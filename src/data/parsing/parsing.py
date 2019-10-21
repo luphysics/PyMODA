@@ -28,6 +28,7 @@ def get_lines(filename):
                 lines.append(line)
     except FileNotFoundError:
         print(f"File not found at path: '{filename}'")
+        raise ParsingException(f"File does not exist: {filename}")
 
     return lines
 
