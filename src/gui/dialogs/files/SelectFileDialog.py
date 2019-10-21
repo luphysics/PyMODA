@@ -48,6 +48,9 @@ class SelectFileDialog(QDialog, BaseUI):
         QTimer.singleShot(500, self.check_args)
 
     def get_result(self) -> str:
+        """
+        Shows the dialog and returns the path to the file chosen by the user.
+        """
         self.exec()
         self.settings.add_recent_file(self.file)
         return self.get_file_path()
@@ -78,6 +81,9 @@ class SelectFileDialog(QDialog, BaseUI):
             self.file = filenames[0]
             self.lbl_drag_drop.show_selected_file(self.file)
 
+            if self.file:
+                self.disable_recent_files()
+
     def setup_recent_files(self):
         files = self.settings.get_recent_files()
         self.combo_recent.addItems(files)
@@ -93,7 +99,16 @@ class SelectFileDialog(QDialog, BaseUI):
                 "Cannot load file: ''. This may be an issue specific to your OS."
             )
 
+        self.disable_recent_files()
         self.file = file
+
+    def disable_recent_files(self):
+        """
+        Disables the UI for selecting a recent file, since it may cause users to erroneously
+        use a recent file instead of the file chosen in the GUI.
+        """
+        self.btn_use_recent.setDisabled(True)
+        self.combo_recent.setDisabled(True)
 
     def get_file_path(self):
         """Gets the file path for the selected file."""

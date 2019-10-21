@@ -73,3 +73,12 @@ class FrequencyDialog(QDialog, BaseUI):
 
     def on_freq_changed(self, value):
         self.frequency = float_or_none(value)
+        self.disable_recent_freq()
+
+    def disable_recent_freq(self):
+        """
+        Disables the UI for selecting a recent frequency, since it may cause users to erroneously
+        use a recent frequency instead of the frequency typed into the GUI.
+        """
+        self.combo_recent.setDisabled(True)
+        self.btn_use_recent.setDisabled(True)
