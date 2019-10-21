@@ -18,6 +18,7 @@ import os
 from data.parsing.BaseParser import BaseParser
 from data.parsing.CsvParser import CsvParser
 from data.parsing.MatParser import MatParser
+from data.parsing.NpyParser import NpyParser
 
 
 def get_lines(filename):
@@ -42,6 +43,8 @@ def get_parser(filename) -> BaseParser:
         return MatParser(filename)
     elif extension == ".csv":
         return CsvParser(filename)
+    elif extension == ".npy":
+        return NpyParser(filename)
 
     raise ParsingException(f"Cannot parse a file with the extension: {extension}")
 

@@ -13,36 +13,20 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from typing import List
 
+import numpy as np
 from numpy import ndarray
-from scipy.io import loadmat
 
 from data.parsing.BaseParser import BaseParser
 
 
-class MatParser(BaseParser):
+class NpyParser(BaseParser):
     """
-    A parser which loads data from a .mat file.
+    A parser which loads data from a .npy file.
     """
 
     def parse(self) -> ndarray:
-        from data.parsing.parsing import ParsingException
-
-        data: dict = loadmat(self.filename)
-        arrays: List[ndarray] = list(
-            filter(lambda i: isinstance(i, ndarray), data.values())
-        )
-
-        if len(arrays) > 1:
-            raise ParsingException(
-                ".mat file should contain only one array. To load multiple signals,"
-                " each signal should be a row or column in the array."
-            )
-        elif len(arrays) == 0:
-            raise ParsingException("No arrays were found in the .mat file.")
-        else:
-            signals: ndarray = arrays[0]
+        signals: ndarray = np.load(self.filename)
 
         rows, cols = signals.shape
         row_wise = rows < cols
