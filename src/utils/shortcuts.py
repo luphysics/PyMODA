@@ -15,34 +15,10 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import os
-import platform
 import sys
 from subprocess import Popen, PIPE
 
-system = platform.system()
-
-
-class OS:
-    @staticmethod
-    def is_windows() -> bool:
-        """
-        Returns whether the current OS is Windows.
-        """
-        return system == "Windows"
-
-    @staticmethod
-    def is_linux() -> bool:
-        """
-        Returns whether the current OS is Linux-based.
-        """
-        return system == "Linux"
-
-    @staticmethod
-    def is_mac_os() -> bool:
-        """
-        Returns whether the current OS is macOS (hopefully).
-        """
-        return not (OS.is_linux() or OS.is_windows())  # TODO: Improve implementation.
+from utils.os_utils import OS
 
 
 def create_shortcut() -> str:

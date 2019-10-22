@@ -19,6 +19,7 @@ from easysettings import EasySettings
 
 _key_recent_files = "recent_files"
 _key_recent_frequencies = "recent_freq"
+_key_runtime_warning = "runtime_warning"
 
 
 class Settings:
@@ -59,4 +60,11 @@ class Settings:
             freq.insert(0, new_freq)
 
         self._settings.set(_key_recent_frequencies, freq)
+        self._settings.save()
+
+    def is_runtime_warning_enabled(self) -> bool:
+        return self._settings.get(_key_runtime_warning, True)
+
+    def set_runtime_warning_enabled(self, enabled: bool) -> None:
+        self._settings.set(_key_runtime_warning, enabled)
         self._settings.save()

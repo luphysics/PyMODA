@@ -13,10 +13,9 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-
+import asyncio
 
 from PyQt5 import uic
-from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QDialog
 
 from data import resources
@@ -46,7 +45,7 @@ class FrequencyDialog(QDialog, BaseUI):
         self.btn_use_recent.clicked.connect(self.use_recent_freq)
         self.setup_combo()
 
-        QTimer.singleShot(500, self.check_args)
+        asyncio.ensure_future(self.coro_check_args())
 
     def run_and_get(self) -> float:
         self.exec()
@@ -57,8 +56,12 @@ class FrequencyDialog(QDialog, BaseUI):
         values = self.settings.get_recent_freq()
         self.combo_recent.addItems([float_to_str(f) for f in values])
 
-    def check_args(self):
-        """Checks whether the frequency has been set in the commandline arguments."""
+    async def coro_check_args(self):
+        """
+        Checks whether the frequency has been set in the commandline arguments and, if so, uses it.
+        """
+        await asyncio.sleep(0.4)
+
         freq: float = args.args_freq()
         if freq:
             self.frequency = freq

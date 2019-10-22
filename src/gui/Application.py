@@ -36,8 +36,8 @@ class Application(QApplication):
 
     windows = []
 
-    def __init__(self, args):
-        super(Application, self).__init__(args)
+    def __init__(self, _args):
+        super(Application, self).__init__(_args)
         self.setup_event_loop()
         self.start_launcher()
 
