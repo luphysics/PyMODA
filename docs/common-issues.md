@@ -95,10 +95,18 @@ Uninstalling Python 3.7 and installing Python 3.6 appears to fix the issue. Pyth
 
 ### Solution
 
+Uninstall PyQt5 and PyQt5-sip:
+
 ```
-# Note: on macOS/Linux, replace "pip" with "pip3".
-pip install pyqt5-sip
-pip install pyqt5
+# If you get an error, run in an administrator terminal on Windows 
+# or prefix with 'sudo' on macOS/Linux.
+pip uninstall pyqt5-sip pyqt5 -y
+```
+
+Install them again:
+
+```
+pip install pyqt5-sip pyqt5 --user
 ```
 
 ---

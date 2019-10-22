@@ -106,26 +106,52 @@ An alias will be created, which adds the terminal command `pymoda` to launch PyM
 
 ## Performance and efficiency
 
+### Concurrency
+
 When performing multiple discrete calculations - for example, the wavelet transform of 6 signals - PyMODA uses multiprocessing to greatly increase efficiency by allocating different calculations to different CPU cores.
 
 Therefore, it is more efficient to transform multiple signals if possible. Efficiency will plateau when the number of signals is higher than the number of CPU cores.
 
-| Operation | CPU cores/threads | Total time: individually ("Transform Single" for all) | Total time: simultaneously ("Transform All") | Performance improvement |
-| ------------- | ------------- | ------------- | ------ | ------ |
-| WT on 2 signals | i7-6700 (4 cores, 8 threads) | 10s | 5.4s | x1.9 |
-| WT on 6 signals | i7-6700 (4 cores, 8 threads) | 30s | 8.4s | x3.6 |
-| WT on 32 signals | i7-6700 (4 cores, 8 threads) | 160s | 43.1s | x3.7 |
-| WT on 32 signals | Ryzen 3700X (8 cores, 16 threads) | 157s | 34.5s | x4.55 |
+#### AMD Ryzen 3700X
 
-> Note: the i7-6700 was tested on Linux, while the Ryzen 3700X was running Windows. This causes differences in performance.
+The AMD Ryzen 3700X is an 8-core, 16-thread CPU.
+
+| Operation | Total time: individually ("Transform Single" for all) | Total time: simultaneously ("Transform All") | Performance improvement |
+| ------------- | ------------- | ------ | ------ |
+| WT on 32 signals | 134s | 19.1s | x7.0 |
+
+> Note: These tests were run on Manjaro Linux.
+
+#### Intel i7-6700
+
+The Intel i7-6700 is a 4-core, 8-thread CPU.
+
+| Operation | Total time: individually ("Transform Single" for all) | Total time: simultaneously ("Transform All") | Performance improvement |
+| ------------- | ------------- | ------ | ------ |
+| WT on 2 signals | 10s | 5.4s | x1.9 |
+| WT on 6 signals | 30s | 8.4s | x3.6 |
+| WT on 32 signals | 160s | 43.1s | x3.7 |
+
+> Note: These tests were run on KDE neon.
 
 ### Windows vs Linux
 
-Linux performs similarly to Windows with 6 signals, but significantly better with 32 signals.
+Linux performs slightly better than Windows with a small number of signals, and significantly better with many signals.
 
-| Operation | Time (Windows) | Time (Linux) | 
-| -----     | -----     | -----     |
-| WT on 6 signals | 17.5s | 17.4s | 
-| WT on 32 signals | 82s | 74s | 
+#### AMD Ryzen 3700X (physical system)
 
-> Note: These tests were performed with a Windows 10 virtual machine and a Manjaro Linux virtual machine. Both were running in Virtualbox with 4 cores and 14GB of memory allocated, on a physical system with an i7-6700.
+These tests were performed using a Ryzen 3700X system.
+
+| Operating system | Time: WT on 1 signal | Time: WT on 32 signals |
+| ---- | ---- | ---- |
+| Windows 10 | 4.7s | 33.1s | 
+| Manjaro Linux | 4.2s | 19.1s | 
+
+#### Intel i7-6700 (virtual machine)
+
+These tests were performed using virtual machines on an i7-6700 system running KDE neon. Each VM had 4 logical cores and 14GB RAM.
+
+| Operating system | Time: WT on 6 signals | Time: WT on 32 signals |
+| ---- | ---- | ---- |
+| Windows 10 (VM) | 17.5s | 82s | 
+| Manjaro Linux (VM) | 17.4s | 74s |

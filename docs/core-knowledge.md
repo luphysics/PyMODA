@@ -4,7 +4,6 @@
 
 - [Core knowledge](#core-knowledge)
   - [Opening a terminal](#opening-a-terminal)
-  - [Administrator/elevated terminal](#administratorelevated-terminal)
   - [Changing directory](#changing-directory)
   - [Opening a terminal in a specific folder](#opening-a-terminal-in-a-specific-folder)
   - [Using Python from the terminal](#using-python-from-the-terminal)
@@ -26,7 +25,7 @@ On Windows 10, press `Win`+`X` to open the menu over the start button. Then pres
 
 On older versions of Windows, press `Win`+`R`, type `powershell` and press enter. If this doesn't work, use `cmd` instead of `powershell`.
 
-> Note: You can use either Cmd or Powershell, but Powershell is the default in recent versions of Windows 10. Powershell is preferred, since it is more powerful and user-friendly.
+> Note: You can use either Cmd or Powershell, but Powershell is the default in recent versions of Windows 10. Powershell is more powerful and user-friendly.
 
 ### macOS
 
@@ -38,33 +37,9 @@ This varies between distributions, but `Ctrl`+`Alt`+`T` is a common shortcut to 
 
 ---
 
-## Administrator/elevated terminal
-
-Some tasks, such as installing Python packages, may require you to run a command with elevated or administrator privileges.
-
-### Windows
-
-On Windows 10, press `Win`+`X` to open the menu over the start button. Then press `A` to open an administrator Powershell. Any command executed in this window will run with elevated permissions.
-
-On previous versions of Windows, search for Powershell, right-click on it and click "Run as administrator". If Powershell is not available, replace with Command Prompt.
-
-### macOS/Linux
-
-macOS and Linux have a different permissions system to Windows. Instead of opening a new terminal, simply prefix every command with `sudo`.
-
-```
-# Needs elevated permissions.
-pip3 install numpy   
-
-# Fixed: now runs with elevated permissions. 
-sudo pip3 install numpy
-```
-
----
-
 ## Changing directory
 
-The terminal always has a working directory. Unless you provide a relative or absolute path to a file, the file can only be accessed when inside the terminal's working directory. The working directory is displayed to the left of the cursor.
+The terminal always has a working directory. Unless you provide a relative or absolute path to a file, the file can only be accessed when inside the terminal's working directory. The current working directory is displayed to the left of the cursor.
 
 To change your working directory, use the `cd` command followed by the relative or absolute path to the target directory. 
 
@@ -98,8 +73,6 @@ It can often be easier to open a terminal in a specific folder instead of changi
 
 In file explorer, ensure that nothing is selected and then `Shift`+`Right-click` on an empty area of the folder. Click `Open Powershell here` in the context menu.
 
-> Note: an elevated terminal cannot be opened in a specific folder. `cd` must be used.
-
 ### macOS
 
 macOS does not implement this functionality. You must open a terminal and `cd` to the target directory.
@@ -128,7 +101,7 @@ The command for Python 3.x is usually `python3`, while `python` refers to Python
 
 Some Linux distributions have a version of `python3` which is too old to meet the requirements. In this case, you may need to install a newer version; for example, on Ubuntu you can use the [deadsnakes PPA](https://launchpad.net/~deadsnakes/+archive/ubuntu/ppa) to install newer Python versions. 
 
-If you've installed a newer Python version, it will have a specific command such as `python3.8`. Use it instead of `python3`.
+> Note: If you've installed a newer Python version, it will have a specific command such as `python3.8`. Use it instead of `python3`.
 
 ---
 
@@ -136,7 +109,7 @@ If you've installed a newer Python version, it will have a specific command such
 
 `pip` is the Python package manager. It handles downloading and installing Python libraries from PyPI, the Python Package Index.
 
-> Note: The `pip` associated with a Python installation can always be accessed using `{python executable} -m pip`, e.g. `python3 -m pip`.
+> Note: The `pip` associated with a Python installation can always be accessed using `{python executable} -m pip`, e.g. `python3 -m pip` or `python3.8 -m pip`.
 
 > :warning: When following the docs, always substitude `pip` with the appropriate command for your system.
 
