@@ -86,7 +86,10 @@ class SelectFileDialog(QDialog, BaseUI):
 
     def setup_recent_files(self):
         files = self.settings.get_recent_files()
-        self.combo_recent.addItems(files)
+        if files:
+            self.combo_recent.addItems(files)
+        else:
+            self.disable_recent_files()
 
     def use_recent_file(self):
         file = self.combo_recent.currentText()

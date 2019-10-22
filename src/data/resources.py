@@ -30,12 +30,16 @@ def get_program_name() -> str:
     return "PyMODA"
 
 
-def path_from_file_string(str) -> str:
+def path_from_file_string(file_string: str) -> str:
     """
     Returns the file path from a file string which is
     retrieved from a drag-and-drop event.
     """
-    result = str.replace("file://", "")
+    if file_string is None:
+        raise Exception("No file provided.")
+
+    # In the case of drag-and-drop, get the path from the URI.
+    result = file_string.replace("file://", "")
     try:
         if ":" == result[2]:  # This is a Windows path; remove initial forward-slash.
             result = result[1:]

@@ -54,7 +54,10 @@ class FrequencyDialog(QDialog, BaseUI):
 
     def setup_combo(self):
         values = self.settings.get_recent_freq()
-        self.combo_recent.addItems([float_to_str(f) for f in values])
+        if values:
+            self.combo_recent.addItems([float_to_str(f) for f in values])
+        else:
+            self.disable_recent_freq()
 
     async def coro_check_args(self):
         """
