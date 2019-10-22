@@ -102,7 +102,7 @@ def _get_python_interpreter_executable() -> str:
 
 
 def _create_shortcut_mac_os() -> str:
-    return "macOS shortcuts are not supported yet."
+    return _create_shortcut_linux()
 
 
 def _get_abs_path_in_home_folder(file_name: str) -> str:
