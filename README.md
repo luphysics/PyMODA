@@ -43,19 +43,17 @@ This guide is aimed at users wishing to set up and run PyMODA. If you're interes
 
 ## Requirements
 
-- Python 3.6 or higher.
+- Python 3.6 or 3.7. Scientific distributions of Python are not officially supported.
 - [MATLAB Runtime](https://www.mathworks.com/products/compiler/matlab-runtime.html), 
-version R2019a (9.6). A license is not required.
+version R2019a (9.6). The runtime does not require a license.
 
 > :warning: Do not use a newer version of the MATLAB Runtime.
-
-> Note: The Microsoft Store release of Python is incompatible with PyMODA due to the permissions on its folders.
 
 ## Operating systems
 
 PyMODA should run on Windows, macOS and Linux. Linux performs slightly better than Windows ([see comparison](#windows-vs-linux)).
 
-> :warning: You should ensure that you are familiar with the [core knowledge](docs/core-knowledge.md) before proceeding.
+> Note: You should ensure that you are familiar with the [core knowledge](docs/core-knowledge.md) before proceeding.
 
 ## Downloading the code
 
@@ -78,17 +76,17 @@ If you prefer the Git method:
 
 When the code is downloaded and Python is installed, you'll need to install the dependencies. Open a terminal in the `PyMODA` folder and run `python packages/install.py`.
 
-> :warning: Do not run `install.py` with elevated permissions.
+> :warning: Do not run this command with elevated permissions.
 
 ## Running PyMODA
 
-To start PyMODA, run `python src/main.py` in the PyMODA folder.
+To start PyMODA, run `python src/main.py` in the `PyMODA` folder.
 
 > :warning: Linux users also need to specify the path to the MATLAB Runtime using a command-line argument (see [command-line arguments](/docs/developer-guide.md#command-line-arguments)).
 
 ## Creating a shortcut
 
-In the launcher window, click "Create shortcut" to create a shortcut to easily open PyMODA. This has different behaviour on different operating systems:
+In the launcher window, click "Create shortcut" to create a shortcut to easily open PyMODA. This has different behaviour on different operating systems.
 
 > :warning: The shortcut will need to be recreated if the path to the PyMODA folder is changed, if the folder is renamed, or if the path to the Python interpreter changes.
 
@@ -114,17 +112,15 @@ Therefore, it is more efficient to transform multiple signals if possible. Effic
 
 #### AMD Ryzen 3700X
 
-The AMD Ryzen 3700X is an 8-core, 16-thread CPU.
+The AMD Ryzen 3700X is an 8-core, 16-thread CPU. These tests were run on Manjaro Linux.
 
 | Operation | Total time: individually ("Transform Single" for all) | Total time: simultaneously ("Transform All") | Performance improvement |
 | ------------- | ------------- | ------ | ------ |
 | WT on 32 signals | 134s | 19.1s | x7.0 |
 
-> Note: These tests were run on Manjaro Linux.
-
 #### Intel i7-6700
 
-The Intel i7-6700 is a 4-core, 8-thread CPU.
+The Intel i7-6700 is a 4-core, 8-thread CPU. These tests were run on KDE neon.
 
 | Operation | Total time: individually ("Transform Single" for all) | Total time: simultaneously ("Transform All") | Performance improvement |
 | ------------- | ------------- | ------ | ------ |
@@ -132,24 +128,18 @@ The Intel i7-6700 is a 4-core, 8-thread CPU.
 | WT on 6 signals | 30s | 8.4s | x3.6 |
 | WT on 32 signals | 160s | 43.1s | x3.7 |
 
-> Note: These tests were run on KDE neon.
-
 ### Windows vs Linux
 
 Linux performs slightly better than Windows with a small number of signals, and significantly better with many signals.
 
-#### AMD Ryzen 3700X (physical system)
-
-These tests were performed using a Ryzen 3700X system.
+#### AMD Ryzen 3700X
 
 | Operating system | Time: WT on 1 signal | Time: WT on 32 signals |
 | ---- | ---- | ---- |
 | Windows 10 | 4.7s | 33.1s | 
 | Manjaro Linux | 4.2s | 19.1s | 
 
-#### Intel i7-6700 (virtual machine)
-
-These tests were performed using virtual machines on an i7-6700 system running KDE neon. Each VM had 4 logical cores and 14GB RAM.
+#### Intel i7-6700
 
 | Operating system | Time: WT on 6 signals | Time: WT on 32 signals |
 | ---- | ---- | ---- |

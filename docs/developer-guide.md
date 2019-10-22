@@ -104,7 +104,7 @@ PyMODA consists of 5 main windows, whose names are abbreviated in the codebase. 
 
 ### Libraries
 
-PyMODA uses `multiprocess` and `asyncio`.
+PyMODA uses `multiprocess`, `asyncio`, `asyncqt` and `AsyncProcessScheduler`.
 
 #### multiprocess
 
@@ -138,116 +138,19 @@ Coroutines shouldn't be used to run intensive code on the main thread, because i
 
 `asyncqt` is a library which allows the `asyncio` event loop to be set to a Qt event loop. Coroutines running on this event loop are able to safely interact with the GUI.
 
+#### AsyncProcessScheduler
+
+`AsyncProcessScheduler` is a library which contains the `Scheduler` and `Task` classes. `Scheduler` provides an easy way to execute and receive results from multiple processes, returning results directly in a coroutine instead of using a callback-based system. See the [documentation](https://github.com/CabbageDevelopment/async-process-scheduler) for more details.
+
 ### Implementation
 
-PyMODA's concurrency is centred around the `Scheduler`, `Task` and `MPHandler` classes. 
-
-#### Task
-
-`Task` is a simple class which contains a process and a queue. The queue should have been passed to the process when it was instantiated, and the process should put data in the queue instead of returning it. 
-
-Task is able to determine whether it has finished by checking if the queue is empty.
-
-#### Scheduler
-
-`Scheduler` provides an abstract way to execute and receive results from multiple processes. A key feature of `Scheduler` is that it can return results from `Task` objects directly in a coroutine, which greatly simplifies the data flow over a callback-based design. 
-
-A `Scheduler` instance contains a list of `Task` objects, and when started it will handle scheduling the tasks to run efficiently based on CPU core count and CPU usage. A scheduler is started by calling the async function `coro_run()`, which schedules all tasks until complete and then returns the results as a list of tuples. Each tuple in the list corresponds to the result of one task. 
-
-> Note: `coro_run()` now returns ordered results; i.e. the `i`-th item in the returned list will be the result of the `i`-th task added to the Scheduler.
-
-![Diagram demonstrating how Scheduler operates.](/docs/images/scheduler.png)
-
-Below is a simplified code sample demonstrating the basic usage of the Scheduler class. Points to note:
-
-- For simplicity, the code sample makes no reference to PyQt. The `MyWindow` class is not actually a window.
-- In PyMODA, code in the window class should not be responsible for handling calculations. This is the presenter's job.
-- In PyMODA, the presenter doesn't directly interact with `Scheduler`; it uses `MPHandler`.
-- For `asyncio` to work in PyQt, the event loop must be set in the application. This only needs to be done once in the program's lifecycle, and it is already implemented in `Application.py`.
-
-```python
-class MyWindow:
-
-    def do_calculation(self):
-        """
-        Starts the coroutine to perform the calculation.
-        """
-        asyncio.ensure_future(self.coro_calculate())
-
-    async def coro_calculate(self):
-        """
-        Performs the calculation and plots the result.
-        """
-        # Store to prevent garbage collection.
-        self.scheduler = Scheduler(self.on_progress)
-
-        num_tasks = 16  # The number of processes to run.
-
-        # Generate some random data to supply to the processes.
-        inputs = [random.randint(2, 7) for _ in range(num_tasks)]
-
-        for i in range(num_tasks):
-            queue = Queue()
-
-            # Tuple containing the arguments which are passed to the process.
-            _args = (queue, inputs[i])
-
-            process = Process(target=long_function, args=_args)
-            self.scheduler.add_task(Task(process, queue))
-
-        # Now we can start the scheduler and wait for the results without blocking the main thread.
-        data: List[tuple] = await self.scheduler.coro_run()
-
-        # Note: `data` is a list containing one tuple from each process.
-
-        # The result from the first process.
-        first_result = data[0]
-        x, y, status = first_result
-
-        self.plot(x, y) # Plot the result in the GUI. 
-
-    def on_progress(self, num_completed: int, num_total: int):
-        """
-        This function takes the number of tasks completed 
-        and the total number of tasks being run. 
-        
-        Pretend that it is used to update a progress bar.
-        """
-
-    def plot(self, x, y):
-        """
-        Pretend that this function plots the results.
-        """
-
-def long_function(queue: Queue, n: int):
-    """
-    Function which simulates a long-running calculation.
-
-    This function will be called in another process.
-    """
-    # Pretend that this is a long, useful calculation.
-    time.sleep(n + 1)
-
-    # Pretend that this is a useful result of the calculation.
-    x, y, status = 4, 8, "success"
-    
-    # Instead of returning values, add them to the queue.
-    queue.put((
-        x,
-        y,
-        status,
-    ))
-
-if __name__ == "__main__":
-    window = MyWindow()
-    window.do_calculation()
-```
+Most of PyMODA's concurrency is provided by the `MPHandler` class.
 
 #### MPHandler
 
 `MPHandler` is an intermediary between GUI code and `Scheduler`. It contains functions which create a Scheduler and use it to run mathematical operations in a coroutine.
 
-> Note: A reference to an `MPHandler` must be stored in GUI-related code to prevent it from being garbage-collected, and allow the processes to be terminated.
+> :warning: A reference to an `MPHandler` must be stored in GUI-related code to prevent it from being garbage-collected, and allow the processes to be terminated.
 
 #### Overview
 
