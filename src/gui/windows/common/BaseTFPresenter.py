@@ -17,7 +17,6 @@ import asyncio
 
 from gui.dialogs.ErrorBox import ErrorBox
 from gui.windows.common.BaseTFWindow import BaseTFWindow
-from maths.algorithms.preprocessing import preprocess
 from maths.signals.Signals import Signals
 from maths.signals.TimeSeries import TimeSeries
 from processes.MPHandler import MPHandler
@@ -40,7 +39,10 @@ class BaseTFPresenter:
         self.selected_signal_name: str = None
         self.open_file: str = None
         self.freq: float = None
+
         self.mp_handler: MPHandler = None
+        self.preproc_mp_handler: MPHandler = None
+
         self.logger: WindowLogger = stdout_redirect.WindowLogger(self.on_log)
 
         errorhandling.subscribe(self.on_error)
@@ -145,10 +147,6 @@ class BaseTFPresenter:
     def on_signal_selected(self, item):
         pass
 
-    def get_total_tasks_count(self) -> int:
-        """Returns the total number of tasks in progress."""
-        return 0
-
     def get_selected_signal(self) -> TimeSeries:
         """Returns the currently selected signal as a TimeSeries."""
         return self.signals.get(self.selected_signal_name)
@@ -162,11 +160,13 @@ class BaseTFPresenter:
         Coroutine to preprocess the signal and plot the result.
         """
         sig = self.get_selected_signal()
-
         fmin = self.view.get_fmin()
         fmax = self.view.get_fmax()
 
-        p = preprocess(sig.signal, sig.frequency, fmin, fmax)
-        self.view.plot_preprocessed_signal(sig.times, sig.signal, p)
+        if not self.preproc_mp_handler:
+            self.preproc_mp_handler = MPHandler()
 
-        # TODO: use MPHandler to preprocess on another process.
+        result = await self.preproc_mp_handler.coro_preprocess(sig, fmin, fmax)
+
+        if result and result[0] is not None:
+            self.view.plot_preprocessed_signal(sig.times, sig.signal, result[0])

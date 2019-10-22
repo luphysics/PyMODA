@@ -39,9 +39,6 @@ class TFPresenter(BaseTFPresenter):
         self.view: TFWindow = view
         self.is_calculating_all = True
 
-    def get_total_tasks_count(self) -> int:
-        return len(self.signals) if self.is_calculating_all else 1
-
     def calculate(self, calculate_all: bool):
         """Calculates the desired transform(s), and plots the result."""
         asyncio.ensure_future(self.coro_calculate(calculate_all))
@@ -70,7 +67,6 @@ class TFPresenter(BaseTFPresenter):
         self.view.amplitude_plot().set_log_scale(logarithmic=log)
 
         self.view.on_calculate_started()
-        self.view.update_progress(0, self.get_total_tasks_count())
 
         all_data = await self.mp_handler.coro_transform(
             params, self.on_progress_updated
@@ -201,7 +197,6 @@ class TFPresenter(BaseTFPresenter):
         """Called when the time-series data has been loaded."""
         self.view.update_signal_listview(self.signals.names())
         self.plot_signal()
-        self.plot_preprocessed_signal()
 
     def on_signal_selected(self, item: Union[QListWidgetItem, str]):
         """
@@ -222,3 +217,5 @@ class TFPresenter(BaseTFPresenter):
             self.plot_signal()
             self.view.on_xlim_edited()
             self.plot_output()
+
+            self.plot_preprocessed_signal()

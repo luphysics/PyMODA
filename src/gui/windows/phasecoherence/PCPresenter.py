@@ -190,12 +190,3 @@ class PCPresenter(BaseTFPresenter):
             surr_method=self.view.get_surr_method(),
             surr_enabled=self.view.get_surr_enabled(),
         )
-
-    def get_total_tasks_count(self) -> int:
-        count = len(self.signals) if self.is_calculating_all else 2
-        count += count // 2
-
-        if self.surrogates_enabled:
-            count += count * self.surrogate_count // 2
-
-        return count

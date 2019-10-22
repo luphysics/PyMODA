@@ -30,6 +30,7 @@ from maths.algorithms.multiprocessing.bispectrum_analysis import (
     _biphase,
 )
 from maths.algorithms.multiprocessing.phase_coherence import _phase_coherence
+from maths.algorithms.multiprocessing.preprocess import preprocess
 from maths.algorithms.multiprocessing.ridge_extraction import _ridge_extraction
 from maths.algorithms.multiprocessing.time_frequency import _time_frequency
 from maths.params.BAParams import BAParams
@@ -38,6 +39,7 @@ from maths.params.REParams import REParams
 from maths.params.TFParams import TFParams, _fmin, _fmax
 from maths.signals.SignalPairs import SignalPairs
 from maths.signals.Signals import Signals
+from maths.signals.TimeSeries import TimeSeries
 
 
 class MPHandler:
@@ -194,6 +196,20 @@ class MPHandler:
 
             self.scheduler.add_task(Task(p, q))
 
+        return await self.scheduler.run()
+
+    async def coro_preprocess(
+        self, signal: TimeSeries, fmin: float, fmax: float
+    ) -> List[Tuple]:
+        self.stop()
+        self.scheduler = Scheduler()
+
+        q = Queue()
+        p = Process(
+            target=preprocess, args=(q, signal.signal, signal.frequency, fmin, fmax)
+        )
+
+        self.scheduler.add_task(Task(p, q))
         return await self.scheduler.run()
 
     def stop(self):

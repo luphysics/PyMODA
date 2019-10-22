@@ -370,6 +370,8 @@ class BAPresenter(BaseTFPresenter):
             self.plot_signal_pair()
             self.view.on_xlim_edited()
 
+            self.plot_preprocessed_signal()
+
     def get_selected_signal_pair(self) -> Tuple[TimeSeries, TimeSeries]:
         """
         Gets the currently selected signal pair as a tuple containing 2 signals.
