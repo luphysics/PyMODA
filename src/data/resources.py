@@ -50,12 +50,17 @@ def path_from_file_string(file_string: str) -> str:
 
 def get(resource: string) -> str:
     """
-    Gets the path to a resource from the appropriate folder,
-    when given a name beginning with the resource type and
-    a colon. For example, `resources.get("layout:my_window.ui")`.
+    Gets the path to a resource. Can be supplied with a relative path from the res/ folder,
+    or with a name prefixed with the resource type and a colon.
+
+    The following are all valid:
+    >>> get("layout:window_time_freq.ui")
+    >>> get("layout/window_time_freq.ui")
+    >>> get("data:csv/dual_signal.csv")
+    >>> get("data/csv/dual_signal.csv")
     """
     split = resource.split(":")
-    if len(split) != 2:
+    if len(split) > 2:
         raise ResourceException(
             f"Error finding resource type for '{resource}'. Wrong number of colon separators."
         )
@@ -66,7 +71,7 @@ def get(resource: string) -> str:
     if res_type == "test":
         print("Warning: using deprecated prefix 'test' instead of 'data'.")
 
-    folder = resources_dict.get(res_type)
+    folder = resources_dict.get(res_type) or _get_base_path()
     if not folder:
         raise ResourceException(
             f"Requested resource type '{res_type}' has no associated folder."
