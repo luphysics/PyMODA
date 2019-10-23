@@ -21,7 +21,10 @@ from maths.algorithms.loop_butter import loop_butter
 from maths.signals.TimeSeries import TimeSeries
 from multiprocess import Queue, Process
 
+from processes.mp_utils import process
 
+
+@process
 def _bandpass_filter(queue: Queue, time_series: TimeSeries, fmin, fmax, fs):
     bands, _ = loop_butter(time_series.signal, fmin, fmax, fs)
     h = hilbert(bands)
@@ -29,10 +32,4 @@ def _bandpass_filter(queue: Queue, time_series: TimeSeries, fmin, fmax, fs):
     phase = np.angle(h)
     amp = np.abs(h)
 
-    queue.put((
-        time_series.name,
-        bands,
-        phase,
-        amp,
-        (fmin, fmax),
-    ))
+    queue.put((time_series.name, bands, phase, amp, (fmin, fmax)))

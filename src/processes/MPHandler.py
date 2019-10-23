@@ -30,7 +30,7 @@ from maths.algorithms.multiprocessing.bispectrum_analysis import (
     _biphase,
 )
 from maths.algorithms.multiprocessing.phase_coherence import _phase_coherence
-from maths.algorithms.multiprocessing.preprocess import preprocess
+from maths.algorithms.multiprocessing.preprocess import _preprocess
 from maths.algorithms.multiprocessing.ridge_extraction import _ridge_extraction
 from maths.algorithms.multiprocessing.time_frequency import _time_frequency
 from maths.params.BAParams import BAParams
@@ -80,7 +80,7 @@ class MPHandler:
         on_progress: Callable[[int, int], None],
     ) -> List[tuple]:
 
-        self.stop()  # Clear lists of processes, etc.
+        self.stop()
         self.scheduler = Scheduler(progress_callback=on_progress)
 
         for i in range(signals.pair_count()):
@@ -206,7 +206,7 @@ class MPHandler:
 
         q = Queue()
         p = Process(
-            target=preprocess, args=(q, signal.signal, signal.frequency, fmin, fmax)
+            target=_preprocess, args=(q, signal.signal, signal.frequency, fmin, fmax)
         )
 
         self.scheduler.add_task(Task(p, q))

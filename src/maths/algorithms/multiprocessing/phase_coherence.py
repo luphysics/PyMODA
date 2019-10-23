@@ -21,8 +21,10 @@ from maths.algorithms.surrogates import surrogate_calc
 from maths.algorithms.wpc import wphcoh, wpc
 from maths.num_utils import matlab_to_numpy
 from maths.params.PCParams import PCParams
+from processes.mp_utils import process
 
 
+@process
 def _wt_surrogate_calc(queue, wt1, surrogate, params, index):
     from maths.algorithms.matlabwrappers import wt
 
@@ -31,9 +33,10 @@ def _wt_surrogate_calc(queue, wt1, surrogate, params, index):
 
     surr_avg, _ = wphcoh(wt1, wt_surrogate)
 
-    queue.put((index, surr_avg,))
+    queue.put((index, surr_avg))
 
 
+@process
 def _phase_coherence(queue, signal_pair, params: PCParams):
     """Should not be called in the main process."""
     s1, s2 = signal_pair
@@ -60,9 +63,7 @@ def _phase_coherence(queue, signal_pair, params: PCParams):
         queues.append(q)
 
         processes.append(
-            Process(
-                target=_wt_surrogate_calc, args=(q, wt1, surrogates[i], params, i)
-            )
+            Process(target=_wt_surrogate_calc, args=(q, wt1, surrogates[i], params, i))
         )
 
     # Start processes for surrogates.
@@ -87,10 +88,4 @@ def _phase_coherence(queue, signal_pair, params: PCParams):
 
     # Put all results, including phase coherence and surrogates,
     # in the queues to be returned to the GUI.
-    queue.put((
-        signal_pair,
-        tpc,
-        pc,
-        pdiff,
-        tpc_surr,
-    ))
+    queue.put((signal_pair, tpc, pc, pdiff, tpc_surr))

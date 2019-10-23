@@ -27,9 +27,13 @@ from maths.algorithms.loop_butter import loop_butter
 from maths.algorithms.matlab_utils import sort2d
 from maths.algorithms.surrogates import surrogate_calc
 from maths.signals.TimeSeries import TimeSeries
+from processes.mp_utils import process
 
 
-def _dynamic_bayesian_inference(queue: Queue, signal1: TimeSeries, signal2: TimeSeries, params: ParamSet):
+@process
+def _dynamic_bayesian_inference(
+    queue: Queue, signal1: TimeSeries, signal2: TimeSeries, params: ParamSet
+):
     sig1 = signal1.signal
     sig2 = signal2.signal
 
@@ -53,14 +57,7 @@ def _dynamic_bayesian_inference(queue: Queue, signal1: TimeSeries, signal2: Time
 
     ### Bayesian inference ###
 
-    tm, cc, e = bayes_main(phi1,
-                           phi2,
-                           win,
-                           1 / fs,
-                           ovr,
-                           pr,
-                           0,
-                           bn)
+    tm, cc, e = bayes_main(phi1, phi2, win, 1 / fs, ovr, pr, 0, bn)
 
     from maths.algorithms.matlab_utils import zeros, mean
 
@@ -70,7 +67,7 @@ def _dynamic_bayesian_inference(queue: Queue, signal1: TimeSeries, signal2: Time
     cpl1 = zeros(N)
     cpl2 = zeros(N)
 
-    q21 = zeros((s, s, N,))
+    q21 = zeros((s, s, N))
     q12 = zeros(q21.shape)
 
     for m in range(N):
@@ -88,11 +85,13 @@ def _dynamic_bayesian_inference(queue: Queue, signal1: TimeSeries, signal2: Time
     surr2, _ = surrogate_calc(phi2, ns, "CPP", 0, fs)
 
     cc_surr: List[ndarray] = []
-    scpl1 = zeros((ns, 2,))
+    scpl1 = zeros((ns, 2))
     scpl2 = zeros(scpl1.shape)
 
     for n in range(ns):
-        _, _cc_surr, _ = bayes_main(surr1[n, :], surr2[n, :], win, 1 / fs, ovr, pr, 1, bn)
+        _, _cc_surr, _ = bayes_main(
+            surr1[n, :], surr2[n, :], win, 1 / fs, ovr, pr, 1, bn
+        )
         cc_surr.append(_cc_surr)
 
         for idx in range(len(_cc_surr)):
@@ -118,17 +117,19 @@ def _dynamic_bayesian_inference(queue: Queue, signal1: TimeSeries, signal2: Time
         surr_cpl1 = None
         surr_cpl2 = None
 
-    queue.put((
-        signal1.name,
-        tm,
-        p1,
-        p2,
-        cpl1,
-        cpl2,
-        cf1,
-        cf2,
-        mcf1,
-        mcf2,
-        surr_cpl1,
-        surr_cpl2,
-    ))
+    queue.put(
+        (
+            signal1.name,
+            tm,
+            p1,
+            p2,
+            cpl1,
+            cpl2,
+            cf1,
+            cf2,
+            mcf1,
+            mcf2,
+            surr_cpl1,
+            surr_cpl2,
+        )
+    )

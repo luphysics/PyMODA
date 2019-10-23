@@ -17,8 +17,21 @@ from multiprocess import Queue
 from numpy import ndarray
 
 from maths.algorithms import preprocessing
+from processes.mp_utils import process
 
 
-def preprocess(queue: Queue, sig: ndarray, fs: float, fmin: float, fmax: float):
+@process
+def _preprocess(
+    queue: Queue, sig: ndarray, fs: float, fmin: float, fmax: float
+) -> None:
+    """
+    Performs preprocessing on a signal
+
+    :param queue: the queue to put the output in
+    :param sig: the signal as a 1D array
+    :param fs: the sampling frequency
+    :param fmin: the minimum frequency
+    :param fmax: the maximum frequency
+    """
     result = preprocessing.preprocess(sig, fs, fmin, fmax)
     queue.put(result)

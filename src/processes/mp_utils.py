@@ -24,6 +24,26 @@ Contains functions to help with multiprocessing.
 """
 
 
+def process(func):
+    """
+    Decorator which denotes that a function should run in a separate process.
+    Functions with this decorator will not return a value, because the output
+    should be stored in a queue.
+
+    :raises: MultiProcessingException if running in the main process.
+    """
+
+    def wrapper(*args, **kwargs):
+        if is_main_process():
+            raise MultiProcessingException(
+                "Functions marked with the `process` decorator should not be called in the main process."
+            )
+
+        func(*args, **kwargs)
+
+    return wrapper
+
+
 def is_main_process() -> bool:
     """Returns whether the current process is the main process."""
     return current_process().name == "MainProcess"

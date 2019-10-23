@@ -21,8 +21,10 @@ from processes import mp_utils
 from maths.num_utils import matlab_to_numpy
 from maths.params.REParams import REParams
 from maths.signals.TimeSeries import TimeSeries
+from processes.mp_utils import process
 
 
+@process
 def _ridge_extraction(queue: Queue, time_series: TimeSeries, params: REParams):
     mp_utils.setup_matlab_runtime()
     import ridge_extraction
@@ -31,15 +33,17 @@ def _ridge_extraction(queue: Queue, time_series: TimeSeries, params: REParams):
     package = ridge_extraction.initialize()
 
     d = params.get()
-    result = package.ridge_extraction(1,
-                                      matlab.double(time_series.signal.tolist()),
-                                      params.fs,
-                                      d["fmin"],
-                                      d["fmax"],
-                                      d["CutEdges"],
-                                      d["Preprocess"],
-                                      d["Wavelet"],
-                                      nargout=6)
+    result = package.ridge_extraction(
+        1,
+        matlab.double(time_series.signal.tolist()),
+        params.fs,
+        d["fmin"],
+        d["fmax"],
+        d["CutEdges"],
+        d["Preprocess"],
+        d["Wavelet"],
+        nargout=6,
+    )
 
     transform, freq, iamp, iphi, ifreq, filtered_signal = result
 
@@ -73,17 +77,19 @@ def _ridge_extraction(queue: Queue, time_series: TimeSeries, params: REParams):
         avg_ampl[i] = np.mean(row)
         avg_pow[i] = np.mean(np.square(row))
 
-    queue.put((
-        time_series.name,
-        time_series.times,
-        freq,
-        transform,
-        amplitude,
-        powers,
-        avg_ampl,
-        avg_pow,
-        (d["fmin"], d["fmax"]),
-        filtered_signal,
-        iphi,
-        ifreq,
-    ))
+    queue.put(
+        (
+            time_series.name,
+            time_series.times,
+            freq,
+            transform,
+            amplitude,
+            powers,
+            avg_ampl,
+            avg_pow,
+            (d["fmin"], d["fmax"]),
+            filtered_signal,
+            iphi,
+            ifreq,
+        )
+    )

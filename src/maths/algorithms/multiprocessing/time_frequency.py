@@ -22,8 +22,10 @@ from multiprocess import Queue
 from maths.num_utils import matlab_to_numpy
 from maths.params.TFParams import TFParams, _wft
 from maths.signals.TimeSeries import TimeSeries
+from processes.mp_utils import process
 
 
+@process
 def _time_frequency(queue: Queue, time_series: TimeSeries, params: TFParams):
     """Should not be called in the main process."""
     # Don't move the import statements.
