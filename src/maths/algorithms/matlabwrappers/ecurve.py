@@ -18,14 +18,10 @@
 Do not import this module in the main process, or it will break Linux support
 due to issues with the LD_LIBRARY_PATH.
 """
-from processes import mp_utils
-from maths.params.REParams import REParams
-
-# This must be above the matlab imports.
-mp_utils.setup_matlab_runtime()
-
 import ecurve
 import matlab
+
+from maths.params.REParams import REParams
 
 package = ecurve.initialize()
 
@@ -44,7 +40,7 @@ def calculate(freq, fs, params: REParams) -> tuple:
         matlab.double([1]),  # Pass nothing; data is saved in cache.
         matlab.double([fs]),
         params.get(),
-        nargout=1
+        nargout=1,
     )
 
     return tfsupp

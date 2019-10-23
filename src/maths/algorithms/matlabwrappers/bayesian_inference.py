@@ -21,11 +21,12 @@ from maths.signals.TimeSeries import TimeSeries
 from processes import mp_utils
 
 
-def _moda_dynamic_bayesian_inference(queue: Queue, signal1: TimeSeries, signal2: TimeSeries, params: ParamSet):
-    mp_utils.setup_matlab_runtime()
-
+def _moda_dynamic_bayesian_inference(
+    queue: Queue, signal1: TimeSeries, signal2: TimeSeries, params: ParamSet
+):
     import full_bayesian
     import matlab
+
     package = full_bayesian.initialize()
 
     sig1 = matlab.double(signal1.signal.tolist())
@@ -42,6 +43,8 @@ def _moda_dynamic_bayesian_inference(queue: Queue, signal1: TimeSeries, signal2:
     ns = params.surr_count
     signif = params.confidence_level
 
-    result = package.full_bayesian(sig1, sig2, *int1, *int2, fs, win, pr, ovr, bn, ns, signif)
+    result = package.full_bayesian(
+        sig1, sig2, *int1, *int2, fs, win, pr, ovr, bn, ns, signif
+    )
 
     queue.put((signal1.name, *result))

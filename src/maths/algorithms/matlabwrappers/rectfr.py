@@ -18,14 +18,10 @@
 DO NOT import this module in the main process, or it will break Linux support
 due to issues with the LD_LIBRARY_PATH.
 """
-from processes import mp_utils
-from maths.params.REParams import REParams
-
-# This must be above the matlab imports.
-mp_utils.setup_matlab_runtime()
-
-import rectfr
 import matlab
+import rectfr
+
+from maths.params.REParams import REParams
 
 package = rectfr.initialize()
 

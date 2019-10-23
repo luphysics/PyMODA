@@ -32,13 +32,11 @@ def _wt_surrogate_calc(queue, wt1, surrogate, params, index):
     wt_surrogate = matlab_to_numpy(transform)
 
     surr_avg, _ = wphcoh(wt1, wt_surrogate)
-
     queue.put((index, surr_avg))
 
 
 @process
 def _phase_coherence(queue, signal_pair, params: PCParams):
-    """Should not be called in the main process."""
     s1, s2 = signal_pair
 
     wt1 = s1.output_data.values

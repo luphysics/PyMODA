@@ -18,21 +18,17 @@
 Do not import this module in the main process, or it will break Linux support
 due to issues with the LD_LIBRARY_PATH.
 """
-from processes import mp_utils
-from maths.signals.TimeSeries import TimeSeries
-
-# This must be above the WT and matlab imports.
-mp_utils.setup_matlab_runtime()
-
 import WT
 import matlab
+
+from maths.signals.TimeSeries import TimeSeries
 
 package = WT.initialize()
 
 
 def calculate(signal, params):
     """
-    Calculates the windowed Fourier transform.
+    Calculates the wavelet transform.
 
     IMPORTANT: this function should not be called directly due to issues
     with the LD_LIBRARY_PATH on Linux. Instead, use `MPHandler` to call it
@@ -41,9 +37,8 @@ def calculate(signal, params):
     if isinstance(signal, TimeSeries):
         signal = signal.signal
 
-    wt, frequency = package.wt(matlab.double([signal.tolist()]),
-                               params.fs,
-                               params.get(),
-                               nargout=2)
+    wt, frequency = package.wt(
+        matlab.double([signal.tolist()]), params.fs, params.get(), nargout=2
+    )
 
     return wt, frequency

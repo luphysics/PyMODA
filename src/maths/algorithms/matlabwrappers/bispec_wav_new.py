@@ -20,22 +20,19 @@ due to issues with the LD_LIBRARY_PATH.
 """
 from typing import Tuple
 
+import bispecWavPython
+import matlab
 import numpy as np
 from numpy import ndarray
 
 from maths.num_utils import multi_matlab_to_numpy
-from processes import mp_utils
-
-# This must be above the matlab imports.
-mp_utils.setup_matlab_runtime()
-
-import bispecWavPython
-import matlab
 
 package = bispecWavPython.initialize()
 
 
-def calculate(signal1: ndarray, signal2: ndarray, fs, params: dict) -> Tuple[ndarray, ndarray, ndarray, ndarray, dict]:
+def calculate(
+    signal1: ndarray, signal2: ndarray, fs, params: dict
+) -> Tuple[ndarray, ndarray, ndarray, ndarray, dict]:
     """
     Calculates the bispectrum of 2 signals.
 
@@ -44,19 +41,19 @@ def calculate(signal1: ndarray, signal2: ndarray, fs, params: dict) -> Tuple[nda
     safely in a new process.
     """
 
-    result = package.bispecWavPython(matlab.double(signal1),
-                                     matlab.double(signal2),
-                                     fs,
-                                     *expand(params),
-                                     nargout=5)
+    result = package.bispecWavPython(
+        matlab.double(signal1), matlab.double(signal2), fs, *expand(params), nargout=5
+    )
 
     bisp, freq, wt1, wt2, opt = result
     bisp, freq, wt1, wt2 = multi_matlab_to_numpy(bisp, freq, wt1, wt2)
 
-    opt["PadLR1"], opt["PadLR2"], opt["twf1"], opt["twf2"] = [n.tolist()[0] for n in multi_matlab_to_numpy(opt["PadLR1"],
-                                                                                   opt["PadLR2"],
-                                                                                   opt["twf1"],
-                                                                                   opt["twf2"])]
+    opt["PadLR1"], opt["PadLR2"], opt["twf1"], opt["twf2"] = [
+        n.tolist()[0]
+        for n in multi_matlab_to_numpy(
+            opt["PadLR1"], opt["PadLR2"], opt["twf1"], opt["twf2"]
+        )
+    ]
 
     output = (np.abs(bisp), freq, np.abs(wt1), np.abs(wt2), opt)
     return output

@@ -17,7 +17,6 @@
 import numpy as np
 from multiprocess import Queue
 
-from processes import mp_utils
 from maths.num_utils import matlab_to_numpy
 from maths.params.REParams import REParams
 from maths.signals.TimeSeries import TimeSeries
@@ -26,7 +25,6 @@ from processes.mp_utils import process
 
 @process
 def _ridge_extraction(queue: Queue, time_series: TimeSeries, params: REParams):
-    mp_utils.setup_matlab_runtime()
     import ridge_extraction
     import matlab
 

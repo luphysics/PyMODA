@@ -38,7 +38,7 @@ def process(func):
             raise MultiProcessingException(
                 "Functions marked with the `process` decorator should not be called in the main process."
             )
-
+        setup_matlab_runtime()
         func(*args, **kwargs)
 
     return wrapper

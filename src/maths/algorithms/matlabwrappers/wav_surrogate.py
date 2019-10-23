@@ -19,13 +19,8 @@ Do not import this module in the main process, or it will break Linux support
 due to issues with the LD_LIBRARY_PATH.
 """
 
-from processes import mp_utils
-
-# This must be above the matlab imports.
-mp_utils.setup_matlab_runtime()
-
-import wavsurrogate
 import matlab
+import wavsurrogate
 from numpy import ndarray
 
 package = wavsurrogate.initialize()

@@ -20,21 +20,18 @@ due to issues with the LD_LIBRARY_PATH.
 """
 from typing import Tuple
 
+import biphaseWavPython
+import matlab
 from numpy import ndarray
 
 from maths.num_utils import matlab_to_numpy
-from processes import mp_utils
-
-# This must be above the matlab imports.
-mp_utils.setup_matlab_runtime()
-
-import biphaseWavPython
-import matlab
 
 package = biphaseWavPython.initialize()
 
 
-def calculate(signal1: ndarray, signal2: ndarray, fs, f0, fr, opt: dict) -> Tuple[ndarray, ndarray]:
+def calculate(
+    signal1: ndarray, signal2: ndarray, fs, f0, fr, opt: dict
+) -> Tuple[ndarray, ndarray]:
     """
     Calculates the biphase and biamplitude from the bispectrum.
 
@@ -42,13 +39,15 @@ def calculate(signal1: ndarray, signal2: ndarray, fs, f0, fr, opt: dict) -> Tupl
     with the LD_LIBRARY_PATH on Linux. Instead, use `MPHandler` to call it
     safely in a new process.
     """
-    result = package.biphaseWavPython(matlab.double(signal1),
-                                      matlab.double(signal2),
-                                      fs,
-                                      f0,
-                                      matlab.double(list(fr)),
-                                      opt,
-                                      nargout=2)
+    result = package.biphaseWavPython(
+        matlab.double(signal1),
+        matlab.double(signal2),
+        fs,
+        f0,
+        matlab.double(list(fr)),
+        opt,
+        nargout=2,
+    )
 
     biamp, biphase = result
 
