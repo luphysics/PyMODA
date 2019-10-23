@@ -111,6 +111,8 @@ Using MATLAB's Library Compiler, MATLAB functions can be packaged as Python libr
 
 MATLAB has poor Linux support, and causes a library collision which prevents PyQt from functioning while the `LD_LIBRARY_PATH` environment variable is set according to its documentation. To solve this, MATLAB-packaged code must always be called from a separate process and the process must call the function `setup_matlab_runtime()`, which sets the `LD_LIBRARY_PATH` for the process, *before* importing MATLAB packages. 
 
+> Note: The `@process` decorator can now be used instead of calling `setup_matlab_runtime()`. See [@process](#process).
+
 ### Data types
 
 MATLAB can only handle certain Python data types (see [documentation](https://www.mathworks.com/help/matlab/matlab_external/pass-data-to-matlab-from-python.html)). 
@@ -185,7 +187,31 @@ Coroutines shouldn't be used to run intensive code on the main thread, because i
 
 ### Implementation
 
-Most of PyMODA's concurrency is provided by the `MPHandler` class.
+Most of PyMODA's concurrency is provided via the `MPHandler` class. Functions which will be run as separate processes are implemented in `maths.algoritms.multiprocessing`, and must be decorated with `@process` from `processes.mp_utils`.
+
+#### @process
+
+`@process` is a simple decorator with 3 purposes:
+
+- It clearly marks a function as the entry-point of a separate process.
+- It calls `setup_matlab_runtime()` to prevent errors with `LD_LIBRARY_PATH` on Linux.
+- It ensures that the function returns None, since processes should add results to a queue instead of returning values.
+
+Example usage:
+
+```python
+
+def start_process() -> None:
+    """Function which starts a process running `long_calculation`."""
+    q = Queue()
+    process = Process(target=long_calculation, args=(q,))
+    ### [Use process.] ### 
+
+@process
+def long_calculation(queue: Queue, input: ndarray) -> None:
+    ### [Long calculation which produces x, y.] ###
+    queue.put((x,y))
+```
 
 #### MPHandler
 
