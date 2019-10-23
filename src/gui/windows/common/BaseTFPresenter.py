@@ -27,6 +27,8 @@ from utils.stdout_redirect import WindowLogger
 class BaseTFPresenter:
     """
     A base presenter which handles controlling the window.
+
+    This presenter forms the base of all 5 analysis windows' presenters.
     """
 
     def __init__(self, view: BaseTFWindow):

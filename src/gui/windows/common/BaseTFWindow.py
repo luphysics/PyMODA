@@ -31,12 +31,7 @@ from utils.decorators import deprecated
 
 class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
     """
-    A base common window that handles UI-related code. Generally, the window should
-    not make decisions on its own; it should rely on the presenter to react to major
-    events such as a calculation being requested.
-
-    However, the window should handle setting up its widgets and performing tasks which are
-    only directly related to the window.
+    A base window for analysis. This window forms the base of the 5 analysis windows.
     """
 
     # The title of the window.

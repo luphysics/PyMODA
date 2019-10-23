@@ -45,11 +45,13 @@ from maths.signals.TimeSeries import TimeSeries
 class MPHandler:
     """
     A class providing functions which perform mathematical computations
-    using a Scheduler.
+    using a Scheduler. 
 
-    IMPORTANT: you should hold a reference to any instances
-    of this class to prevent them from being garbage collected
-    before completion.
+    Important:
+    - Keep a reference to any instances of `MPHandler` to prevent them from
+      being garbage collected before tasks have completed.
+    - Calling any function on a running MPHandler will stop any tasks
+      currently in progress.
     """
 
     def __init__(self):
@@ -58,7 +60,14 @@ class MPHandler:
     async def coro_transform(
         self, params: TFParams, on_progress: Callable[[int, int], None]
     ) -> List[tuple]:
+        """
+        Performs a wavelet transform or windowed Fourier transform of signals.
+        Used in "time-frequency analysis".
 
+        :param params: the parameters which are used in the algorithm
+        :param on_progress: progress callback
+        :return: list containing the output from each process
+        """
         self.stop()
         self.scheduler = Scheduler(progress_callback=on_progress)
 
@@ -79,7 +88,14 @@ class MPHandler:
         params: PCParams,
         on_progress: Callable[[int, int], None],
     ) -> List[tuple]:
+        """
+        Performs wavelet phase coherence between signal pairs. Used in "wavelet phase coherence".
 
+        :param signals: the pairs of signals
+        :param params: the parameters which are used in the algorithm
+        :param on_progress: progress callback
+        :return: list containing the output from each process
+        """
         self.stop()
         self.scheduler = Scheduler(progress_callback=on_progress)
 
@@ -96,7 +112,13 @@ class MPHandler:
     async def coro_ridge_extraction(
         self, params: REParams, on_progress: Callable[[int, int], None]
     ) -> List[tuple]:
+        """
+        Performs ridge extraction on wavelet transforms. Used in "ridge extraction and filtering".
 
+        :param params: the parameters which are used in the algorithm
+        :param on_progress: progress callback
+        :return: list containing the output from each process
+        """
         self.stop()
         self.scheduler = Scheduler(progress_callback=on_progress)
 
@@ -124,7 +146,14 @@ class MPHandler:
         intervals: tuple,
         on_progress: Callable[[int, int], None],
     ) -> List[tuple]:
+        """
+        Performs bandpass filter on signals. Used in "ridge extraction and filtering".
 
+        :param signals: the signals
+        :param intervals: the intervals to calculate bandpass filter on
+        :param on_progress: progress callback
+        :return: list containing the output from each process
+        """
         self.stop()
         self.scheduler = Scheduler(progress_callback=on_progress)
 
@@ -145,7 +174,14 @@ class MPHandler:
         paramsets: List[ParamSet],
         on_progress: Callable[[int, int], None],
     ) -> List[tuple]:
+        """
+        Performs Bayesian inference on signal pairs. Used in "dynamical Bayesian inference".
 
+        :param signals: the signals
+        :param paramsets: the parameter sets to use in the algorithm
+        :param on_progress: progress callback
+        :return: list containing the output from each process
+        """
         self.stop()
         self.scheduler = Scheduler(progress_callback=on_progress)
 
@@ -164,7 +200,15 @@ class MPHandler:
         params: BAParams,
         on_progress: Callable[[int, int], None],
     ) -> List[tuple]:
+        """
+        Performs wavelet bispectrum analysis on signal pairs.
+        Used in "wavelet bispectrum analysis".
 
+        :param signals: the signal pairs
+        :param params: the parameters to use in the algorithm
+        :param on_progress: progress callback
+        :return: list containing the output from each process
+        """
         self.stop()
         self.scheduler = Scheduler(progress_callback=on_progress)
 
@@ -184,7 +228,16 @@ class MPHandler:
         fr: Tuple[float, float],
         on_progress: Callable[[int, int], None],
     ) -> List[tuple]:
+        """
+        Calculates biphase and biamplitude. Used in "wavelet bispectrum analysis".
 
+        :param signals: the signal pairs
+        :param fs: the sampling frequency
+        :param f0: the resolution
+        :param fr: 'x' and 'y' frequencies
+        :param on_progress: progress callback
+        :return: list containing the output from each process
+        """
         self.stop()
         self.scheduler = Scheduler(progress_callback=on_progress)
 
@@ -201,6 +254,14 @@ class MPHandler:
     async def coro_preprocess(
         self, signal: TimeSeries, fmin: float, fmax: float
     ) -> List[Tuple]:
+        """
+        Performs preprocessing on a single signal.
+
+        :param signal: the signal as a 1D array
+        :param fmin: the minimum frequency
+        :param fmax: the maximum frequency
+        :return: list containing the output from each process
+        """
         self.stop()
         self.scheduler = Scheduler()
 
@@ -208,16 +269,13 @@ class MPHandler:
         p = Process(
             target=_preprocess, args=(q, signal.signal, signal.frequency, fmin, fmax)
         )
-
         self.scheduler.add_task(Task(p, q))
+
         return await self.scheduler.run()
 
     def stop(self):
         """
-        Stops the tasks in progress. The MPHandler can be reused.
-
-        Removes all items from the lists of processes, queues
-        and watchers.
+        Stops the tasks in progress. The MPHandler instance can be reused.
         """
         if self.scheduler:
             self.scheduler.terminate()
