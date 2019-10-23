@@ -10,6 +10,7 @@
   - [Error handling](#error-handling)
   - [Project structure](#project-structure)
   - [Naming conventions and code style](#naming-conventions-and-code-style)
+  - [MATLAB packages](#matlab-packages)
   - [Concurrency](#concurrency)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -48,6 +49,8 @@ Now that the Git hooks are installed, they will automatically run every time a c
 Here is an example of committing with the hooks installed. Black formats a Python file, so the commit must be run again.
 
 ![Screenshot demonstrating Git hooks.](/docs/images/git_hooks.png)
+
+> Tip: If you can't get hooks working due to Windows problems, run `pre-commit uninstall` to remove them.
 
 ## Command-line arguments
 
@@ -99,6 +102,44 @@ PyMODA consists of 5 main windows, whose names are abbreviated in the codebase. 
 | *Ridge Extraction* and Filtering  | RE | `REWindow` |
 | Wavelet *Bispectrum Analysis*  | BA | `BAWindow` |
 | *Dynamical Bayesian* Inference  | DB | `DBWindow` |
+
+## MATLAB packages
+
+Using MATLAB's Library Compiler, MATLAB functions can be packaged as Python libraries which use the MATLAB Runtime. Most of the algorithms in PyMODA use MATLAB libraries from MODA.
+
+### Linux support
+
+MATLAB has poor Linux support, and causes a library collision which prevents PyQt from functioning while the `LD_LIBRARY_PATH` environment variable is set according to its documentation. To solve this, MATLAB-packaged code must always be called from a separate process and the process must call the function `setup_matlab_runtime()`, which sets the `LD_LIBRARY_PATH` for the process, *before* importing MATLAB packages. 
+
+### Data types
+
+MATLAB can only handle certain Python data types (see [documentation](https://www.mathworks.com/help/matlab/matlab_external/pass-data-to-matlab-from-python.html)). 
+
+Numpy can convert MATLAB arrays to Numpy arrays, but Numpy arrays must be converted to Python lists before being converted to MATLAB types with `matlab.double()`. MATLAB arrays should be converted back to Numpy arrays using PyMODA's `matlab_to_numpy()`, which may be faster than `np.asarray()` in some cases.
+
+Although MATLAB can convert complex numbers, Mathworks apparently has not imagined a scenario where a user would pass an array of complex numbers to a programming toolkit which is specifically designed for advanced mathematical computations. Therefore, instead of passing a list of complex numbers, a list of the real parts and a list of the complex parts must be passed separately as MATLAB arrays and then combined in the MATLAB code. 
+
+> Note: `None` cannot be passed to MATLAB.
+
+### Unspecific errors 
+
+Errors referencing `map::at`, lacking any useful context, appear to be caused by MATLAB being unable to convert Python types to MATLAB types or vice versa. Some MODA algorithms were copied and slightly modified to avoid errors when packaged for PyMODA.
+
+### Function parameters
+
+MATLAB functions can take optional parameters, adding them to the cell array `varargin`. `varargin` must be dealt with manually, but in MODA a common approach is to take optional parameters as alternating strings and values. For example, `WT(sig, fs, "fmin", 0.1, "fmax", 5)` is equivalent to `WT(sig, fs, fmin=0.1, fmax=5)` in Python.
+
+To use `varargin`, a Python dictionary is passed to the MATLAB function. Provided that all the keys are strings and the values can be converted to MATLAB types, this will work correctly.
+
+### Performance issues
+
+There is a large performance overhead due to the conversion of Numpy arrays to lists and then the conversion of lists to MATLAB arrays. Additionally, the conversion of the returned data to Numpy arrays is extremely inefficient.
+
+### Implementation
+
+The `maths.algorithms.matlabwrappers` package contains files which form wrappers around the MATLAB code. Since these files import MATLAB functions, they must also not be imported in the main process.
+
+"Params" classes, such as `TFParams`, exist to simplify passing optional parameters to MATLAB functions. Params objects have a `get()` method which returns a dictionary with all the `None` values removed, so that it can safely be passed to MATLAB. 
 
 ## Concurrency
 
