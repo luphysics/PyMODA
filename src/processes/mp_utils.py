@@ -68,7 +68,6 @@ def setup_matlab_runtime():
     path = matlab_runtime()
     if path:
         os.environ["LD_LIBRARY_PATH"] = path
-        print(f"Set LD_LIBRARY_PATH to {path}")
 
 
 class MultiProcessingException(Exception):
