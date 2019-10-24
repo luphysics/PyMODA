@@ -62,6 +62,14 @@ class WindowParams:
     t2e = None
     t1h = None
     t2h = None
+    f0 = None
+
+    def twf(self,t):
+      raise NotImplemented('Twf is not implemented. Alter the has_twf property')
+
+    @property
+    def has_twf(self):
+      return False
 
     def __str__(self):
       sbuf = []
@@ -80,15 +88,81 @@ class WindowParams:
       sbuf.append('t1h=%s' % self.t1h)
       sbuf.append('t2h=%s' % self.t2h)
       return '\n'.join(sbuf)
+class MorseWavelet(WindowParams):
+  def __init__(self,a, f0):
+    a = float(a)
+    self.f0 = float(f0)
+    self.q = 30*np.power(f0,2)/a
+    self.__B = np.power((np.exp(1)*a/self.q),(self.q/a))
+    self.__a = a
+    self.__name = 'Morse'
+    self.xi1 = 0.
+    self.ompeak = np.power((self.q/a),(1./a))
+    self.C = (1/2)*(self.__B/a)*np.gamma(self.q/a)
+    self.D = self.C * exp(1 / (2 * self.q ** 2))
+    if self.q > 1:
+      self.D = (self.ompeak/2)*(self.__B/a)*np.gamma((self.q-1)/a)
+
+    self.fwtmax = self.fwt(self.ompeak)
+
+  @property
+  def name(self):
+    return self.__name
+
+  def module(self,xi):
+    return np.power(np.abs(self.fwt(xi)), 2)
+
+  def fwt(self,xi):
+    if np.isscalar(xi):
+      part_log = (-np.inf if xi<=0 else np.log(xi) )
+      return np.exp(-np.power(xi,self.__a)+self.q*(part_log + (1/self.__a)*np.log(exp(1)*self.__a/self.q)))
+
+    ind = np.where(xi > 0)
+    rv = np.copy(xi)
+    rv[np.where(xi <= 0)] = -np.inf
+    rv[ind] = np.log(xi[ind])
+    return np.exp(-np.power(xi,self.__a)+self.q*(rv + (1/self.__a)*np.log(exp(1)*self.__a/self.q)))
+
+class MorletWavelet(WindowParams):
+  def __init__(self,f0):
+    self.om0 = 2*np.pi*f0 
+    self.__name = 'Morlet'
+    self.D = np.inf
+    self.f0 = f0
+
+  @property
+  def has_twf(self):
+    return self.f0 >= 1
+
+  @property
+  def name(self):
+    return self.__name
+
+  def module(self,xi):
+    return np.power(np.abs(self.fwt(xi)), 2)
+
+  def twf(self,t):
+    if self.f0 >= 1:
+      return (1/np.sqrt(2*np.pi))*(np.exp(1j*self.om0*t)-np.exp(-(self.om0**2)/2))*np.exp(-np.power(t,2)/2)
+
+    raise NotImplemented('Not possible scenario. Fix the has_twf property for f0=%f' % self.__f0)
+
+  def fwt(self,xi):
+    if np.isscalar(xi):
+      return np.exp(-(1/2)*(self.om0-xi)**2) - np.exp(-(1/2)*( (self.om0**2)+(xi**2)))
+
+    return np.exp( -0.5 * np.power(self.om0-xi,2)) - np.exp ( -0.5*(np.power(self.om0,2) + np.power(xi,2 ) ) )
+
 
 class LognormWavelet(WindowParams):
-  def __init__(self,q):
-    self.q = q
+  def __init__(self,f0):
+    self.q = 2*np.pi*f0
     self.__name = 'Lognorm'
     self.xi1 = 0.
     self.ompeak = 1.
     self.C = np.sqrt(np.pi / 2) / self.q
     self.D = self.C * exp(1 / (2 * self.q ** 2))
+    self.f0 = f0
 
   @property
   def name(self):
@@ -109,10 +183,7 @@ class LognormWavelet(WindowParams):
 
 def wft(signal,
         fs,
-        on_error=lambda x: print(f"ERROR: {x}"),
-        on_warning=lambda x: print(f"Warning: {x}"),
-        window="Lognorm",
-        f0=1,
+        wp,
         fmin=None,
         fmax=None,
         fstep="auto",
@@ -122,7 +193,9 @@ def wft(signal,
         disp_mode=True,
         plot_mode=False,
         cut_edges=False,
-        nv=None):
+        nv=None,
+        on_error=lambda x: print(f"ERROR: {x}"),
+        on_warning=lambda x: print(f"Warning: {x}")):
     p = 1  # WT normalisation.
 
     fmax = fmax or fs / 2
@@ -133,17 +206,21 @@ def wft(signal,
 
     rec_flag = 1
 
-    wp = None
-
-    fwt = []
     twf = []
+    fwt = wp.fwt
+    f0 = wp.f0
+    if wp.has_twf:
+      twf = wp.twf
+    '''
     if window == "Lognorm":
         q = twopi * f0
-        wp = LognormWavelet(q)
+        wp = LognormWavelet(f0)
         #fwt = lambda xi: np.exp(-(q ** 2 / 2) * log(xi) ** 2)
 
         #FIX THIS!!
         fwt = wp.fwt#lambda xi: np.exp(-(q ** 2 / 2) * (-np.inf if xi<=0 else np.log(xi)) ** 2)
+        if wp.has_twf:
+          twf = wp.twf
 
     # TODO: Implement these later
     elif window == "Morlet":
@@ -154,11 +231,12 @@ def wft(signal,
         pass
     else:
         on_error(f"Invalid window name: {window}")
+    '''
 
     if rec_flag == 1:
         if disp_mode:
             print("Estimating window parameters.i %f" % fs)
-            parcalc(rel_to_l, L, wp, fwt, twf, disp_mode, f0, fmax,fs=fs)
+        parcalc(rel_to_l, L, wp, fwt, twf, disp_mode, f0, fmax,fs=fs)
 
     if isempty(fmin):
         fmin = wp.ompeak / twopi * (wp.t2e - wp.t1e) * fs / L
@@ -303,7 +381,6 @@ def wft(signal,
       for fn in range(SN):
         cL = int(coib1[fn] + coib2[fn])
         if cL > 0 and cL < L:
-          #pdb.set_trace()
           frn[qn:qn+cL] = fn
           ttn[qn:qn+cL] = concat([np.arange(int(coib1[fn])),np.arange(L-int(coib2[fn]),L)]).T
           qn = qn + cL
@@ -648,12 +725,12 @@ def parcalc(racc, L, wp, fwt, twf, disp_mode, f0, fmax, wavelet="Lognorm", fs=-1
         if not isempty(twf):
             wp.twf = twf
             if isempty(wp.tpeak):
-                wp.tpeak = max([min([0, wp.t2 - abs(wp.t2) / 2]), wp.t1 + abs(wp / t1) / 2])
+                wp.tpeak = np.nanmax([np.nanmin([0, wp.t2 - abs(wp.t2) / 2]), wp.t1 + abs(wp.t1) / 2])
 
                 if isfinite(wp.t1) and isfinite(wp.t2):
                     wp.tpeak = (wp.t1 + wp.t2) / 2
 
-                if twf(wp.tpeak) == 0 or isnan(twf) or not isfinite(twf(wp.tpeak)):
+                if twf(wp.tpeak) == 0 or isnan(twf(wp.tpeak)) or not isfinite(twf(wp.tpeak)):
                     cp1 = wp.tpeak * -10 ** -14
                     cp2 = wp.tpeak * 10 ** -14
                     kk = 1
@@ -697,13 +774,16 @@ def parcalc(racc, L, wp, fwt, twf, disp_mode, f0, fmax, wavelet="Lognorm", fs=-1
                 if isnan(wp.twfmax):
                     wp.twfmax = twf(wp.tpeak + 10 ** -14)
 
-            AC = \
-                quadgk(lambda u: -twf(u), wp.tpeak, xx[0, 0], MIC, 10 ** -16, 0) + \
-                quadgk(lambda u: -twf(u), xx[0, 0], xx[3, 0], MIC, 10 ** -16, 0) + \
-                quadgk(lambda u: twf(u), wp.tpeak, xx[0, 1], MIC, 10 ** -16, 0) + \
-                quadgk(lambda u: twf(u), xx[0, 1], xx[3, 1], MIC, 10 ** -16, 0)
+            AC1, ac1_err = quadgk(lambda u: -twf(u), wp.tpeak, xx[0, 0], MIC, 10 ** -16, 0) 
+            AC2, ac2_err = quadgk(lambda u: -twf(u), xx[0, 0], xx[3, 0], MIC, 10 ** -16, 0) 
+            AC3, ac3_err = quadgk(lambda u: twf(u), wp.tpeak, xx[0, 1], MIC, 10 ** -16, 0) 
+            AC4, ac4_err = quadgk(lambda u: twf(u), xx[0, 1], xx[3, 1], MIC, 10 ** -16, 0)
 
-            if AC > 10 ** -8:
+            AC = AC1 + AC2 + AC3 + AC4
+
+            # Accodding to the matlab documentation how the comparison of numbers is implemented.
+            # https://stackoverflow.com/questions/26371634/comparison-of-complex-numbers-in-matlab
+            if np.real(AC) > 10 ** -8:
                 print("WARNING: wavelet does not seem to be admissible.")
 
             if isempty(fwt):
@@ -1013,7 +1093,7 @@ def parcalc(racc, L, wp, fwt, twf, disp_mode, f0, fmax, wavelet="Lognorm", fs=-1
             lim2 = wp.t2
 
             QQ, wflag, xx, ss = sqeps(vfun, xp, lim1, lim2, racc, MIC,
-                                      8 * twopi * fmax / wp.ompeak * L / fs * asarray[-1, 1]
+                                      8 * twopi * fmax / wp.ompeak * L / fs * np.asarray([-1, 1])
                                       )
 
             wp.t1e = ss[0, 0]
@@ -1034,7 +1114,8 @@ def sqeps(vfun, xp, lim1, lim2, racc, MIC, nlims):
     shp = 0  # Peak shift - changed from 0 because of scipy algorithm behaving differently to Matlab.
 
     while not np.isfinite(vfun(xp + shp) or isnan(vfun(xp + shp))):
-        shp = kk * 10 ** -14
+        shp = kk * (10 ** -14)
+        #print(shp, vfun(xp + shp))
         kk *= -2
 
     vmax = vfun(xp + shp)
@@ -1250,7 +1331,7 @@ def sqeps(vfun, xp, lim1, lim2, racc, MIC, nlims):
         if abs(eb) < 0.5 * abs(qv):
             Q2 = Q2 + qv
 
-    QQ = np.asarray([[Q1, Q2], [-q1m, q2m]], dtype=np.float64)
+    QQ = np.asarray([[Q1, Q2], [-q1m, q2m]], dtype=np.complex64)
     xx = np.asarray((
         [x1e, x2e],
         [x1h, x2h],
