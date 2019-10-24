@@ -64,9 +64,22 @@ def nextpow2(x):
 
 
 def quadgk(func, x0, x1, limit, epsabs, epsrel):
+    '''
+    The function relies on the SciPy implementatioon of Gauss-Kronrod method.
+    The method relies on Fortran implementation and it does not handle complex numbers.
+    In the contex of PyMODA it is expected that the method should handle complex functions.
+    The simpliest approach is to integrate the real and immaginary parts separrately and then return the sum.
+    '''
     if epsrel <= 0:
         epsrel = np.max([50 * eps, 5e-29])
-    return scipy.integrate.quad(func, x0, x1, limit=limit, epsabs=epsabs, epsrel=epsrel)
+    freal = lambda x: np.real(func(x))
+    fimag = lambda x: np.imag(func(x))
+    yr, err_r = scipy.integrate.quad(freal, x0, x1, limit=limit, epsabs=epsabs, epsrel=epsrel)
+    yi, err_i = scipy.integrate.quad(freal, x0, x1, limit=limit, epsabs=epsabs, epsrel=epsrel)
+    if np.abs(yi) < np.finfo(float).eps:
+      return yr, err_r
+
+    return yr+1j*yi, err_r+err_i
 
 
 def interp1(x, y, xq):
