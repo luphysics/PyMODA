@@ -15,6 +15,7 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import pdb
 import numpy as np
+import scipy.special as spec
 
 # Names of window parameters.
 import scipy
@@ -98,10 +99,10 @@ class MorseWavelet(WindowParams):
     self.__name = 'Morse'
     self.xi1 = 0.
     self.ompeak = np.power((self.q/a),(1./a))
-    self.C = (1/2)*(self.__B/a)*np.gamma(self.q/a)
+    self.C = (1/2)*(self.__B/a)*spec.gamma(self.q/a)
     self.D = self.C * exp(1 / (2 * self.q ** 2))
     if self.q > 1:
-      self.D = (self.ompeak/2)*(self.__B/a)*np.gamma((self.q-1)/a)
+      self.D = (self.ompeak/2)*(self.__B/a)*spec.gamma((self.q-1)/a)
 
     self.fwtmax = self.fwt(self.ompeak)
 
