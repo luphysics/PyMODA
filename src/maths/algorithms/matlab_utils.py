@@ -13,7 +13,6 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-import collections
 
 import numpy as np
 import scipy
@@ -75,13 +74,16 @@ def interp1(x, y, xq):
     return f(xq)
 
 
-def sqrt(n): return np.sqrt(n)
+def sqrt(n):
+    return np.sqrt(n)
 
 
-def farr(arr): return np.asarray(arr, dtype=np.float64)
+def farr(arr):
+    return np.asarray(arr, dtype=np.float64)
 
 
-def carr(arr): return np.asarray(arr, dtype=np.complex64)
+def carr(arr):
+    return np.asarray(arr, dtype=np.complex64)
 
 
 def fminsearch(func, x0, xtol):
@@ -94,14 +96,20 @@ isnan = np.isnan
 rand = np.random.rand
 exp = np.exp
 log = np.log
+
 min = np.min
 max = np.max
+
+nanmin = np.nanmin
+nanmax = np.nanmax
+
 argmax = np.argmax
 argmin = np.argmin
 concat = np.concatenate
 
 fft = np.fft.fft
 ifft = np.fft.ifft
+linspace = np.linspace
 
 nonzero = np.nonzero
 asarray = np.asarray
@@ -109,7 +117,7 @@ cumsum = np.cumsum
 vstack = np.vstack
 hstack = np.hstack
 
-matmul = np.matmul # Note: just use the '@' operator instead.
+matmul = np.matmul  # Note: just use the '@' operator instead.
 
 conj = np.conj
 abs = np.abs
@@ -119,7 +127,6 @@ ceil = np.ceil
 arange = np.arange
 length = len
 zeros = np.zeros
-ifft = np.fft.ifft
 atan = np.arctan
 sin = np.sin
 cos = np.cos
@@ -131,16 +138,21 @@ eps = np.finfo(np.float64).eps
 inf = np.inf
 Inf = inf
 NAN = np.NaN
-linspace = np.linspace
 
 
 @deprecated
 def find(arr, condition):
     """
-    This shouldn't be used. numpy has built-in syntax for find. Examples for some array `x`:
-    >>> indices = (x < 5).nonzero()
-    >>> indices = np.nonzero(x < 5)
+    This shouldn't be used. numpy has built-in syntax for find:
+    >>> x = np.arange(0, 20)
+    >>> indices = (x < 5).nonzero() # Gets indices of elements less than 5.
+    >>> indices = np.nonzero(x < 5) # Equivalent to the above.
+
+    >>> # Gets indices of elements which are less than 5 and more than 1.
     >>> indices = np.nonzero((x < 5) & (x > 1)) # The inner brackets are important!
+
+    >>> # Gets indices of elements which are less than 5 or more than 1.
+    >>> indices = np.nonzero((x < 5) | (x > 1)) # The inner brackets are important!
     """
     l = len(arr)
     indices = []
