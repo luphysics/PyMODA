@@ -221,6 +221,6 @@ def long_calculation(queue: Queue, input: ndarray) -> None:
 
 #### Overview
 
-This diagram demonstrates how the GUI code in `TFPresenter`, the class controlling the time-frequency window, interacts with `MPHandler` and `Scheduler`.
+This diagram demonstrates how the GUI code in `TFPresenter`, the class controlling the time-frequency window, interacts with `MPHandler` and `Scheduler`. TFPresenter runs `coro_calculate()` as a coroutine on the main thread, which then waits for the results using `await` and shows them in the GUI.
 
-![Diagram demonstrating how TFPresenter, MPHandler and Scheduler interact.](/docs/images/multiprocessing.png)
+![Diagram demonstrating how TFPresenter, MPHandler and Scheduler interact.](/docs/images/TFPresenter.png)

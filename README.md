@@ -49,6 +49,8 @@ version R2019a (9.6). The runtime does not require a license.
 
 > :warning: Do not use a newer version of the MATLAB Runtime.
 
+> Note: Python 3.8 will not be supported until MATLAB R2020a launches.
+
 ## Operating systems
 
 PyMODA should run on Windows, macOS and Linux. Linux performs slightly better than Windows ([see comparison](#windows-vs-linux)).
