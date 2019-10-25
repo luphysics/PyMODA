@@ -15,6 +15,7 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import pdb
 import numpy as np
+from numpy import ndarray
 import scipy.special as spec
 
 # Names of window parameters.
@@ -206,9 +207,9 @@ class LognormWavelet(WindowParams):
 
 
 def wt(
-    signal,
-    fs,
-    wp,
+    signal: ndarray,
+    fs: float,
+    wp: WindowParams,
     fmin=None,
     fmax=None,
     fstep="auto",
