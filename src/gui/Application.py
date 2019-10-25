@@ -13,11 +13,9 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-import asyncio
 from typing import Type
 
 from PyQt5.QtWidgets import QApplication
-from asyncqt import QEventLoop
 
 from gui.windows.BaseWindow import BaseWindow
 from gui.windows.LauncherWindow import LauncherWindow
@@ -38,15 +36,7 @@ class Application(QApplication):
 
     def __init__(self, _args):
         super(Application, self).__init__(_args)
-        self.setup_event_loop()
         self.start_launcher()
-
-    def setup_event_loop(self):
-        """
-        Sets the event loop which will be used by asyncio.
-        """
-        loop = QEventLoop(self)
-        asyncio.set_event_loop(loop)
 
     def start_launcher(self):
         """Opens the launcher window which has buttons to open the other windows."""

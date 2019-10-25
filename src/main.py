@@ -13,20 +13,27 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-
+import asyncio
 import signal
 import sys
+
+from asyncqt import QEventLoop
 
 from gui.Application import Application
 from utils import errorhandling, stdout_redirect, args
 
 # The entry-point of the program.
 if __name__ == "__main__":
-    # Ensures that Ctrl-C still works.
-    signal.signal(signal.SIGINT, signal.SIG_DFL)
+    signal.signal(signal.SIGINT, signal.SIG_DFL)  # Fixes Ctrl-C behaviour.
 
     args.init(set_working_dir=True)
     errorhandling.init()
     stdout_redirect.init()
 
-    Application(sys.argv).exec()
+    app = Application(sys.argv)
+
+    loop = QEventLoop(app)
+    asyncio.set_event_loop(loop)
+
+    with loop:
+        sys.exit(loop.run_forever())
