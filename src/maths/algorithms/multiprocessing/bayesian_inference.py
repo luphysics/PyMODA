@@ -47,8 +47,8 @@ def _dynamic_bayesian_inference(
     bands2, _ = loop_butter(sig2, *interval2, fs)
     phi2 = np.angle(hilbert(bands2))
 
-    p1 = phi1
-    p2 = phi2
+    p1 = phi1.copy()
+    p2 = phi2.copy()
 
     win = params.window
     ovr = params.overlap

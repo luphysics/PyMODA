@@ -34,8 +34,8 @@ def bayes_main(ph1, ph2, win, h, ovr, pr, s, bn):
     L = 2
 
     M = np.int(M)
-    Cpr = zeros((int(M / L), L,))
-    XIpr = zeros((M, M,))
+    Cpr = zeros((int(M / L), L))
+    XIpr = zeros((M, M))
 
     if max(ph1) < twopi + 0.1:
         ph1 = np.unwrap(ph1)
@@ -49,10 +49,10 @@ def bayes_main(ph1, ph2, win, h, ovr, pr, s, bn):
 
     if m < n:
         ph1 = ph1.conj().T
-        ph2 - ph2.conj().T
+        ph2 = ph2.conj().T
 
     s = np.int(ceil((len(ps) - win) / w))
-    e = zeros((s, s, s,))
+    e = zeros((s, s, s))
 
     w = np.int(w)
     win = np.int(win)
@@ -60,10 +60,12 @@ def bayes_main(ph1, ph2, win, h, ovr, pr, s, bn):
     r = np.int(np.floor((len(ps) - win) / w)) + 1
     cc = zeros((r, Cpr.size))
     for i in range(r):
-        phi1 = ph1[i * w: i * w + win]
-        phi2 = ph2[i * w: i * w + win]
+        phi1 = ph1[i * w : i * w + win]
+        phi2 = ph2[i * w : i * w + win]
 
-        Cpt, XIpt, E = bayesPhs(Cpr, XIpr, h, 500, 1e-5, phi1.conj().T, phi2.conj().T, bn)
+        Cpt, XIpt, E = bayesPhs(
+            Cpr, XIpr, h, 500, 1e-5, phi1.conj().T, phi2.conj().T, bn
+        )
 
         XIpr, Cpr = Propagation_function_XIpt(Cpt, XIpt, pw)
 
@@ -78,7 +80,7 @@ def bayes_main(ph1, ph2, win, h, ovr, pr, s, bn):
 def Propagation_function_XIpt(Cpt, XIpt, p):
     Cpr = Cpt
 
-    Inv_Diffusion = zeros((len(XIpt), len(XIpt),))
+    Inv_Diffusion = zeros((len(XIpt), len(XIpt)))
     invXIpt = np.linalg.inv(XIpt)
 
     for i in range(len(Cpt[:])):
@@ -125,7 +127,7 @@ def calculateP(phi1, phi2, K, bn):
     bn = np.int(bn)
     K = np.int(K)
 
-    p = zeros((K, len(phi1),))
+    p = zeros((K, len(phi1)))
 
     p[0, :] = 1
     br = 1
@@ -157,7 +159,7 @@ def calculateP(phi1, phi2, K, bn):
 def calculateV(phi1, phi2, K, bn, mr):
     bn = np.int(bn)
     K = np.int(K)
-    v = zeros((K, len(phi1),))
+    v = zeros((K, len(phi1)))
 
     br = 1
 
@@ -209,7 +211,7 @@ def calculateV(phi1, phi2, K, bn, mr):
 
 
 def calculateE(c, phiT, L, h, p):
-    E = zeros((L, L,))
+    E = zeros((L, L))
 
     mul = np.matmul(c, p)
     sub = phiT - mul
@@ -226,34 +228,38 @@ def calculateC(E, p, v1, v2, Cpr, XIpr, M, L, phiT, h):
     K = np.int(K)
     M = np.int(M)
 
-    XIpt = zeros((M, M,))
+    XIpt = zeros((M, M))
     Cpt = zeros(Cpr.shape)
 
     mul = matmul(p, p.conj().T)
 
     XIpt[:K, :K] = XIpr[:K, :K] + h * invr[0, 0] * mul
-    XIpt[:K, K:2 * K] = XIpr[:K, K:2 * K] + h * invr[0, 1] * mul
-    XIpt[K:2 * K, :K] = XIpr[K:2 * K, :K] + h * invr[1, 1] * mul
-    XIpt[K:2 * K, K:2 * K] = XIpr[K:2 * K, K:2 * K] + h * invr[1, 1] * mul
+    XIpt[:K, K : 2 * K] = XIpr[:K, K : 2 * K] + h * invr[0, 1] * mul
+    XIpt[K : 2 * K, :K] = XIpr[K : 2 * K, :K] + h * invr[1, 1] * mul
+    XIpt[K : 2 * K, K : 2 * K] = XIpr[K : 2 * K, K : 2 * K] + h * invr[1, 1] * mul
 
     # Evaluate from temp r.
-    r = zeros((K, L,))
+    r = zeros((K, L))
     ED = backslash(E, phiT)
 
     sum_v1 = sum(v1, axis=1)
     # sum_v1 = sum_v1.reshape(len(sum_v1), 1)
 
-    r[:, 0] = matmul(XIpr[:K, :K], Cpr[:, 0]) \
-              + matmul(XIpr[:K, K:2 * K], Cpr[:, 1]) \
-              + h * (matmul(p, ED[0, :].conj().T) - 0.5 * sum_v1)
+    r[:, 0] = (
+        matmul(XIpr[:K, :K], Cpr[:, 0])
+        + matmul(XIpr[:K, K : 2 * K], Cpr[:, 1])
+        + h * (matmul(p, ED[0, :].conj().T) - 0.5 * sum_v1)
+    )
 
-    r[:, 1] = matmul(XIpr[K:2 * K, :K], Cpr[:, 0]) \
-              + matmul(XIpr[K:2 * K, K:2 * K], Cpr[:, 1]) \
-              + h * (matmul(p, ED[1, :].conj().T) - 0.5 * sum_v1)
+    r[:, 1] = (
+        matmul(XIpr[K : 2 * K, :K], Cpr[:, 0])
+        + matmul(XIpr[K : 2 * K, K : 2 * K], Cpr[:, 1])
+        + h * (matmul(p, ED[1, :].conj().T) - 0.5 * sum_v1)
+    )
 
     C = backslash(XIpt, concat([r[:, 0], r[:, 1]])).conj().T
     Cpt[:, 0] = C[:K]
-    Cpt[:, 1] = C[K:2 * K]
+    Cpt[:, 1] = C[K : 2 * K]
 
     return Cpt, XIpt
 
@@ -314,8 +320,8 @@ def CFprint(cc, bn):
     t1 = arange(0, twopi, 0.13)
     t2 = arange(0, twopi, 0.13)
 
-    q1 = zeros((len(t1), len(t1),))
-    q1[:len(t1), :len(t1)] = 0
+    q1 = zeros((len(t1), len(t1)))
+    q1[: len(t1), : len(t1)] = 0
 
     q2 = np.copy(q1)
 
@@ -327,36 +333,56 @@ def CFprint(cc, bn):
             br = 1
 
             for ii in range(1, bn + 1):
-                q1[i1, j1] = q1[i1, j1] + u[br] * sin(ii * t1[i1]) + u[br + 1] * cos(ii * t1[i1])
-                q2[i1, j1] = q2[i1, j1] + u[K + br] * sin(ii * t2[j1]) + u[K + br + 1] * cos(ii * t2[j1])
+                q1[i1, j1] = (
+                    q1[i1, j1] + u[br] * sin(ii * t1[i1]) + u[br + 1] * cos(ii * t1[i1])
+                )
+                q2[i1, j1] = (
+                    q2[i1, j1]
+                    + u[K + br] * sin(ii * t2[j1])
+                    + u[K + br + 1] * cos(ii * t2[j1])
+                )
 
                 br += 2
 
             for ii in range(1, bn + 1):
-                q1[i1, j1] = q1[i1, j1] + u[br] * sin(ii * t2[j1]) + u[br + 1] * cos(ii * t2[j1])
-                q2[i1, j1] = q2[i1, j1] + u[K + br] * sin(ii * t1[i1]) + u[K + br + 1] * cos(ii * t1[i1])
+                q1[i1, j1] = (
+                    q1[i1, j1] + u[br] * sin(ii * t2[j1]) + u[br + 1] * cos(ii * t2[j1])
+                )
+                q2[i1, j1] = (
+                    q2[i1, j1]
+                    + u[K + br] * sin(ii * t1[i1])
+                    + u[K + br + 1] * cos(ii * t1[i1])
+                )
 
                 br += 2
 
             for ii in range(1, bn + 1):
                 for jj in range(1, bn + 1):
-                    q1[i1, j1] = q1[i1, j1] \
-                                 + u[br] * sin(ii * t1[i1] \
-                                               + jj * t2[j1]) + u[br + 1] * cos(ii * t1[i1] + jj * t2[j1])
+                    q1[i1, j1] = (
+                        q1[i1, j1]
+                        + u[br] * sin(ii * t1[i1] + jj * t2[j1])
+                        + u[br + 1] * cos(ii * t1[i1] + jj * t2[j1])
+                    )
 
-                    q2[i1, j1] = q2[i1, j1] \
-                                 + u[K + br] * sin(ii * t1[i1] + jj * t2[j1]) \
-                                 + u[K + br + 1] * cos(ii * t1[i1] + jj * t2[j1])
+                    q2[i1, j1] = (
+                        q2[i1, j1]
+                        + u[K + br] * sin(ii * t1[i1] + jj * t2[j1])
+                        + u[K + br + 1] * cos(ii * t1[i1] + jj * t2[j1])
+                    )
 
                     br += 2
 
-                    q1[i1, j1] = q1[i1, j1] \
-                                 + u[br] * sin(ii * t1[i1] - jj * t2[j1]) \
-                                 + u[br + 1] * cos(ii * t1[i1] - jj * t2[j1])
+                    q1[i1, j1] = (
+                        q1[i1, j1]
+                        + u[br] * sin(ii * t1[i1] - jj * t2[j1])
+                        + u[br + 1] * cos(ii * t1[i1] - jj * t2[j1])
+                    )
 
-                    q2[i1, j1] = q2[i1, j1] \
-                                 + u[K + br] * sin(ii * t1[i1] - jj * t2[j1]) \
-                                 + u[K + br + 1] * cos(ii * t1[i1] - jj * t2[j1])
+                    q2[i1, j1] = (
+                        q2[i1, j1]
+                        + u[K + br] * sin(ii * t1[i1] - jj * t2[j1])
+                        + u[K + br + 1] * cos(ii * t1[i1] - jj * t2[j1])
+                    )
 
                     br += 2
 
