@@ -205,7 +205,7 @@ class LognormWavelet(WindowParams):
         return np.exp(-(self.q ** 2 / 2) * rv)
 
 
-def wft(
+def wt(
     signal,
     fs,
     wp,
@@ -1956,7 +1956,7 @@ if __name__ == "__main__":
     t = np.arange(0, 50, 1 / fs)
     signal = np.cos(twopi * 3 * t + 0.75 * np.sin(twopi * t / 5))
 
-    w, f = wft(signal, fs)
+    w, f = wt(signal, fs)
 
     plt.pcolormesh(t, f, np.abs(w))
     plt.show()
