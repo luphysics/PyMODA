@@ -15,9 +15,12 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from typing import Tuple
 
-import numpy as np
 from numpy import ndarray
+from scipy.io import loadmat
 from scipy.signal import filtfilt, butter
+
+from data import resources
+from maths.algorithms.matlab_utils import *
 
 """
 Translation of MODA's `loop_butter` algorithm into Python.
@@ -26,8 +29,13 @@ STATUS: Finished, not fully working. See usage of `filtfilt` below.
 """
 
 
-def loop_butter(signal_in: ndarray, fmin: float, fmax: float, fs: float) -> Tuple[ndarray, int]:
-    max_out = np.max(signal_in)
+def loop_butter(
+    signal_in: ndarray, fmin: float, fmax: float, fs: float
+) -> Tuple[ndarray, int]:
+    if fmin > fmax:
+        fmin, fmax = fmax, fmin
+
+    max_out = max(signal_in)
     optimal_order = 1
 
     _max = 10 * max_out
@@ -46,11 +54,26 @@ def loop_butter(signal_in: ndarray, fmin: float, fmax: float, fs: float) -> Tupl
 def bandpass_butter(c: ndarray, n: int, flp: float, fhi: float, fs: float) -> ndarray:
     fnq = fs / 2
 
-    Wn = np.asarray([flp / fnq, fhi / fnq])
+    Wn = asarray([flp / fnq, fhi / fnq])
     b, a = butter(n, Wn, btype="bandpass")[:2]
 
     # Warning: this does not seem consistent with Matlab's filtfilt.
     #
     # Note: the extra parameters such as `padtype` have been added because these are the default values
     # used in the Matlab implementation. Removing them does not improve the situation.
-    return filtfilt(b, a, c, padtype="odd", padlen=3 * (max(len(b), len(a)) - 1))
+    return filtfilt(b, a, c, padtype="odd", padlen=3 * (max((len(b), len(a))) - 1))
+
+
+# Test the function.
+if __name__ == "__main__":
+    sig = [
+        i
+        for i in loadmat("../../../res/data/butter.mat").values()
+        if isinstance(i, ndarray)
+    ][0]
+    fmin = 0.081
+    fmax = 0.3
+    fs = 10
+
+    result = loop_butter(sig.reshape(sig.shape[1]), fmin, fmax, fs)
+    print(result)
