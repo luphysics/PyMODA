@@ -19,13 +19,16 @@ from numpy import ndarray
 from scipy.io import loadmat
 from scipy.signal import filtfilt, butter
 
-from data import resources
 from maths.algorithms.matlab_utils import *
 
 """
 Translation of MODA's `loop_butter` algorithm into Python.
 
 STATUS: Finished, not fully working. See usage of `filtfilt` below.
+
+UPDATE: After testing with identical inputs by using the same values 
+from a .mat file, the results are relatively similar but show differences
+at the peaks of the output. 
 """
 
 
@@ -75,5 +78,17 @@ if __name__ == "__main__":
     fmax = 0.3
     fs = 10
 
-    result = loop_butter(sig.reshape(sig.shape[1]), fmin, fmax, fs)
-    print(result)
+    loop = loop_butter(sig, fmin, fmax, fs)[0]
+    band = bandpass_butter(sig, 6, fmin, fmax, fs)
+
+    scipy.io.savemat(
+        "loop_butter.mat",
+        {
+            "python": loop,
+            "band": band,
+            "signal": sig,
+            "fmin": fmin,
+            "fmax": fmax,
+            "fs": fs,
+        },
+    )

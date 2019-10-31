@@ -20,6 +20,8 @@ Translation of the MODA Bayesian inference algorithm into Python.
 
 STATUS: Finished, but not working. Current issue: `filtfilt` in `loop_butter` is
 not giving accurate results.
+
+UPDATE: The problem may be in the value of `cc` being incorrect.
 """
 
 
@@ -52,12 +54,18 @@ def bayes_main(ph1, ph2, win, h, ovr, pr, s, bn):
         ph2 = ph2.conj().T
 
     s = np.int(ceil((len(ps) - win) / w))
-    e = zeros((s, s, s))
+    # e = zeros((s, s, s))
 
-    w = np.int(w)
-    win = np.int(win)
+    w = int(w)
+    win = int(win)
 
-    r = np.int(np.floor((len(ps) - win) / w)) + 1
+    ph1 = ph1.reshape(ph1.shape[0])
+    ph2 = ph2.reshape(ph2.shape[0])
+
+    if len(ps.shape) == 2:
+        ps = ps.reshape(ps.shape[1])
+
+    r = int(np.floor((len(ps) - win) / w)) + 1
     cc = zeros((r, Cpr.size))
     for i in range(r):
         phi1 = ph1[i * w : i * w + win]
@@ -67,17 +75,19 @@ def bayes_main(ph1, ph2, win, h, ovr, pr, s, bn):
             Cpr, XIpr, h, 500, 1e-5, phi1.conj().T, phi2.conj().T, bn
         )
 
-        XIpr, Cpr = Propagation_function_XIpt(Cpt, XIpt, pw)
+        XIpr, Cpr = propagation_function_XIpt(Cpt, XIpt, pw)
 
-        e[i, :, :] = E
+        # e[i, :, :] = E
+        # TODO: investigate whether Cpt is incorrect.
         cc[i, :] = concat([Cpt[:, i] for i in range(Cpt.shape[1])])
 
     tm = arange(win / 2, len(ph1) - win / 2, w) * h
 
-    return tm, cc, e
+    # Note: 'e' was removed because it was causing a bug and is never used.
+    return tm, cc  # , e
 
 
-def Propagation_function_XIpt(Cpt, XIpt, p):
+def propagation_function_XIpt(Cpt, XIpt, p):
     Cpr = Cpt
 
     Inv_Diffusion = zeros((len(XIpt), len(XIpt)))
@@ -231,7 +241,7 @@ def calculateC(E, p, v1, v2, Cpr, XIpr, M, L, phiT, h):
     XIpt = zeros((M, M))
     Cpt = zeros(Cpr.shape)
 
-    mul = matmul(p, p.conj().T)
+    mul = p @ p.conj().T
 
     XIpt[:K, :K] = XIpr[:K, :K] + h * invr[0, 0] * mul
     XIpt[:K, K : 2 * K] = XIpr[:K, K : 2 * K] + h * invr[0, 1] * mul
@@ -246,15 +256,15 @@ def calculateC(E, p, v1, v2, Cpr, XIpr, M, L, phiT, h):
     # sum_v1 = sum_v1.reshape(len(sum_v1), 1)
 
     r[:, 0] = (
-        matmul(XIpr[:K, :K], Cpr[:, 0])
-        + matmul(XIpr[:K, K : 2 * K], Cpr[:, 1])
-        + h * (matmul(p, ED[0, :].conj().T) - 0.5 * sum_v1)
+        XIpr[:K, :K] @ Cpr[:, 0]
+        + XIpr[:K, K : 2 * K] @ Cpr[:, 1]
+        + h * ((p @ ED[0, :].conj().T) - 0.5 * sum_v1)
     )
 
     r[:, 1] = (
-        matmul(XIpr[K : 2 * K, :K], Cpr[:, 0])
-        + matmul(XIpr[K : 2 * K, K : 2 * K], Cpr[:, 1])
-        + h * (matmul(p, ED[1, :].conj().T) - 0.5 * sum_v1)
+        XIpr[K : 2 * K, :K] @ Cpr[:, 0]
+        + (XIpr[K : 2 * K, K : 2 * K] @ Cpr[:, 1])
+        + h * ((p @ ED[1, :].conj().T) - 0.5 * sum_v1)
     )
 
     C = backslash(XIpt, concat([r[:, 0], r[:, 1]])).conj().T

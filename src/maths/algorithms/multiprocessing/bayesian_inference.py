@@ -17,6 +17,7 @@
 from typing import List
 
 import numpy as np
+import scipy
 from multiprocess import Queue
 from numpy import ndarray
 from scipy.signal import hilbert
@@ -47,8 +48,8 @@ def _dynamic_bayesian_inference(
     bands2, _ = loop_butter(sig2, *interval2, fs)
     phi2 = np.angle(hilbert(bands2))
 
-    p1 = phi1.copy()
-    p2 = phi2.copy()
+    p1 = phi1
+    p2 = phi2
 
     win = params.window
     ovr = params.overlap
@@ -57,7 +58,7 @@ def _dynamic_bayesian_inference(
 
     ### Bayesian inference ###
 
-    tm, cc, e = bayes_main(phi1, phi2, win, 1 / fs, ovr, pr, 0, bn)
+    tm, cc = bayes_main(phi1, phi2, win, 1 / fs, ovr, pr, 0, bn)
 
     from maths.algorithms.matlab_utils import zeros, mean
 
@@ -133,3 +134,22 @@ def _dynamic_bayesian_inference(
             surr_cpl2,
         )
     )
+
+
+if __name__ == "__main__":
+    data = scipy.io.loadmat("../bayes.mat")
+    phi1, phi2, win, fs, ovr, pr, bn = (
+        data["phi1"],
+        data["phi2"],
+        data["win"][0, 0],
+        data["fs"][0, 0],
+        data["ovr"][0, 0],
+        data["pr"][0, 0],
+        data["bn"][0, 0],
+    )
+    tm, cc = bayes_main(phi1, phi2, win, 1 / fs, ovr, pr, 0, bn)
+
+    data["py1"] = tm
+    data["py2"] = cc
+
+    scipy.io.savemat("../bayes.mat", data)
