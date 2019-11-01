@@ -119,7 +119,10 @@ def bayesPhs(Cpr, XIpr, h, max_loops, eps, phi1, phi2, bn):
     v2 = calculateV(phi1S, phi2S, K, bn, 2)
 
     C_old = Cpr
-    Cpt = Cpr
+
+    Cpt = Cpr.copy()
+    XIpt = None
+    E = None
 
     for loop in range(max_loops):
         E = calculateE(Cpt.conj().T, phiT, L, h, p)
@@ -235,8 +238,8 @@ def calculateC(E, p, v1, v2, Cpr, XIpr, M, L, phiT, h):
     K = M / L
     invr = np.linalg.inv(E)
 
-    K = np.int(K)
-    M = np.int(M)
+    K = int(K)
+    M = int(M)
 
     XIpt = zeros((M, M))
     Cpt = zeros(Cpr.shape)
@@ -245,7 +248,7 @@ def calculateC(E, p, v1, v2, Cpr, XIpr, M, L, phiT, h):
 
     XIpt[:K, :K] = XIpr[:K, :K] + h * invr[0, 0] * mul
     XIpt[:K, K : 2 * K] = XIpr[:K, K : 2 * K] + h * invr[0, 1] * mul
-    XIpt[K : 2 * K, :K] = XIpr[K : 2 * K, :K] + h * invr[1, 1] * mul
+    XIpt[K : 2 * K, :K] = XIpr[K : 2 * K, :K] + h * invr[1, 0] * mul
     XIpt[K : 2 * K, K : 2 * K] = XIpr[K : 2 * K, K : 2 * K] + h * invr[1, 1] * mul
 
     # Evaluate from temp r.
@@ -253,6 +256,7 @@ def calculateC(E, p, v1, v2, Cpr, XIpr, M, L, phiT, h):
     ED = backslash(E, phiT)
 
     sum_v1 = sum(v1, axis=1)
+    sum_v2 = sum(v2, axis=1)
     # sum_v1 = sum_v1.reshape(len(sum_v1), 1)
 
     r[:, 0] = (
@@ -264,7 +268,7 @@ def calculateC(E, p, v1, v2, Cpr, XIpr, M, L, phiT, h):
     r[:, 1] = (
         XIpr[K : 2 * K, :K] @ Cpr[:, 0]
         + (XIpr[K : 2 * K, K : 2 * K] @ Cpr[:, 1])
-        + h * ((p @ ED[1, :].conj().T) - 0.5 * sum_v1)
+        + h * ((p @ ED[1, :].conj().T) - 0.5 * sum_v2)
     )
 
     C = backslash(XIpt, concat([r[:, 0], r[:, 1]])).conj().T
