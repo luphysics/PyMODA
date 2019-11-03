@@ -42,25 +42,36 @@ def wphcoh(wt1, wt2):  # TODO: check that indices are correctly translated from 
     wt1 = wt1[:FN + 1]
     wt2 = wt2[:FN + 1]
 
+    '''
     phi1 = np.angle(wt1)
     phi2 = np.angle(wt2)
 
     phexp = np.exp(np.complex(0, 1) * (phi1 - phi2))
+    '''
 
     phcoh = np.zeros((FN, 1,), np.float64) * np.NaN
     phdiff = np.zeros((FN, 1,), np.float64) * np.NaN
 
     for fn in range(FN):
-        cphexp = phexp[fn, :]
-        cphexp = cphexp[~np.isnan(cphexp)]
+        phi1 = np.angle(wt1[fn,:])
+        phi2 = np.angle(wt2[fn,:])
+        phexp = np.exp(np.complex(0, 1) * (phi1 - phi2))
+        cphexp = phexp[~np.isnan(phexp)]
+
+        #cphexp = phexp[fn, :]
+        #cphexp = cphexp[~np.isnan(cphexp)]
 
         wt1_i = wt1[fn]
         wt2_i = wt2[fn]
 
         NL = 0
         l = min(wt1.shape[1], wt2.shape[1])
+        '''
         for j in range(l):
             NL += (0 == wt1_i[j] == wt2_i[j])
+        '''
+        n_zero_both = np.nonzero(np.logical_and((wt1_i[:l] == 0), (wt2_i[:l] == 0)))
+        NL = len(n_zero_both[0])
 
         CL = cphexp.shape[0]
         if CL > 0:
