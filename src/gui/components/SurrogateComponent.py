@@ -28,7 +28,9 @@ class SurrogateComponent:
     require the number of surrogates to be specified.
     """
 
-    def __init__(self, slider: QSlider, line_edit: QLineEdit, checkbox: QCheckBox = None):
+    def __init__(
+        self, slider: QSlider, line_edit: QLineEdit, checkbox: QCheckBox = None
+    ):
         self._slider: QSlider = slider
         self._lineedit: QLineEdit = line_edit
         self._checkbox = checkbox
@@ -102,4 +104,4 @@ class SurrogateComponent:
         return text or 0
 
     def get_surr_enabled(self) -> bool:
-        return self._checkbox and self._checkbox.isChecked()
+        return not self._checkbox or self._checkbox.isChecked()

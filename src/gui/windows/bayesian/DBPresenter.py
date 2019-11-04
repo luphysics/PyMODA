@@ -18,14 +18,15 @@ from typing import Tuple, Dict, List
 
 import numpy as np
 from PyQt5.QtWidgets import QListWidgetItem
+from numpy import ndarray
 
 from gui.dialogs.FrequencyDialog import FrequencyDialog
-from maths.signals.data.DBOutputData import DBOutputData
 from gui.windows.bayesian.ParamSet import ParamSet
 from gui.windows.common.BaseTFPresenter import BaseTFPresenter
-from processes.MPHandler import MPHandler
 from maths.signals.SignalPairs import SignalPairs
 from maths.signals.TimeSeries import TimeSeries
+from maths.signals.data.DBOutputData import DBOutputData
+from processes.MPHandler import MPHandler
 
 
 class DBPresenter(BaseTFPresenter):
@@ -48,6 +49,7 @@ class DBPresenter(BaseTFPresenter):
 
     def calculate(self, calculate_all=True):
         asyncio.ensure_future(self.coro_calculate())
+        self.view.on_calculate_started()
 
     async def coro_calculate(self):
         if self.mp_handler:
@@ -58,8 +60,6 @@ class DBPresenter(BaseTFPresenter):
             self.signals, self.get_paramsets(), self.on_progress_updated
         )
 
-        print("Dynamical Bayesian inference completed.")
-
         for d in data:
             self.on_bayesian_inference_completed(*d)
 
@@ -67,6 +67,9 @@ class DBPresenter(BaseTFPresenter):
             self.plot_bayesian()
         else:
             print("No data returned; are any parameter sets added?")
+
+        print("Dynamical Bayesian inference completed.")
+        self.view.on_calculate_stopped()
 
     def on_bayesian_inference_completed(
         self,
@@ -89,42 +92,108 @@ class DBPresenter(BaseTFPresenter):
             tm, p1, p2, cpl1, cpl2, cf1, cf2, mcf1, mcf2, surr_cpl1, surr_cpl2
         )
 
-    def plot_bayesian(self):
+    def plot_bayesian(self) -> None:
+        """
+        Plots the result of Bayesian inference, calling the correct function based
+        on whether the layout is 3 plots or 2 plots.
+        """
         signal = self.get_selected_signal_pair()[0]
 
         times = signal.times
-        data: DBOutputData = signal.db_data
+        try:
+            data: DBOutputData = signal.db_data
+        except AttributeError:
+            return
 
         if self.view.is_triple_plot:
             self.plot_bayesian2d(times, data)
         else:
             self.plot_bayesian3d(data)
 
-    def plot_bayesian2d(self, times, data):
-        self.view.db_plot_top.plot(times, data.p1)
-        self.view.db_plot_middle.plot(times, data.p2)
+    def plot_bayesian2d(self, times: ndarray, data: DBOutputData) -> None:
+        """
+        Plots the 2D data on the 3-plot layout.
 
-        self.view.db_plot_bottom.plot(data.tm, data.cpl1)
-        self.view.db_plot_bottom.plot(data.tm, data.cpl2)
+        :param times: the times to plot on the x-axes
+        :param data: the data object containing data to plot
+        """
+        top = self.view.db_plot_top
+        middle = self.view.db_plot_middle
+        bottom = self.view.db_plot_bottom
+
+        for p in (top, middle, bottom):
+            p.clear()
+
+        for p in (middle, top):
+            p.axes.xaxis.label.set_visible(False)
+            p.options.hide()
+
+        top.plot(times, data.p1)
+        middle.plot(times, data.p2)
+
+        bottom.plot(data.tm, data.cpl1)
+        bottom.plot(data.tm, data.cpl2)
 
         if data.surr_cpl1 is not None and data.surr_cpl2 is not None:
-            self.view.db_plot_bottom.plot(data.tm, data.surr_cpl1)
-            self.view.db_plot_bottom.plot(data.tm, data.surr_cpl2)
+            bottom.plot(data.tm, data.surr_cpl1)
+            bottom.plot(data.tm, data.surr_cpl2)
 
-        self.view.db_plot_bottom.set_xrange(times[0], times[-1])
+        top.update_ylabel(r"$\phi_1$")
+        middle.update_ylabel(r"$\phi_2$")
+        bottom.update_ylabel("Coupling strength")
 
-    def plot_bayesian3d(self, data):
+        bottom.axes.legend(["Data 2 -> 1", "Data 1 -> 2", "Surr 2 -> 1", "Surr 1 -> 2"])
+        bottom.set_xrange(times[0], times[-1])
+
+    def plot_bayesian3d(self, data: DBOutputData) -> None:
+        """
+        Plots the 3D data on the 2-plot layout.
+
+        :param data: the data object containing data to plot
+        """
+        left = self.view.db3d_plot_left
+        right = self.view.db3d_plot_right
+
+        for p in (left, right):
+            p.clear()
+
+        xlabel = r"$\phi_1$"
+        ylabel = r"$\phi_2$"
+        zlabel1 = r"$q_1(\phi_1,\phi_2)$"
+        zlabel2 = r"$q_2(\phi_1,\phi_2)$"
+
+        left.axes.set_xlabel(xlabel)
+        left.axes.set_ylabel(ylabel)
+        left.axes.set_zlabel(zlabel1)
+
+        right.axes.set_xlabel(xlabel)
+        right.axes.set_ylabel(ylabel)
+        right.axes.set_zlabel(zlabel2)
+
         x1 = np.arange(0, 2 * np.pi, 0.13)
         y1 = x1
 
         z1 = data.mcf1
         z2 = data.mcf2
 
-        x1, y1 = np.meshgrid(x1, y1)
-        x2, y2 = x1, y1
+        zmax = max(np.max(z1), np.max(z2))
+        zmin = min(np.min(z1), np.min(z2))
 
-        self.view.db3d_plot_left.plot(x1, y1, z1)
-        self.view.db3d_plot_right.plot(x2, y2, z2)
+        x1, y1 = np.meshgrid(x1, y1)
+
+        # Swap the x and y values to make more similar to MODA
+        # (Matlab uses right-handed basis for plotting).
+        x, y = y1, x1
+
+        left.plot(x, y, z1)
+        right.plot(x, y, z2)
+
+        for p in (left, right):
+            p.axes.set_zlim([zmin, zmax])
+
+        # TODO: why are the titles not visible?
+        left.axes.set_title("Time-averaged CF 2 -> 1")
+        right.axes.set_title("Time-averaged CF 1 -> 2")
 
     def load_data(self):
         self.signals = SignalPairs.from_file(self.open_file)

@@ -160,7 +160,11 @@ class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
         Called when a calculation starts. Enables progress bars
         and sets up cancel button.
         """
-        self.main_plot().set_in_progress(True)
+        try:
+            self.main_plot().set_in_progress(True)
+        except AttributeError:
+            pass
+
         btn = self.btn_calculate_all
 
         btn.setText("Cancel")
@@ -176,7 +180,11 @@ class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
         Called when a calculation stops. Disables progress bars
         and resets cancel button.
         """
-        self.main_plot().set_in_progress(False)
+        try:
+            self.main_plot().set_in_progress(False)
+        except AttributeError:
+            pass
+
         btn = self.btn_calculate_all
 
         btn.setText("Transform All")

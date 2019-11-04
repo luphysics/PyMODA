@@ -18,12 +18,8 @@ from gui.plotting.plots.ColorMeshPlot import colormap
 
 
 class DBPlot3d(MatplotlibWidget):
-
     def plot(self, x, y, z):
         self.axes.xaxis.set_label_position("top")
-        self.update_xlabel()
-        self.update_ylabel()
-
         self.axes.autoscale(True)
 
         self.axes.plot_surface(x, y, z, cmap=colormap())
@@ -36,6 +32,3 @@ class DBPlot3d(MatplotlibWidget):
 
     def is_3d(self) -> bool:
         return True
-
-    def get_xlabel(self):
-        return "Time (s)"

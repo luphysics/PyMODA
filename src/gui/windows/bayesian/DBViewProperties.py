@@ -13,7 +13,15 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from PyQt5.QtWidgets import QPushButton, QLineEdit, QVBoxLayout, QSlider, QListWidget, QHBoxLayout
+from PyQt5.QtWidgets import (
+    QPushButton,
+    QLineEdit,
+    QVBoxLayout,
+    QSlider,
+    QListWidget,
+    QHBoxLayout,
+    QCheckBox,
+)
 
 from gui.windows.ViewProperties import ViewProperties
 from gui.windows.bayesian.DBPlot import DBPlot
@@ -21,7 +29,6 @@ from gui.windows.bayesian.DBPlot3d import DBPlot3d
 
 
 class DBViewProperties(ViewProperties):
-
     def __init__(self):
         self.btn_add_paramset: QPushButton = None
         self.btn_delete_paramset: QPushButton = None
@@ -43,6 +50,7 @@ class DBViewProperties(ViewProperties):
 
         self.slider_surrogate: QSlider = None
         self.line_surrogate: QLineEdit = None
+        self.checkbox_surr: QCheckBox = None
 
         self.listwidget_freq_band1: QListWidget = None
         self.listwidget_freq_band2: QListWidget = None

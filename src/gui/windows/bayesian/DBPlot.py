@@ -17,9 +17,7 @@ from gui.plotting.MatplotlibWidget import MatplotlibWidget
 
 
 class DBPlot(MatplotlibWidget):
-
     def plot(self, times, values):
-        self.axes.xaxis.set_label_position("top")
         self.update_xlabel()
         self.update_ylabel()
 

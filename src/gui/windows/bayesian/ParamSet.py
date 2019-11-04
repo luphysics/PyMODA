@@ -21,16 +21,17 @@ class ParamSet:
     Represents the parameter set used by the dynamical Bayesian inference window.
     """
 
-    def __init__(self,
-                 freq_range1: Tuple[float, float],
-                 freq_range2: Tuple[float, float],
-                 window: float,
-                 propagation_const: float,
-                 surr_count: int,
-                 overlap: float,
-                 order: int,
-                 confidence_level: float
-                 ):
+    def __init__(
+        self,
+        freq_range1: Tuple[float, float],
+        freq_range2: Tuple[float, float],
+        window: float,
+        propagation_const: float,
+        surr_count: int,
+        overlap: float,
+        order: int,
+        confidence_level: float,
+    ):
         self.freq_range1 = freq_range1
         self.freq_range2 = freq_range2
         self.window = window
@@ -47,12 +48,15 @@ class ParamSet:
         # Function to use for each frequency band.
         def convert(freq: Tuple[float, float]) -> str:
             freq_range_str = ",".join([str(i) for i in freq])
-            items = [freq_range_str,
-                     self.window,
-                     self.overlap,
-                     self.propagation_const,
-                     self.order,
-                     self.confidence_level]
+            items = [
+                freq_range_str,
+                self.window,
+                self.overlap,
+                self.propagation_const,
+                self.order,
+                self.surr_count,
+                self.confidence_level,
+            ]
 
             return " | ".join([str(i) for i in items])
 
