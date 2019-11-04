@@ -67,18 +67,18 @@ def bayes_main(ph1, ph2, win, h, ovr, pr, s, bn):
 
     r = int(np.floor((len(ps) - win) / w)) + 1
     cc = zeros((r, Cpr.size))
+
     for i in range(r):
         phi1 = ph1[i * w : i * w + win]
         phi2 = ph2[i * w : i * w + win]
 
-        Cpt, XIpt, E = bayesPhs(
-            Cpr, XIpr, h, 500, 1e-5, phi1.conj().T, phi2.conj().T, bn
-        )
+        # Note: certain values of Cpt are incorrect, while some are accurate.
+        Cpt, XIpt, E = bayesPhs(Cpr, XIpr, h, 500, 1e-5, phi1, phi2, bn)
 
         XIpr, Cpr = propagation_function_XIpt(Cpt, XIpt, pw)
 
         # e[i, :, :] = E
-        # TODO: investigate whether Cpt is incorrect.
+        # TODO: investigate why Cpt is incorrect after the 4th iteration.
         cc[i, :] = concat([Cpt[:, i] for i in range(Cpt.shape[1])])
 
     tm = arange(win / 2, len(ph1) - win / 2, w) * h
@@ -93,7 +93,7 @@ def propagation_function_XIpt(Cpt, XIpt, p):
     Inv_Diffusion = zeros((len(XIpt), len(XIpt)))
     invXIpt = np.linalg.inv(XIpt)
 
-    for i in range(len(Cpt[:])):
+    for i in range(Cpt.size):
         Inv_Diffusion[i, i] = p ** 2 * invXIpt[i, i]
 
     XIpr = np.linalg.inv(invXIpt + Inv_Diffusion)
@@ -133,6 +133,7 @@ def bayesPhs(Cpr, XIpr, h, max_loops, eps, phi1, phi2, bn):
 
         C_old = Cpt
 
+    # Note: the results E, Cpt, XIpt are sometimes accurate but sometimes inaccurate.
     return Cpt, XIpt, E
 
 
@@ -226,9 +227,9 @@ def calculateV(phi1, phi2, K, bn, mr):
 def calculateE(c, phiT, L, h, p):
     E = zeros((L, L))
 
-    mul = np.matmul(c, p)
+    mul = c @ p
     sub = phiT - mul
-    E += np.matmul(sub, sub.conj().T)
+    E += sub @ sub.conj().T
     E = (h / len(phiT[0, :])) * E
 
     return E
@@ -332,12 +333,12 @@ def dirc(c, bn):
 
 def CFprint(cc, bn):
     t1 = arange(0, twopi, 0.13)
-    t2 = arange(0, twopi, 0.13)
+    t2 = t1.copy()
 
     q1 = zeros((len(t1), len(t1)))
     q1[: len(t1), : len(t1)] = 0
 
-    q2 = np.copy(q1)
+    q2 = q1.copy()
 
     u = cc
     K = np.int(len(u) / 2)
