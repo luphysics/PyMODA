@@ -86,13 +86,11 @@ def _dynamic_bayesian_inference(
     surr2, _ = surrogate_calc(phi2, ns, "CPP", 0, fs)
 
     cc_surr: List[ndarray] = []
-    scpl1 = zeros((ns, 2))
-    scpl2 = zeros(scpl1.shape)
+    scpl1 = zeros((ns, len(cc)))
+    scpl2 = scpl1.copy()
 
     for n in range(ns):
-        _, _cc_surr, _ = bayes_main(
-            surr1[n, :], surr2[n, :], win, 1 / fs, ovr, pr, 1, bn
-        )
+        _, _cc_surr = bayes_main(surr1[n, :], surr2[n, :], win, 1 / fs, ovr, pr, 1, bn)
         cc_surr.append(_cc_surr)
 
         for idx in range(len(_cc_surr)):
@@ -137,7 +135,14 @@ def _dynamic_bayesian_inference(
 
 
 if __name__ == "__main__":
-    data = scipy.io.loadmat("../bayes.mat")
+    try:
+        data = scipy.io.loadmat("../bayes.mat")
+    except FileNotFoundError:
+        import sys
+
+        print("Error: file does not exist.")
+        sys.exit(1)
+
     phi1, phi2, win, fs, ovr, pr, bn = (
         data["phi1"],
         data["phi2"],

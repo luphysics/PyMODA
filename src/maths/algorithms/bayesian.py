@@ -13,6 +13,10 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from typing import Tuple
+
+from numpy import ndarray
+
 from maths.algorithms.matlab_utils import *
 
 """
@@ -25,7 +29,7 @@ UPDATE: The problem may be in the value of `cc` being incorrect.
 """
 
 
-def bayes_main(ph1, ph2, win, h, ovr, pr, s, bn):
+def bayes_main(ph1, ph2, win, h, ovr, pr, s, bn) -> Tuple[ndarray, ndarray]:
     win /= h
 
     w = ovr * win
@@ -78,7 +82,6 @@ def bayes_main(ph1, ph2, win, h, ovr, pr, s, bn):
         XIpr, Cpr = propagation_function_XIpt(Cpt, XIpt, pw)
 
         # e[i, :, :] = E
-        # TODO: investigate why Cpt is incorrect after the 4th iteration.
         cc[i, :] = concat([Cpt[:, i] for i in range(Cpt.shape[1])])
 
     tm = arange(win / 2, len(ph1) - win / 2, w) * h
@@ -87,7 +90,7 @@ def bayes_main(ph1, ph2, win, h, ovr, pr, s, bn):
     return tm, cc  # , e
 
 
-def propagation_function_XIpt(Cpt, XIpt, p):
+def propagation_function_XIpt(Cpt, XIpt, p) -> Tuple[ndarray, ndarray]:
     Cpr = Cpt
 
     Inv_Diffusion = zeros((len(XIpt), len(XIpt)))
@@ -101,7 +104,9 @@ def propagation_function_XIpt(Cpt, XIpt, p):
     return XIpr, Cpr
 
 
-def bayesPhs(Cpr, XIpr, h, max_loops, eps, phi1, phi2, bn):
+def bayesPhs(
+    Cpr, XIpr, h, max_loops, eps, phi1, phi2, bn
+) -> Tuple[ndarray, ndarray, ndarray]:
     phi1S = (phi1[1:] + phi1[:-1]) / 2
     phi2S = (phi2[1:] + phi2[:-1]) / 2
 
@@ -133,11 +138,10 @@ def bayesPhs(Cpr, XIpr, h, max_loops, eps, phi1, phi2, bn):
 
         C_old = Cpt
 
-    # Note: the results E, Cpt, XIpt are sometimes accurate but sometimes inaccurate.
     return Cpt, XIpt, E
 
 
-def calculateP(phi1, phi2, K, bn):
+def calculateP(phi1, phi2, K, bn) -> ndarray:
     bn = np.int(bn)
     K = np.int(K)
 
@@ -170,7 +174,7 @@ def calculateP(phi1, phi2, K, bn):
     return p
 
 
-def calculateV(phi1, phi2, K, bn, mr):
+def calculateV(phi1, phi2, K, bn, mr) -> ndarray:
     bn = np.int(bn)
     K = np.int(K)
     v = zeros((K, len(phi1)))
@@ -224,7 +228,7 @@ def calculateV(phi1, phi2, K, bn, mr):
     return v
 
 
-def calculateE(c, phiT, L, h, p):
+def calculateE(c, phiT, L, h, p) -> ndarray:
     E = zeros((L, L))
 
     mul = c @ p
@@ -235,7 +239,7 @@ def calculateE(c, phiT, L, h, p):
     return E
 
 
-def calculateC(E, p, v1, v2, Cpr, XIpr, M, L, phiT, h):
+def calculateC(E, p, v1, v2, Cpr, XIpr, M, L, phiT, h) -> Tuple[ndarray, ndarray]:
     K = M / L
     invr = np.linalg.inv(E)
 
@@ -279,7 +283,7 @@ def calculateC(E, p, v1, v2, Cpr, XIpr, M, L, phiT, h):
     return Cpt, XIpt
 
 
-def dirc(c, bn):
+def dirc(c, bn) -> Tuple[ndarray, ndarray, ndarray]:
     q1 = zeros((bn * 8,))
     q2 = zeros(q1.shape)
     iq1 = 0
@@ -331,7 +335,7 @@ def dirc(c, bn):
     return cpl1, cpl2, drc
 
 
-def CFprint(cc, bn):
+def CFprint(cc, bn) -> Tuple[ndarray, ndarray, ndarray, ndarray]:
     t1 = arange(0, twopi, 0.13)
     t2 = t1.copy()
 
