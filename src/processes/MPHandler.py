@@ -16,6 +16,7 @@
 
 from typing import Callable, List, Tuple
 
+import multiprocess as mp
 from scheduler.Scheduler import Scheduler
 
 from gui.windows.bayesian.ParamSet import ParamSet
@@ -73,7 +74,12 @@ class MPHandler:
         params.remove_signals()  # Don't want to pass large unneeded object to other process.
 
         for time_series in signals:
-            self.scheduler.add(target=_time_frequency, args=(time_series, params))
+            self.scheduler.add(
+                target=_time_frequency,
+                args=(time_series, params),
+                process_type=mp.Process,
+                queue_type=mp.Queue,
+            )
 
         return await self.scheduler.run()
 
@@ -97,7 +103,11 @@ class MPHandler:
         for i in range(signals.pair_count()):
             pair = signals.get_pair_by_index(i)
             self.scheduler.add(
-                target=_phase_coherence, args=(pair, params), subtasks=params.surr_count
+                target=_phase_coherence,
+                args=(pair, params),
+                subtasks=params.surr_count,
+                process_type=mp.Process,
+                queue_type=mp.Queue,
             )
 
         return await self.scheduler.run()
@@ -126,7 +136,12 @@ class MPHandler:
                 params.set_item(_fmin, fmin)
                 params.set_item(_fmax, fmax)
 
-                self.scheduler.add(target=_ridge_extraction, args=(signals[i], params))
+                self.scheduler.add(
+                    target=_ridge_extraction,
+                    args=(signals[i], params),
+                    process_type=mp.Process,
+                    queue_type=mp.Queue,
+                )
 
         return await self.scheduler.run()
 
@@ -151,7 +166,12 @@ class MPHandler:
             fs = s.frequency
             for i in range(len(intervals)):
                 fmin, fmax = intervals[i]
-                self.scheduler.add(target=_bandpass_filter, args=(s, fmin, fmax, fs))
+                self.scheduler.add(
+                    target=_bandpass_filter,
+                    args=(s, fmin, fmax, fs),
+                    process_type=mp.Process,
+                    queue_type=mp.Queue,
+                )
 
         return await self.scheduler.run()
 
@@ -175,7 +195,10 @@ class MPHandler:
         for params in paramsets:
             for pair in signals.get_pairs():
                 self.scheduler.add(
-                    target=_dynamic_bayesian_inference, args=(*pair, params)
+                    target=_dynamic_bayesian_inference,
+                    args=(*pair, params),
+                    process_type=mp.Process,
+                    queue_type=mp.Queue,
                 )
 
         return await self.scheduler.run()
@@ -200,7 +223,11 @@ class MPHandler:
 
         for pair in signals.get_pairs():
             self.scheduler.add(
-                target=_bispectrum_analysis, args=(*pair, params), subtasks=4
+                target=_bispectrum_analysis,
+                args=(*pair, params),
+                subtasks=4,
+                process_type=mp.Process,
+                queue_type=mp.Queue,
             )
 
         return await self.scheduler.run()
@@ -228,7 +255,12 @@ class MPHandler:
 
         for pair in signals.get_pairs():
             opt = pair[0].output_data.opt
-            self.scheduler.add(target=_biphase, args=(*pair, fs, f0, fr, opt))
+            self.scheduler.add(
+                target=_biphase,
+                args=(*pair, fs, f0, fr, opt),
+                process_type=mp.Process,
+                queue_type=mp.Queue,
+            )
 
         return await self.scheduler.run()
 
@@ -247,7 +279,10 @@ class MPHandler:
         self.scheduler = Scheduler()
 
         self.scheduler.add(
-            target=_preprocess, args=(signal.signal, signal.frequency, fmin, fmax)
+            target=_preprocess,
+            args=(signal.signal, signal.frequency, fmin, fmax),
+            process_type=mp.Process,
+            queue_type=mp.Queue,
         )
         return await self.scheduler.run()
 
