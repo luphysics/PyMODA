@@ -36,9 +36,12 @@ def check_cwd() -> str:
     return new_cwd
 
 
-def run_command(command: str, verbose=False) -> Tuple[str, str]:
+def run_command(command: str, verbose=False, dry_run=False) -> Tuple[str, str]:
     print(f"Working directory: {os.getcwd()}")
     print(f"Running command: {command}", end="\n\n")
+
+    if dry_run:
+        return "", ""
 
     result = subprocess.run(
         command,
@@ -67,17 +70,46 @@ def fatal_error(message: str):
 
 
 if __name__ == "__main__":
-    assert sys.version_info >= (3, 6)
+    assert sys.version_info >= (3, 6), "You must use Python 3.6 or greater."
 
-    # Use verbose mode when "-v" is provided as an argument.
-    verbose = len(sys.argv) > 1 and "v" in sys.argv[1].lower()
+    # Set values from command-line arguments.
+    verbose = any(["v" in arg for arg in sys.argv[1:]])
+    matlab_only = any(["m" in arg for arg in sys.argv[1:]])
+    dry_run = any(["d" in arg for arg in sys.argv[1:]])
+    yes = any(["y" in arg for arg in sys.argv[1:]])
+
     if verbose:
         print("Launched in verbose mode.\n")
         time.sleep(1)
-    else:
+    if dry_run:
+        print("Launched in dry-run mode. Commands will not actually be executed.\n")
+        time.sleep(1)
+    if matlab_only:
+        print("Launched in Matlab-only mode. Only Matlab packages will be installed.\n")
+        time.sleep(1)
+    if not dry_run and not matlab_only and not yes:
         print(
-            "Launched in normal mode. Use command-line argument '-v' to launch in verbose mode.\n"
+            "\nThis script will install the required packages for the current Python interpreter. \n"
+            "The MATLAB packages will be installed from the local folders, and pip will be used \n"
+            "to install the dependencies from 'requirements.txt'.\n"
         )
+
+        print(
+            "Command-line arguments can be used with this script:\n\n"
+            "Argument\t Name\t\t Purpose\n"
+            "--------\t ----\t\t -------\n"
+            "-y\t\t N/A\t\t Runs the script without user intervention.\n"
+            "-v\t\t Verbose\t Prints the output from the commands.\n"
+            "-d\t\t Dry-run\t Prints the commands that will be run, but does not run them.\n"
+            "-m\t\t MATLAB-only\t Only installs the MATLAB packages. Does not install pip dependencies.\n\n"
+        )
+
+        try:
+            input("Press [ENTER] to proceed with current settings, or Ctrl-C to exit.")
+        except KeyboardInterrupt:
+            sys.exit(0)
+
+        print("\n\n")
 
     # Whether the OS is Windows-based.
     is_windows = "Windows" == platform.system()
@@ -102,14 +134,29 @@ if __name__ == "__main__":
         os.chdir(wd)
         os.chdir("/".join(f.replace("\\", "/").split("/")[:-1]))
 
-        out, err = run_command(f"{python} setup.py install --user", verbose=verbose)
+        out, err = run_command(
+            f"{python} setup.py install --user", verbose=verbose, dry_run=dry_run
+        )
         if verbose:
-            time.sleep(1)
+            time.sleep(0.5)
 
-    os.chdir(f"{wd}/..")
-    run_command(f"{pip} install -r requirements.txt --user", verbose=verbose)
+    if not matlab_only:
+        msg = "Please wait, the next command may take over a minute."
+        asterisks = "*" * len(msg)
+        print(f"{asterisks}\n{msg}\n{asterisks}\n")
 
-    if is_windows:
-        run_command(f"{pip} install winshell pypiwin32 --user", verbose=verbose)
+        os.chdir(f"{wd}/..")
+        run_command(
+            f"{pip} install -r requirements.txt --user",
+            verbose=verbose,
+            dry_run=dry_run,
+        )
+
+        if is_windows:
+            run_command(
+                f"{pip} install winshell pypiwin32 --user",
+                verbose=verbose,
+                dry_run=dry_run,
+            )
 
     print("\nInstall script has finished.")
