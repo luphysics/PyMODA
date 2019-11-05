@@ -14,10 +14,10 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import time
+from typing import Tuple
 
 import numpy as np
-from multiprocess import Queue
+from numpy import ndarray
 
 from maths.num_utils import matlab_to_numpy
 from maths.params.TFParams import TFParams, _wft
@@ -26,8 +26,20 @@ from processes.mp_utils import process
 
 
 @process
-def _time_frequency(queue: Queue, time_series: TimeSeries, params: TFParams):
-    """Should not be called in the main process."""
+def _time_frequency(
+    time_series: TimeSeries, params: TFParams
+) -> Tuple[str, ndarray, ndarray, ndarray, ndarray, ndarray, ndarray, ndarray]:
+    """
+    Performs a wavelet transform or windowed Fourier transform using the MATLAB-packaged libraries.
+
+    :param time_series: the signal to transform
+    :param params: the input parameters for the MATLAB package
+
+    :return: the name of the input signal; the times associated with the input signal;
+    the frequencies produced by the transform; the values of the transform itself; the amplitudes
+    of the values of the transform; the powers of the values of the transform; the average amplitudes
+    of the transform; and the average powers of the transform.
+    """
     # Don't move the import statements.
     from maths.algorithms.matlabwrappers import wft
     from maths.algorithms.matlabwrappers import wt
@@ -45,9 +57,7 @@ def _time_frequency(queue: Queue, time_series: TimeSeries, params: TFParams):
     power = np.square(amplitude)
     avg_ampl, avg_pow = avg_ampl_pow(amplitude)
 
-    print(f"Started putting items in queue at time: {time.time():.1f} seconds.")
-
-    out = (
+    return (
         time_series.name,
         time_series.times,
         freq,
@@ -58,13 +68,8 @@ def _time_frequency(queue: Queue, time_series: TimeSeries, params: TFParams):
         avg_pow,
     )
 
-    if queue:
-        queue.put(out)
-    else:
-        return out
 
-
-def avg_ampl_pow(amplitude):
+def avg_ampl_pow(amplitude) -> Tuple[ndarray, ndarray]:
     length = len(amplitude)
 
     avg_ampl = np.empty(length, dtype=np.float64)

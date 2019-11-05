@@ -15,8 +15,6 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import os
 
-from multiprocess.process import current_process
-
 from utils.args import matlab_runtime
 
 """
@@ -27,26 +25,16 @@ Contains functions to help with multiprocessing.
 def process(func):
     """
     Decorator which denotes that a function should run in a separate process.
-    Functions with this decorator will not return a value, because the output
-    should be stored in a queue.
-
-    :raises: MultiProcessingException if running in the main process.
+    This decorator ensures that the LD_LIBRARY_PATH for the MATLAB Runtime is
+    set correctly for the process when provided as a command-line argument.
     """
 
     def wrapper(*args, **kwargs):
-        if is_main_process():
-            raise MultiProcessingException(
-                "Functions marked with the `process` decorator should not be called in the main process."
-            )
         setup_matlab_runtime()
-        func(*args, **kwargs)
+        result = func(*args, **kwargs)
+        return result
 
     return wrapper
-
-
-def is_main_process() -> bool:
-    """Returns whether the current process is the main process."""
-    return current_process().name == "MainProcess"
 
 
 def setup_matlab_runtime():
@@ -58,19 +46,6 @@ def setup_matlab_runtime():
     Should not be executed in the main process, because this will
     crash PyQt on Linux.
     """
-    if is_main_process():
-        raise MultiProcessingException(
-            "Do not set the LD_LIBRARY_PATH environment variable on the main process; "
-            "it will break the program on Linux. Instead, call MATLAB code from "
-            "another process using Task and Scheduler. See MPHandler for examples"
-            "of this."
-        )
     path = matlab_runtime()
     if path:
         os.environ["LD_LIBRARY_PATH"] = path
-
-
-class MultiProcessingException(Exception):
-    """
-    Exception thrown when an error is made with multiprocessing.
-    """

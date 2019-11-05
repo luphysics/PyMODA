@@ -13,9 +13,10 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from typing import Tuple
 
 import numpy as np
-from multiprocess import Queue
+from numpy import ndarray
 
 from maths.num_utils import matlab_to_numpy
 from maths.params.REParams import REParams
@@ -24,7 +25,22 @@ from processes.mp_utils import process
 
 
 @process
-def _ridge_extraction(queue: Queue, time_series: TimeSeries, params: REParams):
+def _ridge_extraction(
+    time_series: TimeSeries, params: REParams
+) -> Tuple[
+    str,
+    ndarray,
+    ndarray,
+    ndarray,
+    ndarray,
+    ndarray,
+    ndarray,
+    ndarray,
+    Tuple[float, float],
+    ndarray,
+    ndarray,
+    ndarray,
+]:
     import ridge_extraction
     import matlab
 
@@ -75,19 +91,17 @@ def _ridge_extraction(queue: Queue, time_series: TimeSeries, params: REParams):
         avg_ampl[i] = np.mean(row)
         avg_pow[i] = np.mean(np.square(row))
 
-    queue.put(
-        (
-            time_series.name,
-            time_series.times,
-            freq,
-            transform,
-            amplitude,
-            powers,
-            avg_ampl,
-            avg_pow,
-            (d["fmin"], d["fmax"]),
-            filtered_signal,
-            iphi,
-            ifreq,
-        )
+    return (
+        time_series.name,
+        time_series.times,
+        freq,
+        transform,
+        amplitude,
+        powers,
+        avg_ampl,
+        avg_pow,
+        (d["fmin"], d["fmax"]),
+        filtered_signal,
+        iphi,
+        ifreq,
     )

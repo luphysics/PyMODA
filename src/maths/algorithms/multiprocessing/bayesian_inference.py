@@ -14,11 +14,10 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from typing import List
+from typing import List, Tuple
 
 import numpy as np
 import scipy
-from multiprocess import Queue
 from numpy import ndarray
 from scipy.signal import hilbert
 
@@ -33,8 +32,21 @@ from processes.mp_utils import process
 
 @process
 def _dynamic_bayesian_inference(
-    queue: Queue, signal1: TimeSeries, signal2: TimeSeries, params: ParamSet
-):
+    signal1: TimeSeries, signal2: TimeSeries, params: ParamSet
+) -> Tuple[
+    str,
+    ndarray,
+    ndarray,
+    ndarray,
+    ndarray,
+    ndarray,
+    ndarray,
+    ndarray,
+    ndarray,
+    ndarray,
+    ndarray,
+    ndarray,
+]:
     sig1 = signal1.signal
     sig2 = signal2.signal
 
@@ -116,21 +128,19 @@ def _dynamic_bayesian_inference(
         surr_cpl1 = None
         surr_cpl2 = None
 
-    queue.put(
-        (
-            signal1.name,
-            tm,
-            p1,
-            p2,
-            cpl1,
-            cpl2,
-            cf1,
-            cf2,
-            mcf1,
-            mcf2,
-            surr_cpl1,
-            surr_cpl2,
-        )
+    return (
+        signal1.name,
+        tm,
+        p1,
+        p2,
+        cpl1,
+        cpl2,
+        cf1,
+        cf2,
+        mcf1,
+        mcf2,
+        surr_cpl1,
+        surr_cpl2,
     )
 
 

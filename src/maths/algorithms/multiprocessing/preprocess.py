@@ -13,7 +13,6 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from multiprocess import Queue
 from numpy import ndarray
 
 from maths.algorithms import preprocessing
@@ -21,9 +20,7 @@ from processes.mp_utils import process
 
 
 @process
-def _preprocess(
-    queue: Queue, sig: ndarray, fs: float, fmin: float, fmax: float
-) -> None:
+def _preprocess(sig: ndarray, fs: float, fmin: float, fmax: float) -> ndarray:
     """
     Performs preprocessing on a signal
 
@@ -33,5 +30,4 @@ def _preprocess(
     :param fmin: the minimum frequency
     :param fmax: the maximum frequency
     """
-    result = preprocessing.preprocess(sig, fs, fmin, fmax)
-    queue.put(result)
+    return preprocessing.preprocess(sig, fs, fmin, fmax)

@@ -13,23 +13,25 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from typing import Tuple
 
 import numpy as np
 from scipy.signal import hilbert
-
+from numpy import ndarray
 from maths.algorithms.loop_butter import loop_butter
 from maths.signals.TimeSeries import TimeSeries
-from multiprocess import Queue, Process
 
 from processes.mp_utils import process
 
 
 @process
-def _bandpass_filter(queue: Queue, time_series: TimeSeries, fmin, fmax, fs):
+def _bandpass_filter(
+    time_series: TimeSeries, fmin, fmax, fs
+) -> Tuple[str, ndarray, ndarray, ndarray, Tuple[float, float]]:
     bands, _ = loop_butter(time_series.signal, fmin, fmax, fs)
     h = hilbert(bands)
 
     phase = np.angle(h)
     amp = np.abs(h)
 
-    queue.put((time_series.name, bands, phase, amp, (fmin, fmax)))
+    return time_series.name, bands, phase, amp, (fmin, fmax)

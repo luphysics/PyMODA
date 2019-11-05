@@ -14,8 +14,9 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import math
+from typing import Tuple
 
-from multiprocess import Queue
+from numpy import ndarray
 
 from maths.algorithms.matlab_utils import *
 from maths.algorithms.multiprocessing.time_frequency import avg_ampl_pow
@@ -27,14 +28,19 @@ from processes.mp_utils import process
 
 @process
 def _biphase(
-    queue: Queue,
-    sig1: TimeSeries,
-    sig2: TimeSeries,
-    fs: float,
-    f0: float,
-    fr: float,
-    opt: dict,
-) -> None:
+    sig1: TimeSeries, sig2: TimeSeries, fs: float, f0: float, fr: float, opt: dict
+) -> Tuple[
+    str,
+    Tuple[float, float],
+    ndarray,
+    ndarray,
+    ndarray,
+    ndarray,
+    ndarray,
+    ndarray,
+    ndarray,
+    ndarray,
+]:
     from maths.algorithms.matlabwrappers import biphase_wav_new
     import matlab
 
@@ -85,26 +91,44 @@ def _biphase(
     biamp4 = biamp4.reshape(l)
     biphase4 = biphase4.reshape(l)
 
-    queue.put(
-        (
-            name,
-            *fr,
-            biamp1,
-            biphase1,
-            biamp2,
-            biphase2,
-            biamp3,
-            biphase3,
-            biamp4,
-            biphase4,
-        )
+    return (
+        name,
+        *fr,
+        biamp1,
+        biphase1,
+        biamp2,
+        biphase2,
+        biamp3,
+        biphase3,
+        biamp4,
+        biphase4,
     )
 
 
 @process
 def _bispectrum_analysis(
-    queue: Queue, sig1: TimeSeries, sig2: TimeSeries, params: BAParams
-) -> None:
+    sig1: TimeSeries, sig2: TimeSeries, params: BAParams
+) -> Tuple[
+    str,
+    ndarray,
+    ndarray,
+    ndarray,
+    ndarray,
+    ndarray,
+    ndarray,
+    ndarray,
+    ndarray,
+    ndarray,
+    ndarray,
+    ndarray,
+    ndarray,
+    ndarray,
+    ndarray,
+    ndarray,
+    ndarray,
+    ndarray,
+    dict,
+]:
     from maths.algorithms.matlabwrappers import bispec_wav_new, wav_surrogate
 
     name = sig1.name
@@ -225,26 +249,24 @@ def _bispectrum_analysis(
     import time
 
     print(f"Adding to queue at time={time.time():.1f} seconds.")
-    queue.put(
-        (
-            name,
-            freq,
-            amp_wt1,
-            pow_wt1,
-            avg_amp_wt1,
-            avg_pow_wt1,
-            amp_wt2,
-            pow_wt2,
-            avg_amp_wt2,
-            avg_pow_wt2,
-            bispxxx,
-            bispppp,
-            bispxpp,
-            bisppxx,
-            surrxxx,
-            surrppp,
-            surrxpp,
-            surrpxx,
-            opt,
-        )
+    return (
+        name,
+        freq,
+        amp_wt1,
+        pow_wt1,
+        avg_amp_wt1,
+        avg_pow_wt1,
+        amp_wt2,
+        pow_wt2,
+        avg_amp_wt2,
+        avg_pow_wt2,
+        bispxxx,
+        bispppp,
+        bispxpp,
+        bisppxx,
+        surrxxx,
+        surrppp,
+        surrxpp,
+        surrpxx,
+        opt,
     )

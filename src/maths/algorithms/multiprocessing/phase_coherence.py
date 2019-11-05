@@ -13,14 +13,17 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from typing import Tuple, Union, List, Any
 
 import numpy as np
+from numpy import ndarray
 from multiprocess import Queue, Process
 
 from maths.algorithms.surrogates import surrogate_calc
 from maths.algorithms.wpc import wphcoh, wpc
 from maths.num_utils import matlab_to_numpy
 from maths.params.PCParams import PCParams
+from maths.signals.TimeSeries import TimeSeries
 from processes.mp_utils import process
 
 
@@ -36,7 +39,9 @@ def _wt_surrogate_calc(queue, wt1, surrogate, params, index):
 
 
 @process
-def _phase_coherence(queue, signal_pair, params: PCParams):
+def _phase_coherence(
+    signal_pair: Tuple[TimeSeries, TimeSeries], params: PCParams
+) -> Tuple[Tuple[TimeSeries, TimeSeries], ndarray, ndarray, ndarray, ndarray]:
     s1, s2 = signal_pair
 
     wt1 = s1.output_data.values
@@ -84,6 +89,4 @@ def _phase_coherence(queue, signal_pair, params: PCParams):
     if len(tpc_surr) > 0:
         tpc_surr = np.mean(tpc_surr, axis=0)
 
-    # Put all results, including phase coherence and surrogates,
-    # in the queues to be returned to the GUI.
-    queue.put((signal_pair, tpc, pc, pdiff, tpc_surr))
+    return signal_pair, tpc, pc, pdiff, tpc_surr

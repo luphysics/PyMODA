@@ -16,9 +16,7 @@
 
 from typing import Callable, List, Tuple
 
-from multiprocess import Queue, Process
 from scheduler.Scheduler import Scheduler
-from scheduler.Task import Task
 
 from gui.windows.bayesian.ParamSet import ParamSet
 from maths.algorithms.multiprocessing.bandpass_filter import _bandpass_filter
@@ -75,10 +73,7 @@ class MPHandler:
         params.remove_signals()  # Don't want to pass large unneeded object to other process.
 
         for time_series in signals:
-            q = Queue()
-            p = Process(target=_time_frequency, args=(q, time_series, params))
-
-            self.scheduler.add_task(Task(p, q))
+            self.scheduler.add(target=_time_frequency, args=(time_series, params))
 
         return await self.scheduler.run()
 
@@ -100,12 +95,10 @@ class MPHandler:
         self.scheduler = Scheduler(progress_callback=on_progress)
 
         for i in range(signals.pair_count()):
-            q = Queue()
-
             pair = signals.get_pair_by_index(i)
-            p = Process(target=_phase_coherence, args=(q, pair, params))
-
-            self.scheduler.add_task(Task(p, q, subtasks=params.surr_count))
+            self.scheduler.add(
+                target=_phase_coherence, args=(pair, params), subtasks=params.surr_count
+            )
 
         return await self.scheduler.run()
 
@@ -133,10 +126,7 @@ class MPHandler:
                 params.set_item(_fmin, fmin)
                 params.set_item(_fmax, fmax)
 
-                q = Queue()
-                p = Process(target=_ridge_extraction, args=(q, signals[i], params))
-
-                self.scheduler.add_task(Task(p, q))
+                self.scheduler.add(target=_ridge_extraction, args=(signals[i], params))
 
         return await self.scheduler.run()
 
@@ -161,10 +151,7 @@ class MPHandler:
             fs = s.frequency
             for i in range(len(intervals)):
                 fmin, fmax = intervals[i]
-
-                q = Queue()
-                p = Process(target=_bandpass_filter, args=(q, s, fmin, fmax, fs))
-                self.scheduler.add_task(Task(p, q))
+                self.scheduler.add(target=_bandpass_filter, args=(s, fmin, fmax, fs))
 
         return await self.scheduler.run()
 
@@ -187,10 +174,9 @@ class MPHandler:
 
         for params in paramsets:
             for pair in signals.get_pairs():
-                q = Queue()
-                p = Process(target=_dynamic_bayesian_inference, args=(q, *pair, params))
-
-                self.scheduler.add_task(Task(p, q))
+                self.scheduler.add(
+                    target=_dynamic_bayesian_inference, args=(*pair, params)
+                )
 
         return await self.scheduler.run()
 
@@ -213,10 +199,9 @@ class MPHandler:
         self.scheduler = Scheduler(progress_callback=on_progress)
 
         for pair in signals.get_pairs():
-            q = Queue()
-            p = Process(target=_bispectrum_analysis, args=(q, *pair, params))
-
-            self.scheduler.add_task(Task(p, q, subtasks=4))
+            self.scheduler.add(
+                target=_bispectrum_analysis, args=(*pair, params), subtasks=4
+            )
 
         return await self.scheduler.run()
 
@@ -242,12 +227,8 @@ class MPHandler:
         self.scheduler = Scheduler(progress_callback=on_progress)
 
         for pair in signals.get_pairs():
-            q = Queue()
-
             opt = pair[0].output_data.opt
-            p = Process(target=_biphase, args=(q, *pair, fs, f0, fr, opt))
-
-            self.scheduler.add_task(Task(p, q))
+            self.scheduler.add(target=_biphase, args=(*pair, fs, f0, fr, opt))
 
         return await self.scheduler.run()
 
@@ -265,12 +246,9 @@ class MPHandler:
         self.stop()
         self.scheduler = Scheduler()
 
-        q = Queue()
-        p = Process(
-            target=_preprocess, args=(q, signal.signal, signal.frequency, fmin, fmax)
+        self.scheduler.add(
+            target=_preprocess, args=(signal.signal, signal.frequency, fmin, fmax)
         )
-        self.scheduler.add_task(Task(p, q))
-
         return await self.scheduler.run()
 
     def stop(self):
