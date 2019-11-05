@@ -16,7 +16,7 @@
 from typing import Tuple
 
 import numpy as np
-from multiprocess import Queue, Process
+from multiprocess.pool import Pool
 from numpy import ndarray
 
 from maths.algorithms.surrogates import surrogate_calc
@@ -28,14 +28,16 @@ from processes.mp_utils import process
 
 
 @process
-def _wt_surrogate_calc(queue, wt1, surrogate, params, index):
+def _wt_surrogate_calc(args: tuple):
     from maths.algorithms.matlabwrappers import wt
+
+    wt1, surrogate, params, index = args
 
     transform, freq = wt.calculate(surrogate, params)
     wt_surrogate = matlab_to_numpy(transform)
 
     surr_avg, _ = wphcoh(wt1, wt_surrogate)
-    queue.put((index, surr_avg))
+    return index, surr_avg
 
 
 @process
@@ -56,37 +58,19 @@ def _phase_coherence(
     surr_preproc = params.surr_preproc
     surrogates, _ = surrogate_calc(s1, surr_count, surr_method, surr_preproc, fs)
 
-    tpc_surr = list(range(surr_count))
-    processes = []
-    queues = []
+    # Calculate surrogates.
+    pool = Pool()
+    args = [(wt1, surrogates[i], params, i) for i in range(surr_count)]
+    surr_results = pool.map(_wt_surrogate_calc, args)
 
-    # Create processes for surrogates.
-    for i in range(surr_count):
-        q = Queue()
-        queues.append(q)
-
-        processes.append(
-            Process(target=_wt_surrogate_calc, args=(q, wt1, surrogates[i], params, i))
-        )
-
-    # Start processes for surrogates.
-    for p in processes:
-        p.start()
-
-    # Calculate phase coherence.
-    tpc, pc, pdiff = wpc(wt1, wt2, freq, fs)
-
-    # Wait for processes to calculate surrogate results.
-    # This is fine since we're not running on the main process.
-    for p in processes:
-        p.join()
-
-    # After all processes finished, get all surrogate results.
-    for q in queues:
-        index, result = q.get()
+    tpc_surr = [None for _ in range(surr_count)]
+    for (index, result) in surr_results:
         tpc_surr[index] = result
 
     if len(tpc_surr) > 0:
         tpc_surr = np.mean(tpc_surr, axis=0)
+
+    # Calculate phase coherence.
+    tpc, pc, pdiff = wpc(wt1, wt2, freq, fs)
 
     return signal_pair, tpc, pc, pdiff, tpc_surr
