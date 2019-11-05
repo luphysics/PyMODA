@@ -13,11 +13,11 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from typing import Tuple, Union, List, Any
+from typing import Tuple
 
 import numpy as np
-from numpy import ndarray
 from multiprocess import Queue, Process
+from numpy import ndarray
 
 from maths.algorithms.surrogates import surrogate_calc
 from maths.algorithms.wpc import wphcoh, wpc

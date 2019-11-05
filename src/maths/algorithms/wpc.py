@@ -17,38 +17,52 @@
 """
 Translation of the wavelet phase coherence algorithm from MODA.
 
-STATUS: Finished, apparently working.
+STATUS: Finished. Surrogates may need improvements.
 """
+from typing import Tuple
+
 import numpy as np
-import pdb
+from numpy import ndarray
 
 
-def wpc(wt1, wt2, freq, fs, wsize=10):
+def wpc(
+    wt1: ndarray, wt2: ndarray, freq: ndarray, fs: float, wsize: int = 10
+) -> Tuple[ndarray, ndarray, ndarray]:
+    """
+    Wavelet phase coherence.
+
+    :param wt1: wavelet transform of the first signal
+    :param wt2: wavelet transform of the second signal
+    :param freq: frequencies at which transforms were calculated
+    :param fs: sampling frequency
+    :param wsize: window size
+    :return: [2D array] absolute value of time-localised phase coherence; [1D array] phase coherence; [1D array] phase difference
+    """
     tlpc = tlphcoh(wt1, wt2, freq, fs, wsize)
     pc, pdiff = wphcoh(wt1, wt2)
     return np.abs(tlpc), pc, pdiff
 
 
-def wphcoh(wt1, wt2):  # TODO: check that indices are correctly translated from matlab version
+def wphcoh(wt1: ndarray, wt2: ndarray) -> Tuple[ndarray, ndarray]:
     """
-    Wavelet phase coherence.
+    Time-averaged wavelet phase coherence.
 
-    :param wt1:
-    :param wt2:
-    :return:
+    :param wt1: wavelet transform of first signal
+    :param wt2: wavelet transform of second signal
+    :return: [1D array] phase coherence; [1D array] phase difference
     """
     FN = min(wt1.shape[0], wt2.shape[0])
 
-    wt1 = wt1[:FN + 1]
-    wt2 = wt2[:FN + 1]
+    wt1 = wt1[:FN, :]
+    wt2 = wt2[:FN, :]
 
     phi1 = np.angle(wt1)
     phi2 = np.angle(wt2)
 
-    phexp = np.exp(np.complex(0, 1) * (phi1 - phi2))
+    phexp = np.exp(1j * (phi1 - phi2))
 
-    phcoh = np.zeros((FN, 1,), np.float64) * np.NaN
-    phdiff = np.zeros((FN, 1,), np.float64) * np.NaN
+    phcoh = np.zeros((FN, 1), np.float64) * np.NaN
+    phdiff = np.zeros((FN, 1), np.float64) * np.NaN
 
     for fn in range(FN):
         cphexp = phexp[fn, :]
@@ -60,7 +74,7 @@ def wphcoh(wt1, wt2):  # TODO: check that indices are correctly translated from 
         NL = 0
         l = min(wt1.shape[1], wt2.shape[1])
         for j in range(l):
-            NL += (0 == wt1_i[j] == wt2_i[j])
+            NL += 0 == wt1_i[j] == wt2_i[j]
 
         CL = cphexp.shape[0]
         if CL > 0:
@@ -71,7 +85,9 @@ def wphcoh(wt1, wt2):  # TODO: check that indices are correctly translated from 
     return phcoh, phdiff
 
 
-def tlphcoh(wt1, wt2, freq, fs, wsize=10):  # TODO: check that indices are correctly translated from matlab version
+def tlphcoh(
+    wt1: ndarray, wt2: ndarray, freq: ndarray, fs: float, wsize: int = 10
+) -> ndarray:
     """
     Time-localized phase coherence.
 
@@ -80,26 +96,26 @@ def tlphcoh(wt1, wt2, freq, fs, wsize=10):  # TODO: check that indices are corre
     :param freq: Frequencies at which the wavelet transforms wt1 and wt2 were calculated
     :param fs: Sampling frequency
     :param wsize: Window size, default is 10 samples
-    :return: time-localized wavelet phase coherence with the same shape as wt1
+    :return: [2D array] time-localized wavelet phase coherence with the same shape as wt1
     """
     NF, L = wt1.shape
 
-    ipc = np.exp(np.complex(0, 1) * np.angle(wt1 * np.conj(wt2)))
-    zpc = ipc
+    ipc = np.exp(1j * np.angle(wt1 * wt2.conj()))
+    zpc = ipc.copy()
     zpc[np.isnan(zpc)] = 0
 
     zeros = np.zeros((NF, 1), np.complex64)
-    csum = np.cumsum(zpc, 1)
+    csum = np.cumsum(zpc, axis=1)
 
-    cum_pc = np.hstack((zeros, csum,))
+    cum_pc = np.hstack((zeros, csum))
     tpc = np.zeros((NF, L), np.complex64) * np.NaN
 
     for fn in range(NF):
-        cs = ipc[fn]
-        cumcs = cum_pc[fn]
+        cs = ipc[fn, :]
+        cumcs = cum_pc[fn, :]
 
         f = np.nonzero(~np.isnan(cs))[0]
-        window = np.round(wsize / freq[fn] * fs)#[0]
+        window = np.round(wsize / freq[fn] * fs)
         window += 1 - np.mod(window, 2)
 
         hw = np.floor(window / 2)
@@ -111,7 +127,13 @@ def tlphcoh(wt1, wt2, freq, fs, wsize=10):  # TODO: check that indices are corre
                 window = np.int(window)
                 hw = np.int(hw)
 
-                locpc = np.abs(cumcs[tn1 + window:tn2 + 1] - cumcs[tn1:tn2 - window + 1]) / window
-                tpc[fn, tn1 + hw:tn2 - hw] = locpc
+                locpc = (
+                    np.abs(
+                        cumcs[tn1 + window : tn2 + 1 + 1]
+                        - cumcs[tn1 : tn2 - window + 1 + 1]
+                    )
+                    / window
+                )
+                tpc[fn, tn1 + hw : tn2 - hw + 1] = locpc
 
-    return tpc  # TODO: check and implement 'under_sample' from matlab version
+    return tpc  # TODO: implement 'under_sample' from matlab version
