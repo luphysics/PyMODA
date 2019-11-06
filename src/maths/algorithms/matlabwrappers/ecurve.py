@@ -14,16 +14,8 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-"""
-Do not import this module in the main process, or it will break Linux support
-due to issues with the LD_LIBRARY_PATH.
-"""
-import ecurve
-import matlab
 
 from maths.params.REParams import REParams
-
-package = ecurve.initialize()
 
 
 def calculate(freq, fs, params: REParams) -> tuple:
@@ -34,6 +26,10 @@ def calculate(freq, fs, params: REParams) -> tuple:
     with the LD_LIBRARY_PATH on Linux. Instead, use `MPHandler` to call it
     safely in a new process.
     """
+    import ecurve
+    import matlab
+
+    package = ecurve.initialize()
 
     tfsupp = package.ecurve(
         matlab.double([1]),  # Pass nothing; data is saved in cache.

@@ -17,7 +17,7 @@
 """
 Translation of the wavelet phase coherence algorithm from MODA.
 
-STATUS: Finished. Surrogates may need improvements.
+STATUS: Finished, although surrogates are not complete (see `surrogates.py`).
 """
 from typing import Tuple
 
@@ -136,4 +136,4 @@ def tlphcoh(
                 )
                 tpc[fn, tn1 + hw : tn2 - hw + 1] = locpc
 
-    return tpc  # TODO: implement 'under_sample' from matlab version
+    return tpc  # TODO: implement 'under_sample' from matlab version?

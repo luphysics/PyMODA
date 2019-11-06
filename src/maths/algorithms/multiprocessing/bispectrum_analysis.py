@@ -41,6 +41,17 @@ def _biphase(
     ndarray,
     ndarray,
 ]:
+    """
+    Calculates biphase and biamplitude. Used in bispectrum analysis.
+
+    :param sig1: the first signal
+    :param sig2: the second signal
+    :param fs:  sampling frequency
+    :param f0: resolution parameter
+    :param fr:
+    :param opt: dictionary with params from MATLAB
+    :return:
+    """
     from maths.algorithms.matlabwrappers import biphase_wav_new
     import matlab
 
@@ -129,6 +140,14 @@ def _bispectrum_analysis(
     ndarray,
     dict,
 ]:
+    """
+    Performs bispectrum analysis.
+
+    :param sig1: the first signal
+    :param sig2: the second signal
+    :param params: the params object containing parameters for the MATLAB-packaged function
+    :return:
+    """
     from maths.algorithms.matlabwrappers import bispec_wav_new, wav_surrogate
 
     name = sig1.name
@@ -215,7 +234,7 @@ def _bispectrum_analysis(
             surrpxx = zeros(size)
 
             if ns > 0:
-                for j in range(ns):
+                for j in range(ns):  # TODO: fix. Did it work in previous versions?
                     surr1 = wav_surrogate.calculate(sig1list, "IAAFT2", 1)
                     surr2 = wav_surrogate.calculate(sig2list, "IAAFT2", 1)
 

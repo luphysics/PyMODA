@@ -14,26 +14,29 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-"""
-Do not import this module in the main process, or it will break Linux support
-due to issues with the LD_LIBRARY_PATH.
-"""
-import WT
-import matlab
+from typing import Union, Tuple
 
+from numpy import ndarray
+
+from maths.params.TFParams import TFParams
 from maths.signals.TimeSeries import TimeSeries
 
-package = WT.initialize()
 
-
-def calculate(signal, params):
+def calculate(
+    signal: Union[TimeSeries, ndarray], params: TFParams
+) -> Tuple[ndarray, ndarray]:
     """
-    Calculates the wavelet transform.
+    Calculates the wavelet transform using the MATLAB-packaged function.
 
-    IMPORTANT: this function should not be called directly due to issues
-    with the LD_LIBRARY_PATH on Linux. Instead, use `MPHandler` to call it
-    safely in a new process.
+    :param signal: the signal to perform the transform on
+    :param params: the params object containing parameters to pass to the MATLAB function
+    :return: [2D array] the wavelet transform; [1D array] the frequencies
     """
+    import WT
+    import matlab
+
+    package = WT.initialize()
+
     if isinstance(signal, TimeSeries):
         signal = signal.signal
 

@@ -18,12 +18,18 @@ from multiprocess import Queue
 
 from gui.windows.bayesian.ParamSet import ParamSet
 from maths.signals.TimeSeries import TimeSeries
-from processes import mp_utils
 
 
 def _moda_dynamic_bayesian_inference(
     queue: Queue, signal1: TimeSeries, signal2: TimeSeries, params: ParamSet
 ):
+    """
+    UNUSED.
+
+    Uses the MATLAB-packaged function to perform Bayesian inference.
+    Unused because it causes a serious error on Linux. Check the Python implementation
+    of Bayesian inference instead (`bayesian.py`).
+    """
     import full_bayesian
     import matlab
 

@@ -18,7 +18,7 @@ import numpy as np
 """
 Translation of the algorithm from MODA that performs preprocessing on a signal.
 
-STATUS: Apparently working.
+STATUS: Finished.
 """
 
 
@@ -27,7 +27,7 @@ def preprocess(sig: np.ndarray, fs: float, fmin: float, fmax: float) -> np.ndarr
 
     # De-trending.
     X = np.arange(1, len(sig) + 1).transpose() / fs
-    XM = np.ones((len(X), 4,), dtype=np.float64)
+    XM = np.ones((len(X), 4), dtype=np.float64)
 
     for pn in range(1, 4):
         CX = X ** pn
@@ -40,10 +40,7 @@ def preprocess(sig: np.ndarray, fs: float, fmin: float, fmax: float) -> np.ndarr
     fx = np.fft.fft(new_sig, axis=0)
     Nq = np.ceil((L + 1) / 2)
 
-    ff = np.concatenate([
-        np.arange(0, Nq),
-        -np.arange(1, L - Nq + 1)[::-1]
-    ]) * fs / L
+    ff = np.concatenate([np.arange(0, Nq), -np.arange(1, L - Nq + 1)[::-1]]) * fs / L
     ff = ff.reshape(len(ff), 1)
 
     abs_ff = np.abs(ff)

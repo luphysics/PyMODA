@@ -45,7 +45,7 @@ _CPP = "CPP"
 
 def surrogate_calc(
     time_series: Union[TimeSeries, ndarray], N: int, method: str, pp: bool, fs: float
-):
+) -> Tuple[ndarray, "Params"]:
     """
     Calculates surrogates.
 

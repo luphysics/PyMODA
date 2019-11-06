@@ -28,22 +28,43 @@ from processes.mp_utils import process
 
 
 @process
-def _wt_surrogate_calc(args: tuple):
-    from maths.algorithms.matlabwrappers import wt
+def _wt_surrogate_calc(
+    wt_signal: ndarray, surrogate: ndarray, params: PCParams
+) -> ndarray:
+    """
+    Calculates the phase coherence between a signal and a surrogate.
 
-    wt1, surrogate, params, index = args
+    :param wt_signal: the wavelet transform of the signal
+    :param surrogate: the values of the surrogate (not the wavelet transform)
+    :param params: the params object with parameters to pass to the wavelet transform function
+    :return: [1D array] the wavelet phase coherence between the signal and the surrogate
+    """
+    from maths.algorithms.matlabwrappers import wt
 
     transform, freq = wt.calculate(surrogate, params)
     wt_surrogate = matlab_to_numpy(transform)
 
-    surr_avg, _ = wphcoh(wt1, wt_surrogate)
-    return index, surr_avg
+    surr_avg, _ = wphcoh(wt_signal, wt_surrogate)
+    return surr_avg
 
 
 @process
 def _phase_coherence(
     signal_pair: Tuple[TimeSeries, TimeSeries], params: PCParams
 ) -> Tuple[Tuple[TimeSeries, TimeSeries], ndarray, ndarray, ndarray, ndarray]:
+    """
+    Function which uses `wpc` to calculate phase coherence for a single pair of signals. The signals must have
+    their wavelet transforms attached in their `output_data` member variable.
+
+    :param signal_pair: tuple containing 2 signals
+    :param params: the params object with parameters for the function
+    :return:
+    [tuple] the pair of signals;
+    [2D array] the time-localised phase coherence;
+    [1D array] phase coherence;
+    [1D array] phase difference;
+    [1D array] time-localised phase coherence of surrogates
+    """
     s1, s2 = signal_pair
 
     wt1 = s1.output_data.values
@@ -60,12 +81,8 @@ def _phase_coherence(
 
     # Calculate surrogates.
     pool = Pool()
-    args = [(wt1, surrogates[i], params, i) for i in range(surr_count)]
-    surr_results = pool.map(_wt_surrogate_calc, args)
-
-    tpc_surr = [None for _ in range(surr_count)]
-    for (index, result) in surr_results:
-        tpc_surr[index] = result
+    args = [(wt1, surrogates[i], params) for i in range(surr_count)]
+    tpc_surr = pool.starmap(_wt_surrogate_calc, args)
 
     if len(tpc_surr) > 0:
         tpc_surr = np.mean(tpc_surr, axis=0)

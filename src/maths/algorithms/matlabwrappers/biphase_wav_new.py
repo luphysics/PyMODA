@@ -20,25 +20,22 @@ due to issues with the LD_LIBRARY_PATH.
 """
 from typing import Tuple
 
-import biphaseWavPython
-import matlab
 from numpy import ndarray
 
 from maths.num_utils import matlab_to_numpy
-
-package = biphaseWavPython.initialize()
 
 
 def calculate(
     signal1: ndarray, signal2: ndarray, fs, f0, fr, opt: dict
 ) -> Tuple[ndarray, ndarray]:
     """
-    Calculates the biphase and biamplitude from the bispectrum.
-
-    IMPORTANT: this function should not be called directly due to issues
-    with the LD_LIBRARY_PATH on Linux. Instead, use `MPHandler` to call it
-    safely in a new process.
+    Calculates the biphase and biamplitude from the bispectrum using the MATLAB-packaged function.
     """
+    import biphaseWavPython
+    import matlab
+
+    package = biphaseWavPython.initialize()
+
     result = package.biphaseWavPython(
         matlab.double(signal1),
         matlab.double(signal2),

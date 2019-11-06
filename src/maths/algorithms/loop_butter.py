@@ -24,11 +24,8 @@ from maths.algorithms.matlab_utils import *
 """
 Translation of MODA's `loop_butter` algorithm into Python.
 
-STATUS: Finished, not fully working. See usage of `filtfilt` below.
-
-UPDATE: After testing with identical inputs by using the same values 
-from a .mat file, the results are relatively similar but show differences
-at the peaks of the output. 
+STATUS: Finished. There may be small differences between this and the MODA implementation
+due to scipy's implementation of filtfilt.
 """
 
 

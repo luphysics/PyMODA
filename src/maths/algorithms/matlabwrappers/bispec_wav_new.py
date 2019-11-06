@@ -14,32 +14,24 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-"""
-Do not import this module in the main process, or it will break Linux support
-due to issues with the LD_LIBRARY_PATH.
-"""
 from typing import Tuple
 
-import bispecWavPython
-import matlab
 import numpy as np
 from numpy import ndarray
 
 from maths.num_utils import multi_matlab_to_numpy
-
-package = bispecWavPython.initialize()
 
 
 def calculate(
     signal1: ndarray, signal2: ndarray, fs, params: dict
 ) -> Tuple[ndarray, ndarray, ndarray, ndarray, dict]:
     """
-    Calculates the bispectrum of 2 signals.
-
-    IMPORTANT: this function should not be called directly due to issues
-    with the LD_LIBRARY_PATH on Linux. Instead, use `MPHandler` to call it
-    safely in a new process.
+    Calculates the bispectrum of 2 signals using the MATLAB-packaged function.
     """
+    import bispecWavPython
+    import matlab
+
+    package = bispecWavPython.initialize()
 
     result = package.bispecWavPython(
         matlab.double(signal1), matlab.double(signal2), fs, *expand(params), nargout=5

@@ -14,26 +14,25 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-"""
-Do not import this module in the main process, or it will break Linux support
-due to issues with the LD_LIBRARY_PATH.
-"""
-import WFT
-import matlab
 
 from maths.params.TFParams import TFParams, _f0, _fmin
+from maths.signals.TimeSeries import TimeSeries
 
-package = WFT.initialize()
 
-
-def calculate(time_series, params: TFParams):
+def calculate(time_series: TimeSeries, params: TFParams):
     """
-    Calculates the windowed Fourier transform.
+    Calculates the windowed Fourier transform using the MATLAB-packaged function.
 
-    IMPORTANT: this function should not be called directly due to issues
-    with the LD_LIBRARY_PATH on Linux. Instead, use `MPHandler` to call it
-    safely in a new process.
+    :param time_series: the signal to perform the transform on
+    :param params: the params object containing parameters to pass to the MATLAB function
+    :return: [2D array] the windowed Fourier transform; [1D array] the frequencies
     """
+
+    import WFT
+    import matlab
+
+    package = WFT.initialize()
+
     signal_matlab = matlab.double([time_series.signal.tolist()])
 
     """

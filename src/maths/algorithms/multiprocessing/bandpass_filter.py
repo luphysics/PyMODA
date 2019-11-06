@@ -28,6 +28,20 @@ from processes.mp_utils import process
 def _bandpass_filter(
     time_series: TimeSeries, fmin, fmax, fs
 ) -> Tuple[str, ndarray, ndarray, ndarray, Tuple[float, float]]:
+    """
+    Performs the bandpass filter on a signal. Used in ridge-extraction and filtering.
+
+    :param time_series: the signal
+    :param fmin: the minimum frequency
+    :param fmax: the maximum frequency
+    :param fs:  the sampling frequency
+    :return:
+    [str] name of the signal;
+    [?] bands
+    [1D array] phase
+    [1D array] amplitude
+    [tuple] the min and max frequencies
+    """
     bands, _ = loop_butter(time_series.signal, fmin, fmax, fs)
     h = hilbert(bands)
 

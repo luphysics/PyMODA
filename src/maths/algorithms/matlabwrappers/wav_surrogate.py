@@ -14,29 +14,27 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-"""
-Do not import this module in the main process, or it will break Linux support
-due to issues with the LD_LIBRARY_PATH.
-"""
-
-import matlab
-import wavsurrogate
 from numpy import ndarray
 
-package = wavsurrogate.initialize()
 
-
-def calculate(signal: ndarray, type: str, adj: int) -> ndarray:
+def calculate(signal: ndarray, surr_type: str, adj: int) -> ndarray:
     """
-    Calculates the windowed Fourier transform.
+    Calculates surrogates using the MATLAB-packaged function. Used in bispectrum analysis for
+    IAAFT2 surrogates.
 
-    IMPORTANT: this function should not be called directly due to issues
-    with the LD_LIBRARY_PATH on Linux. Instead, use `MPHandler` to call it
-    safely in a new process.
+    :param signal: the signal
+    :param surr_type: the type of surrogate
+    :param adj: ?
+    :return: [1D array] the surrogate signal
     """
+    import matlab
+    import wavsurrogate
+
+    package = wavsurrogate.initialize()
+
     if isinstance(signal, ndarray):
         signal = signal.tolist()
 
-    result = package.wavsurrogate(matlab.double(signal), type, adj)
+    result = package.wavsurrogate(matlab.double(signal), surr_type, adj)
 
     return result

@@ -29,5 +29,6 @@ def _preprocess(sig: ndarray, fs: float, fmin: float, fmax: float) -> ndarray:
     :param fs: the sampling frequency
     :param fmin: the minimum frequency
     :param fmax: the maximum frequency
+    :return the preprocessed signal
     """
     return preprocessing.preprocess(sig, fs, fmin, fmax)

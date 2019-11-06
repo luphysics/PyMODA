@@ -14,31 +14,32 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-"""
-DO NOT import this module in the main process, or it will break Linux support
-due to issues with the LD_LIBRARY_PATH.
-"""
-import matlab
-import rectfr
+from numpy import ndarray
 
 from maths.params.REParams import REParams
 
-package = rectfr.initialize()
 
-
-def calculate(tfsupp, tfr, freq, wopt, params: REParams) -> tuple:
+def calculate(tfsupp: ndarray, tfr: ndarray, freq, wopt, params: REParams) -> tuple:
     """
-    Extracts ridge curve from wavelet transform or windowed Fourier transform.
+    Extracts ridge curve from wavelet transform or
+    windowed Fourier transform using MATLAB-packaged function.
 
-    IMPORTANT: this function should not be called directly due to issues
-    with the LD_LIBRARY_PATH on Linux. Instead, use `MPHandler` to call it
-    safely in a new process.
+    :param tfsupp:
+    :param tfr:
+    :param freq:
+    :param wopt:
+    :param params:
+    :return:
     """
+    import rectfr
+    import matlab
+
+    package = rectfr.initialize()
 
     iamp, iphi, ifreq, rtfsupp = package.rectfr(
         tfsupp,
-        matlab.double(tfr.tolist()),  # Pass nothing; data is saved in cache.
-        matlab.double(freq.tolist()),  # Pass nothing; data is saved in cache.
+        matlab.double(tfr.tolist()),
+        matlab.double(freq.tolist()),
         params.get(),
         "direct",
     )
