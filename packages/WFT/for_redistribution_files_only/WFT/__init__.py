@@ -26,7 +26,7 @@ class _PathInitializer(object):
     def set_interpreter_version(self):    
         """Make sure the interpreter version is supported."""
         ver = sys.version_info
-        version = '{0}_{1}'.format(ver[0], ver[1])
+        version = '{0}_{1}'.format(3, 7)
 
         if version in _PathInitializer.SUPPORTED_PYTHON_VERSIONS:
             self.interpreter_version = version
