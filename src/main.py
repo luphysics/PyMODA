@@ -17,7 +17,7 @@ import asyncio
 import signal
 import sys
 
-from asyncqt import QEventLoop
+from qasync import QEventLoop
 
 from gui.Application import Application
 from utils import errorhandling, stdout_redirect, args

@@ -1,4 +1,4 @@
-asyncqt>=0.7.0
+qasync>=0.9.1
 AsyncProcessScheduler>=0.4.0b1
 dataclasses>=0.6
 EasySettings>=3.2.0
