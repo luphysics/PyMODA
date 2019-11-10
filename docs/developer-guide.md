@@ -40,17 +40,19 @@ pip install pre-commit --user   # Installs the pre-commit tool.
 pre-commit install              # Adds the Git hooks to the repository.
 ```
 
-On Windows, also run `git config core.safecrlf false` in the `PyMODA` folder. This prevents a circular problem where Git cannot commit because it converts line endings to CRLF but doctoc converts line endings back to LF.
+On Windows, also run `git config core.safecrlf false` in the `PyMODA` folder. This prevents a circular problem where Git cannot commit because it converts line endings to CRLF but `doctoc` converts line endings back to LF.
 
 Now that the Git hooks are installed, they will automatically run every time a commit changes relevant files.
 
 > :warning: When a hook changes a file, you'll need to add the files and commit again.
 
-Here is an example of committing with the hooks installed. Black formats a Python file, so the commit must be run again.
+Here is an example of committing with the hooks installed. Black formats a Python file, so the commit must be run again. (Note that the `-am` flag stages currently tracked, modified, files before committing.)
 
 ![Screenshot demonstrating Git hooks.](/docs/images/git_hooks.png)
 
-> Tip: If you can't get hooks working due to Windows problems, run `pre-commit uninstall` to remove them.
+> Note: If absolutely necessary, hooks can be skipped by adding `--no-verify` to the `git commit` command.
+
+> Tip: If `pre-commit` is not a valid command after installing, try `python -m pre-commit` instead.
 
 ## Command-line arguments
 
@@ -87,11 +89,13 @@ By default, PyMODA attempts to catch all exceptions on the main process and disp
 
 ## Project structure
 
-Many subfolders contain their own README files, describing their contents. When you click on a subfolder, GitHub will render the README below the file structure.
+Many subfolders contain their own README files, describing their contents. When you click on a subfolder in GitHub, the README will be rendered below the file structure.
 
 ## Naming conventions and code style
 
-PyMODA code should follow the standard guidelines and naming conventions for Python. To ensure that the codebase uses a similar style, Git hooks will automatically format code when it is committed.
+PyMODA code should follow the standard guidelines and naming conventions for Python. To ensure that the codebase uses a similar style, Git hooks will automatically format code with Black when it is committed.
+
+### Window names
 
 PyMODA consists of 5 main windows, whose names are abbreviated in the codebase. The abbreviations are as follows:
 
@@ -103,33 +107,76 @@ PyMODA consists of 5 main windows, whose names are abbreviated in the codebase. 
 | Wavelet *Bispectrum Analysis*  | BA | `BAWindow` |
 | *Dynamical Bayesian* Inference  | DB | `DBWindow` |
 
+### Type hints
+
+Type hints are used throughout PyMODA. While not required for local variables, they should be used for most function parameters and all return types (including functions which return `None`).
+
+They serve multiple purposes: 
+
+- The intent of a function is much easier to interpret.
+- The input parameters and output of a function are much easier to interpret.
+- The auto-completion in the IDE is much better. This is especially useful for member variables.
+
+### ViewProperties
+
+All main windows inherit from a `ViewProperties` class. The only purpose of the `ViewProperties` class is to provide the names and types of member variables which will be instantiated when the GUI is created from the `.ui` file, greatly improving the auto-completion in PyCharm.
+
+Since the constructor of a `ViewProperties` is called before the GUI is created, it can safely initialize values to `None`.
+
+```python
+class SampleViewProperties(ViewProperties):
+
+  def __init__(self):
+    self.btn: QPushButton = None
+    self.lbl: QLabel = None
+```
+
+### Float and int decorators
+
+When a function returns a value from the GUI, it is necessary to validate the value and convert to the correct type. This is when the `@floaty` decorator is useful; it ensures that a value is returned as a float if it can be interpreted as a float, or `None` if it cannot.
+
+```python
+class Window:
+
+  @floaty
+  def get_fmin(self) -> Optional[float]:
+    """
+    Returns the minimum frequency from the GUI as either a float, 
+    if it can be interpreted as such, or `None`.
+    """
+    fmin: str = self.lineedit_fmin.text()
+    return fmin # Return as a string; the decorator will take care of the conversion.
+```
+
+The `@inty` decorator is identical to the `@floaty` decorator, except it returns an int or `None` instead of a float or `None`.
+
 ## MATLAB packages
 
 Using MATLAB's Library Compiler, MATLAB functions can be packaged as Python libraries which use the MATLAB Runtime. Most of the algorithms in PyMODA use MATLAB libraries from MODA.
 
 ### Linux support
 
-MATLAB has poor Linux support, and causes a library collision which prevents PyQt from functioning while the `LD_LIBRARY_PATH` environment variable is set according to its documentation. To solve this, MATLAB-packaged code must always be called from a separate process and the process must call the function `setup_matlab_runtime()`, which sets the `LD_LIBRARY_PATH` for the process, *before* importing MATLAB packages. 
+MATLAB causes a library collision which prevents PyQt from functioning while the `LD_LIBRARY_PATH` environment variable is set according to its documentation. To solve this, MATLAB-packaged code must always be called from a separate process and the process must call the function `setup_matlab_runtime()`, which sets the `LD_LIBRARY_PATH` for the process, *before* importing MATLAB packages. 
 
-> Note: The `@process` decorator can now be used instead of calling `setup_matlab_runtime()`. See [@process](#process).
+> Note: The `process` decorator can now be used instead of calling `setup_matlab_runtime()`. See [process](#process).
 
 ### Data types
 
 MATLAB can only handle certain Python data types (see [documentation](https://www.mathworks.com/help/matlab/matlab_external/pass-data-to-matlab-from-python.html)). 
 
-Numpy can convert MATLAB arrays to Numpy arrays, but Numpy arrays must be converted to Python lists before being converted to MATLAB types with `matlab.double()`. MATLAB arrays should be converted back to Numpy arrays using PyMODA's `matlab_to_numpy()`, which may be faster than `np.asarray()` in some cases.
+Numpy can convert MATLAB arrays to Numpy arrays, but Numpy arrays must be converted to Python lists before being converted to MATLAB arrays with `matlab.double()`. MATLAB arrays should be converted back to Numpy arrays using PyMODA's `matlab_to_numpy()`, which may be faster than `np.asarray()` in some cases. A tuple of MATLAB arrays can be converted to a tuple of Numpy arrays using `multi_matlab_to_numpy()`.
 
-Although MATLAB can convert complex numbers, Mathworks apparently has not imagined a scenario where a user would pass an array of complex numbers to a programming toolkit which is specifically designed for advanced mathematical computations. Therefore, instead of passing a list of complex numbers, a list of the real parts and a list of the complex parts must be passed separately as MATLAB arrays and then combined in the MATLAB code. 
+Although MATLAB can convert single complex numbers, it seems unable to convert a list of complex numbers. Instead of passing a list of complex numbers, a list of the real parts and a list of the complex parts can be passed separately as MATLAB arrays and then combined in the MATLAB code. 
 
 > Note: `None` cannot be passed to MATLAB.
 
 ### Unspecific errors 
 
-Errors referencing `map::at`, lacking any useful context, appear to be caused by MATLAB being unable to convert Python types to MATLAB types or vice versa. Some MODA algorithms were copied and slightly modified to avoid errors when packaged for PyMODA.
+Errors referencing `map::at`, lacking any useful context, appear to be caused by MATLAB being unable to convert Python types to MATLAB types or vice versa. Some MODA algorithms were copied and slightly modified to avoid errors when packaged for PyMODA. This is why `bispecWavPython` exists alongside `bispecWavNew` in MODA; the former is packaged as a Python library.
 
 ### Function parameters
 
-MATLAB functions can take optional parameters, adding them to the cell array `varargin`. `varargin` must be dealt with manually, but in MODA a common approach is to take optional parameters as alternating strings and values. For example, `WT(sig, fs, "fmin", 0.1, "fmax", 5)` is equivalent to `WT(sig, fs, fmin=0.1, fmax=5)` in Python.
+MATLAB functions can take optional parameters, adding them to the cell array `varargin`. `varargin` must be dealt with manually, but in MATLAB a common approach is to take optional parameters as alternating strings and values. For example, `WT(sig, fs, "fmin", 0.1, "fmax", 5)` is equivalent to `WT(sig, fs, fmin=0.1, fmax=5)` in Python.
 
 To use `varargin`, a Python dictionary is passed to the MATLAB function. Provided that all the keys are strings and the values can be converted to MATLAB types, this will work correctly.
 
