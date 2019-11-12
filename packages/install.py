@@ -15,6 +15,9 @@ from typing import Tuple, Optional
 packages = "packages"
 cwd = os.getcwd()
 
+# Pip parameter for avoiding permission issues.
+user_flag = "--user"
+
 
 def find_cwd() -> Optional[str]:
     if packages in os.listdir("."):
@@ -72,6 +75,13 @@ def fatal_error(message: str):
 if __name__ == "__main__":
     assert sys.version_info >= (3, 6), "You must use Python 3.6 or greater."
 
+    # Whether the OS is Windows-based.
+    is_windows = "Windows" == platform.system()
+
+    # If Python is in a virtual environment, don't use --user.
+    if os.environ.get("VIRTUAL_ENV"):
+        user_flag = ""
+
     # Set values from command-line arguments.
     verbose = any(["v" in arg for arg in sys.argv[1:]])
     matlab_only = any(["m" in arg for arg in sys.argv[1:]])
@@ -98,7 +108,7 @@ if __name__ == "__main__":
             "Command-line arguments can be used with this script:\n\n"
             "Argument\t Name\t\t Purpose\n"
             "--------\t ----\t\t -------\n"
-            "-y\t\t N/A\t\t Runs the script without user intervention.\n"
+            "-y\t\t Yes\t\t Automatically accept confirmations.\n"
             "-v\t\t Verbose\t Prints the output from the commands.\n"
             "-d\t\t Dry-run\t Prints the commands that will be run, but does not run them.\n"
             "-m\t\t MATLAB-only\t Only installs the MATLAB packages. Does not install pip dependencies.\n\n"
@@ -110,9 +120,6 @@ if __name__ == "__main__":
             sys.exit(0)
 
         print("\n\n")
-
-    # Whether the OS is Windows-based.
-    is_windows = "Windows" == platform.system()
 
     python = sys.executable  # Path to correct python interpreter.
     pip = f"{python} -m pip"  # Pip command for current interpreter.
@@ -135,7 +142,7 @@ if __name__ == "__main__":
         os.chdir("/".join(f.replace("\\", "/").split("/")[:-1]))
 
         out, err = run_command(
-            f"{python} setup.py install --user", verbose=verbose, dry_run=dry_run
+            f"{python} setup.py install {user_flag}", verbose=verbose, dry_run=dry_run
         )
         if verbose:
             time.sleep(0.5)
@@ -147,14 +154,14 @@ if __name__ == "__main__":
 
         os.chdir(f"{wd}/..")
         run_command(
-            f"{pip} install -r requirements.txt --user",
+            f"{pip} install -r requirements.txt {user_flag}",
             verbose=verbose,
             dry_run=dry_run,
         )
 
         if is_windows:
             run_command(
-                f"{pip} install winshell pypiwin32 --user",
+                f"{pip} install winshell pypiwin32 {user_flag}",
                 verbose=verbose,
                 dry_run=dry_run,
             )
