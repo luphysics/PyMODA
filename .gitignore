@@ -1,6 +1,9 @@
 ## Custom ##
 
+**.zip
 cache/
+backup/
+temp/
 **/.directory
 **/.vscode/
 .idea/PyMODA.iml
