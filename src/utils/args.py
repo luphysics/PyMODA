@@ -30,18 +30,48 @@ def parser() -> ArgumentParser:
     """
     p = ArgumentParser(description="PyMODA argument parser")
 
-    p.add_argument("-file", action="store", nargs=1, default=None,
-                   help="A preset data file to use when testing.")
-    p.add_argument("-freq", action="store", type=float, nargs=1, default=None,
-                   help="A preset sampling frequency to use when testing.")
-    p.add_argument("-runtime", action="store", nargs=1, default=None,
-                   help="***Must be specified on Linux.***"
-                        "\nThe LD_LIBRARY_PATH used to make libraries run using the MATLAB Runtime. ")
-    p.add_argument("--no-maximise", action="store_false", default=True,
-                   help="Use this argument to prevent windows from opening in a maximised state.")
-    p.add_argument("--debug", action="store_true", default=False,
-                   help="Use this argument to disable error handling and throw hard exceptions "
-                        "which will crash the program with a traceback.")
+    p.add_argument(
+        "-file",
+        action="store",
+        nargs=1,
+        default=None,
+        help="A preset data file to use when testing.",
+    )
+    p.add_argument(
+        "-freq",
+        action="store",
+        type=float,
+        nargs=1,
+        default=None,
+        help="A preset sampling frequency to use when testing.",
+    )
+    p.add_argument(
+        "-runtime",
+        action="store",
+        nargs=1,
+        default=None,
+        help="***Must be specified on Linux.***"
+        "\nThe LD_LIBRARY_PATH used to make libraries run using the MATLAB Runtime. ",
+    )
+    p.add_argument(
+        "--no-maximise",
+        action="store_false",
+        default=True,
+        help="Use this argument to prevent windows from opening in a maximised state.",
+    )
+    p.add_argument(
+        "--debug",
+        action="store_true",
+        default=False,
+        help="Use this argument to disable error handling and throw hard exceptions "
+        "which will crash the program with a traceback.",
+    )
+    p.add_argument(
+        "--post-update",
+        action="store_true",
+        default=False,
+        help="This argument should not be used manually.",
+    )
     return p
 
 
@@ -89,6 +119,18 @@ def debug() -> bool:
 
 
 def matlab_runtime() -> Optional[str]:
+    """
+    Returns the LD_LIBRARY_PATH for the Matlab Runtime when it has been set with
+    an argument.
+    """
     if args and args.runtime:
         return args.runtime[0]
     return None
+
+
+def post_update() -> bool:
+    """
+    Returns whether an update has just completed. This argument is set by
+    the updater when it launches PyMODA after an update.
+    """
+    return args and args.post_update

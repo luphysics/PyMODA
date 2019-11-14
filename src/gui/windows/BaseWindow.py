@@ -45,5 +45,8 @@ class BaseWindow(QMainWindow, BaseUI):
         self.setWindowIcon(icon)
 
     def closeEvent(self, e: QtGui.QCloseEvent) -> None:
-        self.application.notify_close_event(self)
+        try:
+            self.application.notify_close_event(self)
+        except AttributeError:
+            pass
         super(BaseWindow, self).closeEvent(e)

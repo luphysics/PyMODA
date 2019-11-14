@@ -13,17 +13,23 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import asyncio
+import os
 import sys
+import time
+from pathlib import Path
 
 from PyQt5 import uic
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtGui import QPixmap, QKeySequence
+from PyQt5.QtWidgets import QMessageBox, QShortcut
 
+import updater.update as upd
 from data import resources
 from data.resources import get
 from gui.dialogs.MatlabRuntimeDialog import MatlabRuntimeDialog
 from gui.windows.CentredWindow import CentredWindow
+from updater.update import get_latest_commit
 from utils import args
 from utils.os_utils import OS
 from utils.settings import Settings
@@ -38,6 +44,8 @@ class LauncherWindow(CentredWindow):
     def __init__(self, parent):
         self.settings = Settings()
         super(LauncherWindow, self).__init__(parent)
+
+        self.update_shortcut = None
 
     def setup_ui(self) -> None:
         uic.loadUi(get("layout:window_launcher.ui"), self)
@@ -54,12 +62,26 @@ class LauncherWindow(CentredWindow):
         self.btn_create_shortcut.clicked.connect(self.create_shortcut)
         self.check_matlab_runtime()
 
+        self.lbl_update.hide()
+        self.btn_update.hide()
+        self.btn_update.clicked.connect(self.on_update_clicked)
+
+        # Secret shortcut to trigger a check for updates.
+        self.update_shortcut = QShortcut(QKeySequence("Ctrl+U"), self)
+        self.update_shortcut.activated.connect(self.force_check_updates)
+
+        asyncio.get_event_loop().run_until_complete(self.check_for_updates())
+
     def check_matlab_runtime(self) -> None:
         """
-        Checks whether the LD_LIBRARY_PATH for the MATLAB Runtime is correctly passed to the program, and opens
-        a dialog if appropriate.
+        Checks whether the LD_LIBRARY_PATH for the MATLAB Runtime is correctly passed to
+        the program, and shows a dialog if appropriate.
         """
-        if OS.is_linux() and not args.matlab_runtime() and self.settings.is_runtime_warning_enabled():
+        if (
+            OS.is_linux()
+            and not args.matlab_runtime()
+            and self.settings.is_runtime_warning_enabled()
+        ):
             dialog = MatlabRuntimeDialog()
             dialog.exec()
 
@@ -81,3 +103,82 @@ class LauncherWindow(CentredWindow):
         """
         status = create_shortcut()
         QMessageBox(text=status).exec()
+
+    def on_update_clicked(self) -> None:
+        """
+        Called when the button to update is clicked.
+        """
+        response = QMessageBox().question(
+            self,
+            "Update",
+            "PyMODA will close and update. Please close other PyMODA windows and "
+            "ensure you have no unsaved work. \n\n"
+            "The current version of PyMODA will be saved in a folder named 'backup'. "
+            "Old backups will be deleted.\n\n"
+            "Continue?",
+        )
+
+        if QMessageBox.Yes == response:
+            cwd = os.getcwd()
+            parent = Path(cwd).parent
+            upd.start_update(parent)
+
+    def force_check_updates(self) -> None:
+        """
+        Forces a check for updates. Called when the hidden shortcut is triggered.
+        """
+        asyncio.ensure_future(self.check_for_updates(force=True))
+        print("Forcing a check for updates...")
+
+    async def check_for_updates(self, force=False) -> None:
+        """
+        Checks for updates, and takes appropriate action such as saving
+        to the settings.
+
+        :param force: whether to force an update check, even if there was a recent check
+        """
+        # If an update just completed, perform cleanup.
+        if args.post_update():
+            self.settings.set_update_available(False)
+            upd.cleanup()
+            self.settings.set_latest_commit(await get_latest_commit())
+            return
+
+        # If there was an update found the last time we checked.
+        elif self.settings.get_update_available():
+            self.show_update_available()
+            return
+
+        # If we should check again now.
+        elif not self.settings.should_check_updates() and not force:
+            return
+
+        # Retrieve the latest commit from the GitHub API.
+        new_commit = await get_latest_commit()
+
+        if new_commit is None:
+            return
+
+        # If it's the first ever check for updates.
+        elif self.settings.get_latest_commit() is None:
+            self.settings.set_latest_commit(new_commit)
+
+        # If there's an update available.
+        elif new_commit != self.settings.get_latest_commit():
+            self.settings.set_update_available(True)
+            self.show_update_available()
+
+        # No updates available.
+        else:
+            self.settings.set_update_available(False)
+
+        # Set now as the last time at which an update check occurred.
+        self.settings.set_last_update_check(time.time())
+
+    def show_update_available(self) -> None:
+        """
+        Shows that an update is available by making the button and label visible.
+        """
+        for item in (self.lbl_update, self.btn_update):
+            item.setStyleSheet("color: blue;")
+            item.show()

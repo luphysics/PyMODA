@@ -13,13 +13,17 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from typing import List
+import time
+from typing import List, Optional
 
 from easysettings import EasySettings
 
 _key_recent_files = "recent_files"
 _key_recent_frequencies = "recent_freq"
 _key_runtime_warning = "runtime_warning"
+_key_latest_commit = "latest_commit"
+_key_update_available = "update_available"
+_key_last_update_check = "last_update_check"
 
 
 class Settings:
@@ -67,4 +71,25 @@ class Settings:
 
     def set_runtime_warning_enabled(self, enabled: bool) -> None:
         self._settings.set(_key_runtime_warning, enabled)
+        self._settings.save()
+
+    def get_latest_commit(self) -> Optional[str]:
+        return self._settings.get(_key_latest_commit, None)
+
+    def set_latest_commit(self, latest_commit: str) -> None:
+        self._settings.set(_key_latest_commit, latest_commit)
+        self._settings.save()
+
+    def set_update_available(self, value: bool) -> None:
+        self._settings.set(_key_update_available, value)
+        self._settings.save()
+
+    def get_update_available(self) -> bool:
+        return self._settings.get(_key_update_available, False)
+
+    def should_check_updates(self) -> bool:
+        return time.time() - self._settings.get(_key_last_update_check, 0.0) > 3600 * 6
+
+    def set_last_update_check(self, time: float) -> None:
+        self._settings.set(_key_last_update_check, time)
         self._settings.save()
