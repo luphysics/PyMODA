@@ -45,7 +45,9 @@ class LauncherWindow(CentredWindow):
         self.settings = Settings()
         super(LauncherWindow, self).__init__(parent)
 
-        self.update_shortcut = None
+        # Hidden shortcut to trigger a check for updates.
+        self.update_shortcut = QShortcut(QKeySequence("Ctrl+U"), self)
+        self.update_shortcut.activated.connect(self.force_check_updates)
 
     def setup_ui(self) -> None:
         uic.loadUi(get("layout:window_launcher.ui"), self)
@@ -66,11 +68,10 @@ class LauncherWindow(CentredWindow):
         self.btn_update.hide()
         self.btn_update.clicked.connect(self.on_update_clicked)
 
-        # Secret shortcut to trigger a check for updates.
-        self.update_shortcut = QShortcut(QKeySequence("Ctrl+U"), self)
-        self.update_shortcut.activated.connect(self.force_check_updates)
-
-        asyncio.get_event_loop().run_until_complete(self.check_for_updates())
+        if args.post_update():
+            asyncio.ensure_future(self.post_update())
+        else:
+            asyncio.ensure_future(self.check_for_updates())
 
     def check_matlab_runtime(self) -> None:
         """
@@ -120,8 +121,21 @@ class LauncherWindow(CentredWindow):
 
         if QMessageBox.Yes == response:
             cwd = os.getcwd()
-            parent = Path(cwd).parent
-            upd.start_update(parent)
+            root = Path(cwd).parent
+
+            upd.start_update(root)
+
+    async def post_update(self) -> None:
+        """
+        Called when the program launches after a successful update.
+        """
+        upd.cleanup()
+        self.settings.set_update_available(False)
+
+        await asyncio.sleep(0.2)  # Prevent jarring animations.
+        QMessageBox.information(self, "Update", "Update completed.")
+
+        self.settings.set_latest_commit(await get_latest_commit())
 
     def force_check_updates(self) -> None:
         """
@@ -137,19 +151,12 @@ class LauncherWindow(CentredWindow):
 
         :param force: whether to force an update check, even if there was a recent check
         """
-        # If an update just completed, perform cleanup.
-        if args.post_update():
-            self.settings.set_update_available(False)
-            upd.cleanup()
-            self.settings.set_latest_commit(await get_latest_commit())
-            return
-
         # If there was an update found the last time we checked.
-        elif self.settings.get_update_available():
+        if self.settings.get_update_available():
             self.show_update_available()
             return
 
-        # If we should check again now.
+        # If we should check for updates again now.
         elif not self.settings.should_check_updates() and not force:
             return
 

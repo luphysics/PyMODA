@@ -34,10 +34,6 @@ class Application(QApplication):
 
     windows = []
 
-    def __init__(self, _args):
-        super(Application, self).__init__(_args)
-        self.start_launcher()
-
     def start_launcher(self):
         """Opens the launcher window which has buttons to open the other windows."""
         self.open_window(LauncherWindow)
