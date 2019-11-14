@@ -13,7 +13,10 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import os
 import time
+from os import path
+from pathlib import Path
 from typing import List, Optional
 
 from easysettings import EasySettings
@@ -32,7 +35,10 @@ class Settings:
     """
 
     def __init__(self):
-        self._settings = EasySettings("settings.conf")
+        location = Path(os.getcwd()).parent
+        filepath = path.join(location, "settings.conf")
+
+        self._settings = EasySettings(filepath)
 
     def get_recent_files(self) -> List[str]:
         files = self._settings.get(_key_recent_files)
