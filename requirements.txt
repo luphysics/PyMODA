@@ -1,4 +1,4 @@
-qasync>=0.9.1
+aiohttp>=3.6.2
 AsyncProcessScheduler>=0.4.0b1
 dataclasses>=0.6
 EasySettings>=3.2.0
@@ -13,3 +13,4 @@ PyQt5-stubs==5.13.0.1
 PyQtGraph>=0.10.0
 scipy>=1.3.2
 psutil>=5.6.3
+qasync>=0.9.1
