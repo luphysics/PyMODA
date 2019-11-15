@@ -13,18 +13,11 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from typing import Callable
-
-from dataclasses import dataclass
+from matplotlib.backends.backend_qt5 import NavigationToolbar2QT
 
 
-@dataclass
-class Callbacks:
+class NavigationBar(NavigationToolbar2QT):
     """
-    Maintains references to Matplotlib callbacks to prevent them being garbage collected.
+    A toolbar which provides helpful options for interacting with a MatplotlibWidget,
+    like resetting the view or switching to zoom mode.
     """
-
-    click: Callable
-    release: Callable
-    xlim_changed: Callable
-    ylim_changed: Callable

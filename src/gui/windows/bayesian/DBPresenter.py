@@ -126,7 +126,7 @@ class DBPresenter(BaseTFPresenter):
 
         for p in (middle, top):
             p.axes.xaxis.label.set_visible(False)
-            p.options.hide()
+            p.toolbar.hide()
 
         top.plot(times, data.p1)
         middle.plot(times, data.p2)

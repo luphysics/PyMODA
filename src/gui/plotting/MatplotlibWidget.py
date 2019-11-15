@@ -19,6 +19,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPalette
 from PyQt5.QtWidgets import QVBoxLayout, QApplication
 from matplotlib import patches
+from matplotlib.axes import Axes
 from matplotlib.backend_bases import MouseButton
 from matplotlib.backends.backend_qt5agg import FigureCanvas
 from matplotlib.figure import Figure
@@ -26,9 +27,10 @@ from matplotlib.lines import Line2D
 from mpl_toolkits.mplot3d import Axes3D
 
 from gui.plotting.Callbacks import Callbacks
-from gui.plotting.PlotOptionsWidget import PlotOptionsBar
+from gui.plotting.NavigationBar import NavigationBar
 from gui.plotting.PlotWidget import PlotWidget
 from gui.plotting.plots.Rect import Rect
+from utils.decorators import deprecated
 
 
 class MatplotlibWidget(PlotWidget):
@@ -42,7 +44,7 @@ class MatplotlibWidget(PlotWidget):
         self.canvas: FigureCanvas = None
         self.layout: QVBoxLayout = None
 
-        self.axes = None
+        self.axes: Axes = None
         self.fig: Figure = None
 
         self.log_y = False  # Whether the y-axis should be logarithmic.
@@ -71,35 +73,33 @@ class MatplotlibWidget(PlotWidget):
         self.max_crosshairs = 10
         self.crosshair_listeners = []
 
-        self.options: PlotOptionsBar = None
+        self.toolbar: NavigationBar = None
 
         super(MatplotlibWidget, self).__init__(parent)
 
     def setup_ui(self) -> None:
-        super().setup_ui()
-
         self.canvas = FigureCanvas(Figure())
-        self.init_callbacks()
-        self.options = PlotOptionsBar(self.callbacks)
-
-        self.setMouseTracking(True)
-        self.layout = QVBoxLayout(self)
-        self.set_in_progress(False)
-
-        self.layout.addWidget(self.canvas)
-        self.layout.addWidget(self.options)
-
         self.fig: Figure = self.canvas.figure
+
+        self.toolbar = NavigationBar(self.canvas, self, coordinates=False)
 
         if self.is_3d():
             self.axes = Axes3D(self.fig)
         else:
             self.axes = self.fig.subplots()
 
+        self.init_callbacks()
+
+        self.setMouseTracking(True)
+        self.layout = QVBoxLayout(self)
+        self.set_in_progress(False)
+
+        self.layout.addWidget(self.canvas)
+        self.layout.addWidget(self.toolbar)
+
         self.axes.set_xlabel(self.get_xlabel())
         self.axes.set_ylabel(self.get_ylabel())
 
-        # self.fig.tight_layout(pad=0)
         background = self.palette().color(QPalette.Background)
         self.fig.patch.set_facecolor(background.name())
 
@@ -110,25 +110,14 @@ class MatplotlibWidget(PlotWidget):
         """
         Creates the callbacks for interacting with the plot.
         """
-        move = self.canvas.mpl_connect("motion_notify_event", self.on_move)
         click = self.canvas.mpl_connect("button_press_event", self.on_click)
         release = self.canvas.mpl_connect("button_release_event", self.on_release)
 
-        # We want "leave" to trigger for the axes and the figure, because a fast
-        # mouse movement can cause the axes leave event to not occur.
-        axes_leave = self.canvas.mpl_connect("axes_leave_event", self.on_leave)
-        figure_leave = self.canvas.mpl_connect("figure_leave_event", self.on_leave)
+        xlim = self.axes.callbacks.connect("xlim_changed", self.on_xlim_changed)
+        ylim = self.axes.callbacks.connect("ylim_changed", self.on_ylim_changed)
 
         # Set the callbacks object to hold references to these callbacks.
-        self.callbacks = Callbacks(
-            move,
-            click,
-            release,
-            axes_leave,
-            figure_leave,
-            self.on_reset,
-            self.on_go_back,
-        )
+        self.callbacks = Callbacks(click, release, xlim, ylim)
 
     def on_plot_complete(self) -> None:
         """
@@ -137,8 +126,13 @@ class MatplotlibWidget(PlotWidget):
         """
         self.clear_rect_states()
         self.add_rect_state(self.current_rect())
-        self.options.set_in_progress(False)
         self.canvas.draw()
+
+    def on_xlim_changed(self, axes) -> None:
+        print("xlim changed")
+
+    def on_ylim_changed(self, axes) -> None:
+        print("ylim changed")
 
     def set_mouse_zoom_enabled(self, value: bool) -> None:
         self.mouse_zoom_enabled = value
@@ -250,6 +244,7 @@ class MatplotlibWidget(PlotWidget):
         """Removes all temporary items on the plot."""
         self.remove_temp_rectangle()
 
+    @deprecated
     def on_move(self, event) -> None:
         """Called when the mouse moves over the plot."""
         self.cross_cursor(True)
@@ -338,12 +333,14 @@ class MatplotlibWidget(PlotWidget):
         """Adds a rect state to the stack of states."""
         self.rect_stack.append(rect)
 
+    @deprecated
     def on_leave(self, event) -> None:
         """Called when the mouse is no longer over the figure or the axes."""
         self.cross_cursor(False)
         self.pre_update()
         self.update()
 
+    @deprecated
     def on_reset(self) -> None:
         """Called when the reset button is pressed."""
         if len(self.rect_stack) > 0:
@@ -351,6 +348,7 @@ class MatplotlibWidget(PlotWidget):
             self.zoom_to(normal)
             self.update()
 
+    @deprecated
     def on_go_back(self) -> None:
         """Called when the back button is pressed."""
         if len(self.rect_stack) > 1:
@@ -416,7 +414,8 @@ class MatplotlibWidget(PlotWidget):
 
     def set_in_progress(self, in_progress=True) -> None:
         """Sets the progress bar to display whether the plot is in progress."""
-        self.options.set_in_progress(in_progress)
+        # Removed when refactoring NavigationBar.
+        pass  # TODO: re-implement or fully remove this functionality.
 
     def update_xlabel(self, text=None) -> None:
         self.axes.set_xlabel(text if text else self.get_xlabel())
