@@ -25,6 +25,7 @@ class PlotOptionsBar(QWidget, BaseUI):
     a MatplotlibWidget. For example, resetting the view or switching to
     drag-to-move mode.
     """
+
     layout: QHBoxLayout = None
 
     def __init__(self, callbacks: Callbacks):
@@ -33,7 +34,7 @@ class PlotOptionsBar(QWidget, BaseUI):
         self.reset_button.set_onclick(self.callbacks.reset)
         self.back_button.set_onclick(self.callbacks.back)
 
-    def setup_ui(self):
+    def setup_ui(self) -> None:
         self.layout = QHBoxLayout(self)
 
         self.reset_button = ResetButton()
@@ -47,7 +48,7 @@ class PlotOptionsBar(QWidget, BaseUI):
 
         self.create_progressbar()
 
-    def create_progressbar(self):
+    def create_progressbar(self) -> None:
         self.progress = QProgressBar()
         self.progress.setFixedWidth(110)
 
@@ -56,7 +57,7 @@ class PlotOptionsBar(QWidget, BaseUI):
         self.progress.setValue(0)
         self.layout.addWidget(self.progress)
 
-    def set_in_progress(self, loading):
+    def set_in_progress(self, loading) -> None:
         if loading:
             self.progress.show()
             self.setFixedWidth(240)
@@ -70,22 +71,20 @@ class OptionsButton(QPushButton, BaseUI):
     A button to be used in the options bar for a plotting.
     """
 
-    def setup_ui(self):
+    def setup_ui(self) -> None:
         self.setFixedWidth(50)
 
-    def set_onclick(self, onclick):
+    def set_onclick(self, onclick) -> None:
         self.clicked.connect(onclick)
 
 
 class ResetButton(OptionsButton):
-
-    def setup_ui(self):
+    def setup_ui(self) -> None:
         super().setup_ui()
         self.setText("Reset")
 
 
 class BackButton(OptionsButton):
-
-    def setup_ui(self):
+    def setup_ui(self) -> None:
         super().setup_ui()
         self.setText("Back")

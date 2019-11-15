@@ -13,6 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+
 from gui.plotting.MatplotlibWidget import MatplotlibWidget
 from maths.signals.TimeSeries import TimeSeries
 
@@ -41,13 +42,13 @@ class SignalPlot(MatplotlibWidget):
         self.axes.set_xlim(xlim)
         self.on_plot_complete()
 
-    def zoom_to(self, rect, save_state=True, trigger_listeners=True):
+    def zoom_to(self, rect, save_state=True, trigger_listeners=True) -> None:
         """Override the zoom to not change the range of visible y-values."""
         rect.y1, rect.y2 = self.ylim()
         super(SignalPlot, self).zoom_to(rect, save_state, trigger_listeners)
 
-    def get_xlabel(self):
+    def get_xlabel(self) -> str:
         return "Time (s)"
 
-    def get_ylabel(self):
+    def get_ylabel(self) -> str:
         return "Value"

@@ -24,39 +24,39 @@ class PlotWidget(QWidget, BaseUI):
     plotting library.
     """
 
-    def get_xlabel(self):
+    def get_xlabel(self) -> str:
         """Returns the label for the x-axis. Should be overridden in subclasses."""
         pass
 
-    def get_ylabel(self):
+    def get_ylabel(self) -> str:
         """Returns the label for the y-axis. Should be overridden in subclasses."""
         pass
 
-    def set_in_progress(self, in_progress):
+    def set_in_progress(self, in_progress) -> None:
         """Sets the progress bar to display whether the plotting is in progress."""
         pass
 
-    def on_plot_complete(self):
+    def on_plot_complete(self) -> None:
         """
         Should be called after the first plotting is complete. It will then set the initial state
         so that the reset button can work.
         """
         pass
 
-    def clear(self):
+    def clear(self) -> None:
         """
         Clears the plot, removing all plotted elements.
         """
         pass
 
-    def update_xlabel(self, text=None):
+    def update_xlabel(self, text=None) -> None:
         """
         Updates the x-label. If no value is passed,
         the result from get_xlabel() will be used.
         """
         pass
 
-    def update_ylabel(self, text=None):
+    def update_ylabel(self, text=None) -> None:
         """
         Updates the y-label. If no value is passed,
         the result from get_ylabel() will be used.

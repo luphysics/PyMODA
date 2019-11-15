@@ -21,13 +21,13 @@ from gui.plotting.PlotWidget import PlotWidget
 
 class PyQtGraphWidget(PlotWidget):
     """
-    Warning: not fully implemented. Correct implementation is
-    not planned.
-
     A widget which enables plotting via PyQtGraph.
+
+    Warning: not fully implemented. Complete implementation is
+    not currently planned.
     """
 
-    def setup_ui(self):
+    def setup_ui(self) -> None:
         self.layout = QVBoxLayout(self)
 
         self.plot_widget = GLViewWidget()
