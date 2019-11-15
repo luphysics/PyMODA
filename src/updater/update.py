@@ -29,6 +29,7 @@ The update process is as follows:
 import os
 
 # Fix issue where imports fail when launching from 'temp'.
+
 os.environ["PYTHONPATH"] = "."
 
 import asyncio
@@ -65,6 +66,27 @@ async def get_latest_commit() -> Optional[str]:
                 return None
 
             return obj.get("sha")
+
+
+async def get_repo_size() -> Optional[int]:
+    """
+    Called in 'temp' to get the size of the PyMODA repository before
+    downloading as a zip file. This is usually less than the actual size
+    of the zip file, but GitHub uses chunked encoding so there is no
+    "Content-Length" header to provide the size of the zip file while
+    downloading it.
+
+    :return: the size in bytes
+    """
+    async with aiohttp.ClientSession() as session:
+        async with session.get(api_url) as response:
+            text = await response.text()
+
+            size = json.loads(text).get("size")
+            if size is not None:
+                size *= 1000  # Convert to bytes.
+
+            return size
 
 
 def start_update(root_directory: str) -> None:

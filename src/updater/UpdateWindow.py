@@ -13,6 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import asyncio
 
 from PyQt5.QtWidgets import QVBoxLayout, QProgressBar, QLabel, QWidget
 
@@ -41,9 +42,19 @@ class UpdateWindow(CentredWindow):
         self.progress = QProgressBar()
         layout.addWidget(self.progress)
 
+        self.thread = None
+        asyncio.ensure_future(self.start_download())
+
+    async def start_download(self) -> None:
+        """
+        Gets the size of the GitHub repository from the API,
+        then starts the download thread.
+        """
         from updater.DownloadThread import DownloadThread
 
-        self.thread = DownloadThread(self)
+        size = await upd.get_repo_size()
+
+        self.thread = DownloadThread(self, size)
         self.thread.progress_signal.connect(self.on_progress)
         self.thread.finished_signal.connect(self.on_download_finished)
         self.thread.start()
@@ -58,7 +69,7 @@ class UpdateWindow(CentredWindow):
             try:
                 upd.extract_zip(temp_filename)
             except:
-                self.label.setText("Unzip failed. Please try again.")
+                self.label.setText("Unzip failed. Please try again later.")
             else:
                 self.start_copy_files()
         else:

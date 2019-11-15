@@ -13,8 +13,9 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-
+import asyncio
 import os
+import time
 from http.client import HTTPResponse
 from urllib.request import urlopen
 
@@ -34,9 +35,10 @@ class DownloadThread(QThread):
     progress_signal = pyqtSignal(object)
     finished_signal = pyqtSignal(bool)
 
-    def __init__(self, window):
+    def __init__(self, window, size):
         super().__init__()
         self.window = window
+        self.size = size
 
     def run(self) -> None:
         """
@@ -44,6 +46,12 @@ class DownloadThread(QThread):
         """
         # Pretend to download the file if an environment variable, MOCK_DOWNLOAD, is set.
         if os.environ.get("MOCK_DOWNLOAD") is not None:
+            counter = 0
+            while counter <= 100:
+                self.progress_signal.emit(counter)
+                counter += 1
+                time.sleep(0.02)
+
             return self.finished_signal.emit(True)
 
         try:
@@ -61,17 +69,12 @@ class DownloadThread(QThread):
 
         :param response: the HTTP response to download the file from
         """
-        print(f"TYPE: {type(response)}")
-        content_length = response.headers.get("Content-Length")
+        size = self.size
 
-        # Sometimes the Content-Length header is missing.
-        # In this case, guess the size instead.
-        size = 10 ** 6 * 44
-
-        if content_length is None:
-            print(f"Could not get length from request headers:\n\n{response.headers}")
+        if size is not None:
+            print(f"Got size from GitHub API: {size} bytes.")
         else:
-            size = int(content_length)
+            size = 10 ** 6 * 44
 
         with open(temp_filename, "wb") as f:
             downloaded_bytes = 0
