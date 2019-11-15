@@ -18,6 +18,8 @@ from argparse import ArgumentParser
 # Args are global and should only be modified at startup.
 from typing import Optional
 
+from updater import update
+
 args = None
 
 
@@ -64,7 +66,7 @@ def parser() -> ArgumentParser:
         "which will crash the program with a traceback.",
     )
     p.add_argument(
-        "--post-update",
+        update.arg_post_update,
         action="store_true",
         default=False,
         help="This argument should not be used manually.",

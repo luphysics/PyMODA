@@ -18,6 +18,7 @@ import os
 import sys
 from subprocess import Popen, PIPE
 
+from updater import update
 from utils.os_utils import OS
 
 
@@ -29,9 +30,9 @@ def create_shortcut() -> str:
     if OS.is_windows():
         status = _create_shortcut_windows()
     elif OS.is_linux():
-        status = _create_shortcut_linux()
+        status = _create_shortcut_nix()
     elif OS.is_mac_os():
-        status = _create_shortcut_mac_os()
+        status = _create_shortcut_nix()
     else:
         status = "Operating system unknown. Could not create shortcut."
 
@@ -48,18 +49,17 @@ def _create_shortcut_windows() -> str:
 
     path = os.path.join(winshell.desktop(), "PyMODA.lnk")
     with winshell.shortcut(path) as s:
-        # Path to Python interpreter.
-        s.path = _get_python_interpreter_executable()
+        s.path = sys.executable  # Path to Python interpreter.
         s.description = "Shortcut to launch PyMODA."
         s.arguments = _python_interpreter_arguments()
 
     return "Created desktop shortcut for PyMODA with current arguments."
 
 
-def _create_shortcut_linux() -> str:
+def _create_shortcut_nix() -> str:
     """
-    Creates a command-line alias to launch PyMODA with current arguments,
-    by adding it to ~/.bashrc and ~/.zshrc if it exists or zsh is installed.
+    Creates a command-line alias on *nix to launch PyMODA with current arguments,
+    by adding the alias to ~/.bashrc and ~/.zshrc if it exists or zsh is installed.
     """
     bashrc = _get_abs_path_in_home_folder(".bashrc")  # Bash.
     zshrc = _get_abs_path_in_home_folder(".zshrc")  # Zsh.
@@ -77,7 +77,7 @@ def _create_shortcut_linux() -> str:
 
     alias_pymoda = "alias pymoda="
     filter_func = lambda line: alias_pymoda not in line
-    line_to_add = f"{alias_pymoda}'{_get_python_interpreter_executable()} {_python_interpreter_arguments()}'"
+    line_to_add = f"{alias_pymoda}'{sys.executable} {_python_interpreter_arguments()}'"
 
     bash_lines = list(filter(filter_func, bash_lines))
     bash_lines.append(line_to_add)
@@ -97,14 +97,6 @@ def _create_shortcut_linux() -> str:
     )
 
 
-def _get_python_interpreter_executable() -> str:
-    return sys.executable
-
-
-def _create_shortcut_mac_os() -> str:
-    return _create_shortcut_linux()
-
-
 def _get_abs_path_in_home_folder(file_name: str) -> str:
     """
     Returns the absolute path to the a particular file
@@ -120,7 +112,9 @@ def _python_interpreter_arguments() -> str:
     """
     Returns the path to the main Python file plus all current arguments.
     """
-    return " ".join([_abs_path_to_main_py()] + sys.argv[1:])
+    blacklist = [update.arg_post_update]  # Args to avoid adding to shortcut.
+    args = [a for a in sys.argv[1:] if a not in blacklist]
+    return " ".join([_abs_path_to_main_py()] + args)
 
 
 def _abs_path_to_main_py() -> str:
