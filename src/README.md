@@ -22,4 +22,5 @@ The `src` folder is the folder containing PyMODA's source code.
 | `gui` | Code related to the GUI | 
 | `maths` | Code related to calculations, e.g. the algorithms used by PyMODA | 
 | `processes` | Code related to multiprocessing, such as the `Scheduler` class | 
+| `updater` | Code dedicated to checking for, and applying, updates | 
 | `utils` | Utility code, e.g. error handling, user settings and command-line argument parsing | 

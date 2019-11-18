@@ -7,10 +7,11 @@
 - [User Guide](#user-guide)
   - [Requirements](#requirements)
   - [Operating systems](#operating-systems)
-  - [Downloading the code](#downloading-the-code)
+  - [Downloading PyMODA](#downloading-pymoda)
   - [Preparing to run](#preparing-to-run)
   - [Running PyMODA](#running-pymoda)
   - [Creating a shortcut](#creating-a-shortcut)
+  - [Updating PyMODA](#updating-pymoda)
   - [Performance and efficiency](#performance-and-efficiency)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -47,38 +48,33 @@ This guide is aimed at users wishing to set up and run PyMODA. If you're interes
 - [MATLAB Runtime](https://www.mathworks.com/products/compiler/matlab-runtime.html), 
 version R2019a (9.6). The runtime does not require a license.
 
-> :warning: Do not use a newer version of the MATLAB Runtime.
+> :warning: Do not use a newer version of the MATLAB Runtime. MATLAB-packaged libraries are neither forward nor backward compatible.
 
-> Note: Python 3.8 will not be supported until MATLAB R2020a launches.
+> **Note:** Python 3.8 will not be supported until MATLAB R2020a launches.
 
 ## Operating systems
 
 PyMODA should run on Windows, macOS and Linux. Linux performs slightly better than Windows ([see comparison](#windows-vs-linux)).
 
-> Note: You should ensure that you are familiar with the [core knowledge](docs/core-knowledge.md) before proceeding.
+> **Note:** You should ensure that you are familiar with the [core knowledge](docs/core-knowledge.md) before proceeding.
 
-## Downloading the code
+## Downloading PyMODA
 
-There are two methods to download the code: as a zip file, or by cloning the repository with Git. The advantage of cloning with Git is that you can easily update PyMODA by running `git pull` in the terminal, preserving any added files such as shortcuts, instead of downloading a new zip file.
-
-If you prefer the zip method:
+PyMODA can be downloaded as a .zip file. 
 
 - [Click here](https://github.com/luphysics/PyMODA/zipball/master) to download the .zip file. 
 - Extract the zip file to a desired location.
 - For simplicity of instructions, rename the folder to `PyMODA`.
 
-If you prefer the Git method:
-
-- [Install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
-- Open a terminal in a desired folder and run `git clone https://github.com/luphysics/PyMODA.git`.
-- The code will download as a folder named `PyMODA`.
-- Whenever you want to update, open a terminal in `PyMODA` and run `git pull`.
+> :warning: Do not place `PyMODA` in a folder which requires admin permissions, such as `C:\Program Files`.
 
 ## Preparing to run
 
-When the code is downloaded and Python is installed, you'll need to install the dependencies. Open a terminal in the `PyMODA` folder and run `python packages/install.py`.
+When the code is downloaded and Python is installed, you'll need to install the dependencies. 
 
-> :warning: Do not run this command with elevated permissions.
+Open a terminal in the `PyMODA` folder and run `python packages/install.py`. When prompted, you will then need to press the `Enter` key to proceed.
+
+> :warning: For security reasons, do not run this command with elevated permissions.
 
 ## Running PyMODA
 
@@ -94,15 +90,31 @@ In the launcher window, click "Create shortcut" to create a shortcut to easily o
 
 #### Windows
 
-A desktop shortcut will be created, which launches PyMODA with the current Python interpreter. If it exists, it will be replaced.
+A desktop shortcut will be created, which launches PyMODA with the current Python interpreter. If a shortcut already exists, it will be replaced.
 
 #### macOS/Linux
 
 An alias will be created, which adds the terminal command `pymoda` to launch PyMODA with the current Python interpreter. The alias will be added to `~/.bashrc` for Bash, and if Zsh is installed, to `~/.zshrc`. If the alias already exists, it will be replaced.
 
-> Note: This will not take effect in currently open shells. Open a new terminal to try it out. 
+> **Note:** This will not take effect in currently open shells. Open a new terminal to try it out. 
 
-> Tip: If the `-runtime` argument was provided to the instance of PyMODA which created the alias, it does not need to specified when using the `pymoda` command. 
+> **Tip:** If the `-runtime` argument was provided to the instance of PyMODA which created the alias, it does not need to specified when using the `pymoda` command. 
+
+## Updating PyMODA
+
+PyMODA checks for updates occasionally, and shows a blue message in the launcher window if updates are available. 
+
+> **Tip:** You can press `Ctrl`+`U` to trigger a check for updates. 
+
+### Applying an update
+
+To apply an update automatically, press the "Update now" button and accept the confirmation. A dialog will show the download progress, and PyMODA will automatically re-open after the update is complete. 
+
+> **Note:** If you've made modifications to the code, you should use Git instead of the built-in updater. 
+
+### Rolling back to the previous version
+
+If an update fails to apply or introduces a new problem, the previous version of PyMODA can be restored from `PyMODA/backup`. Just copy all of the files and folders from `PyMODA/backup` and paste them into `PyMODA`, overwriting if applicable.
 
 ## Performance and efficiency
 
