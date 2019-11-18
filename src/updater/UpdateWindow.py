@@ -68,8 +68,9 @@ class UpdateWindow(CentredWindow):
             self.label.setText("Unzipping files...")
             try:
                 upd.extract_zip(temp_filename)
-            except:
+            except Exception as e:
                 self.label.setText("Unzip failed. Please try again later.")
+                print(e)
             else:
                 self.start_copy_files()
         else:
@@ -79,8 +80,9 @@ class UpdateWindow(CentredWindow):
         try:
             self.label.setText("Backing up current version and moving files...")
             upd.copy_files()
-        except:
+        except Exception as e:
             self.label.setText("Failed to copy files.")
+            print(e)
         else:
             self.label.setText("Finished!")
             upd.relaunch_pymoda(success=True)

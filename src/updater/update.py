@@ -29,7 +29,6 @@ The update process is as follows:
 import os
 
 # Fix issue where imports fail when launching from 'temp'.
-
 os.environ["PYTHONPATH"] = "."
 
 import asyncio
@@ -50,6 +49,9 @@ zip_url = f"{api_url}/zipball/master"
 
 commit_url = f"{api_url}/git/refs/heads/master"
 temp = "temp"
+
+# The folder where the new version of PyMODA will be unzipped.
+unzip_target = "pymoda_new"
 
 
 async def get_latest_commit() -> Optional[str]:
@@ -109,6 +111,10 @@ def start_update(root_directory: str) -> None:
     print(f"Launching updater at: {updater_path}")
     subprocess.Popen([sys.executable, updater_path, *sys.argv[1:]])
 
+    from PyQt5.QtCore import QCoreApplication
+
+    QCoreApplication.quit()
+
     sys.exit(0)
 
 
@@ -123,8 +129,16 @@ def extract_zip(zip_path: str) -> None:
     """
     import zipfile
 
+    try:
+        # Just in case the target folder already exists, try deleting it.
+        shutil.rmtree(unzip_target)
+    except:
+        # It doesn't exist; no problem.
+        pass
+
+    # Extract the zip file.
     with zipfile.ZipFile(zip_path, "r") as zipref:
-        zipref.extractall()
+        zipref.extractall(unzip_target)
 
 
 def copy_files() -> None:
@@ -147,40 +161,67 @@ def copy_files() -> None:
     backup_folder = path.join(target, f"backup")
 
     # Path to new files. This will be where the new version of PyMODA has been extracted.
-    new_path = [f for f in os.listdir(".") if path.isdir(f)][-1]
+    # The PyMODA code will be in the only folder inside `unzip_target`.
+    pymoda_new = [path.join(unzip_target, f) for f in os.listdir(unzip_target)][0]
+    print(f"New files are at: {pymoda_new}")
 
-    # Delete backup folder, then copy current PyMODA folder to 'backup'.
-    if path.exists(backup_folder):
+    # Delete current backup folder.
+    try:
         shutil.rmtree(backup_folder)
+    except:
+        # If the folder doesn't exist, ignore the exception.
+        pass
 
-    shutil.copytree(target, backup_folder)
+    # Copy current PyMODA folder to 'backup', creating backup of current PyMODA.
+    shutil.copytree(target, backup_folder, ignore=shutil.ignore_patterns(".git"))
 
     # For every file/folder in the new version of PyMODA, delete the old file/folder
     # from the current PyMODA folder and copy the new file/folder to its location.
-    for f in os.listdir(new_path):
+    for f in os.listdir(pymoda_new):
         if f == "__pycache__" or f.endswith(".pyc") or f == ".idea":
             continue
 
+        # Remove old file/folder from target directory.
         old = path.join(target, f)
-        try:
-            print(f"Removing {old}")
-            if path.isdir(old):
-                shutil.rmtree(old)
-            else:
-                os.remove(old)
-        except Exception as e:
-            print(e)
+        print(f"Removing {old}")
+        _remove_file(old)
 
-        try:
-            new_file = path.join(new_path, f)
-            print(f"Copying {new_file} to {target}")
-            if path.isdir(new_file):
-                target_folder = path.join(target, path.basename(new_file))
-                shutil.copytree(new_file, target_folder)
-            else:
-                shutil.copy(new_file, target)
-        except Exception as e:
-            print(e)
+        # Copy new version of file/folder to target directory.
+        file_path = path.join(pymoda_new, f)
+        print(f"Copying {file_path} to {target}")
+        _copy_new_file(file_path, target)
+
+
+def _remove_file(file_path: str) -> None:
+    """
+    Removes a file/folder.
+
+    :param file_path: the path to the file/folder
+    """
+    try:
+        if path.isdir(file_path):
+            shutil.rmtree(file_path)
+        else:
+            os.remove(file_path)
+    except Exception as e:
+        print(e)
+
+
+def _copy_new_file(file_path: str, target: str) -> None:
+    """
+    Copies a file/folder to a new location.
+
+    :param file_path: the path to the file/folder
+    :param target: the new location
+    """
+    try:
+        if path.isdir(file_path):
+            target_folder = path.join(target, path.basename(file_path))
+            shutil.copytree(file_path, target_folder)
+        else:
+            shutil.copy(file_path, target)
+    except Exception as e:
+        print(e)
 
 
 def path_here() -> str:
@@ -212,6 +253,10 @@ def relaunch_pymoda(success: bool) -> None:
     main_path = path.join(root, src_main)
     subprocess.Popen([sys.executable, main_path] + args)
 
+    from PyQt5.QtCore import QCoreApplication
+
+    QCoreApplication.quit()
+
     sys.exit(0)
 
 
@@ -219,9 +264,9 @@ def cleanup() -> None:
     """
     Called by PyMODA. Cleans up after an update by deleting the 'temp' folder.
     """
-    temp = path.join(Path(os.getcwd()).parent, "temp")
+    _temp_folder = path.join(Path(os.getcwd()).parent, temp)
     try:
-        shutil.rmtree(temp)
+        shutil.rmtree(_temp_folder)
     except:
         pass
 
