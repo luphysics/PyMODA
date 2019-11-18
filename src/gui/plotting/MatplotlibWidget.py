@@ -26,7 +26,6 @@ from matplotlib.figure import Figure
 from matplotlib.lines import Line2D
 from mpl_toolkits.mplot3d import Axes3D
 
-from gui.plotting.Callbacks import Callbacks
 from gui.plotting.NavigationBar import NavigationBar
 from gui.plotting.PlotWidget import PlotWidget
 from gui.plotting.plots.Rect import Rect
@@ -39,8 +38,6 @@ class MatplotlibWidget(PlotWidget):
     """
 
     def __init__(self, parent):
-        self.callbacks: Callbacks = None
-
         self.canvas: FigureCanvas = None
         self.layout: QVBoxLayout = None
 
@@ -67,15 +64,21 @@ class MatplotlibWidget(PlotWidget):
 
         # A list of listeners which are notified of zoom events.
         self.zoom_listeners = []
-        self.mouse_zoom_enabled = True
+        self.mouse_zoom_enabled = False  # Deprecated?
+
+        # Callbacks used to receive click and release events from the plot.
+        # Stored as member variables to prevent garbage collection.
+        self._mpl_click_callback = None
+        self._mpl_release_callback = None
 
         self.click_crosshair_enabled = False
         self.max_crosshairs = 10
         self.crosshair_listeners = []
 
+        # The navigation toolbar which has options for zooming, etc.
         self.toolbar: NavigationBar = None
 
-        super(MatplotlibWidget, self).__init__(parent)
+        PlotWidget.__init__(self, parent)
 
     def setup_ui(self) -> None:
         self.canvas = FigureCanvas(Figure())
@@ -86,7 +89,7 @@ class MatplotlibWidget(PlotWidget):
         if self.is_3d():
             self.axes = Axes3D(self.fig)
         else:
-            self.axes = self.fig.subplots()
+            self.axes = self.fig.subplots(1, 1)
 
         self.init_callbacks()
 
@@ -110,29 +113,31 @@ class MatplotlibWidget(PlotWidget):
         """
         Creates the callbacks for interacting with the plot.
         """
-        click = self.canvas.mpl_connect("button_press_event", self.on_click)
-        release = self.canvas.mpl_connect("button_release_event", self.on_release)
+        self._mpl_click_callback = self.canvas.mpl_connect(
+            "button_press_event", self.on_click
+        )
+        self._mpl_release_callback = self.canvas.mpl_connect(
+            "button_release_event", self.on_release
+        )
 
-        xlim = self.axes.callbacks.connect("xlim_changed", self.on_xlim_changed)
-        ylim = self.axes.callbacks.connect("ylim_changed", self.on_ylim_changed)
-
-        # Set the callbacks object to hold references to these callbacks.
-        self.callbacks = Callbacks(click, release, xlim, ylim)
+        self.toolbar.add_zoom_callback(self.on_zoom)
 
     def on_plot_complete(self) -> None:
         """
         Should be called after the first plot is complete. It will then set the initial state
         so that the reset button can work.
         """
-        self.clear_rect_states()
-        self.add_rect_state(self.current_rect())
+        # self.clear_rect_states()
+        # self.add_rect_state(self.current_rect())
         self.canvas.draw()
 
-    def on_xlim_changed(self, axes) -> None:
-        print("xlim changed")
+    def on_zoom(self) -> None:
+        x1, x2 = self.axes.get_xlim()
+        y1, y2 = self.axes.get_ylim()
+        rect = Rect(x1, y1, x2, y2)
 
-    def on_ylim_changed(self, axes) -> None:
-        print("ylim changed")
+        for func in self.zoom_listeners:
+            func(rect)
 
     def set_mouse_zoom_enabled(self, value: bool) -> None:
         self.mouse_zoom_enabled = value
@@ -293,9 +298,9 @@ class MatplotlibWidget(PlotWidget):
         Zooms the plot to the region designated by the rectangle.
         Adds the new state to the stack of states.
         """
-        rect = rect.sorted()
-        if save_state:
-            self.add_rect_state(rect)
+        # rect = rect.sorted()
+        # if save_state:
+        #     self.add_rect_state(rect)
 
         self.axes.set_xlim(rect.x1, rect.x2)
         self.axes.set_ylim(rect.y1, rect.y2)
@@ -304,6 +309,9 @@ class MatplotlibWidget(PlotWidget):
         if trigger_listeners:
             for l in self.zoom_listeners:
                 l(rect)
+
+        if save_state:
+            self.toolbar.push_current()
 
     def set_xrange(self, x1=None, x2=None, **kwargs) -> None:
         """Set the range of x-values shown by the plot."""
@@ -326,9 +334,11 @@ class MatplotlibWidget(PlotWidget):
     def remove_crosshair_listener(self, func) -> None:
         self.crosshair_listeners.remove(func)
 
+    @deprecated
     def clear_rect_states(self) -> None:
         self.rect_stack.clear()
 
+    @deprecated
     def add_rect_state(self, rect: Rect) -> None:
         """Adds a rect state to the stack of states."""
         self.rect_stack.append(rect)

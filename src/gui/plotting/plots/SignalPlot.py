@@ -23,6 +23,10 @@ class SignalPlot(MatplotlibWidget):
     Plots the signal, which is a simple set of amplitudes against time.
     """
 
+    def __init__(self, parent):
+        MatplotlibWidget.__init__(self, parent)
+        self.toolbar.disable_panning()
+
     def plot(self, data: TimeSeries, clear=True):
         if clear:
             self.clear()
