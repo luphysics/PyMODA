@@ -256,7 +256,6 @@ def relaunch_pymoda(success: bool) -> None:
     from PyQt5.QtCore import QCoreApplication
 
     QCoreApplication.quit()
-
     sys.exit(0)
 
 

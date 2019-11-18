@@ -15,11 +15,12 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import asyncio
 
-from PyQt5.QtWidgets import QVBoxLayout, QProgressBar, QLabel, QWidget
+from PyQt5 import QtGui
+from PyQt5.QtCore import QThread
+from PyQt5.QtWidgets import QVBoxLayout, QProgressBar, QLabel, QWidget, QPushButton
 
 import updater.update as upd
 from gui.windows.CentredWindow import CentredWindow
-from updater.DownloadThread import temp_filename
 
 
 class UpdateWindow(CentredWindow):
@@ -36,53 +37,123 @@ class UpdateWindow(CentredWindow):
         layout = QVBoxLayout()
         central_widget.setLayout(layout)
 
-        self.label = QLabel("Downloading...")
+        self.label: QLabel = QLabel("Downloading...")
         layout.addWidget(self.label)
 
-        self.progress = QProgressBar()
+        self.progress: QProgressBar = QProgressBar()
         layout.addWidget(self.progress)
 
-        self.thread = None
-        asyncio.ensure_future(self.start_download())
+        self.btn_cancel: QPushButton = QPushButton("Cancel")
+        layout.addWidget(self.btn_cancel)
 
-    async def start_download(self) -> None:
+        self.btn_cancel.clicked.connect(self.on_cancel_clicked)
+        self.can_cancel = True
+
+        self.btn_close: QPushButton = QPushButton("Close")
+        layout.addWidget(self.btn_close)
+
+        self.btn_close.clicked.connect(self.on_close_clicked)
+        self.btn_close.hide()
+
+        self.thread: QThread = None
+        asyncio.ensure_future(self.start_update())
+
+    def closeEvent(self, event: QtGui.QCloseEvent) -> None:
         """
-        Gets the size of the GitHub repository from the API,
-        then starts the download thread.
+        Overrides closeEvent to prevent the window from being closed by the user
+        while the installation is in progress.
         """
-        from updater.DownloadThread import DownloadThread
+        event.ignore()
+
+    def on_cancel_clicked(self) -> None:
+        """
+        Called when the cancel button is clicked.
+        """
+        if self.can_cancel:
+            self.thread.quit()
+            upd.relaunch_pymoda(success=False)
+
+    def on_close_clicked(self) -> None:
+        """
+        Called when the close button is clicked. The close button only appears
+        when the update has failed.
+        """
+        self.thread.quit()
+        upd.relaunch_pymoda(success=False)
+
+    def on_failed(self) -> None:
+        """
+        Called when the update fails. Shows the button to close the dialog.
+        """
+        self.btn_close.show()
+        self.btn_cancel.hide()
+        self.progress.hide()
+
+    async def start_update(self) -> None:
+        """
+        Gets the size of the repository from the GitHub API,
+        then starts the update thread.
+        """
+        from updater.UpdateThread import UpdateThread
 
         size = await upd.get_repo_size()
+        print(f"Got size from GitHub API: {size} bytes.")
 
-        self.thread = DownloadThread(self, size)
-        self.thread.progress_signal.connect(self.on_progress)
-        self.thread.finished_signal.connect(self.on_download_finished)
+        self.thread = UpdateThread(self, size)
+
+        self.thread.download_progress_signal.connect(self.on_progress)
+        self.thread.download_finished_signal.connect(self.on_download_finished)
+
+        self.thread.extract_finished_signal.connect(self.on_extract_finished)
+        self.thread.copy_finished_signal.connect(self.on_copy_finished)
+
         self.thread.start()
 
     def on_progress(self, progress: float) -> None:
+        """
+        Called to update the progress bar with the download progress.
+        :param progress: the progress, as a percentage
+        """
         self.progress.setValue(progress)
 
     def on_download_finished(self, success: bool) -> None:
-        self.progress.hide()
-        if success:
-            self.label.setText("Unzipping files...")
-            try:
-                upd.extract_zip(temp_filename)
-            except Exception as e:
-                self.label.setText("Unzip failed. Please try again later.")
-                print(e)
-            else:
-                self.start_copy_files()
-        else:
-            self.label.setText("Download failed. Please try again later.")
+        """
+        Called when download the zip file has finished.
 
-    def start_copy_files(self) -> None:
-        try:
-            self.label.setText("Backing up current version and moving files...")
-            upd.copy_files()
-        except Exception as e:
+        :param success: whether it was successful
+        """
+        if not success:
+            self.label.setText("Download failed. Please try again later.")
+            return self.on_failed()
+
+        self.can_cancel = False
+
+        self.btn_cancel.hide()
+        self.progress.setRange(0, 0)
+
+        self.label.setText("Unzipping files...")
+
+    def on_extract_finished(self, success: bool) -> None:
+        """
+        Called when extracting the zip file has finished.
+
+        :param success: whether it was successful
+        """
+        if not success:
+            self.label.setText("Unzip failed. Please try again later.")
+            return self.on_failed()
+
+        self.label.setText("Backing up and overwriting files...")
+
+    def on_copy_finished(self, success: bool) -> None:
+        """
+        Called when overwriting the old PyMODA with the new version has finished.
+
+        :param success: whether it was successful
+        """
+        if not success:
             self.label.setText("Failed to copy files.")
-            print(e)
-        else:
-            self.label.setText("Finished!")
-            upd.relaunch_pymoda(success=True)
+            return self.on_failed()
+
+        self.label.setText("Finished!")
+        upd.relaunch_pymoda(success=True)
