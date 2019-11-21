@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
 """
-Python script which installs all Matlab packages and pip dependencies.
+Python script which installs all Matlab-packaged libraries and pip dependencies.
+
+Important: moving or renaming this file will break PyMODA's updater. Check the code in 'src/updater' before making changes to command-line arguments or core functionality.
 """
 
 import os
@@ -11,35 +13,22 @@ import sys
 import time
 from glob import glob
 from typing import Tuple, Optional
+from os import path
 
-packages = "packages"
-cwd = os.getcwd()
+assert sys.version_info >= (3, 6), "You must use Python 3.6 or greater."
 
 # Pip parameter for avoiding permission issues.
 user_flag = "--user"
 
 
-def find_cwd() -> Optional[str]:
-    if packages in os.listdir("."):
-        return os.path.join(cwd, packages)
-    elif cwd.replace("\\", "/").split("/")[-1] == packages:
-        return cwd
-    return None
-
-
-def check_cwd() -> str:
-    new_cwd = find_cwd()
-
-    if not new_cwd:
-        fatal_error(
-            "The script should be executed from the PyMODA directory or its `packages` subfolder."
-        )
-
-    os.chdir(new_cwd)
-    return new_cwd
-
-
 def run_command(command: str, verbose=False, dry_run=False) -> Tuple[str, str]:
+    """
+    Runs a command via the system shell.
+
+    :param command: the command, as a string
+    :param verbose: whether to return the output
+    :param dry_run: whether to 'dry-run' the command (pretend to run it)
+    """
     print(f"Working directory: {os.getcwd()}")
     print(f"Running command: {command}", end="\n\n")
 
@@ -64,21 +53,25 @@ def run_command(command: str, verbose=False, dry_run=False) -> Tuple[str, str]:
     return output, error
 
 
-def fatal_error(message: str):
-    # ANSI codes to make the text red.
-    red, endc = "\033[91m", "\033[0m"
-
-    print(f"{red}\n\nError: {message}\n\n{endc}")
+def fatal_error(message: str) -> None:
+    """
+    Prints an error and calls sys.exit().
+    """
+    print(f"Error: {message}")
     sys.exit(1)
 
 
 if __name__ == "__main__":
-    assert sys.version_info >= (3, 6), "You must use Python 3.6 or greater."
+    # Set working directory to here.
+    wd = path.dirname(path.abspath(__file__))
+    os.chdir(wd)
+
+    print(f"Set working directory to: {os.getcwd()}")
 
     # Whether the OS is Windows-based.
     is_windows = "Windows" == platform.system()
 
-    # If Python is in a virtual environment, don't use --user.
+    # If Python is in a virtual environment, don't use the --user flag.
     if os.environ.get("VIRTUAL_ENV"):
         user_flag = ""
 
@@ -129,7 +122,6 @@ if __name__ == "__main__":
             f"Please reinstall Python so that its path does not contain spaces. The current Python path is '{python}'."
         )
 
-    wd = check_cwd()
     files = []
 
     # Get all the `setup.py` files for MATLAB packages.
