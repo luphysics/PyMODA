@@ -55,6 +55,12 @@ class UpdateWindow(CentredWindow):
         self.btn_close.clicked.connect(self.on_close_clicked)
         self.btn_close.hide()
 
+        self.btn_continue: QPushButton = QPushButton("Continue")
+        layout.addWidget(self.btn_continue)
+
+        self.btn_continue.hide()
+        self.btn_continue.clicked.connect(self.on_continue_clicked)
+
         self.thread: QThread = None
         asyncio.ensure_future(self.start_update())
 
@@ -80,6 +86,13 @@ class UpdateWindow(CentredWindow):
         """
         self.thread.quit()
         upd.relaunch_pymoda(success=False)
+
+    def on_continue_clicked(self) -> None:
+        """
+        Called when the continue button is clicked. The continue button only appears
+        when the update has been successful and packages are about to be updated.
+        """
+        upd.update_packages(success=True)
 
     def on_failed(self) -> None:
         """
@@ -155,5 +168,11 @@ class UpdateWindow(CentredWindow):
             self.label.setText("Failed to copy files.")
             return self.on_failed()
 
-        self.label.setText("Finished!")
-        upd.relaunch_pymoda(success=True)
+        self.progress.hide()
+        self.btn_continue.show()
+
+        self.label.setText(
+            "The installer window will close while packages are updated.\n"
+            "PyMODA will automatically relaunch once the process is complete.\n\n"
+            "This may take over a minute."
+        )

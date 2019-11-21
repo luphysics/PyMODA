@@ -38,7 +38,7 @@ import subprocess
 import sys
 from os import path
 from pathlib import Path
-from typing import Optional
+from typing import Optional, List
 
 import aiohttp
 from PyQt5.QtWidgets import QApplication
@@ -243,20 +243,73 @@ def relaunch_pymoda(success: bool) -> None:
 
     :param success: whether the update was successful
     """
-    args = sys.argv[1:]
-    if success:
-        args.append(arg_post_update)
-
-    src_main = path.join("src", "main.py")
-    root = Path(os.getcwd()).parent
-
-    main_path = path.join(root, src_main)
-    subprocess.Popen([sys.executable, main_path] + args)
+    args = _get_relaunch_args(success)
+    subprocess.Popen(_get_relaunch_command(args), shell=True)
 
     from PyQt5.QtCore import QCoreApplication
 
     QCoreApplication.quit()
     sys.exit(0)
+
+
+def update_packages(success: bool) -> None:
+    """
+    Calls the install script at packages/install.py, quits the program and relaunches PyMODA with
+    the current command-line arguments.
+
+    :param success: whether the update was a success
+    """
+    # PyMODA directory.
+    root = Path(os.getcwd()).parent
+
+    # PyMODA/packages.
+    packages = os.path.join(root, "packages")
+
+    # PyMODA/packages/install.py.
+    install_script = os.path.join(packages, "install.py")
+
+    # Command to run install.py with the current interpreter.
+    install_command = f"{sys.executable} {install_script} -y"
+
+    args = _get_relaunch_args(success)
+    relaunch_command = _get_relaunch_command(args)
+
+    # Run the commands. '&&' should work on all OSes.
+    subprocess.Popen(f"{install_command} && {relaunch_command}", shell=True)
+
+    from PyQt5.QtCore import QCoreApplication
+
+    QCoreApplication.quit()
+    sys.exit(0)
+
+
+def _get_relaunch_command(args: List[str]) -> str:
+    """
+    Gets the command used to relaunch PyMODA.
+
+    :param args: the command-line arguments to use
+    :return: the shell command
+    """
+    src_main = path.join("src", "main.py")
+
+    root = Path(os.getcwd()).parent
+    main_path = path.join(root, src_main)
+
+    args_string = " ".join(args)
+    return f"{sys.executable} {main_path} {args_string}"
+
+
+def _get_relaunch_args(success: bool) -> List[str]:
+    """
+    Gets the command-line arguments to use when relaunching PyMODA.
+
+    :param success: whether the update was successful
+    """
+    args = sys.argv[1:]
+    if success:
+        args.append(arg_post_update)
+
+    return args
 
 
 def cleanup() -> None:
