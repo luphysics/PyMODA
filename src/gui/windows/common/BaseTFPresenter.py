@@ -21,6 +21,7 @@ from maths.signals.Signals import Signals
 from maths.signals.TimeSeries import TimeSeries
 from processes.MPHandler import MPHandler
 from utils import stdout_redirect, errorhandling
+from utils.decorators import deprecated
 from utils.stdout_redirect import WindowLogger
 
 
@@ -50,14 +51,14 @@ class BaseTFPresenter:
         errorhandling.subscribe(self.on_error)
         stdout_redirect.subscribe(self.logger)
 
-    def init(self):
+    def init(self) -> None:
         # Add zoom listener to the signal plotting, which is displayed in the top left.
         self.view.signal_plot().add_zoom_listener(self.on_signal_zoomed)
 
         # Open dialog to select a data file.
         self.view.select_file()
 
-    def calculate(self, calculate_all: bool):
+    def calculate(self, calculate_all: bool) -> None:
         """
         Performs the main calculation. To connect as a slot,
         use functools.partial:
@@ -66,28 +67,28 @@ class BaseTFPresenter:
         """
         pass
 
-    def on_progress_updated(self, current, total):
+    def on_progress_updated(self, current, total) -> None:
         self.view.update_progress(current, total)
 
-    def on_all_tasks_completed(self):
+    def on_all_tasks_completed(self) -> None:
         self.tasks_completed = 0
 
-    def on_error(self, exc_type, value, traceback):
+    def on_error(self, exc_type, value, traceback) -> None:
         """Called when an error occurs, provided that the debug argument is not in use."""
         self.cancel_calculate()
         ErrorBox(exc_type, value, traceback)
 
-    def on_log(self, text):
+    def on_log(self, text) -> None:
         """Called when a log should occur; tells view to display message in log pane."""
         self.view.set_log_text(text)
 
-    def on_signal_zoomed(self, rect):
+    def on_signal_zoomed(self, rect) -> None:
         """Called when the signal plotting (top left) is zoomed, and sets the x-limits."""
         if rect.is_valid():
             self.view.set_xlimits(rect.x1, rect.x2)
             self.signals.set_xlimits(rect.x1, rect.x2)
 
-    def invalidate_data(self):
+    def invalidate_data(self) -> None:
         """
         Sets the current data as invalid, so that it is not plotted
         while a calculation is in progress.
@@ -95,7 +96,7 @@ class BaseTFPresenter:
         for d in self.signals:
             d.output_data.invalidate()
 
-    def cancel_calculate(self):
+    def cancel_calculate(self) -> None:
         """
         Cancels the calculation of the desired transform(s),
         killing their processes immediately.
@@ -107,11 +108,12 @@ class BaseTFPresenter:
         self.on_all_tasks_completed()
         print("Calculation terminated.")
 
-    def on_freq_changed(self, freq):
+    @deprecated
+    def on_freq_changed(self, freq) -> None:
         """Called when the frequency is changed."""
         self.freq = float(freq)
 
-    def set_frequency(self, freq: float):
+    def set_frequency(self, freq: float) -> None:
         """Sets the frequency of the time-series."""
         self.signals.set_frequency(freq)
 
@@ -122,7 +124,7 @@ class BaseTFPresenter:
         self.view.update_title()
         self.load_data()
 
-    def load_data(self):
+    def load_data(self) -> None:
         pass
 
     def get_window_name(self) -> str:
@@ -135,7 +137,7 @@ class BaseTFPresenter:
             title += f" - {self.open_file}"
         return title
 
-    def on_close(self):
+    def on_close(self) -> None:
         """Called when the window closes."""
         self.cancel_calculate()
         errorhandling.unsubscribe(self.on_error)
@@ -143,21 +145,23 @@ class BaseTFPresenter:
     def get_params(self):
         pass
 
-    def on_data_loaded(self):
+    def on_data_loaded(self) -> None:
         pass
 
-    def on_signal_selected(self, item):
+    def on_signal_selected(self, item) -> None:
         pass
 
     def get_selected_signal(self) -> TimeSeries:
         """Returns the currently selected signal as a TimeSeries."""
         return self.signals.get(self.selected_signal_name)
 
-    def plot_preprocessed_signal(self):
-        """Plots the preprocessed version of the signal."""
+    def plot_preprocessed_signal(self) -> None:
+        """
+        Plots the preprocessed version of the signal.
+        """
         asyncio.ensure_future(self.coro_plot_preprocessed_signal())
 
-    async def coro_plot_preprocessed_signal(self):
+    async def coro_plot_preprocessed_signal(self) -> None:
         """
         Coroutine to preprocess the signal and plot the result.
         """

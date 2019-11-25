@@ -19,6 +19,7 @@ from typing import Union
 from PyQt5.QtWidgets import QListWidgetItem
 
 from gui.dialogs.FrequencyDialog import FrequencyDialog
+from gui.plotting.plots.Rect import Rect
 from gui.windows.common.BaseTFPresenter import BaseTFPresenter
 from maths.params.TFParams import TFParams, _wt, _wft, create
 from maths.signals.Signals import Signals
@@ -201,6 +202,16 @@ class TFPresenter(BaseTFPresenter):
         """Called when the time-series data has been loaded."""
         self.view.update_signal_listview(self.signals.names())
         self.plot_signal()
+
+    def on_signal_zoomed(self, rect: Rect) -> None:
+        """
+        Override callback to also plot the preprocessed version of
+        the x-limited signal instead of the whole signal.
+
+        :param rect: the rectangle which has been zoomed to
+        """
+        super().on_signal_zoomed(rect)
+        self.plot_preprocessed_signal()
 
     def on_signal_selected(self, item: Union[QListWidgetItem, str]):
         """
