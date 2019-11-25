@@ -51,6 +51,6 @@ def calculate(time_series: TimeSeries, params: TFParams):
     if f0 is not None and fmin is not None and fmin != 0:
         params_dict[_f0] = f0 / fmin
 
-    wft, frequency = package.transform(signal_matlab, params.fs, params_dict, nargout=2)
+    wft, frequency = package.wft(signal_matlab, params.fs, params_dict, nargout=2)
 
     return wft, frequency

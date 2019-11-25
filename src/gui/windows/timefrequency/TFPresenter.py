@@ -40,12 +40,20 @@ class TFPresenter(BaseTFPresenter):
         self.is_calculating_all = True
 
     def calculate(self, calculate_all: bool):
-        """Calculates the desired transform(s), and plots the result."""
+        """
+        Calculates the desired transform(s), and plots the result.
+        """
+        # If WFT parameters are incorrect, show error.
+        if not self.view.get_fmin() and not self.view.is_wavelet_transform_selected():
+            return self.view.show_wft_error()
+
         asyncio.ensure_future(self.coro_calculate(calculate_all))
         print("Started calculation...")
 
     async def coro_calculate(self, calc_all: bool):
-        """Coroutine to calculate all results."""
+        """
+        Coroutine to calculate all results.
+        """
         self.is_calculating_all = calc_all
 
         self.mp_handler = MPHandler()
@@ -54,7 +62,6 @@ class TFPresenter(BaseTFPresenter):
         params = self.get_params(all_signals=calc_all)
         if params.transform == _wft:
             if self.view.get_fmin() is None:
-                # Will be caught by error handling and shown as a dialog.
                 raise Exception("Minimum frequency must be defined for WFT.")
 
         self.is_plotted = False
@@ -168,12 +175,9 @@ class TFPresenter(BaseTFPresenter):
             fmin=self.view.get_fmin(),
             fmax=self.view.get_fmax(),
             f0=self.view.get_f0(),
-            fstep=self.view.get_fstep(),
-            padding=self.view.get_padding(),
             # Only one of these two will be used, depending on the selected transform.
             window=self.view.get_wt_wft_type(),
             wavelet=self.view.get_wt_wft_type(),
-            rel_tolerance=self.view.get_rel_tolerance(),
             cut_edges=self.view.get_cut_edges(),
             preprocess=self.view.get_preprocess(),
             transform=self.view.get_transform_type(),

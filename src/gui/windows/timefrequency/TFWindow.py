@@ -13,10 +13,9 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from typing import Optional
 
 from PyQt5 import QtGui
-from PyQt5.QtGui import QWindow
+from PyQt5.QtWidgets import QMessageBox
 
 from data import resources
 from gui.components.FreqComponent import FreqComponent
@@ -25,24 +24,33 @@ from gui.components.SingleSignalComponent import SingleSignalComponent
 from gui.windows.common.BaseTFWindow import BaseTFWindow
 from gui.windows.timefrequency.TFPresenter import TFPresenter
 from gui.windows.timefrequency.TFViewProperties import TFViewProperties
-from utils.decorators import floaty, deprecated
 
 
-class TFWindow(TFViewProperties,
-               PreprocessComponent,
-               BaseTFWindow,
-               FreqComponent,
-               SingleSignalComponent):
+class TFWindow(
+    TFViewProperties,
+    PreprocessComponent,
+    BaseTFWindow,
+    FreqComponent,
+    SingleSignalComponent,
+):
     """
     The time-frequency window. This class is the "View" in MVP,
     meaning that it should defer responsibility for tasks to the
     presenter.
     """
+
     name = "Time-Frequency Analysis"
 
     # The items to be shown in the "WT / WFT Type" combobox.
     window_items = (
-        ["Gaussian", "Hann", "Blackman", "Exp", "Rect", "Kaiser-a"],  # Windowed Fourier transform.
+        [
+            "Gaussian",
+            "Hann",
+            "Blackman",
+            "Exp",
+            "Rect",
+            "Kaiser-a",
+        ],  # Windowed Fourier transform.
         ["Lognorm", "Morlet", "Bump"],  # Wavelet transform.
     )
 
@@ -86,7 +94,15 @@ class TFWindow(TFViewProperties,
         """Called when the type of transform (WT or WFT) is toggled."""
         self.setup_combo_wt(is_wt)
 
-    def setup_combo_wt(self, is_wt=True):
+    def show_wft_error(self) -> None:
+        """
+        Shows an error regarding the parameters of the WFT.
+        """
+        QMessageBox.warning(
+            self, "Error", "Minimum frequency must be defined and non-zero for WFT."
+        )
+
+    def setup_combo_wt(self, is_wt: bool = True):
         """
         Sets up the "WT / WFT Type" combobox according to the current transform type.
         :param is_wt: whether the current transform is WT (not WFT)
@@ -94,7 +110,7 @@ class TFWindow(TFViewProperties,
         combo = self.combo_window
         combo.clear()
 
-        # Gets the list of items from the tuple, since the bool evaluates to 0 or 1.
+        # Gets the correct list of items from the tuple, since the bool evaluates to 0 or 1.
         items = self.window_items[is_wt]
         for i in items:
             combo.addItem(i)
@@ -107,27 +123,26 @@ class TFWindow(TFViewProperties,
         self.radio_transform_wt.setChecked(True)
         self.radio_transform_wt.toggled.connect(self.on_transform_toggled)
 
-    @floaty
-    def get_fstep(self) -> Optional[float]:
-        return None  # Placeholder.
-
-    def get_padding(self) -> str:  # TODO: is this actually used in the algorithm?
-        return None
-
-    @floaty
-    def get_rel_tolerance(self) -> Optional[float]:
-        return None
-
     def get_wt_wft_type(self) -> str:
+        """
+        Gets the type of WT/WFT from the GUI; for example, this could be "Morlet" for WT
+        or "Gaussian" for WFT.
+        """
         combo = self.combo_window
         return combo.currentText()
 
+    def is_wavelet_transform_selected(self) -> bool:
+        """
+        Returns whether the wavelet transform is selected (not the windowed Fourier transform).
+        """
+        return self.get_transform_type() == "wt"
+
     def get_transform_type(self) -> str:
+        """
+        :return: "wft" if the selected transform is windowed Fourier transform, or "wt" if wavelet transform
+        """
         if self.radio_transform_wft.isChecked():
             transform = "wft"
         else:
             transform = "wt"
         return transform
-
-    def setup_radio_cut_edges(self):
-        self.radio_cut_on.setChecked(True)

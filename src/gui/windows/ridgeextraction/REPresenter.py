@@ -36,6 +36,7 @@ class REPresenter(TFPresenter):
         super(REPresenter, self).__init__(view)
 
         from gui.windows.ridgeextraction.REWindow import REWindow
+
         self.view: REWindow = view
 
     def calculate(self, calculate_all: bool):
@@ -50,7 +51,9 @@ class REPresenter(TFPresenter):
     def on_ridge_extraction_clicked(self):
         intervals = self.view.get_interval_strings()
         if len(intervals) < 1:
-            raise Exception("At least one interval must be specified for ridge extraction.")
+            raise Exception(
+                "At least one interval must be specified for ridge extraction."
+            )
 
         print("Starting ridge extraction...")
         self.view.clear_all()
@@ -60,8 +63,7 @@ class REPresenter(TFPresenter):
 
     async def coro_ridge_extraction(self):
         data: tuple = await self.mp_handler.coro_ridge_extraction(
-            self.get_re_params(),
-            on_progress=self.on_progress_updated
+            self.get_re_params(), on_progress=self.on_progress_updated
         )
 
         for d in data:
@@ -69,19 +71,21 @@ class REPresenter(TFPresenter):
 
         self.on_all_ridge_completed()
 
-    def on_ridge_completed(self,
-                           name,
-                           times,
-                           freq,
-                           values,
-                           ampl,
-                           powers,
-                           avg_ampl,
-                           avg_pow,
-                           interval,
-                           filtered_signal,
-                           iphi,
-                           ifreq):
+    def on_ridge_completed(
+        self,
+        name,
+        times,
+        freq,
+        values,
+        ampl,
+        powers,
+        avg_ampl,
+        avg_pow,
+        interval,
+        filtered_signal,
+        iphi,
+        ifreq,
+    ):
 
         sig = self.signals.get(name)
 
@@ -125,13 +129,13 @@ class REPresenter(TFPresenter):
             self.triple_plot(times, bands, amp, phi)
 
     def triple_plot(
-            self,
-            x_values: ndarray,
-            top_y: ndarray,
-            middle_y: ndarray,
-            bottom_y: ndarray,
-            main_values: ndarray = None,
-            main_freq: ndarray = None
+        self,
+        x_values: ndarray,
+        top_y: ndarray,
+        middle_y: ndarray,
+        bottom_y: ndarray,
+        main_values: ndarray = None,
+        main_freq: ndarray = None,
     ):
         """
         Plots values on the 3 plots in the main section of the window.
@@ -193,9 +197,11 @@ class REPresenter(TFPresenter):
         asyncio.ensure_future(self.coro_bandpass_filter())
 
     async def coro_bandpass_filter(self):
-        data = await self.mp_handler.coro_bandpass_filter(self.signals,
-                                                          self.view.get_interval_tuples(),
-                                                          on_progress=self.on_progress_updated)
+        data = await self.mp_handler.coro_bandpass_filter(
+            self.signals,
+            self.view.get_interval_tuples(),
+            on_progress=self.on_progress_updated,
+        )
 
         for d in data:
             name, bands, phase, amp, interval = d
@@ -225,18 +231,12 @@ class REPresenter(TFPresenter):
             signals=self.signals,
             params_type=REParams,
             intervals=self.view.get_interval_tuples(),
-
             # fmin=fmin,
             # fmax=fmax,
             f0=self.view.get_f0(),
-            fstep=self.view.get_fstep(),
-            padding=self.view.get_padding(),
-
             # Only one of these two will be used, depending on the selected transform.
             window=self.view.get_wt_wft_type(),
             wavelet=self.view.get_wt_wft_type(),
-
-            rel_tolerance=self.view.get_rel_tolerance(),
             cut_edges=self.view.get_cut_edges(),
             preprocess=self.view.get_preprocess(),
             transform=self.view.get_transform_type(),
