@@ -154,6 +154,7 @@ class LauncherWindow(CentredWindow):
         # If there was an update found the last time we checked.
         if self.settings.get_update_available():
             self.show_update_available()
+            print("Update is available.")
             return
 
         # If we should check for updates again now.
@@ -174,10 +175,12 @@ class LauncherWindow(CentredWindow):
         elif new_commit != self.settings.get_latest_commit():
             self.settings.set_update_available(True)
             self.show_update_available()
+            print(f"Found new update. Commit hash: {new_commit}")
 
         # No updates available.
         else:
             self.settings.set_update_available(False)
+            print("No updates available.")
 
         # Set now as the last time at which an update check occurred.
         self.settings.set_last_update_check(time.time())
