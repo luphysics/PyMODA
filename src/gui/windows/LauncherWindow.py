@@ -135,6 +135,11 @@ class LauncherWindow(CentredWindow):
         await asyncio.sleep(0.2)  # Prevent jarring animations.
         QMessageBox.information(self, "Update", "Update completed.")
 
+        # After updating, we want the relaunched window to be obvious.
+        # On Windows, this will make the taskbar icon flash orange.
+        self.activateWindow()
+
+        # Set the latest commit to the current commit on GitHub.
         self.settings.set_latest_commit(await get_latest_commit())
 
     def force_check_updates(self) -> None:
