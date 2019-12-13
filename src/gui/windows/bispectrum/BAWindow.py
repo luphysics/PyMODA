@@ -31,12 +31,14 @@ from maths.num_utils import float_to_str
 from utils.decorators import floaty
 
 
-class BAWindow(BAViewProperties,
-               BaseTFWindow,
-               DualSignalComponent,
-               FreqComponent,
-               SurrogateComponent,
-               VerticalMultiPlotComponent):
+class BAWindow(
+    BAViewProperties,
+    BaseTFWindow,
+    DualSignalComponent,
+    FreqComponent,
+    SurrogateComponent,
+    VerticalMultiPlotComponent,
+):
     name = "Wavelet Bispectrum Analysis"
 
     def __init__(self, application):
@@ -45,7 +47,9 @@ class BAWindow(BAViewProperties,
 
         DualSignalComponent.__init__(self, self.signal_plot())
         FreqComponent.__init__(self, self.line_fmax, self.line_fmin, self.line_res)
-        SurrogateComponent.__init__(self, self.slider_surrogate, self.line_surrogate)
+        SurrogateComponent.__init__(
+            self, self.slider_surrogate, self.line_surrogate, self.checkbox_surr
+        )
         VerticalMultiPlotComponent.__init__(self, self.vbox_right)
 
         self.presenter: BAPresenter = self.presenter
@@ -63,7 +67,9 @@ class BAWindow(BAViewProperties,
         self.btn_add_point.clicked.connect(self.on_add_point_clicked)
         self.btn_clear_plots.clicked.connect(self.on_clear_plots_clicked)
 
-        self.combo_plot_type.currentTextChanged.connect(lambda _: self.presenter.update_plots())
+        self.combo_plot_type.currentTextChanged.connect(
+            lambda _: self.presenter.update_plots()
+        )
         self.listwidget_freq.itemClicked.connect(self.on_freq_selected)
 
     def on_calculate_started(self):
