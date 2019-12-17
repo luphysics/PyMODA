@@ -202,7 +202,7 @@ class LognormWavelet(WindowParams):
         return np.exp(-(self.q ** 2 / 2) * rv)
 
 
-def wft(
+def wt(
     signal,
     fs,
     wp: WindowParams,
@@ -348,7 +348,6 @@ def wft(
     if preprocess:
         fx[(ff <= max([fmin, fs / L])) & (ff >= fmax)] = 0
 
-        # Windowed Fourier Transform by itself
     WT = np.zeros((SN, L), dtype=np.complex64) * np.NaN
     ouflag = 0
     if (wp.t2e - wp.t1e) * wp.ompeak / (2 * np.pi * fmax) > L / fs:
@@ -402,7 +401,7 @@ def wft(
         n2 = np.int(n2)
         NL = np.int(NL)
 
-        WT[sn, arange(0, L)] = out[n1 : NL - n2 + 1]
+        WT[sn, arange(0, L)] = out[n1 : NL - n2]
 
     if cut_edges:
         icoib = nonzero((L - coib1 - coib2) <= 0)[0]
@@ -427,6 +426,7 @@ def wft(
                 [frn.astype(np.int), ttn.astype(np.int)], dims=WT.shape
             )
         ] = np.nan
+
     return WT, freq
 
 
@@ -1627,9 +1627,9 @@ def fcast(sig, fs, NP, fint, *args):  # line1145
     T = (L + 1) / fs
     t = arange(0, L + 1) / fs
 
-    w = w[-L - 1 :]  # level3
-    rw = rw[-L - 1 :]  # level3
-    Y = Y[-L - 1 :]  # level3
+    w = w[-L + 1 :]  # level3
+    rw = rw[-L + 1 :]  # level3
+    Y = Y[-L + 1 :]  # level3
 
     MaxOrder = np.min([MaxOrder, np.floor(L + 1 / 3)])
 
@@ -1728,35 +1728,31 @@ def fcast(sig, fs, NP, fint, *args):  # line1145
 
         while cf[1] - cf[0] > FTol and cf[2] - cf[1] > FTol:
             tf = cf[0] + cf[2] - cf[1]
-            FM = np.concatenate(
-                [
-                    np.ones((L + 1,)),
-                    np.cos(2 * np.pi * tf * t),
-                    np.sin(2 * np.pi * tf * t),
-                ]
-            )
+            FM = np.array(
+                [np.ones((L + 1,)), np.cos(twopi * tf * t), np.sin(twopi * tf * t)]
+            ).T
             if not isempty(rw):
-                FM = FM * (rw * np.ones((1, 3)))
+                FM = FM * (rw.T * np.ones((1, 3)))
 
-            tb = np.linalg.lstsq(FM, Y)
-            terr = np.std(Y - FM * tb)
+            tb = backslash(FM, Y.T)
+            terr = np.std(Y.T - FM * tb.T)
 
-            if terr < cerr[2] and tf < cf[2]:  # TODO: fix all indices
-                cf = [cf(1), tf, cf(2)]
-                cerr = [cerr(1), terr, cerr(2)]
+            if terr < cerr[1] and tf < cf[1]:  # TODO: fix all indices
+                cf = [cf[0], tf, cf[1]]
+                cerr = [cerr[0], terr, cerr[1]]
+                cb = [cb[0], tb[:], cb[:2]]
+            if terr < cerr[1] and tf > cf[1]:
+                cf = [cf[1], tf, cf[2]]
+                cerr = [cerr[1], terr, cerr[2]]
                 cb = [cb[1], tb[:], cb[:2]]
-            if terr < cerr[2] and tf > cf[2]:
-                cf = [cf[2], tf, cf[3]]
-                cerr = [cerr[2], terr, cerr[3]]
-                cb = [cb[2], tb[:], cb[:3]]
-            if terr > cerr[2] and tf < cf[2]:
-                cf = [tf, cf(2), cf(3)]
-                cerr = [terr, cerr[2], cerr[3]]
-                cb = [tb[:], cb[2], cb[3]]
-            if terr > cerr[2] and tf > cf[2]:
-                cf = [cf[1], cf[2], tf]
-                cerr = [cerr[1], cerr[2], terr]
-                cb = [cb[1], cb[2], tb[:]]
+            if terr > cerr[1] and tf < cf[1]:
+                cf = [tf, cf[1], cf[2]]
+                cerr = [terr, cerr[1], cerr[2]]
+                cb = [tb[:], cb[1], cb[2]]
+            if terr > cerr[1] and tf > cf[1]:
+                cf = [cf[0], cf[1], tf]
+                cerr = [cerr[0], cerr[1], terr]
+                cb = [cb[0], cb[1], tb[:]]
 
         # Forward values.
         fcf = cf[1]
@@ -1917,7 +1913,7 @@ def aminterp(X, Y, Z, XI, YI, method):
     ZI = np.zeros(np.size(Z, 1), len(XI)) * np.NaN
     xstep = np.mean(np.diff(XI))
     xind = 1 + np.floor((1 / 2) + (X - XI(1)) / xstep)
-    xpnt = np.asarray([0], [0], [0])  # level3 TODO: add later
+    xpnt = np.asarray([[0], [0], [0]])  # level3 TODO: add later
 
     if method == "max":
         for xn in range(1, len(xpnt)):
@@ -1958,7 +1954,7 @@ if __name__ == "__main__":
 
     wp = LognormWavelet(f0=1)
 
-    w, f = wft(signal, fs, wp)
+    w, f = wt(signal, fs, wp)
 
     plt.pcolormesh(t, f, np.abs(w))
     plt.show()

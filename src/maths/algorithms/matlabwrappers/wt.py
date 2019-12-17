@@ -18,6 +18,8 @@ from typing import Union, Tuple
 
 from numpy import ndarray
 
+from maths.algorithms import wavelet_transform
+from maths.algorithms.wavelet_transform import LognormWavelet
 from maths.params.TFParams import TFParams
 from maths.signals.TimeSeries import TimeSeries
 
@@ -43,5 +45,8 @@ def calculate(
     wt, frequency = package.wt(
         matlab.double([signal.tolist()]), params.fs, params.get(), nargout=2
     )
+
+    ### Uncomment next line to test the pure Python version of the wavelet transform. ###
+    # wt, frequency = wavelet_transform.wt(signal, params.fs , LognormWavelet(f0=params.fs))
 
     return wt, frequency
