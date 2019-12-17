@@ -50,9 +50,9 @@ Here is an example of committing with the hooks installed. Black formats a Pytho
 
 ![Screenshot demonstrating Git hooks.](/docs/images/git_hooks.png)
 
-> Note: If absolutely necessary, hooks can be skipped by adding `--no-verify` to the `git commit` command.
+> **Note:** If absolutely necessary, hooks can be skipped by adding `--no-verify` to the `git commit` command.
 
-> Tip: If `pre-commit` is not a valid command after installing, try `python -m pre-commit` instead.
+> **Tip:** If `pre-commit` is not a valid command after installing, try `python -m pre-commit` instead.
 
 ## Command-line arguments
 
@@ -68,7 +68,7 @@ Here is an example of PyMODA being run on Linux:
 python3 src/main.py -runtime "/usr/local/MATLAB/MATLAB_Runtime/v96/runtime/glnxa64:/usr/local/MATLAB/MATLAB_Runtime/v96/bin/glnxa64:/usr/local/MATLAB/MATLAB_Runtime/v96/sys/os/glnxa64:/usr/local/MATLAB/MATLAB_Runtime/v96/extern/bin/glnxa64"
 ```
 
-> Tip: You can add command-line arguments like `-runtime` to your PyCharm configuration.
+> **Tip:** You can add command-line arguments like `-runtime` to your PyCharm configuration.
 
 Below is a table listing the other command-line arguments.
 
@@ -81,7 +81,7 @@ Below is a table listing the other command-line arguments.
 
 Command-line arguments can be specified in PyCharm configurations. 
 
-> Tip: Create multiple PyCharm configurations with different `-file` and `-freq` args to easily test different datasets. 
+> **Tip:** Create multiple PyCharm configurations with different `-file` and `-freq` args to easily test different datasets. 
 
 ## Error handling
 
@@ -158,7 +158,7 @@ Using MATLAB's Library Compiler, MATLAB functions can be packaged as Python libr
 
 MATLAB causes a library collision which prevents PyQt from functioning while the `LD_LIBRARY_PATH` environment variable is set according to its documentation. To solve this, MATLAB-packaged code must always be called from a separate process and the process must call the function `setup_matlab_runtime()`, which sets the `LD_LIBRARY_PATH` for the process, *before* importing MATLAB packages. 
 
-> Note: The `process` decorator can now be used instead of calling `setup_matlab_runtime()`. See [process](#process).
+> **Note:** The `process` decorator can now be used instead of calling `setup_matlab_runtime()`. See [process](#process).
 
 ### Data types
 
@@ -168,7 +168,7 @@ Numpy can convert MATLAB arrays to Numpy arrays, but Numpy arrays must be conver
 
 Although MATLAB can convert single complex numbers, it seems unable to convert a list of complex numbers. Instead of passing a list of complex numbers, a list of the real parts and a list of the complex parts can be passed separately as MATLAB arrays and then combined in the MATLAB code. 
 
-> Note: `None` cannot be passed to MATLAB.
+> **Note:** `None` cannot be passed to MATLAB.
 
 ### Unspecific errors 
 
@@ -214,7 +214,7 @@ using multiple processes.
 
 PyMODA uses the `multiprocess` library rather than the standard library's `multiprocessing`, due to problems with the latter's serialization in Windows. `multiprocess` has the same API as `multiprocessing`, so all documentation and tutorials are still directly applicable; the only changes required are the import statements.
 
-> Note: `from multiprocess import Process, Queue` is falsely reported as an error in PyCharm.
+> **Note:** `from multiprocess import Process, Queue` is falsely reported as an error in PyCharm.
 
 #### asyncio
 
@@ -222,7 +222,7 @@ PyMODA uses the `multiprocess` library rather than the standard library's `multi
 
 Coroutines shouldn't be used to run intensive code on the main thread, because it will still be blocked. However, they are very useful for lightweight tasks. 
 
-> Note: Names of async functions, and functions designed to be used in coroutines, are usually prefixed by `coro_` in PyMODA. 
+> **Note:** Names of async functions, and functions designed to be used in coroutines, are usually prefixed by `coro_` in PyMODA. 
 
 #### asyncqt
 

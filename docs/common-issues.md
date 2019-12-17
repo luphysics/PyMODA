@@ -71,7 +71,7 @@ RuntimeError: Could not find an appropriate directory for MATLAB or the MATLAB r
 
 ### Solution
 
-This may occur because the `-runtime` command-line argument was not provided. However, it can also occur when the MATLAB Runtime is a newer or older version than the required version. See the [requirements](/docs/README.md#requirements).
+This may occur because the `-runtime` command-line argument was not provided. However, it can also occur when the MATLAB Runtime is a newer or older version than the required version. See the [requirements](/README.md#requirements).
 
 ---
 
@@ -83,7 +83,7 @@ This may occur because the `-runtime` command-line argument was not provided. Ho
 
 ### Solution
 
-Uninstalling Python 3.7 and installing Python 3.6 appears to fix the issue. Python 3.8 may also solve the problem when numpy/scipy add support for it.
+Uninstalling Python 3.7 and installing Python 3.6 appears to fix the issue. Python 3.8 may also solve the problem when it is supported.
 
 ---
 
