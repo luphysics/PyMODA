@@ -21,6 +21,8 @@ from typing import List, Optional
 
 from easysettings import EasySettings
 
+from utils.file_utils import get_root_folder
+
 _key_recent_files = "recent_files"
 _key_recent_frequencies = "recent_freq"
 _key_runtime_warning = "runtime_warning"
@@ -35,7 +37,7 @@ class Settings:
     """
 
     def __init__(self):
-        location = Path(os.getcwd()).parent
+        location = get_root_folder()
         filepath = path.join(location, "settings.conf")
 
         self._settings = EasySettings(filepath)

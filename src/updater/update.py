@@ -30,6 +30,7 @@ import os
 
 # Fix issue where imports fail when launching from 'temp'.
 from utils import args
+from utils.file_utils import get_root_folder
 
 os.environ["PYTHONPATH"] = "."
 
@@ -153,8 +154,8 @@ def copy_files() -> None:
     it will not be deleted. All files inside a directory will be deleted and replaced if the
     directory exists in the new version.
     """
-    # PyMODA folder. Working directory has already been set correctly.
-    target = Path(os.getcwd()).parent
+    # PyMODA folder.
+    target = get_root_folder()
 
     print(f"Current directory: {os.getcwd()}")
     print(f"Target directory: {target}")
@@ -262,7 +263,7 @@ def update_packages(success: bool) -> None:
     :param success: whether the update was a success
     """
     # PyMODA directory.
-    root = Path(os.getcwd()).parent
+    root = get_root_folder()
 
     # PyMODA/packages.
     packages = os.path.join(root, "packages")
@@ -294,7 +295,7 @@ def _get_relaunch_command(args: List[str]) -> str:
     """
     src_main = path.join("src", "main.py")
 
-    root = Path(os.getcwd()).parent
+    root = get_root_folder()
     main_path = path.join(root, src_main)
 
     args_string = " ".join(args)
@@ -318,7 +319,7 @@ def cleanup() -> None:
     """
     Called by PyMODA. Cleans up after an update by deleting the 'temp' folder.
     """
-    _temp_folder = path.join(Path(os.getcwd()).parent, temp)
+    _temp_folder = path.join(get_root_folder(), temp)
     try:
         shutil.rmtree(_temp_folder)
     except:
@@ -339,7 +340,7 @@ def _is_git_present() -> bool:
     """
     Returns whether the ".git" folder is present in the PyMODA folder.
     """
-    return ".git" in os.listdir(Path(os.getcwd()).parent)
+    return ".git" in os.listdir(get_root_folder())
 
 
 arg_post_update = "--post-update"
