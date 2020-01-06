@@ -69,7 +69,14 @@ def parser() -> ArgumentParser:
         update.arg_post_update,
         action="store_true",
         default=False,
-        help="This argument should not be used manually.",
+        help="This argument should not be supplied manually. "
+        "It is automatically passed when the PyMODA updater relaunches the program.",
+    )
+    p.add_argument(
+        "--no-update",
+        action="store_true",
+        default=False,
+        help="Use this argument to make PyMODA ignore potential updates.",
     )
     return p
 
@@ -125,3 +132,10 @@ def post_update() -> bool:
     the updater when it launches PyMODA after an update.
     """
     return args and args.post_update
+
+
+def no_update() -> bool:
+    """
+    Returns whether PyMODA should avoid showing that updates are available.
+    """
+    return args and args.no_update

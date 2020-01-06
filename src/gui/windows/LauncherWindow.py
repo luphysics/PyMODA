@@ -70,7 +70,7 @@ class LauncherWindow(CentredWindow):
 
         if args.post_update():
             asyncio.ensure_future(self.post_update())
-        else:
+        elif not args.no_update():
             asyncio.ensure_future(self.check_for_updates())
 
     def check_matlab_runtime(self) -> None:
