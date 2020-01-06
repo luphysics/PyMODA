@@ -29,6 +29,7 @@ from data import resources
 from data.resources import get
 from gui.dialogs.MatlabRuntimeDialog import MatlabRuntimeDialog
 from gui.windows.CentredWindow import CentredWindow
+from updater import update
 from updater.update import get_latest_commit
 from utils import args
 from utils.os_utils import OS
@@ -70,7 +71,7 @@ class LauncherWindow(CentredWindow):
 
         if args.post_update():
             asyncio.ensure_future(self.post_update())
-        elif not args.no_update():
+        elif update.should_check_for_updates():
             asyncio.ensure_future(self.check_for_updates())
 
     def check_matlab_runtime(self) -> None:

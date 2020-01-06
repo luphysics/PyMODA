@@ -29,6 +29,8 @@ The update process is as follows:
 import os
 
 # Fix issue where imports fail when launching from 'temp'.
+from utils import args
+
 os.environ["PYTHONPATH"] = "."
 
 import asyncio
@@ -321,6 +323,23 @@ def cleanup() -> None:
         shutil.rmtree(_temp_folder)
     except:
         pass
+
+
+def should_check_for_updates() -> bool:
+    """
+    Returns whether PyMODA should check for updates.
+
+    This will be False if the ".git" folder is present, or if the "--no-update"
+    command-line argument has been supplied.
+    """
+    return not args.no_update() and not _is_git_present()
+
+
+def _is_git_present() -> bool:
+    """
+    Returns whether the ".git" folder is present in the PyMODA folder.
+    """
+    return ".git" in os.listdir(Path(os.getcwd()).parent)
 
 
 arg_post_update = "--post-update"
