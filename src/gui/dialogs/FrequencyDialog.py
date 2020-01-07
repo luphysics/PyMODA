@@ -16,7 +16,7 @@
 import asyncio
 
 from PyQt5 import uic
-from PyQt5.QtWidgets import QDialog
+from PyQt5.QtWidgets import QDialog, QDialogButtonBox
 
 from data import resources
 from gui.BaseUI import BaseUI
@@ -35,7 +35,9 @@ class FrequencyDialog(QDialog, BaseUI):
 
     def __init__(self):
         self.frequency: float = None
+        self.buttonBox: QDialogButtonBox = None
         self.settings = Settings()
+
         super(FrequencyDialog, self).__init__()
 
     def setup_ui(self) -> None:
@@ -45,9 +47,16 @@ class FrequencyDialog(QDialog, BaseUI):
         self.btn_use_recent.clicked.connect(self.use_recent_freq)
         self.setup_combo()
 
+        self.set_ok_enabled(False)
+
         asyncio.ensure_future(self.coro_check_args())
 
     def run_and_get(self) -> float:
+        """
+        Shows the dialog and returns the result.
+
+        :return: the frequency entered by the user
+        """
         self.exec()
         self.settings.add_recent_freq(self.frequency)
         return self.frequency
@@ -57,7 +66,7 @@ class FrequencyDialog(QDialog, BaseUI):
         if values:
             self.combo_recent.addItems([float_to_str(f) for f in values])
         else:
-            self.disable_recent_freq()
+            self.enable_recent_freq(False)
 
     async def coro_check_args(self):
         """
@@ -79,12 +88,23 @@ class FrequencyDialog(QDialog, BaseUI):
 
     def on_freq_changed(self, value):
         self.frequency = float_or_none(value)
-        self.disable_recent_freq()
 
-    def disable_recent_freq(self):
+        valid_freq = self.frequency is not None and self.frequency > 0
+        self.enable_recent_freq(not valid_freq)
+        self.set_ok_enabled(valid_freq)
+
+    def enable_recent_freq(self, enable: bool) -> None:
         """
         Disables the UI for selecting a recent frequency, since it may cause users to erroneously
         use a recent frequency instead of the frequency typed into the GUI.
         """
-        self.combo_recent.setDisabled(True)
-        self.btn_use_recent.setDisabled(True)
+        self.combo_recent.setEnabled(enable)
+        self.btn_use_recent.setEnabled(enable)
+
+    def set_ok_enabled(self, enabled: bool) -> None:
+        """
+        Sets the "ok" button in the dialog as enabled or disabled.
+
+        :param enabled: whether to set the button as enabled, not disabled
+        """
+        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(enabled)

@@ -13,6 +13,8 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from typing import Callable
+
 from PyQt5 import QtGui
 from PyQt5.QtGui import QDropEvent
 from PyQt5.QtWidgets import QLabel
@@ -26,20 +28,18 @@ class DragDropLabel(QLabel):
     """
 
     def __init__(self, parent):
+        self.drop_callback: Callable = None
         super().__init__(parent)
-
-        # Callback will be used to send the file name.
-        self.callback = None
 
     def dropEvent(self, event: QDropEvent) -> None:
         """Called when a drop event occurs."""
         file_path = event.mimeData().text()
-        if self.callback:
-            self.callback(file_path)
+        if self.drop_callback:
+            self.drop_callback(file_path)
 
         self.show_selected_file(file_path)
 
-    def show_selected_file(self, file_path):
+    def show_selected_file(self, file_path) -> None:
         file_name = file_path.split("/")[-1].split("\\")[-1]
         self.setText(f"File selected:\n{file_name}")
         self.set_background(highlighted=False)
@@ -47,9 +47,11 @@ class DragDropLabel(QLabel):
     def dragLeaveEvent(self, e: QtGui.QDragLeaveEvent) -> None:
         self.set_background(highlighted=False)
 
-    def set_background(self, highlighted):
+    def set_background(self, highlighted: bool) -> None:
         background = "grey" if highlighted else "transparent"
-        self.setStyleSheet(f"QLabel {{ background-color : {background}; color : black; }}")
+        self.setStyleSheet(
+            f"QLabel {{ background-color : {background}; color : black; }}"
+        )
 
     def dragEnterEvent(self, event: QtGui.QDragEnterEvent) -> None:
         """Called when a drag event enters the label."""
@@ -59,6 +61,6 @@ class DragDropLabel(QLabel):
         else:
             event.ignore()
 
-    def set_drop_callback(self, callback):
+    def set_drop_callback(self, callback: Callable[[str], None]) -> None:
         """Sets a callback for when the drop is complete."""
-        self.callback = callback
+        self.drop_callback = callback

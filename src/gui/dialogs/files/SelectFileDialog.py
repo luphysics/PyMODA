@@ -16,7 +16,7 @@
 
 from PyQt5 import uic
 from PyQt5.QtCore import QTimer
-from PyQt5.QtWidgets import QDialog, QFileDialog, QComboBox
+from PyQt5.QtWidgets import QDialog, QFileDialog, QComboBox, QDialogButtonBox
 
 from data import resources
 from gui.BaseUI import BaseUI
@@ -33,8 +33,11 @@ class SelectFileDialog(QDialog, BaseUI):
 
     def __init__(self):
         self.file: str = None
-        self.combo_recent: QComboBox = None
         self.settings = Settings()
+
+        self.combo_recent: QComboBox = None
+        self.buttonBox: QDialogButtonBox = None
+
         super().__init__()
 
     def setup_ui(self):
@@ -44,6 +47,8 @@ class SelectFileDialog(QDialog, BaseUI):
 
         self.btn_browse.clicked.connect(self.browse_for_file)
         self.btn_use_recent.clicked.connect(self.use_recent_file)
+
+        self.set_ok_enabled(False)
 
         QTimer.singleShot(500, self.check_args)
 
@@ -78,7 +83,7 @@ class SelectFileDialog(QDialog, BaseUI):
 
         if dialog.exec():
             filenames = dialog.selectedFiles()
-            self.file = filenames[0]
+            self.set_file(filenames[0])
             self.lbl_drag_drop.show_selected_file(self.file)
 
             if self.file:
@@ -99,11 +104,15 @@ class SelectFileDialog(QDialog, BaseUI):
     def on_drop(self, file: str):
         if not file:
             raise Exception(
-                "Cannot load file: ''. This may be an issue specific to your OS."
+                f"Cannot load file: '{file}'. This may be an issue specific to drag-and-drop on your OS."
             )
 
         self.disable_recent_files()
+        self.set_file(file)
+
+    def set_file(self, file: str) -> None:
         self.file = file
+        self.set_ok_enabled(bool(file))
 
     def disable_recent_files(self):
         """
@@ -112,6 +121,14 @@ class SelectFileDialog(QDialog, BaseUI):
         """
         self.btn_use_recent.setDisabled(True)
         self.combo_recent.setDisabled(True)
+
+    def set_ok_enabled(self, enabled: bool) -> None:
+        """
+        Sets the "ok" button in the dialog as enabled or disabled.
+
+        :param enabled: whether to set the button as enabled, not disabled
+        """
+        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(enabled)
 
     def get_file_path(self):
         """Gets the file path for the selected file."""
