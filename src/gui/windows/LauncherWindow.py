@@ -133,15 +133,19 @@ class LauncherWindow(CentredWindow):
         upd.cleanup()
         self.settings.set_update_available(False)
 
-        await asyncio.sleep(0.2)  # Prevent jarring animations.
-        QMessageBox.information(self, "Update", "Update completed.")
+        # Set the latest commit to the current commit on GitHub.
+        self.settings.set_latest_commit(await get_latest_commit())
+
+        # Remove the `--post-update` argument to prevent confusion in other parts of the program.
+        sys.argv.remove(update.arg_post_update)
+        args.set_post_update(False)
 
         # After updating, we want the relaunched window to be obvious.
         # On Windows, this will make the taskbar icon flash orange.
         self.activateWindow()
 
-        # Set the latest commit to the current commit on GitHub.
-        self.settings.set_latest_commit(await get_latest_commit())
+        await asyncio.sleep(0.2)  # Prevent jarring animations.
+        QMessageBox.information(self, "Update", "Update completed.")
 
     def force_check_updates(self) -> None:
         """

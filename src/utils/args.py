@@ -134,6 +134,15 @@ def post_update() -> bool:
     return args and args.post_update
 
 
+def set_post_update(value: bool) -> None:
+    """
+    Sets the boolean associated with `--post-update` to a value.
+    This is used after an update has completed, to set the value to False.
+    """
+    if args:
+        args.post_update = value
+
+
 def no_update() -> bool:
     """
     Returns whether PyMODA should avoid showing that updates are available.

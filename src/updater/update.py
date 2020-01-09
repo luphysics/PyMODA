@@ -323,7 +323,7 @@ def cleanup() -> None:
     try:
         shutil.rmtree(_temp_folder)
     except:
-        pass
+        print(f"Temp folder to clean up was not found: {_temp_folder}")
 
 
 def should_check_for_updates() -> bool:
