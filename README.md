@@ -24,33 +24,31 @@ PyMODA is cross-platform and does not require any paid software. To get started,
 
 ## Status
 
-PyMODA does not yet offer all the functionality available in MODA. This table shows the current status of different features.
+PyMODA plans to offer all the functionality available in MODA, but development is still in progress. This table shows the current status of different features.
 
-| Window    |   Functionality   |  MATLAB-packaged library | Python implementation |
-| ----      |   ---------       |   ---------   |  ----- |
-| Time-Frequency Analysis      |   Wavelet transform    |  :heavy_check_mark: | Mostly written |
-| Time-Frequency Analysis      |   Windowed Fourier transform    |  :heavy_check_mark:   | Partially written |
-| Wavelet Phase Coherence      |   Phase coherence    |  :heavy_check_mark:  | Some surrogates written, needs testing |
-| Ridge Extraction and Filtering     |   Extract ridges    |  :heavy_check_mark:  | Not implemented |
-| Ridge Extraction and Filtering     |   Bandpass filter    |  Not implemented   | :heavy_check_mark: |
-| Wavelet Bispectrum Analysis     |   Bispectrum analysis    |  :heavy_check_mark:  | Not implemented |
-| Dynamical Bayesian Inference     |   Bayesian inference    |  Not implemented   | Written, not working |
+| Window    |  Status | Notes | 
+| ----      |   ---------        |   ---------   |  
+| Time-Frequency Analysis        |  :heavy_check_mark: | |
+| Wavelet Phase Coherence        |  :heavy_check_mark:  | Surrogates require further testing | 
+| Ridge Extraction and Filtering |  :heavy_check_mark:  | | 
+| Wavelet Bispectrum Analysis    |  :heavy_check_mark:  | Surrogates cannot be plotted yet |
+| Dynamical Bayesian Inference   |  Implemented | Results are slightly inaccurate |
 
 # User Guide
 
 This guide is aimed at users wishing to set up and run PyMODA. If you're interested in modifying or contributing to the program, you should use the [Developer Guide](docs/developer-guide.md).
 
-> Tip: If you experience any problems, check the [Common Issues](docs/common-issues.md) document.
+> **Tip:** If you experience any problems, check the [Common Issues](docs/common-issues.md) document.
 
 ## Requirements
 
-- Python 3.6 or 3.7. Scientific distributions of Python are not officially supported.
+- Python 3.6 or 3.7. **Python 3.8 is not supported yet.** 
 - [MATLAB Runtime](https://www.mathworks.com/products/compiler/matlab-runtime.html), 
-version R2019a (9.6). The runtime does not require a license.
+**version R2019a (9.6)**. The runtime does not require a MATLAB license.
 
-> :warning: Do not use a newer version of the MATLAB Runtime. MATLAB-packaged libraries are neither forward nor backward compatible.
+> :warning: **Do not use a newer version of the MATLAB Runtime**. MATLAB-packaged libraries are neither forwards nor backwards compatible.
 
-> **Note:** Python 3.8 will not be supported until MATLAB R2020a launches.
+> **Note:** Scientific distributions of Python are not officially supported, but may be compatible. Python 3.8 will not be supported until MATLAB R2020a launches.
 
 ## Operating systems
 
@@ -62,7 +60,7 @@ PyMODA should run on Windows, macOS and Linux. Linux performs slightly better th
 
 PyMODA can be downloaded as a .zip file. 
 
-- [Click here](https://github.com/luphysics/PyMODA/zipball/master) to download the .zip file. 
+- [Click here](https://github.com/luphysics/PyMODA/zipball/release) to download the .zip file. 
 - Extract the zip file to a desired location.
 - For simplicity of instructions, rename the folder to `PyMODA`.
 
@@ -80,13 +78,13 @@ Open a terminal in the `PyMODA` folder and run `python packages/install.py`. Whe
 
 To start PyMODA, run `python src/main.py` in the `PyMODA` folder.
 
-> :warning: Linux users also need to specify the path to the MATLAB Runtime using a command-line argument (see [command-line arguments](/docs/developer-guide.md#command-line-arguments)).
+> **Note:** Linux users also need to specify the path to the MATLAB Runtime using a command-line argument (see [command-line arguments](/docs/developer-guide.md#command-line-arguments)).
 
 ## Creating a shortcut
 
 In the launcher window, click "Create shortcut" to create a shortcut to easily open PyMODA. This has different behaviour on different operating systems.
 
-> :warning: The shortcut will need to be recreated if the path to the PyMODA folder is changed, if the folder is renamed, or if the path to the Python interpreter changes.
+> **Note:** The shortcut will need to be recreated if the path to the PyMODA folder is changed, if the folder is renamed, or if the path to the Python interpreter changes.
 
 #### Windows
 
@@ -102,9 +100,11 @@ An alias will be created, which adds the terminal command `pymoda` to launch PyM
 
 ## Updating PyMODA
 
-PyMODA checks for updates occasionally, and shows a blue message in the launcher window if updates are available. 
+PyMODA checks for updates occasionally, and shows a message in the launcher window if updates are available. 
 
-> **Tip:** You can press `Ctrl`+`U` to trigger a check for updates. 
+![Screenshot demonstrating the launcher window when an update is available.](/docs/images/update_available.png)
+
+> **Tip:** You can press `Ctrl`+`U` to trigger an immediate check for updates. 
 
 ### Applying an update
 

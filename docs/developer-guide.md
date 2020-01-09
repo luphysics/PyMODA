@@ -5,13 +5,16 @@
 - [Developer Guide](#developer-guide)
   - [Additional requirements](#additional-requirements)
   - [Downloading the code](#downloading-the-code)
-  - [Installing Git hooks](#installing-git-hooks)
+  - [Git workflow](#git-workflow)
+  - [Collaborator](#collaborator)
+  - [Non-collaborator](#non-collaborator)
   - [Command-line arguments](#command-line-arguments)
   - [Error handling](#error-handling)
   - [Project structure](#project-structure)
   - [Naming conventions and code style](#naming-conventions-and-code-style)
   - [MATLAB packages](#matlab-packages)
   - [Concurrency](#concurrency)
+  - [Update system](#update-system)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -19,17 +22,57 @@
 
 This guide is aimed at developers wishing to modify or contribute to the program, and is designed to be accessible to programmers with basic to intermediate knowledge of Python.
 
+> **Tip:** If you experience any difficulties, you can [create an issue on the dedicated page](https://github.com/luphysics/PyMODA/issues/new).
+
 ## Additional requirements
+
+Ensure that your system fulfills the [user requirements](/README.md#requirements). 
+
 To develop the program, you may need to install additional tools:
 - Git is required to download the code, save and upload your changes.
 - Qt Designer is required to edit the layout files.
 
 ## Downloading the code
-If you are not registered as a collaborator, you should [fork the repository](https://help.github.com/en/articles/fork-a-repo). You can then clone your fork to download the code. 
 
-To start running the code, see [preparing to run](/README.md#preparing-to-run).
+To download the code, see the section below for [collaborators](/docs/developer-guide.md#collaborator) or [non-collaborators](/docs/developer-guide.md#non-collaborator).
 
-## Installing Git hooks
+> **Note:** To start running the code, see [preparing to run](/README.md#preparing-to-run).
+
+## Git workflow
+
+| Branch name | Purpose | 
+| --- | --- |
+| `master` | Main branch of the repository. Can accept pull requests. | 
+| `staging` | The pre-release branch. All changes should be pushed to `staging` and tested before being merged into `release`. | 
+| `release` | The release branch. PyMODA downloads updates from this branch. |
+
+Force-pushes are disabled for the `master` and `release` branches. This protection should not be removed.
+
+**Any commits pushed to `release` will trigger an update for all users, so changes to this branch should be made carefully.**
+
+## Collaborator
+
+If you are registered as a collaborator, you can clone the repository using one of the following commands:
+
+```bash
+# SSH method.
+git clone git@github.com:luphysics/PyMODA.git
+
+# HTTPS method.
+git clone https://github.com/luphysics/PyMODA.git
+```
+
+Developers are encouraged to use their own development branches (e.g. `dev` followed by an identifier) for making changes. If working as the main developer on the project, you may merge your branch directly into `master`; otherwise, pull requests are usually a better approach.
+
+> **Tip:** It is safe to rebase parts of your branch which are ahead of `master`, and force-push your branch, before merging into `master`.
+
+## Non-collaborator
+
+If you are not registered as a collaborator, you should [fork the repository](https://help.github.com/en/articles/fork-a-repo). You can then clone your fork to download the code.
+
+When you make changes, you can open a pull request targeting PyMODA's `master` branch. Do not open a pull request targeting the `release` branch.
+
+### Installing Git hooks
 
 Git hooks are used to automatically perform tasks when a commit is made. PyMODA uses `doctoc` to add the table of contents to markdown files, and `black` to format Python files to follow a consistent style.
 
@@ -194,7 +237,7 @@ The `maths.algorithms.matlabwrappers` package contains files which form wrappers
 
 ### Libraries
 
-PyMODA uses `multiprocess`, `asyncio`, `asyncqt` and `AsyncProcessScheduler`.
+PyMODA uses `multiprocess`, `asyncio`, `qasync` and `AsyncProcessScheduler`.
 
 #### multiprocess
 
@@ -224,9 +267,9 @@ Coroutines shouldn't be used to run intensive code on the main thread, because i
 
 > **Note:** Names of async functions, and functions designed to be used in coroutines, are usually prefixed by `coro_` in PyMODA. 
 
-#### asyncqt
+#### qasync
 
-`asyncqt` is a library which allows the `asyncio` event loop to be set to a Qt event loop. Coroutines running on this event loop are able to safely interact with the GUI.
+`qasync` is a library which allows the `asyncio` event loop to be set to a Qt event loop. Coroutines running on this event loop are able to safely interact with the GUI.
 
 #### AsyncProcessScheduler
 
@@ -242,7 +285,6 @@ Most of PyMODA's concurrency is provided via the `MPHandler` class. Functions wh
 
 - It clearly marks a function as the entry-point of a separate process.
 - It calls `setup_matlab_runtime()` to prevent errors with `LD_LIBRARY_PATH` on Linux.
-- It ensures that the function returns None, since processes should add results to a queue instead of returning values.
 
 Example usage:
 
@@ -271,3 +313,50 @@ def long_calculation(queue: Queue, input: ndarray) -> None:
 This diagram demonstrates how the GUI code in `TFPresenter`, the class controlling the time-frequency window, interacts with `MPHandler` and `Scheduler`. TFPresenter runs `coro_calculate()` as a coroutine on the main thread, which then waits for the results using `await` and shows them in the GUI.
 
 ![Diagram demonstrating how TFPresenter, MPHandler and Scheduler interact.](/docs/images/TFPresenter.png)
+
+## Update system
+
+PyMODA features a built-in updater, which is able to automatically download a new version of PyMODA and replace the old version. 
+
+> **Note:** When the `.git` folder is present in PyMODA's root directory, the updater will not check for updates unless `Ctrl`+`U` is pressed while the launcher window is in focus.
+
+### Checking for updates
+
+To prevent excess work on the part of the developer, PyMODA will automatically detect updates based on changes to the `release` branch of the GitHub repository.
+
+When PyMODA checks for updates, it uses GitHub's API to retrieve the latest commit's hash. If the hash is not the same as the previously recorded hash, the update system reports that an update is available. This ensures that every commit to `release` triggers an update.
+
+> **Note:** On first launch, the latest commit hash is recorded as the previous hash.
+
+### Applying updates
+
+The process of applying an update is as follows:
+
+- PyMODA copies the contents of the `src/updater/` folder to a temporary folder, `temp/`.
+- PyMODA launches `temp/update.py` as a new program with the same Python interpreter and command-line arguments. This will be referenced to as *Updater*.
+- PyMODA exits.
+- *Updater* downloads the PyMODA repository as a .zip file to `temp/`.
+- *Updater* extracts the .zip file to a folder inside `temp/`.
+- *Updater* deletes the `backup/` folder, then copies the current contents of the `PyMODA` folder (excluding `temp/`) to `backup/`. 
+- For each item in the first level of the `PyMODA` folder: if it exists, it is deleted by *Updater*; then the new file/folder is copied from the folder inside `temp/` to its new location.
+- *Updater* starts a shell command which will update the packages used by PyMODA using `packages/install.py` and then launch PyMODA with the same Python interpreter and command-line arguments. If the update was judged to be successful, another command-line argument, `--post-update`, is added.
+- *Updater* exits, leaving the shell command running.
+- After the packages are updated, PyMODA launches. If the `--post-update` argument is present, PyMODA removes the `temp/` folder and records the latest commit hash from GitHub. The `--post-update` argument is then removed from `sys.argv`.
+
+> **Note:** All paths specified in this section are relative to PyMODA's root directory.
+
+### Modifying the update system
+
+***Take care when modifying the update system***, because if a bug is introduced:
+
+- Users will be stranded on a broken version of the program, which will be **unable to apply the fixes which are required**.
+- Problems will not be noticed until the new version of the program attempts to update, i.e. until the first change after the broken release.
+- Depending on the bug, users may not be made aware that updates are failing; this may lead to confusing feedback about bugs which have been fixed.
+
+**Changing the name of relevant files/folders such as `updater` and `update.py` will break the update system.** If name changes are necessary, ensure that all references to names in the code are searched for and changed.
+
+> **Note:** Any file/folder changes outside `src/updater` should be completely safe.
+
+When testing changes to the update system, remember that a successful update will replace the new code with the older code from the GitHub repository. This means that *changes made to the post-update behaviour will not occur when testing an update*, but can be verified by supplying the `--post-update` argument manually.
+
+To test a full update, it is recommended to copy the PyMODA folder to a temporary location; then delete its `.git` folder, launch PyMODA from the new location and apply an update.
