@@ -40,7 +40,6 @@ import shutil
 import subprocess
 import sys
 from os import path
-from pathlib import Path
 from typing import Optional, List
 
 import aiohttp
@@ -157,6 +156,7 @@ def copy_files() -> None:
     # PyMODA folder.
     target = get_root_folder()
 
+    print(f"Python interpreter: {sys.executable}")
     print(f"Current directory: {os.getcwd()}")
     print(f"Target directory: {target}")
 
@@ -175,8 +175,25 @@ def copy_files() -> None:
         # If the folder doesn't exist, ignore the exception.
         pass
 
-    # Copy current PyMODA folder to 'backup', creating backup of current PyMODA.
-    shutil.copytree(target, backup_folder, ignore=shutil.ignore_patterns(".git"))
+    try:
+        os.remove(
+            backup_folder
+        )  # Prevents an error if there is a file named "backup" in the folder.
+    except:
+        pass
+
+    os.mkdir(backup_folder)
+
+    # For every file/folder in the old version of PyMODA, copy it to the `backup` folder.
+    for f in os.listdir(target):
+        if f == ".git":
+            continue
+
+        old = path.join(target, f)
+        new = path.join(target, "backup")
+
+        print(f"Backing up {old} at {new}")
+        _copy_new_file(old, new)
 
     # For every file/folder in the new version of PyMODA, delete the old file/folder
     # from the current PyMODA folder and copy the new file/folder to its location.
@@ -214,8 +231,8 @@ def _copy_new_file(file_path: str, target: str) -> None:
     """
     Copies a file/folder to a new location.
 
-    :param file_path: the path to the file/folder
-    :param target: the new location
+    :param file_path: the path to the file/folder, as a path including the filename
+    :param target: the new location, as a path excluding the filename
     """
     try:
         if path.isdir(file_path):
