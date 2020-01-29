@@ -94,8 +94,8 @@ def _dynamic_bayesian_inference(
     mcf2 = np.squeeze(mean(q12, 2))
 
     ns = params.surr_count
-    surr1, _ = surrogate_calc(phi1, ns, "CPP", 0, fs)
-    surr2, _ = surrogate_calc(phi2, ns, "CPP", 0, fs)
+    surr1, _ = surrogate_calc(phi1, ns, "CPP", False, fs)
+    surr2, _ = surrogate_calc(phi2, ns, "CPP", False, fs)
 
     cc_surr: List[ndarray] = []
     scpl1 = zeros((ns, len(cc)))

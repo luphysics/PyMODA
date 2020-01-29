@@ -61,7 +61,7 @@ def surrogate_calc(
     else:
         sig = time_series
 
-    surr = np.empty((N, len(sig)), dtype=np.float64)  # TODO: check this
+    surr = np.empty((N, len(sig)), dtype=np.float64)
 
     params = Params()
     origsig = sig
@@ -204,23 +204,27 @@ def surrogate_calc(
     elif method == _CPP:
         signal = np.mod(sig, 2 * np.pi)
 
-        dcpoints = np.nonzero((signal[1:] - signal[:-1]) < -np.pi)
-        NC = len(dcpoints) - 1
+        dcpoints = ((signal[1:] - signal[:-1]) < -np.pi).nonzero()
+        dcpoints = dcpoints[0]
 
+        NC = len(dcpoints) - 1
         if NC > 0:
-            cycles = np.zeros(NC)
+            cycles = []
 
             for k in range(NC):
-                cycles[k] = signal[dcpoints[k] + 1 : dcpoints[k + 1]]
+                cycles.append(signal[dcpoints[k] + 1 : dcpoints[k + 1]])
 
             stcycle = signal[: dcpoints[0]]
-            endcycle = signal[dcpoints[k + 1] + 1 :]
+            endcycle = signal[dcpoints[NC] + 1 :]
+
+            rand_cycles = []
+            for i in randperm(NC):
+                rand_cycles.append(cycles[i])
 
             for sn in range(N):
                 surr[sn, :] = np.unwrap(
-                    np.hstack([stcycle, cycles[np.random.permutation(NC), endcycle]])
+                    np.concatenate((stcycle, *rand_cycles, endcycle))
                 )
-
         else:
             for sn in range(N):
                 surr[sn, :] = np.unwrap(signal)
