@@ -175,7 +175,7 @@ def _bispectrum_analysis(
     # due to some strange problem with the Matlab runtime. Processes would
     # hang at the `package.initialize()` stage for unknown reasons.
     if sigcheck != 0:
-        if not preprocess:  # TODO: check this block.
+        if not preprocess:  # TODO: check this block, replace with block below?
             bispxxx, _, _, _, _ = bispec_wav_new.calculate(
                 sig1list, sig1list, fs, params
             )
@@ -227,29 +227,28 @@ def _bispectrum_analysis(
                 sig2list, sig1list, fs, params
             )
 
-            size = bispxxx.shape
+            size = bispxxx.shape + (ns,)
             surrxxx = zeros(size)
             surrppp = zeros(size)
             surrxpp = zeros(size)
             surrpxx = zeros(size)
 
-            if ns > 0:
-                for j in range(ns):  # TODO: fix. Did it work in previous versions?
-                    surr1 = wav_surrogate.calculate(sig1list, "IAAFT2", 1)
-                    surr2 = wav_surrogate.calculate(sig2list, "IAAFT2", 1)
+            for j in range(ns):  # TODO: fix. Did it work in previous versions?
+                surr1 = wav_surrogate.calculate(sig1list, "IAAFT2", 1)
+                surr2 = wav_surrogate.calculate(sig2list, "IAAFT2", 1)
 
-                    surrxxx[:, :, j] = abs(
-                        bispec_wav_new.calculate(surr1, surr1, fs, params)[0]
-                    )
-                    surrppp[:, :, j] = abs(
-                        bispec_wav_new.calculate(surr2, surr2, fs, params)[0]
-                    )
-                    surrxpp[:, :, j] = abs(
-                        bispec_wav_new.calculate(surr1, surr2, fs, params)[0]
-                    )
-                    surrpxx[:, :, j] = abs(
-                        bispec_wav_new.calculate(surr2, surr1, fs, params)[0]
-                    )
+                surrxxx[:, :, j] = abs(
+                    bispec_wav_new.calculate(surr1, surr1, fs, params)[0]
+                )
+                surrppp[:, :, j] = abs(
+                    bispec_wav_new.calculate(surr2, surr2, fs, params)[0]
+                )
+                surrxpp[:, :, j] = abs(
+                    bispec_wav_new.calculate(surr1, surr2, fs, params)[0]
+                )
+                surrpxx[:, :, j] = abs(
+                    bispec_wav_new.calculate(surr2, surr1, fs, params)[0]
+                )
 
     else:
         raise Exception("sigcheck == 0. This case is not implemented yet.")  # TODO
@@ -265,9 +264,6 @@ def _bispectrum_analysis(
     opt["twf1"] = matlab_to_numpy(opt["twf1"])
     opt["twf2"] = matlab_to_numpy(opt["twf2"])
 
-    import time
-
-    print(f"Adding to queue at time={time.time():.1f} seconds.")
     return (
         name,
         freq,
