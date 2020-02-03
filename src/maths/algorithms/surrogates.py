@@ -212,16 +212,15 @@ def surrogate_calc(
             cycles = []
 
             for k in range(NC):
-                cycles.append(signal[dcpoints[k] + 1 : dcpoints[k + 1]])
+                cycles.append(signal[dcpoints[k] : dcpoints[k + 1]])
 
             stcycle = signal[: dcpoints[0]]
-            endcycle = signal[dcpoints[NC] + 1 :]
+            endcycle = signal[dcpoints[NC] :]
 
             rand_cycles = []
             for i in randperm(NC):
                 rand_cycles.append(cycles[i])
 
-            cycles = np.asarray(cycles)
             for sn in range(N):
                 surr[sn, :] = np.unwrap(
                     np.concatenate((stcycle, *rand_cycles, endcycle))
@@ -232,6 +231,7 @@ def surrogate_calc(
 
     params.type = method
     params.numsurr = N
+
     if pp:
         params.preprocessing = True
         params.cutsig = sig
