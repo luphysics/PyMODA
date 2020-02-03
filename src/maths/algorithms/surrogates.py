@@ -221,6 +221,7 @@ def surrogate_calc(
             for i in randperm(NC):
                 rand_cycles.append(cycles[i])
 
+            cycles = np.asarray(cycles)
             for sn in range(N):
                 surr[sn, :] = np.unwrap(
                     np.concatenate((stcycle, *rand_cycles, endcycle))
