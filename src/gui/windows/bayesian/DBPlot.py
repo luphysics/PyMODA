@@ -17,13 +17,13 @@ from gui.plotting.MatplotlibWidget import MatplotlibWidget
 
 
 class DBPlot(MatplotlibWidget):
-    def plot(self, times, values):
+    def plot(self, times, values, *args, **kwargs):
         self.update_xlabel()
         self.update_ylabel()
 
         self.axes.autoscale(True)
 
-        self.axes.plot(times, values, linewidth=0.8)
+        self.axes.plot(times, values, linewidth=0.8, *args, **kwargs)
         self.axes.autoscale(False)
         self.axes.set_xlim([times[0], times[-1]])
         self.on_plot_complete()

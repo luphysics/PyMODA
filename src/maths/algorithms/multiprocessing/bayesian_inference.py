@@ -50,8 +50,9 @@ def _dynamic_bayesian_inference(
     sig1 = signal1.signal
     sig2 = signal2.signal
 
-    fs = signal1.frequency
     interval1, interval2 = params.freq_range1, params.freq_range2
+
+    fs = signal1.frequency
     bn = params.order
 
     bands1, _ = loop_butter(sig1, *interval1, fs)
@@ -84,29 +85,35 @@ def _dynamic_bayesian_inference(
     q12 = zeros(q21.shape)
 
     for m in range(N):
+        # Direction of coupling.
         cpl1[m], cpl2[m], _ = dirc(cc[m, :], bn)
+
+        # Coupling functions.
         _, _, q21[:, :, m], q12[:, :, m] = CFprint(cc[m, :], bn)
 
+    # Coupling functions for each time window.
     cf1 = q21
     cf2 = q12
 
+    # Mean coupling functions.
     mcf1 = np.squeeze(mean(q21, 2))
     mcf2 = np.squeeze(mean(q12, 2))
 
+    # Surrogates.
     ns = params.surr_count
     surr1, _ = surrogate_calc(phi1, ns, "CPP", False, fs)
     surr2, _ = surrogate_calc(phi2, ns, "CPP", False, fs)
 
     cc_surr: List[ndarray] = []
-    scpl1 = zeros((ns, len(cc)))
-    scpl2 = scpl1.copy()
+    scpl1 = np.empty((ns, len(cc)))
+    scpl2 = np.empty(scpl1.shape)
 
     for n in range(ns):
         _, _cc_surr = bayes_main(surr1[n, :], surr2[n, :], win, 1 / fs, ovr, pr, 1, bn)
         cc_surr.append(_cc_surr)
 
         for idx in range(len(_cc_surr)):
-            scpl1[n, idx], scpl2[n, idx], _ = dirc(_cc_surr[idx], bn)
+            scpl1[n, idx], scpl2[n, idx], _ = dirc(_cc_surr[idx, :], bn)
 
     alph = signif
     alph = 1 - alph / 100

@@ -134,9 +134,9 @@ class DBPresenter(BaseTFPresenter):
         bottom.plot(data.tm, data.cpl1)
         bottom.plot(data.tm, data.cpl2)
 
-        # if data.surr_cpl1 is not None and data.surr_cpl2 is not None:
-        #     bottom.plot(data.tm, data.surr_cpl1)
-        #     bottom.plot(data.tm, data.surr_cpl2)
+        if data.surr_cpl1 is not None and data.surr_cpl2 is not None:
+            bottom.plot(data.tm, data.surr_cpl1, linestyle="--")
+            bottom.plot(data.tm, data.surr_cpl2, linestyle="--")
 
         top.update_ylabel(r"$\phi_1$")
         middle.update_ylabel(r"$\phi_2$")
