@@ -182,18 +182,6 @@
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_13">
             <item>
-             <widget class="QGroupBox" name="verticalGroupBox_3">
-              <property name="title">
-               <string>Freq band 2</string>
-              </property>
-              <layout class="QVBoxLayout" name="verticalLayout_5">
-               <item>
-                <widget class="QListWidget" name="listwidget_freq_band2"/>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
              <widget class="QGroupBox" name="verticalGroupBox_2">
               <property name="title">
                <string>Freq band 1</string>
@@ -201,6 +189,18 @@
               <layout class="QVBoxLayout" name="verticalLayout_4">
                <item>
                 <widget class="QListWidget" name="listwidget_freq_band1"/>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="verticalGroupBox_3">
+              <property name="title">
+               <string>Freq band 2</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_5">
+               <item>
+                <widget class="QListWidget" name="listwidget_freq_band2"/>
                </item>
               </layout>
              </widget>
