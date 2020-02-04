@@ -46,10 +46,11 @@ import aiohttp
 from PyQt5.QtWidgets import QApplication
 from qasync import QEventLoop
 
+branch = "release"
 api_url = "https://api.github.com/repos/luphysics/pymoda"
-zip_url = f"{api_url}/zipball/master"
+zip_url = f"{api_url}/zipball/{branch}"
 
-commit_url = f"{api_url}/git/refs/heads/master"
+commit_url = f"{api_url}/git/refs/heads/{branch}"
 temp = "temp"
 
 # The folder where the new version of PyMODA will be unzipped.
@@ -59,7 +60,7 @@ unzip_target = "pymoda_new"
 async def get_latest_commit() -> Optional[str]:
     """
     Called by PyMODA. Performs a GitHub API request and returns the hash
-    of the latest commit on the 'master' branch.
+    of the latest commit on the 'release' branch.
     """
     async with aiohttp.ClientSession() as session:
         async with session.get(commit_url) as response:
