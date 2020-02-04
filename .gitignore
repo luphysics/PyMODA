@@ -10,6 +10,10 @@ temp/
 .idea/misc.xml
 *.conf
 
+# Ignore data files in the root of the repository.
+/*.mat
+/*.csv
+
 # Created by https://www.gitignore.io/api/pycharm,code,python
 # Edit at https://www.gitignore.io/?templates=pycharm,code,python
 
