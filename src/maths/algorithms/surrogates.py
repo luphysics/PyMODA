@@ -187,8 +187,53 @@ def surrogate_calc(
             it += 1
 
     # Iterated amplitude-adjusted Fourier transform with exact spectrum.
-    elif method == _IAFFT2:
-        pass
+    elif method == _IAFFT2:  # Note: needs testing.
+        maxit = 1000
+
+        val = np.sort(sig)
+        ind = np.argsort(sig)
+
+        rankind = np.empty(L, dtype=np.int64)
+        rankind[ind] = np.arange(0, L)
+
+        ftsig = np.fft.fft(sig, axis=0)
+        F = ftsig[np.ones((1, N)), :]
+        surr = np.zeros((N, L))
+
+        for j in range(N):
+            surr[j, :] = sig[randperm(L)]
+
+        it = 1
+        irank = rankind.copy()
+        irank = irank[np.ones((1, N)), :]
+        irank2 = np.zeros((N, L))
+        oldrank = np.zeros((N, L))
+        iind = np.zeros((N, L))
+        iterf = np.zeros((N, L))
+
+        while np.max(np.abs(oldrank - irank)) != 0 and it < maxit:
+            go = np.max(np.abs(oldrank - irank))
+            inc = (go.T != 0).nonzero()[0]
+
+            oldrank = irank.copy()
+            iterf[inc, :] = np.real(
+                np.fft.ifft(
+                    np.abs(F[inc, :])
+                    * np.exp(1j * np.angle(np.fft.fft(surr[inc, :], axis=1))),
+                    axis=1,
+                )
+            )
+
+            iind[inc, :] = np.argsort(iterf[inc, :], axis=1)
+
+            k = inc
+            irank2[iind[k, :]] = np.arange(0, L)
+            irank[k, :] = irank2.copy()
+            surr[k, :] = val[irank2]
+
+            it += 1
+
+        surr = iterf
 
     # Wavelet iterated amplitude adjusted Fourier transform surrogates
     elif method == _WIAFFT:
