@@ -31,7 +31,7 @@ class SignalPairs(Signals):
 
     def get_pairs(self) -> List[Tuple[TimeSeries, TimeSeries]]:
         if len(self) < 2:
-            return []
+            return [(self[0], self[0])]
 
         def mapper(index):
             return self[index], self[index + 1]
