@@ -97,8 +97,21 @@ class BAPresenter(BaseTFPresenter):
         """
         data = self.get_selected_signal_pair()[0].output_data
 
-        self.update_main_plot(data)
-        self.update_side_plots(data)
+        try:
+            self.update_main_plot(data)
+            self.update_side_plots(data)
+        except AttributeError:
+            pass
+
+    def set_plot_type(self, amplitude_selected=True) -> None:
+        """
+        Set the type of plot to display (power or amplitude). This affects
+        the main plot and the amplitude plot.
+
+        :param amplitude_selected: whether to set the plot type as amplitude (not power)
+        """
+        self.plot_ampl = amplitude_selected
+        self.update_plots()
 
     def update_main_plot(self, data):
         """
@@ -134,9 +147,8 @@ class BAPresenter(BaseTFPresenter):
         :param data: the data object
         """
         if self.view.is_wt_selected():  # Plot average amplitude or power.
-            amp_not_power = self.view.is_amplitude_selected()
             x, y = self.get_side_plot_data_wt(
-                self.view.get_plot_type(), data, amp_not_power
+                self.view.get_plot_type(), data, self.plot_ampl
             )
 
             if x is not None and y is not None and len(x) > 0:
@@ -222,9 +234,8 @@ class BAPresenter(BaseTFPresenter):
         biamp, biphase = _dict.get(plot_type)
         return biamp, biphase
 
-    @staticmethod
     def get_main_plot_data(
-        plot_type: str, data: BAOutputData
+        self, plot_type: str, data: BAOutputData
     ) -> Tuple[ndarray, ndarray, ndarray, bool]:
         """
         Gets the relevant arrays to plot in the main plot (WT or bispectrum).
@@ -236,9 +247,16 @@ class BAPresenter(BaseTFPresenter):
         if not isinstance(data, BAOutputData):
             return [None for _ in range(4)]
 
+        if self.plot_ampl:
+            wt1 = data.amp_wt1
+            wt2 = data.amp_wt2
+        else:
+            wt1 = data.pow_wt1
+            wt2 = data.pow_wt2
+
         _dict = {
-            "Wavelet transform 1": (data.times, data.freq, data.amp_wt1, False),
-            "Wavelet transform 2": (data.times, data.freq, data.amp_wt2, False),
+            "Wavelet transform 1": (data.times, data.freq, wt1, False),
+            "Wavelet transform 2": (data.times, data.freq, wt2, False),
             "b111": (data.freq, data.freq, data.bispxxx, True),
             "b222": (data.freq, data.freq, data.bispppp, True),
             "b122": (data.freq, data.freq, data.bispxpp, True),

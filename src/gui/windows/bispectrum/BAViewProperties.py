@@ -13,7 +13,17 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from PyQt5.QtWidgets import QLineEdit, QSlider, QComboBox, QVBoxLayout, QWidget, QGridLayout, QPushButton, QListWidget
+from PyQt5.QtWidgets import (
+    QLineEdit,
+    QSlider,
+    QComboBox,
+    QVBoxLayout,
+    QGridLayout,
+    QPushButton,
+    QListWidget,
+    QCheckBox,
+    QRadioButton,
+)
 
 from gui.plotting.plots.AmplitudePlot import AmplitudePlot
 from gui.plotting.plots.ColorMeshPlot import ColorMeshPlot
@@ -22,7 +32,6 @@ from gui.windows.bispectrum.BAPlot import BAPlot
 
 
 class BAViewProperties(ViewProperties):
-
     def __init__(self):
         """Define properties introduced by the .ui file."""
         self.line_surrogate: QLineEdit = None
@@ -50,4 +59,7 @@ class BAViewProperties(ViewProperties):
         self.btn_clear_plots: QPushButton = None
 
         self.listwidget_freq: QListWidget = None
+        self.checkbox_plot_surr: QCheckBox = None
 
+        self.radio_power: QRadioButton = None
+        self.radio_ampl: QRadioButton = None

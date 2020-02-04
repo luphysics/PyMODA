@@ -72,6 +72,8 @@ class BAWindow(
         )
         self.listwidget_freq.itemClicked.connect(self.on_freq_selected)
 
+        self.radio_ampl.toggled.connect(self.on_plot_type_toggled)
+
     def on_calculate_started(self):
         super(BAWindow, self).on_calculate_started()
         self.btn_add_point.setEnabled(False)
@@ -128,9 +130,6 @@ class BAWindow(
 
     def is_wt_selected(self):
         return "Wavelet transform" in self.combo_plot_type.currentText()
-
-    def is_amplitude_selected(self):
-        pass  # TODO: add checkbox for ampl/power and implement
 
     def switch_to_all_plots(self):
         pass

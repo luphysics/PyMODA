@@ -40,7 +40,7 @@ class TFPresenter(BaseTFPresenter):
         self.view: TFWindow = view
         self.is_calculating_all = True
 
-    def calculate(self, calculate_all: bool):
+    def calculate(self, calculate_all: bool) -> None:
         """
         Calculates the desired transform(s), and plots the result.
         """
@@ -51,7 +51,7 @@ class TFPresenter(BaseTFPresenter):
         asyncio.ensure_future(self.coro_calculate(calculate_all))
         print("Started calculation...")
 
-    async def coro_calculate(self, calc_all: bool):
+    async def coro_calculate(self, calc_all: bool) -> None:
         """
         Coroutine to calculate all results.
         """
@@ -85,7 +85,7 @@ class TFPresenter(BaseTFPresenter):
 
     def on_transform_completed(
         self, name, times, freq, values, ampl, powers, avg_ampl, avg_pow
-    ):
+    ) -> None:
         """Called when the calculation of the desired transform(s) is completed."""
         self.view.on_calculate_stopped()
 
@@ -100,11 +100,11 @@ class TFPresenter(BaseTFPresenter):
         if self.all_transforms_completed():
             self.on_all_transforms_completed()
 
-    def all_transforms_completed(self):
+    def all_transforms_completed(self) -> bool:
         """Returns whether all transforms have been completed."""
         return all([s.output_data.is_valid() for s in self.signals_calc])
 
-    def on_all_transforms_completed(self):
+    def on_all_transforms_completed(self) -> None:
         """Called when all transforms have been completed."""
         self.plot_output()
         self.on_all_tasks_completed()
@@ -132,23 +132,23 @@ class TFPresenter(BaseTFPresenter):
 
         return tf_data.times, tf_data.freq, values, avg_values
 
-    def set_plot_type(self, amplitude_selected=True):
+    def set_plot_type(self, amplitude_selected=True) -> None:
         """
-        Set the type of plotting to display (power or amplitude). This affects
-        the main plotting and the amplitude plotting.
+        Set the type of plot to display (power or amplitude). This affects
+        the main plot and the amplitude plot.
 
-        :param amplitude_selected: whether to set the plotting type as amplitude (not power)
+        :param amplitude_selected: whether to set the plot type as amplitude (not power)
         """
         self.plot_ampl = amplitude_selected
         if self.is_plotted:
             t, f, values, avg_values = self.get_values_to_plot()
             self.plot(t, f, values, avg_values)
 
-    def plot(self, times, freq, values, avg_values):
+    def plot(self, times, freq, values, avg_values) -> None:
         self.view.main_plot().plot(times, values, freq)
         self.view.amplitude_plot().plot(avg_values, freq)
 
-    def plot_output(self):
+    def plot_output(self) -> None:
         """
         Plots the output of the WT/WFT calculations for the currently selected signal.
         """
@@ -184,7 +184,7 @@ class TFPresenter(BaseTFPresenter):
             transform=self.view.get_transform_type(),
         )
 
-    def load_data(self):
+    def load_data(self) -> None:
         self.signals = Signals.from_file(self.open_file)
 
         if not self.signals.has_frequency():
@@ -194,11 +194,11 @@ class TFPresenter(BaseTFPresenter):
                 self.set_frequency(freq)
                 self.on_data_loaded()
 
-    def plot_signal(self):
+    def plot_signal(self) -> None:
         """Plots the signal on the SignalPlot."""
         self.view.plot_signal(self.get_selected_signal())
 
-    def on_data_loaded(self):
+    def on_data_loaded(self) -> None:
         """Called when the time-series data has been loaded."""
         self.view.update_signal_listview(self.signals.names())
         self.plot_signal()
@@ -213,7 +213,7 @@ class TFPresenter(BaseTFPresenter):
         super().on_signal_zoomed(rect)
         self.plot_preprocessed_signal()
 
-    def on_signal_selected(self, item: Union[QListWidgetItem, str]):
+    def on_signal_selected(self, item: Union[QListWidgetItem, str]) -> None:
         """
         Called when a signal is selected in the QListWidget.
         Plots the new signal in the top-left plotting and, if

@@ -52,8 +52,14 @@ def _biphase(
     :param opt: dictionary with params from MATLAB
     :return:
     """
-    from maths.algorithms.matlabwrappers import biphase_wav_new
+    # We need to import a Matlab module such as WT, in order to be able to use "import matlab".
+    import WT
+
+    # To avoid the "import WT" being removed by the auto-import optimiser, we assign a dummy variable to it.
+    dummy_variable = WT
+
     import matlab
+    from maths.algorithms.matlabwrappers import biphase_wav_new
 
     name = sig1.name
     sig1list = sig1.signal.tolist()
