@@ -163,7 +163,9 @@ def _bispectrum_analysis(
     sig1list = sig1.tolist()
     sig2list = sig2.tolist()
 
-    sigcheck = np.sum(np.abs(sig1 - sig2))
+    # Whether the signals are unique; if a single signal was loaded, it would have been duplicated and
+    # passed to this function, making this boolean False.
+    unique_signals = np.sum(np.abs(sig1 - sig2)) != 0
 
     fs = params.fs
     preprocess = params.preprocess
@@ -178,153 +180,80 @@ def _bispectrum_analysis(
     params = {"nv": nv, "fmin": fmin, "fmax": fmax, "f0": f0}
 
     # If a unique pair of signals is being analysed, perform autobispectral and crossbispectral analysis.
-    if sigcheck != 0:
+    if unique_signals:
+
         # Note: Previously attempted to calculate bispec_wav_new in a process each. Did not work
         # due to some strange problem with the Matlab runtime. Processes would
         # hang at the `package.initialize()` stage for unknown reasons.
-        if not preprocess:  # TODO: check this block, unify with block below?
-            bispxxx, _, _, _, _ = bispec_wav_new.calculate(
-                sig1list, sig1list, fs, params
-            )
-            bispppp, _, _, _, _ = bispec_wav_new.calculate(
-                sig2list, sig2list, fs, params
-            )
-            bispxpp, freq, amp_wt1, amp_wt2, opt = bispec_wav_new.calculate(
-                sig1list, sig2list, fs, params
-            )
-            bisppxx, _, _, _, _ = bispec_wav_new.calculate(
-                sig2list, sig1list, fs, params
-            )
 
-            size = bispxxx.shape
-            surrxxx = zeros(size)
-            surrppp = zeros(size)
-            surrxpp = zeros(size)
-            surrpxx = zeros(size)
+        print(
+            "Multiple signals; performing autobispectral and crossbispectral analysis..."
+        )
+        bispxxx, _, _, _, _ = bispec_wav_new.calculate(sig1list, sig1list, fs, params)
+        bispppp, _, _, _, _ = bispec_wav_new.calculate(sig2list, sig2list, fs, params)
+        bispxpp, freq, amp_wt1, amp_wt2, opt = bispec_wav_new.calculate(
+            sig1list, sig2list, fs, params
+        )
+        bisppxx, _, _, _, _ = bispec_wav_new.calculate(sig2list, sig1list, fs, params)
 
-            if ns > 0:
-                for j in range(ns):
-                    surr1 = wav_surrogate.calculate(sig1list, "IAAFT2", 1)
-                    surr2 = wav_surrogate.calculate(sig2list, "IAAFT2", 1)
+        bisp_size = bispxxx.shape + (ns,)
+        surrxxx = zeros(bisp_size)
+        surrppp = zeros(bisp_size)
+        surrxpp = zeros(bisp_size)
+        surrpxx = zeros(bisp_size)
 
-                    surrxxx[:, :, j] = abs(
-                        bispec_wav_new.calculate(surr1, surr1, fs, params)[0]
-                    )
-                    surrppp[:, :, j] = abs(
-                        bispec_wav_new.calculate(surr2, surr2, fs, params)[0]
-                    )
-                    surrxpp[:, :, j] = abs(
-                        bispec_wav_new.calculate(surr1, surr2, fs, params)[0]
-                    )
-                    surrpxx[:, :, j] = abs(
-                        bispec_wav_new.calculate(surr2, surr1, fs, params)[0]
-                    )
+        for j in range(ns):
+            surr1 = wav_surrogate.calculate(sig1list, "IAAFT2", 1)
+            surr2 = wav_surrogate.calculate(sig2list, "IAAFT2", 1)
 
-        elif preprocess:
-            bispxxx, _, _, _, _ = bispec_wav_new.calculate(
-                sig1list, sig1list, fs, params
+            surrxxx[:, :, j] = abs(
+                bispec_wav_new.calculate(surr1, surr1, fs, params)[0]
             )
-            bispppp, _, _, _, _ = bispec_wav_new.calculate(
-                sig2list, sig2list, fs, params
+            surrppp[:, :, j] = abs(
+                bispec_wav_new.calculate(surr2, surr2, fs, params)[0]
             )
-            bispxpp, freq, amp_wt1, amp_wt2, opt = bispec_wav_new.calculate(
-                sig1list, sig2list, fs, params
+            surrxpp[:, :, j] = abs(
+                bispec_wav_new.calculate(surr1, surr2, fs, params)[0]
             )
-            bisppxx, _, _, _, _ = bispec_wav_new.calculate(
-                sig2list, sig1list, fs, params
+            surrpxx[:, :, j] = abs(
+                bispec_wav_new.calculate(surr2, surr1, fs, params)[0]
             )
-
-            size = bispxxx.shape + (ns,)
-            surrxxx = zeros(size)
-            surrppp = zeros(size)
-            surrxpp = zeros(size)
-            surrpxx = zeros(size)
-
-            for j in range(ns):
-                surr1 = wav_surrogate.calculate(sig1list, "IAAFT2", 1)
-                surr2 = wav_surrogate.calculate(sig2list, "IAAFT2", 1)
-
-                surrxxx[:, :, j] = abs(
-                    bispec_wav_new.calculate(surr1, surr1, fs, params)[0]
-                )
-                surrppp[:, :, j] = abs(
-                    bispec_wav_new.calculate(surr2, surr2, fs, params)[0]
-                )
-                surrxpp[:, :, j] = abs(
-                    bispec_wav_new.calculate(surr1, surr2, fs, params)[0]
-                )
-                surrpxx[:, :, j] = abs(
-                    bispec_wav_new.calculate(surr2, surr1, fs, params)[0]
-                )
 
     # If only one signal is being analysed, instead of a pair, perform autobispectral analysis only.
-    elif sigcheck == 0:
-        print("1 signal being analysed; performing autobispectral analysis only...")
-        if not preprocess:
-            bispxxx, freq, amp_wt1, amp_wt2, opt = bispec_wav_new.calculate(
-                sig1list, sig1list, fs, params
-            )
-            bispxxx = abs(bispxxx)
+    elif not unique_signals:
+        print("1 signal; performing autobispectral analysis only...")
 
-            # Create NaN arrays for remaining bispectra.
-            size = bispxxx.shape
-            bispppp = np.empty(size)
-            bispxpp = np.empty(size)
-            bisppxx = np.empty(size)
+        bispxxx, freq, amp_wt1, amp_wt2, opt = bispec_wav_new.calculate(
+            sig1list, sig1list, fs, params
+        )
+        bispxxx = abs(bispxxx)
 
-            for a in (bispppp, bispxpp, bisppxx):
-                a.fill(NAN)
-
-            size = bispxxx.shape + (ns,)
-            surrxxx = zeros(size)
-            surrppp = zeros(size)
-            surrxpp = zeros(size)
-            surrpxx = zeros(size)
-
-            for i in range(ns):
-                surr1 = wav_surrogate.calculate(sig1list, "IAAFT2", 1)
-
-                surrxxx[:, :, i] = abs(
-                    bispec_wav_new.calculate(surr1, surr1, fs, params)[0]
-                )
-                surrppp.fill(NAN)
-                surrxpp.fill(NAN)
-                surrpxx.fill(NAN)
-
-        elif preprocess:
-            bispxxx, freq, amp_wt1, _, opt = bispec_wav_new.calculate(
-                sig1list, sig1list, fs, params
-            )
-            bispxxx = abs(bispxxx)
-
+        if preprocess:
             # Create NaN array for WT2.
             amp_wt2 = np.empty(amp_wt1.shape)
             amp_wt2.fill(NAN)
 
-            # Create NaN arrays for remaining bispectra.
-            size = bispxxx.shape
-            bispppp = np.empty(size)
-            bispxpp = np.empty(size)
-            bisppxx = np.empty(size)
+        # Create NaN arrays for remaining bispectra.
+        bisp_size = bispxxx.shape
+        surr_size = bisp_size + (ns,)
+        surrxxx = zeros(surr_size)
 
-            for a in (bispppp, bispxpp, bisppxx):
-                a.fill(NAN)
+        # Create empty arrays and make them all NaN.
+        bispppp = np.empty(bisp_size)
+        bispxpp = np.empty(bisp_size)
+        bisppxx = np.empty(bisp_size)
+        surrppp = zeros(surr_size)
+        surrxpp = zeros(surr_size)
+        surrpxx = zeros(surr_size)
+        for a in (bispppp, bispxpp, bisppxx, surrppp, surrxpp, surrpxx):
+            a.fill(NAN)
 
-            size = bispxxx.shape + (ns,)
-            surrxxx = zeros(size)
-            surrppp = zeros(size)
-            surrxpp = zeros(size)
-            surrpxx = zeros(size)
+        for i in range(ns):
+            surr1 = wav_surrogate.calculate(sig1list, "IAAFT2", 1)
 
-            for i in range(ns):
-                surr1 = wav_surrogate.calculate(sig1list, "IAAFT2", 1)
-
-                surrxxx[:, :, i] = abs(
-                    bispec_wav_new.calculate(surr1, surr1, fs, params)[0]
-                )
-                surrppp.fill(NAN)
-                surrxpp.fill(NAN)
-                surrpxx.fill(NAN)
+            surrxxx[:, :, i] = abs(
+                bispec_wav_new.calculate(surr1, surr1, fs, params)[0]
+            )
 
     freq = matlab_to_numpy(freq)
     avg_amp_wt1, avg_pow_wt1 = avg_ampl_pow(amp_wt1)
