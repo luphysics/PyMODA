@@ -14,7 +14,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import sys
-import traceback
 
 from utils import args
 
@@ -27,8 +26,8 @@ def init():
     Overrides the system exception hook with our custom hook,
     unless disabled by a commandline argument.
     """
-    if not args.debug():
-        sys.excepthook = hook
+    # Replace default exception hook with custom hook.
+    sys.excepthook = hook
 
 
 def hook(exc_type, value, traceback):
@@ -36,7 +35,7 @@ def hook(exc_type, value, traceback):
     Exception hook. KeyboardInterrupts are allowed to stop the program,
     but for other exceptions all subscribers are notified.
     """
-    if exc_type is not KeyboardInterrupt:
+    if exc_type is not KeyboardInterrupt and not args.debug():
         notify_subscribers(exc_type, value, traceback)
     else:
         system_exception(exc_type, value, traceback)
@@ -59,9 +58,7 @@ def notify_subscribers(exc_type, value, tb):
         else:
             s(exc_type, value, tb)
 
-    warning = "\033[91m"
-    endc = "\033[0m"
-    print(f"{warning}\nEXCEPTION: {exc_type}\nMESSAGE: {value}{endc}")
+    system_exception(exc_type, value, tb)
 
 
 def system_exception(exc_type, value, traceback):
