@@ -102,6 +102,14 @@ class BAPresenter(BaseTFPresenter):
             self.update_side_plots(data)
         except AttributeError:
             pass
+        except ValueError as e:
+            msg = "zero-size array to reduction operation minimum which has no identity"
+            if msg in str(e):
+                print(
+                    f"'{self.view.combo_plot_type.currentText()}' is not available to plot."
+                )
+            else:
+                raise e
 
     def set_plot_type(self, amplitude_selected=True) -> None:
         """
