@@ -55,7 +55,7 @@ class BAWindow(
         self.presenter: BAPresenter = self.presenter
         self.presenter.init()
 
-    def setup_ui(self):
+    def setup_ui(self) -> None:
         super(BAWindow, self).setup_ui()
         self.btn_calculate_single.hide()
 
@@ -74,19 +74,22 @@ class BAWindow(
 
         self.radio_ampl.toggled.connect(self.on_plot_type_toggled)
 
-    def on_calculate_started(self):
+    def on_calculate_started(self) -> None:
         super(BAWindow, self).on_calculate_started()
         self.btn_add_point.setEnabled(False)
 
-    def on_calculate_stopped(self):
+    def on_calculate_stopped(self) -> None:
         super(BAWindow, self).on_calculate_stopped()
         self.btn_add_point.setEnabled(True)
 
-    def on_select_point_clicked(self):
+        self.btn_calculate_single.hide()
+        self.btn_calculate_all.setText("Calculate")
+
+    def on_select_point_clicked(self) -> None:
         if not self.is_wt_selected():
             self.plot_main.set_click_crosshair_enabled(True)
 
-    def on_add_point_clicked(self):
+    def on_add_point_clicked(self) -> None:
         x = self.get_freq_x()
         y = self.get_freq_y()
 
@@ -100,10 +103,10 @@ class BAWindow(
 
             self.presenter.add_point(x, y)
 
-    def on_clear_plots_clicked(self):
+    def on_clear_plots_clicked(self) -> None:
         pass
 
-    def switch_to_triple_plot(self):
+    def switch_to_triple_plot(self) -> None:
         self.plot_right_middle = BAPlot(self)
         self.plot_right_bottom = BAPlot(self)
 
@@ -112,7 +115,7 @@ class BAWindow(
 
         self.plot_right_top = None
 
-    def switch_to_dual_plot(self):
+    def switch_to_dual_plot(self) -> None:
         self.plot_right_top = AmplitudePlot(self)
 
         self.vplot_remove_all_plots()
@@ -121,20 +124,20 @@ class BAWindow(
         self.plot_right_middle = None
         self.plot_right_bottom = None
 
-    def on_crosshair_drawn(self, x: float, y: float):
+    def on_crosshair_drawn(self, x: float, y: float) -> None:
         x = float_to_str(x)
         y = float_to_str(y)
 
         self.lineedit_freq_x.setText(x)
         self.lineedit_freq_y.setText(y)
 
-    def is_wt_selected(self):
+    def is_wt_selected(self) -> bool:
         return "Wavelet transform" in self.combo_plot_type.currentText()
 
-    def switch_to_all_plots(self):
+    def switch_to_all_plots(self) -> None:
         pass
 
-    def on_freq_selected(self, _: QListWidgetItem):
+    def on_freq_selected(self, _: QListWidgetItem) -> None:
         self.presenter.update_plots()
 
     def get_layout_file(self) -> str:
