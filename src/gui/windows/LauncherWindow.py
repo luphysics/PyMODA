@@ -46,6 +46,10 @@ class LauncherWindow(CentredWindow):
         self.settings = Settings()
         super(LauncherWindow, self).__init__(parent)
 
+        print(
+            "Welcome to PyMODA. Please do not close this terminal window while PyMODA is running."
+        )
+
         # Hidden shortcut to trigger a check for updates.
         self.update_shortcut = QShortcut(QKeySequence("Ctrl+U"), self)
         self.update_shortcut.activated.connect(self.force_check_updates)
