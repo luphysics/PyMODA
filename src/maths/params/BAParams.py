@@ -13,22 +13,22 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from maths.params.PCParams import PCParams
-from maths.params.TFParams import _wft
 from maths.signals.Signals import Signals
 
 
 class BAParams:
-
-    def __init__(self,
-                 signals: Signals,
-                 fmin: float,
-                 fmax: float,
-                 f0: float,
-                 preprocess: bool,
-                 nv: float,
-                 surr_count: int,
-                 opt:dict):
+    def __init__(
+        self,
+        signals: Signals,
+        fmin: float,
+        fmax: float,
+        f0: float,
+        preprocess: bool,
+        nv: float,
+        surr_count: int,
+        alpha: float,
+        opt: dict,
+    ):
         self.signals = signals
         self.fmin = fmin
         self.fmax = fmax
@@ -36,6 +36,7 @@ class BAParams:
         self.preprocess = preprocess
         self.nv = nv
         self.surr_count = surr_count
+        self.alpha = alpha
         self.fs = signals.frequency
 
         # The MATLAB algorithm returns a struct, `opt`, which is converted to this dict.

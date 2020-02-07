@@ -73,6 +73,7 @@ class BAWindow(
         self.listwidget_freq.itemClicked.connect(self.on_freq_selected)
 
         self.radio_ampl.toggled.connect(self.on_plot_type_toggled)
+        self.checkbox_plot_surr.toggled.connect(self.presenter.update_plots)
 
     def on_calculate_started(self) -> None:
         super(BAWindow, self).on_calculate_started()
@@ -124,6 +125,12 @@ class BAWindow(
         self.plot_right_middle = None
         self.plot_right_bottom = None
 
+    def plot_surrogates_enabled(self) -> bool:
+        """
+        Returns whether the option to plot surrogates is enabled.
+        """
+        return self.checkbox_plot_surr.isChecked()
+
     def on_crosshair_drawn(self, x: float, y: float) -> None:
         x = float_to_str(x)
         y = float_to_str(y)
@@ -153,6 +160,9 @@ class BAWindow(
             return float(str_freq_x), float(str_freq_y)
 
         return None, None
+
+    def get_plot_surrogates_selected(self) -> bool:
+        return self.checkbox_plot_surr.isChecked()
 
     @floaty
     def get_freq_x(self) -> Optional[int]:

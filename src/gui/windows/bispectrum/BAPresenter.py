@@ -265,6 +265,8 @@ class BAPresenter(BaseTFPresenter):
         if not isinstance(data, BAOutputData):
             return [None for _ in range(4)]
 
+        plot_surr = self.view.get_plot_surrogates_selected()
+
         if self.plot_ampl:
             wt1 = data.amp_wt1
             wt2 = data.amp_wt2
@@ -280,11 +282,37 @@ class BAPresenter(BaseTFPresenter):
             "b122": (data.freq, data.freq, data.bispxpp, True),
             "b211": (data.freq, data.freq, data.bisppxx, True),
         }
-        data = _dict.get(plot_type)
-        if data is None:  # All plots.
+        tup = _dict.get(plot_type)
+        if tup is None:  # All plots.
             pass  # TODO
 
-        return data
+        if plot_surr and self.params.surr_count > 0 and "transform" not in plot_type:
+            tup = self.apply_surrogates(plot_type, data, tup)
+
+        return tup
+
+    def apply_surrogates(
+        self,
+        plot_type: str,
+        data: BAOutputData,
+        tup: Tuple[ndarray, ndarray, ndarray, bool],
+    ) -> Tuple[ndarray, ndarray, ndarray, bool]:
+        fx, fy, bisp, b = tup
+
+        K = np.int(np.floor((self.params.surr_count + 1) * self.params.alpha))
+        surr = {
+            "b111": data.surrxxx,
+            "b222": data.surrppp,
+            "b122": data.surrxpp,
+            "b211": data.surrpxx,
+        }.get(plot_type)[:, :, K]
+
+        bisp = bisp.copy()
+
+        bisp -= surr
+        bisp[bisp < 0] = np.NAN
+
+        return fx, fy, bisp, b
 
     def on_bispectrum_completed(
         self,
@@ -481,5 +509,6 @@ class BAPresenter(BaseTFPresenter):
             f0=self.view.get_f0(),
             nv=self.view.get_nv(),
             surr_count=self.view.get_surr_count(),
+            alpha=self.view.get_alpha(),
             opt={},
         )
