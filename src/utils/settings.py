@@ -13,10 +13,8 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-import os
 import time
 from os import path
-from pathlib import Path
 from typing import List, Optional
 
 from easysettings import EasySettings
@@ -44,6 +42,9 @@ class Settings:
 
     def get_recent_files(self) -> List[str]:
         files = self._settings.get(_key_recent_files)
+        if files is not None and not hasattr(files, "__len__"):
+            files = [files]
+
         return files or []
 
     def add_recent_file(self, new_file: str):
@@ -60,6 +61,9 @@ class Settings:
 
     def get_recent_freq(self) -> List[float]:
         freq = self._settings.get(_key_recent_frequencies)
+        if freq is not None and not hasattr(freq, "__len__"):
+            freq = [freq]
+
         return freq or []
 
     def add_recent_freq(self, new_freq: float):
