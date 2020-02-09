@@ -106,7 +106,7 @@ pip uninstall pyqt5-sip pyqt5 -y
 Install them again:
 
 ```
-pip install pyqt5-sip pyqt5 --user
+pip install pyqt5-sip pyqt5 --user --force-reinstall
 ```
 
 ---
