@@ -42,8 +42,9 @@ class Settings:
 
     def get_recent_files(self) -> List[str]:
         files = self._settings.get(_key_recent_files)
-        if files is not None and not hasattr(files, "__len__"):
-            files = [files]
+
+        if files and isinstance(files, str):
+            return []
 
         return files or []
 
@@ -61,9 +62,6 @@ class Settings:
 
     def get_recent_freq(self) -> List[float]:
         freq = self._settings.get(_key_recent_frequencies)
-        if freq is not None and not hasattr(freq, "__len__"):
-            freq = [freq]
-
         return freq or []
 
     def add_recent_freq(self, new_freq: float):
