@@ -33,7 +33,7 @@ class DragDropLabel(QLabel):
 
     def dropEvent(self, event: QDropEvent) -> None:
         """Called when a drop event occurs."""
-        file_path = event.mimeData().text()
+        file_path = event.mimeData().text().rstrip()
         if self.drop_callback:
             self.drop_callback(file_path)
 
