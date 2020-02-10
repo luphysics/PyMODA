@@ -13,7 +13,6 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from typing import Callable, Union, Tuple, Optional
 
 from maths.num_utils import float_or_none, int_or_none
 
@@ -76,6 +75,19 @@ def deprecated(func):
 
     def wrapper(*args, **kwargs):
         print(f"Warning: calling deprecated function '{func.__name__}'.")
+        return func(*args, **kwargs)
+
+    return wrapper
+
+
+def override(func):
+    """
+    Decorator that marks a function as overriding a function from a parent class.
+
+    Like in Java, this serves no real purpose other than to make the intention clearer to developers.
+    """
+
+    def wrapper(*args, **kwargs):
         return func(*args, **kwargs)
 
     return wrapper
