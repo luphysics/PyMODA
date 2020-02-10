@@ -50,9 +50,11 @@ class LauncherWindow(CentredWindow):
             "Welcome to PyMODA. Please do not close this terminal window while PyMODA is running."
         )
 
-        # Hidden shortcut to trigger a check for updates.
+        # Hidden shortcuts to trigger a check for updates.
         self.update_shortcut = QShortcut(QKeySequence("Ctrl+U"), self)
         self.update_shortcut.activated.connect(self.force_check_updates)
+        self.update_shortcut_force = QShortcut(QKeySequence("Ctrl+Shift+U"), self)
+        self.update_shortcut_force.activated.connect(self.force_show_update)
 
     def setup_ui(self) -> None:
         uic.loadUi(get("layout:window_launcher.ui"), self)
@@ -157,6 +159,14 @@ class LauncherWindow(CentredWindow):
         """
         asyncio.ensure_future(self.check_for_updates(force=True))
         print("Forcing a check for updates...")
+
+    def force_show_update(self) -> None:
+        """
+        Forces PyMODA to show an available update, even if one does not exist.
+        """
+        self.settings.set_latest_commit("dummy-commit-hash")
+        asyncio.ensure_future(self.check_for_updates(force=True))
+        print("Double-forcing a check for updates...")
 
     async def check_for_updates(self, force=False) -> None:
         """
