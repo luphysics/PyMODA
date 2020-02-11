@@ -27,6 +27,7 @@ _key_runtime_warning = "runtime_warning"
 _key_latest_commit = "latest_commit"
 _key_update_available = "update_available"
 _key_last_update_check = "last_update_check"
+_key_update_source = "update_source"
 
 
 class Settings:
@@ -103,3 +104,10 @@ class Settings:
     def set_last_update_check(self, time: float) -> None:
         self._settings.set(_key_last_update_check, time)
         self._settings.save()
+
+    def set_update_source(self, branch: str) -> None:
+        self._settings.set(_key_update_source, branch)
+        self._settings.save()
+
+    def get_update_source(self) -> str:
+        return self._settings.get(_key_update_source, "release")

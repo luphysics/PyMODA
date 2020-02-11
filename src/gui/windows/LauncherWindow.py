@@ -33,6 +33,7 @@ from updater import update
 from updater.update import get_latest_commit
 from utils import args
 from utils.os_utils import OS
+from utils.qutils import retain_size_when_hidden
 from utils.settings import Settings
 from utils.shortcuts import create_shortcut
 
@@ -75,6 +76,12 @@ class LauncherWindow(CentredWindow):
         self.btn_update.hide()
         self.btn_update.clicked.connect(self.on_update_clicked)
 
+        retain_size_when_hidden(self.btn_update)
+        retain_size_when_hidden(self.lbl_unstable)
+
+        self.combo_source.currentTextChanged.connect(self.on_update_source_changed)
+        self.update_stability_warning()
+
         if args.post_update():
             asyncio.ensure_future(self.post_update())
         elif update.should_check_for_updates():
@@ -111,6 +118,22 @@ class LauncherWindow(CentredWindow):
         """
         status = create_shortcut()
         QMessageBox(text=status).exec()
+
+    def update_stability_warning(self) -> None:
+        stable = self.settings.get_update_source().lower() == "release"
+        self.lbl_unstable.setVisible(not stable)
+
+    def on_update_source_changed(self, branch: str) -> None:
+        """
+        Called when the selection in the "Update source" ComboBox is changed.
+
+        :param branch: the branch name selected as the update source
+        """
+        branch = branch.lower()
+        self.settings.set_update_source(branch)
+        self.update_stability_warning()
+
+        asyncio.ensure_future(self.check_for_updates(force=True))
 
     def on_update_clicked(self) -> None:
         """
