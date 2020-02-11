@@ -14,6 +14,11 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import asyncio
+from typing import Dict
+
+import numpy as np
+from PyQt5.QtWidgets import QFileDialog
+from scipy.io import savemat
 
 from gui.dialogs.ErrorBox import ErrorBox
 from gui.windows.common.BaseTFWindow import BaseTFWindow
@@ -126,6 +131,46 @@ class BaseTFPresenter:
 
     def load_data(self) -> None:
         pass
+
+    def get_data_to_save(self) -> Dict:
+        """
+        Returns a dictionary containing the data that will be saved to a file, based on the current results.
+        """
+        raise Exception("This function should have been implemented by a subclass.")
+
+    def save_data_mat(self) -> None:
+        """
+        Saves the current results as a .mat file.
+        """
+        print("Saving data as .mat file...")
+        data = self.get_data_to_save()
+
+        path = self.get_save_location()
+        if not path.endswith(".mat"):
+            path += ".mat"
+
+        savemat(path, data)
+        print(f"Data saved to {path}.")
+
+    def save_data_npy(self) -> None:
+        """
+        Saves the current results as a .npy file.
+        """
+        print("Saving data as .npy file...")
+        data = self.get_data_to_save()
+
+        path = self.get_save_location()
+        np.save(path, data)
+        print(f"Data saved to {path}.")
+
+    def get_save_location(self) -> str:
+        """
+        Uses a dialog to get the desired save location, and returns the path.
+
+        :return: the file path at which the file should be saved
+        """
+        path, filetype = QFileDialog.getSaveFileName(self.view, "Save file")
+        return path
 
     def get_window_name(self) -> str:
         """

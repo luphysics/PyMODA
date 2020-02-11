@@ -14,8 +14,9 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import asyncio
-from typing import Union
+from typing import Union, Dict, List
 
+import numpy as np
 from PyQt5.QtWidgets import QListWidgetItem
 
 from gui.dialogs.FrequencyDialog import FrequencyDialog
@@ -25,6 +26,7 @@ from maths.params.TFParams import TFParams, _wt, _wft, create
 from maths.signals.Signals import Signals
 from maths.signals.data.TFOutputData import TFOutputData
 from processes.MPHandler import MPHandler
+from utils.decorators import override
 
 
 class TFPresenter(BaseTFPresenter):
@@ -108,6 +110,35 @@ class TFPresenter(BaseTFPresenter):
         """Called when all transforms have been completed."""
         self.plot_output()
         self.on_all_tasks_completed()
+
+    @override
+    def get_data_to_save(self) -> Dict:
+        """
+        Gets all the data which will be saved in a file, and returns it as a dictionary.
+
+        :return: a dictionary containing the current results
+        """
+        output_data: List[TFOutputData] = [s.output_data for s in self.signals]
+        cols = len(output_data)
+
+        amp = np.empty((*output_data[0].ampl.shape, cols))
+        avg_amp = np.empty((output_data[0].avg_ampl.shape[0], cols))
+        freq = output_data[0].freq
+        time = output_data[0].times
+        preproc = []  # TODO: Save this and other params
+
+        for index, d in enumerate(output_data):
+            avg_amp[:, index] = d.avg_ampl[:]
+            amp[:, :, index] = d.ampl[:]
+
+        tfr_data = {
+            "amplitude": amp,
+            "avg_amplitude": avg_amp,
+            "frequency": freq,
+            "time": time,
+            # "preprocessed_signals": preproc,
+        }
+        return {"TFData": tfr_data}
 
     def get_values_to_plot(self, amplitude=None) -> tuple:
         """

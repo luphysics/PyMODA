@@ -47,31 +47,39 @@ class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
     def get_layout_file(self) -> str:
         pass
 
-    def update_title(self, title=""):
+    def update_title(self, title="") -> None:
         super().update_title(title or self.presenter.get_window_name())
 
-    def select_file(self):
+    def select_file(self) -> None:
         file_path = SelectFileDialog().get_result()
         if file_path:
             self.presenter.on_file_selected(file_path)
 
-    def plot_preprocessed_signal(self, times, signal, preproc_signal):
+    def plot_preprocessed_signal(self, times, signal, preproc_signal) -> None:
         """
         Does nothing by default. Will be overridden by the PreprocessComponent for
         windows which need it.
         """
         pass
 
-    def setup_menu_bar(self):
+    def setup_menu_bar(self) -> None:
         """
         Sets up the toolbar at the top of the window.
         """
         menu = self.menubar
         file = menu.addMenu("File")
+        save = menu.addMenu("Save")
+
         file.addAction("Load data file")
         file.triggered.connect(self.select_file)
 
-    def setup_ui(self):
+        mat = save.addAction("Save data as .mat")
+        mat.triggered.connect(self.presenter.save_data_mat)
+
+        npy = save.addAction("Save data as .npy")
+        npy.triggered.connect(self.presenter.save_data_npy)
+
+    def setup_ui(self) -> None:
         uic.loadUi(self.get_layout_file(), self)
         self.update_title()
         self.setup_menu_bar()
@@ -91,7 +99,7 @@ class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
             partial(self.presenter.calculate, False)
         )
 
-    def on_plot_type_toggled(self, ampl_selected):
+    def on_plot_type_toggled(self, ampl_selected) -> None:
         """
         Called when the plot type is changed from amplitude to power, or vice versa.
 
@@ -100,22 +108,22 @@ class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
         self.presenter.set_plot_type(ampl_selected)
 
     @staticmethod
-    def progress_message(current=0, total=0):
+    def progress_message(current=0, total=0) -> str:
         """Gets the text to display under the progress bar."""
         if current < total:
             return f"Completed task {current} of {total}."
         return "No tasks in progress."
 
-    def setup_lineedit_fmin(self):
+    def setup_lineedit_fmin(self) -> None:
         self.line_fmin.editingFinished.connect(self.on_freq_or_res_edited)
 
-    def setup_lineedit_fmax(self):
+    def setup_lineedit_fmax(self) -> None:
         self.line_fmax.editingFinished.connect(self.on_freq_or_res_edited)
 
-    def setup_lineedit_res(self):
+    def setup_lineedit_res(self) -> None:
         self.line_res.editingFinished.connect(self.on_freq_or_res_edited)
 
-    def on_freq_or_res_edited(self):
+    def on_freq_or_res_edited(self) -> None:
         self.presenter.plot_preprocessed_signal()
 
     def main_plot(self) -> ColorMeshPlot:
@@ -127,23 +135,23 @@ class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
     def amplitude_plot(self) -> AmplitudePlot:
         return self.plot_right
 
-    def setup_radio_preproc(self):
+    def setup_radio_preproc(self) -> None:
         self.radio_preproc_on.setChecked(True)
 
-    def get_preprocessing(self):
+    def get_preprocessing(self) -> None:
         return self.radio_preproc_on.isChecked()
 
-    def update_signal_listview(self, items: List[str]):
+    def update_signal_listview(self, items: List[str]) -> None:
         list_widget = self.list_select_data
         list_widget.clear()
         list_widget.addItems(items)
         list_widget.setCurrentRow(0)
         self.presenter.on_signal_selected(list_widget.selectedIndexes()[0].data())
 
-    def setup_signal_listview(self):
+    def setup_signal_listview(self) -> None:
         self.list_select_data.itemClicked.connect(self.presenter.on_signal_selected)
 
-    def set_log_text(self, text: str):
+    def set_log_text(self, text: str) -> None:
         """Sets the text displayed in the log pane, and scrolls to the bottom."""
         if text != "\n":
             self.text_log.setPlainText(text.rstrip())
@@ -155,7 +163,7 @@ class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
     def get_preprocess(self) -> bool:
         return self.radio_preproc_on.isChecked()
 
-    def on_calculate_started(self):
+    def on_calculate_started(self) -> None:
         """
         Called when a calculation starts. Enables progress bars
         and sets up cancel button.
@@ -175,7 +183,7 @@ class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
         btn.clicked.disconnect()
         btn.clicked.connect(self.presenter.cancel_calculate)
 
-    def on_calculate_stopped(self):
+    def on_calculate_stopped(self) -> None:
         """
         Called when a calculation stops. Disables progress bars
         and resets cancel button.
@@ -196,10 +204,10 @@ class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
 
         self.setup_progress()
 
-    def setup_progress(self):
+    def setup_progress(self) -> None:
         self.update_progress(0, 0)
 
-    def update_progress(self, current, total):
+    def update_progress(self, current, total) -> None:
         lbl = self.lbl_progress
         progress: QProgressBar = self.progress
 
@@ -219,17 +227,17 @@ class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
     def get_button_calculate_single(self) -> QPushButton:
         return self.btn_calculate_single
 
-    def on_xlim_edited(self):
+    def on_xlim_edited(self) -> None:
         """Called when the x-limits have been changed."""
         x1 = self.line_xlim1.text()
         x2 = self.line_xlim2.text()
         self.signal_plot().set_xrange(x1=float_or_none(x1), x2=float_or_none(x2))
 
-    def setup_xlim_edits(self):
+    def setup_xlim_edits(self) -> None:
         """Sets up the refresh button to trigger x-limit changes."""
         self.btn_refresh.clicked.connect(self.on_xlim_edited)
 
-    def set_xlimits(self, x1, x2):
+    def set_xlimits(self, x1, x2) -> None:
         """
         Sets the x-limits on the signal plotting, restricting the values to
         a certain range of times.
