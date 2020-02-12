@@ -31,6 +31,7 @@ import os
 # Fix issue where imports fail when launching from 'temp'.
 from utils import args
 from utils.file_utils import get_root_folder
+from utils.settings import Settings
 
 os.environ["PYTHONPATH"] = "."
 
@@ -46,11 +47,7 @@ import aiohttp
 from PyQt5.QtWidgets import QApplication
 from qasync import QEventLoop
 
-branch = "release"
 api_url = "https://api.github.com/repos/luphysics/pymoda"
-zip_url = f"{api_url}/zipball/{branch}"
-
-commit_url = f"{api_url}/git/refs/heads/{branch}"
 temp = "temp"
 
 # The folder where the new version of PyMODA will be unzipped.
@@ -62,6 +59,8 @@ async def get_latest_commit() -> Optional[str]:
     Called by PyMODA. Performs a GitHub API request and returns the hash
     of the latest commit on the 'release' branch.
     """
+    branch, zip, commit_url = get_update_params()
+
     async with aiohttp.ClientSession() as session:
         async with session.get(commit_url) as response:
             text = await response.text()
@@ -363,10 +362,22 @@ def _is_git_present() -> bool:
 
 arg_post_update = "--post-update"
 
+
+def get_update_params():
+    branch = Settings().get_update_branch()
+    zip_url = f"{api_url}/zipball/{branch}"
+    commit_url = f"{api_url}/git/refs/heads/{branch}"
+
+    return branch, zip_url, commit_url
+
+
 if __name__ == "__main__":
     # Change working directory to this file's location.
     new_wd = path.dirname(path.abspath(sys.argv[0]))
     os.chdir(new_wd)
+
+    branch, zip_url, commit_url = get_update_params()
+    print(f"Updating from branch: '{branch}'")
 
     app = QApplication(sys.argv)
 

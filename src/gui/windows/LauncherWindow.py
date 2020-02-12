@@ -22,7 +22,7 @@ from pathlib import Path
 from PyQt5 import uic
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QKeySequence
-from PyQt5.QtWidgets import QMessageBox, QShortcut
+from PyQt5.QtWidgets import QMessageBox, QShortcut, QComboBox
 
 import updater.update as upd
 from data import resources
@@ -79,7 +79,10 @@ class LauncherWindow(CentredWindow):
         retain_size_when_hidden(self.btn_update)
         retain_size_when_hidden(self.lbl_unstable)
 
-        self.combo_source.currentTextChanged.connect(self.on_update_source_changed)
+        combo: QComboBox = self.combo_source
+        combo.currentTextChanged.connect(self.on_update_source_changed)
+        combo.setCurrentText(self.settings.get_update_branch().capitalize())
+
         self.update_stability_warning()
 
         if args.post_update():
@@ -120,7 +123,7 @@ class LauncherWindow(CentredWindow):
         QMessageBox(text=status).exec()
 
     def update_stability_warning(self) -> None:
-        stable = self.settings.get_update_source().lower() == "release"
+        stable = self.settings.get_update_branch().lower() == "release"
         self.lbl_unstable.setVisible(not stable)
 
     def on_update_source_changed(self, branch: str) -> None:
@@ -176,6 +179,8 @@ class LauncherWindow(CentredWindow):
         await asyncio.sleep(0.2)  # Prevent jarring animations.
         QMessageBox.information(self, "Update", "Update completed.")
 
+        await self.check_for_updates()
+
     def force_check_updates(self) -> None:
         """
         Forces a check for updates. Called when the hidden shortcut is triggered.
@@ -199,43 +204,54 @@ class LauncherWindow(CentredWindow):
         :param force: whether to force an update check, even if there was a recent check
         """
         # If there was an update found the last time we checked.
-        if self.settings.get_update_available():
-            self.show_update_available()
-            print("Update is available.")
+        if self.settings.get_update_available_on_branch():
+            self.show_update_available(True)
+            print(
+                f"Update is available on branch '{self.settings.get_update_branch()}'."
+            )
             return
 
         # If we should check for updates again now.
         elif not self.settings.should_check_updates() and not force:
+            self.show_update_available(False)
+            print(f"Skipping a check for updates.")
             return
 
         # Retrieve the latest commit from the GitHub API.
         new_commit = await get_latest_commit()
 
         if new_commit is None:
+            self.show_update_available(False)
             return
 
         # If it's the first ever check for updates.
-        elif self.settings.get_latest_commit() is None:
+        elif self.settings.get_latest_commit_on_branch() is None:
             self.settings.set_latest_commit(new_commit)
+            self.show_update_available(False)
 
         # If there's an update available.
-        elif new_commit != self.settings.get_latest_commit():
+        elif new_commit != self.settings.get_latest_commit_on_branch():
             self.settings.set_update_available(True)
-            self.show_update_available()
-            print(f"Found new update. Commit hash: {new_commit}")
+            self.show_update_available(True)
+            print(
+                f"Found new update on branch '{self.settings.get_update_branch()}'. Commit hash: {new_commit}"
+            )
 
         # No updates available.
         else:
             self.settings.set_update_available(False)
-            print("No updates available.")
+            self.show_update_available(False)
+            print(
+                f"No updates available on branch '{self.settings.get_update_branch()}'."
+            )
 
         # Set now as the last time at which an update check occurred.
         self.settings.set_last_update_check(time.time())
 
-    def show_update_available(self) -> None:
+    def show_update_available(self, show: bool) -> None:
         """
         Shows that an update is available by making the button and label visible.
         """
         for item in (self.lbl_update, self.btn_update):
             item.setStyleSheet("color: blue;")
-            item.show()
+            item.setVisible(show)

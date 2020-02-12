@@ -74,8 +74,9 @@ class UpdateThread(QThread):
             return True
 
         try:
-            print(f"Downloading new version of PyMODA from {upd.zip_url}...")
-            with urlopen(upd.zip_url) as response:
+            branch, zip_url, commit_url = upd.get_update_params()
+            print(f"Downloading new version of PyMODA from {zip_url}...")
+            with urlopen(zip_url) as response:
                 _chunked_download(
                     temp_filename, response, self.size, self.download_progress_signal
                 )

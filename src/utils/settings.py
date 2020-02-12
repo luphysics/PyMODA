@@ -15,7 +15,7 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import time
 from os import path
-from typing import List, Optional
+from typing import List, Dict, Optional
 
 from easysettings import EasySettings
 
@@ -84,19 +84,55 @@ class Settings:
         self._settings.set(_key_runtime_warning, enabled)
         self._settings.save()
 
-    def get_latest_commit(self) -> Optional[str]:
-        return self._settings.get(_key_latest_commit, None)
+    def get_latest_commits(self) -> Optional[Dict]:
+        """
+        :returns a dictionary containing the latest commit hash for each branch.
+        """
+        out = self._settings.get(_key_latest_commit, None)
+        branch = self.get_update_branch()
+
+        # In older versions, this is a string rather than a dict.
+        if isinstance(out, str):
+            out = {branch: out}
+
+        return out
+
+    def get_latest_commit_on_branch(self) -> Optional[str]:
+        """
+        :returns the latest commit on the branch which is selected as the update source.
+        """
+        return self.get_latest_commits().get(self.get_update_branch())
 
     def set_latest_commit(self, latest_commit: str) -> None:
+        """
+        Sets the latest commit hash for the current update branch.
+
+        :param latest_commit: the latest commit hash
+        """
+        commits = self.get_latest_commits()
+        commits[self.get_update_branch()] = latest_commit
+
         self._settings.set(_key_latest_commit, latest_commit)
         self._settings.save()
 
     def set_update_available(self, value: bool) -> None:
-        self._settings.set(_key_update_available, value)
+        available: Dict = self.get_update_available()
+        available[self.get_update_branch()] = value
+
+        self._settings.set(_key_update_available, available)
         self._settings.save()
 
-    def get_update_available(self) -> bool:
-        return self._settings.get(_key_update_available, False)
+    def get_update_available_on_branch(self) -> bool:
+        return self.get_update_available().get(self.get_update_branch())
+
+    def get_update_available(self) -> Optional[Dict]:
+        out = self._settings.get(_key_update_available, False)
+        branch = self.get_update_branch()
+
+        if isinstance(out, bool):
+            out = {branch: out}
+
+        return out
 
     def should_check_updates(self) -> bool:
         return time.time() - self._settings.get(_key_last_update_check, 0.0) > 3600 * 6
@@ -109,5 +145,5 @@ class Settings:
         self._settings.set(_key_update_source, branch)
         self._settings.save()
 
-    def get_update_source(self) -> str:
-        return self._settings.get(_key_update_source, "release")
+    def get_update_branch(self) -> str:
+        return self._settings.get(_key_update_source, "release").lower()
