@@ -67,6 +67,7 @@ class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
         Sets up the toolbar at the top of the window.
         """
         menu = self.menubar
+
         file = menu.addMenu("File")
         save = menu.addMenu("Save")
 
@@ -78,6 +79,14 @@ class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
 
         npy = save.addAction("Save data as .npy")
         npy.triggered.connect(self.presenter.save_data_npy)
+
+        self.enable_save_data(False)
+
+    def enable_save_data(self, enable: bool) -> None:
+        for item in self.menubar.actions():
+            if item.text() == "Save":
+                item.setEnabled(enable)
+                return
 
     def setup_ui(self) -> None:
         uic.loadUi(self.get_layout_file(), self)

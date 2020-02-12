@@ -108,6 +108,7 @@ class TFPresenter(BaseTFPresenter):
 
     def on_all_transforms_completed(self) -> None:
         """Called when all transforms have been completed."""
+        self.enable_save_data(True)
         self.plot_output()
         self.on_all_tasks_completed()
 

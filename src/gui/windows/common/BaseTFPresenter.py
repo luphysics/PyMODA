@@ -51,10 +51,11 @@ class BaseTFPresenter:
         self.mp_handler: MPHandler = None
         self.preproc_mp_handler: MPHandler = None
 
-        self.logger: WindowLogger = stdout_redirect.WindowLogger(self.on_log)
+        self._logger: WindowLogger = stdout_redirect.WindowLogger(self.on_log)
+        self._can_save_data = False
 
         errorhandling.subscribe(self.on_error)
-        stdout_redirect.subscribe(self.logger)
+        stdout_redirect.subscribe(self._logger)
 
     def init(self) -> None:
         # Add zoom listener to the signal plotting, which is displayed in the top left.
@@ -71,6 +72,10 @@ class BaseTFPresenter:
         `button.clicked.connect(partial(self.calculate, my_argument))`
         """
         pass
+
+    def enable_save_data(self, enable: bool) -> None:
+        self._can_save_data = enable
+        self.view.enable_save_data(enable)
 
     def on_progress_updated(self, current, total) -> None:
         self.view.update_progress(current, total)
