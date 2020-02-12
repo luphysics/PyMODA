@@ -147,26 +147,27 @@ class BaseTFPresenter:
         """
         Saves the current results as a .mat file.
         """
-        print("Saving data as .mat file...")
         data = self.get_data_to_save()
-
         path = self.get_save_location()
-        if not path.endswith(".mat"):
+
+        if path and not path.endswith(".mat"):
             path += ".mat"
 
-        savemat(path, data)
-        print(f"Data saved to {path}.")
+            print("Saving data as .mat file...")
+            savemat(path, data)
+            print(f"Data saved to {path}.")
 
     def save_data_npy(self) -> None:
         """
         Saves the current results as a .npy file.
         """
-        print("Saving data as .npy file...")
         data = self.get_data_to_save()
-
         path = self.get_save_location()
-        np.save(path, data)
-        print(f"Data saved to {path}.")
+
+        if path:
+            print("Saving data as .npy file...")
+            np.save(path, data)
+            print(f"Data saved to {path}.")
 
     def get_save_location(self) -> str:
         """
