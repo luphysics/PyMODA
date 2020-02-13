@@ -13,25 +13,23 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-from typing import Union, Tuple
+from typing import Union, Tuple, Dict
 
 from numpy import ndarray
 
-from maths.algorithms import wavelet_transform
-from maths.algorithms.wavelet_transform import LognormWavelet
 from maths.params.TFParams import TFParams
 from maths.signals.TimeSeries import TimeSeries
 
 
 def calculate(
-    signal: Union[TimeSeries, ndarray], params: TFParams
-) -> Tuple[ndarray, ndarray]:
+    signal: Union[TimeSeries, ndarray], params: TFParams, return_opt: bool = False
+) -> Union[Tuple[ndarray, ndarray], Tuple[ndarray, ndarray, Dict]]:
     """
     Calculates the wavelet transform using the MATLAB-packaged function.
 
     :param signal: the signal to perform the transform on
     :param params: the params object containing parameters to pass to the MATLAB function
+    :param return_opt: whether to return a 3rd value, the options used to calculate the wavelet transform ('wopt' in the MATLAB function)
     :return: [2D array] the wavelet transform; [1D array] the frequencies
     """
     import WT
@@ -42,11 +40,16 @@ def calculate(
     if isinstance(signal, TimeSeries):
         signal = signal.signal
 
-    wt, frequency = package.wt(
-        matlab.double([signal.tolist()]), params.fs, params.get(), nargout=2
+    kwargs = {**params.get(), "python": True}
+
+    wt, frequency, opt = package.wt(
+        matlab.double([signal.tolist()]), params.fs, kwargs, nargout=3
     )
 
     ### Uncomment next line to test the pure Python version of the wavelet transform. ###
     # wt, frequency = wavelet_transform.wt(signal, params.fs , LognormWavelet(f0=params.fs))
 
-    return wt, frequency
+    if not return_opt:
+        return wt, frequency
+
+    return wt, frequency, opt

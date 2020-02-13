@@ -61,6 +61,9 @@ class BaseTFPresenter:
         errorhandling.subscribe(self.on_error)
         stdout_redirect.subscribe(self._logger)
 
+        # Will be used to record the parameters passed to the algorithms. This is useful when saving data.
+        self.params = None
+
     def init(self) -> None:
         # Add zoom listener to the signal plotting, which is displayed in the top left.
         self.view.signal_plot().add_zoom_listener(self.on_signal_zoomed)

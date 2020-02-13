@@ -76,7 +76,7 @@ class MPHandler:
         for time_series in signals:
             self.scheduler.add(
                 target=_time_frequency,
-                args=(time_series, params),
+                args=(time_series, params, True),
                 process_type=mp.Process,
                 queue_type=mp.Queue,
             )

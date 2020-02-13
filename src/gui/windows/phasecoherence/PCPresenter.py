@@ -18,14 +18,14 @@ from typing import Tuple
 
 from PyQt5.QtWidgets import QListWidgetItem
 
-from gui.windows.common.BaseTFPresenter import BaseTFPresenter
 from gui.dialogs.FrequencyDialog import FrequencyDialog
-from processes.MPHandler import MPHandler
+from gui.windows.common.BaseTFPresenter import BaseTFPresenter
 from maths.params.PCParams import PCParams
 from maths.params.TFParams import create
 from maths.signals.SignalPairs import SignalPairs
-from maths.signals.data.TFOutputData import TFOutputData
 from maths.signals.TimeSeries import TimeSeries
+from maths.signals.data.TFOutputData import TFOutputData
+from processes.MPHandler import MPHandler
 
 
 class PCPresenter(BaseTFPresenter):
@@ -42,6 +42,7 @@ class PCPresenter(BaseTFPresenter):
         print("Started calculation...")
 
     async def coro_calculate(self, calculate_all: bool):
+        self.view.enable_save_data(False)
         self.is_calculating_all = calculate_all
 
         if self.mp_handler:
@@ -89,7 +90,7 @@ class PCPresenter(BaseTFPresenter):
         return await self.mp_handler.coro_phase_coherence(signals, params, on_progress)
 
     def on_transform_completed(
-        self, name, times, freq, values, ampl, powers, avg_ampl, avg_pow
+        self, name, times, freq, values, ampl, powers, avg_ampl, avg_pow, opt=None
     ):
         print(f"Calculated wavelet transform for '{name}'")
 

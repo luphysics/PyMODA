@@ -13,9 +13,10 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from typing import Type
+from typing import Type, Dict
 
 from maths.signals.Signals import Signals
+from utils.dict_utils import sanitise
 
 # Keys for the dictionary that is supplied to the Matlab function.
 _fmin = "fmin"
@@ -49,19 +50,21 @@ class TFParams:
     from the dictionary.
     """
 
-    def __init__(self,
-                 signals: Signals,
-                 fmin=0,
-                 fmax=None,
-                 fstep="auto",
-                 f0=1,
-                 padding="predictive",
-                 cut_edges=False,
-                 window="Gaussian",  # Just for WFT.
-                 wavelet="Lognorm",  # Just for WT.
-                 preprocess=True,
-                 rel_tolerance=0.01,
-                 transform=_wft):
+    def __init__(
+        self,
+        signals: Signals,
+        fmin=0,
+        fmax=None,
+        fstep="auto",
+        f0=1,
+        padding="predictive",
+        cut_edges=False,
+        window="Gaussian",  # Just for WFT.
+        wavelet="Lognorm",  # Just for WT.
+        preprocess=True,
+        rel_tolerance=0.01,
+        transform=_wft,
+    ):
         """
         Constructor which takes the desired parameters and converts
         them into floats if necessary (to prevent Matlab errors).
@@ -84,9 +87,9 @@ class TFParams:
         if transform == _wt and fmin == 0:
             fmin = None
 
-        self.signals = signals
-        self.fs = float(signals.frequency)
-        self.transform = transform
+        self.signals: Signals = signals
+        self.fs: float = float(signals.frequency)
+        self.transform: str = transform
 
         self.data = {
             _fmin: float(fmin) if fmin is not None else None,
@@ -102,23 +105,43 @@ class TFParams:
         }
 
     def get(self) -> dict:
-        """Gets the parameters to supply to the wt/wft function as a dictionary."""
-        temp_keys = []
-        for key, value in self.data.items():
-            if value is None:
-                temp_keys.append(key)
+        """
+        Gets the parameters to supply to the wt/wft function as a dictionary.
 
-        # Remove values which are None, because they cannot be passed to Matlab.
-        for k in temp_keys:
-            self.delete(k)
-
-        return self.data
+        Removes values which are None, because they cannot be passed to Matlab.
+        """
+        return sanitise(self.data)
 
     def set_item(self, key, value):
         self.data[key] = value
 
     def get_item(self, key):
         return self.data.get(key)
+
+    def items_to_save(self) -> Dict:
+        """
+        Returns a dictionary containing the parameters which should be saved
+        when using the "save data" option.
+        """
+        # Window type or wavelet type.
+        if self.transform == _wft:
+            window_type_name = "window_type"
+            window_type = self.get_item("Window")
+        else:
+            window_type_name = "wavelet_type"
+            window_type = self.get_item("Wavelet")
+
+        out = {
+            "transform_type": self.transform.upper(),
+            "sampling_frequency": self.fs,
+            window_type_name: window_type,
+            "fmax": self.get_item(_fmax),
+            "fmin": self.get_item(_fmin),
+            "cut_edges": self.get_item(_cut_edges),
+            "fr": self.get_item(_f0),
+            "preprocessing": self.get_item(_preprocess),
+        }
+        return sanitise(out)
 
     def remove_signals(self):
         """

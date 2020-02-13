@@ -14,7 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from typing import Tuple
+from typing import Tuple, Union, Dict
 
 import numpy as np
 from numpy import ndarray
@@ -27,13 +27,17 @@ from processes.mp_utils import process
 
 @process
 def _time_frequency(
-    time_series: TimeSeries, params: TFParams
-) -> Tuple[str, ndarray, ndarray, ndarray, ndarray, ndarray, ndarray, ndarray]:
+    time_series: TimeSeries, params: TFParams, return_opt: bool = False
+) -> Union[
+    Tuple[str, ndarray, ndarray, ndarray, ndarray, ndarray, ndarray, ndarray],
+    Tuple[str, ndarray, ndarray, ndarray, ndarray, ndarray, ndarray, ndarray, Dict],
+]:
     """
     Performs a wavelet transform or windowed Fourier transform using the MATLAB-packaged libraries.
 
     :param time_series: the signal to transform
     :param params: the input parameters for the MATLAB package
+    :param return_opt: whether to return the options from the transform function
 
     :return: the name of the input signal; the times associated with the input signal;
     the frequencies produced by the transform; the values of the transform itself; the amplitudes
@@ -46,10 +50,18 @@ def _time_frequency(
 
     if params.transform == _wft:
         func = wft
+        return_opt = False
     else:
         func = wt
 
-    transform, freq = func.calculate(time_series, params)
+    opt = None
+
+    # WFT does not take a 3rd parameter. This is why we can't simplify the following block into one line.
+    if return_opt:
+        transform, freq, opt = func.calculate(time_series, params, True)
+    else:
+        transform, freq = func.calculate(time_series, params)
+
     transform = matlab_to_numpy(transform)
     freq = matlab_to_numpy(freq)
 
@@ -57,7 +69,7 @@ def _time_frequency(
     power = np.square(amplitude)
     avg_ampl, avg_pow = avg_ampl_pow(amplitude)
 
-    return (
+    out = (
         time_series.name,
         time_series.times,
         freq,
@@ -67,6 +79,11 @@ def _time_frequency(
         avg_ampl,
         avg_pow,
     )
+
+    if return_opt:
+        return out + (opt,)
+
+    return out
 
 
 def avg_ampl_pow(amplitude) -> Tuple[ndarray, ndarray]:

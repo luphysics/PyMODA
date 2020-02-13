@@ -14,7 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import asyncio
-from typing import Union, Dict, List
+from typing import Union, Dict, List, Optional
 
 import numpy as np
 from PyQt5.QtWidgets import QListWidgetItem
@@ -27,6 +27,7 @@ from maths.signals.Signals import Signals
 from maths.signals.data.TFOutputData import TFOutputData
 from processes.MPHandler import MPHandler
 from utils.decorators import override
+from utils.dict_utils import sanitise
 
 
 class TFPresenter(BaseTFPresenter):
@@ -67,6 +68,8 @@ class TFPresenter(BaseTFPresenter):
             if self.view.get_fmin() is None:
                 raise Exception("Minimum frequency must be defined for WFT.")
 
+        self.params = params
+
         self.is_plotted = False
         self.view.main_plot().clear()
         self.view.main_plot().set_in_progress(True)
@@ -86,10 +89,16 @@ class TFPresenter(BaseTFPresenter):
             self.on_transform_completed(*d)
 
     def on_transform_completed(
-        self, name, times, freq, values, ampl, powers, avg_ampl, avg_pow
+        self, name, times, freq, values, ampl, powers, avg_ampl, avg_pow, opt=None
     ) -> None:
-        """Called when the calculation of the desired transform(s) is completed."""
+        """
+        Called when the calculation of the desired transform(s) is completed.
+        """
         self.view.on_calculate_stopped()
+
+        # Get the returned minimum frequency, because otherwise it is unknown if not specified in the GUI.
+        if opt:
+            self.params.set_item("fmin", opt.get("fmin"))
 
         t = self.signals.get(name)
         t.output_data = TFOutputData(
@@ -113,12 +122,15 @@ class TFPresenter(BaseTFPresenter):
         self.on_all_tasks_completed()
 
     @override
-    def get_data_to_save(self) -> Dict:
+    def get_data_to_save(self) -> Optional[Dict]:
         """
         Gets all the data which will be saved in a file, and returns it as a dictionary.
 
         :return: a dictionary containing the current results
         """
+        if not self.params:
+            return None
+
         output_data: List[TFOutputData] = [s.output_data for s in self.signals]
         cols = len(output_data)
 
@@ -144,9 +156,10 @@ class TFPresenter(BaseTFPresenter):
             "avg_amplitude": avg_amp,
             "frequency": freq,
             "time": time,
-            # "preprocessed_signals": preproc,
+            "preprocessed_signals": preproc,
+            **self.params.items_to_save(),
         }
-        return {"TFData": tfr_data}
+        return {"TFData": sanitise(tfr_data)}
 
     def get_values_to_plot(self, amplitude=None) -> tuple:
         """
