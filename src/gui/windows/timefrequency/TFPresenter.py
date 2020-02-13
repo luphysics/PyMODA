@@ -122,15 +122,22 @@ class TFPresenter(BaseTFPresenter):
         output_data: List[TFOutputData] = [s.output_data for s in self.signals]
         cols = len(output_data)
 
-        amp = np.empty((*output_data[0].ampl.shape, cols))
-        avg_amp = np.empty((output_data[0].avg_ampl.shape[0], cols))
-        freq = output_data[0].freq
-        time = output_data[0].times
+        first = [d for d in output_data if d.is_valid()][0]
+
+        amp = np.empty((*first.ampl.shape, cols))
+        avg_amp = np.empty((first.avg_ampl.shape[0], cols))
+
+        freq = first.freq
+        time = first.times
         preproc = []  # TODO: Save this and other params
 
         for index, d in enumerate(output_data):
-            avg_amp[:, index] = d.avg_ampl[:]
-            amp[:, :, index] = d.ampl[:]
+            if d.is_valid():
+                avg_amp[:, index] = d.avg_ampl[:]
+                amp[:, :, index] = d.ampl[:]
+            else:
+                avg_amp[:, index] = np.NAN
+                amp[:, :, index] = np.NAN
 
         tfr_data = {
             "amplitude": amp,
