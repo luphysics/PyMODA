@@ -14,6 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import asyncio
+import os
 from typing import Dict
 
 import numpy as np
@@ -27,6 +28,7 @@ from maths.signals.TimeSeries import TimeSeries
 from processes.MPHandler import MPHandler
 from utils import stdout_redirect, errorhandling
 from utils.decorators import deprecated
+from utils.settings import Settings
 from utils.stdout_redirect import WindowLogger
 
 
@@ -52,7 +54,9 @@ class BaseTFPresenter:
         self.preproc_mp_handler: MPHandler = None
 
         self._logger: WindowLogger = stdout_redirect.WindowLogger(self.on_log)
-        self._can_save_data = False
+        self._can_save_data: bool = False
+
+        self.settings: Settings = Settings()
 
         errorhandling.subscribe(self.on_error)
         stdout_redirect.subscribe(self._logger)
@@ -150,12 +154,15 @@ class BaseTFPresenter:
         data = self.get_data_to_save()
         path = self.get_save_location()
 
-        if path and not path.endswith(".mat"):
+        if not path:
+            return
+
+        if not path.endswith(".mat"):
             path += ".mat"
 
-            print("Saving data as .mat file...")
-            savemat(path, data)
-            print(f"Data saved to {path}.")
+        print("Saving data as .mat file...")
+        savemat(path, data)
+        print(f"Data saved to {path}.")
 
     def save_data_npy(self) -> None:
         """
@@ -175,7 +182,13 @@ class BaseTFPresenter:
 
         :return: the file path at which the file should be saved
         """
-        path, filetype = QFileDialog.getSaveFileName(self.view, "Save file")
+        start_dir = self.settings.get_save_directory()
+        path, filetype = QFileDialog.getSaveFileName(self.view, "Save file", start_dir)
+
+        if path:
+            save_dir, _ = os.path.split(path)
+            self.settings.set_save_directory(save_dir)
+
         return path
 
     def get_window_name(self) -> str:

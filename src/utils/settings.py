@@ -13,6 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import os
 import time
 from os import path
 from typing import List, Optional
@@ -27,6 +28,7 @@ _key_runtime_warning = "runtime_warning"
 _key_latest_commit = "latest_commit"
 _key_update_available = "update_available"
 _key_last_update_check = "last_update_check"
+_key_save_dir = "save_directory"
 
 
 class Settings:
@@ -102,4 +104,11 @@ class Settings:
 
     def set_last_update_check(self, time: float) -> None:
         self._settings.set(_key_last_update_check, time)
+        self._settings.save()
+
+    def get_save_directory(self) -> str:
+        return self._settings.get(_key_save_dir, os.getcwd())
+
+    def set_save_directory(self, save_dir: str) -> None:
+        self._settings.set(_key_save_dir, save_dir)
         self._settings.save()
