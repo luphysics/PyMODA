@@ -10,6 +10,9 @@ temp/
 .idea/misc.xml
 *.conf
 
+# Ignore MATLAB packaging logs.
+**/PackagingLog.html
+
 # Ignore data files in the root of the repository.
 /*.mat
 /*.csv
