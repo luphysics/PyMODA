@@ -13,46 +13,50 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from maths.signals.Signals import Signals
+
 from maths.params.TFParams import TFParams, _wft, _fmin, _fmax
+from maths.signals.Signals import Signals
+from utils.decorators import deprecated
 
 
 class REParams(TFParams):
-
-    def __init__(self, signals: Signals,
-                 fmin=None,
-                 fmax=None,
-                 fstep="auto",
-                 f0=1,
-                 padding="predictive",
-                 cut_edges=False,
-                 window="Gaussian",
-                 wavelet="Lognorm",
-                 preprocess=True,
-                 rel_tolerance=0.01,
-                 transform=_wft,
-
-                 # Added in REParams.
-                 method=2,
-                 param=None,
-                 normalize=False,
-                 path_opt=True,
-                 max_iterations=20,
-                 cache_file=None,
-                 intervals=None
-                 ):
-        super().__init__(signals,
-                         fmin,
-                         fmax,
-                         fstep,
-                         f0,
-                         padding,
-                         cut_edges,
-                         window,
-                         wavelet,
-                         preprocess,
-                         rel_tolerance,
-                         transform)
+    def __init__(
+        self,
+        signals: Signals,
+        fmin=None,
+        fmax=None,
+        fstep="auto",
+        f0=1,
+        padding="predictive",
+        cut_edges=False,
+        window="Gaussian",
+        wavelet="Lognorm",
+        preprocess=True,
+        rel_tolerance=0.01,
+        transform=_wft,
+        # Added in REParams.
+        method=2,
+        param=None,
+        normalize=False,
+        path_opt=True,
+        max_iterations=20,
+        cache_file=None,
+        intervals=None,
+    ):
+        super().__init__(
+            signals,
+            fmin,
+            fmax,
+            fstep,
+            f0,
+            padding,
+            cut_edges,
+            window,
+            wavelet,
+            preprocess,
+            rel_tolerance,
+            transform,
+        )
 
         self.intervals = intervals
 
@@ -81,5 +85,6 @@ class REParams(TFParams):
 
         self.data["Display"] = "off"
 
-    def set_cache_file(self, file: str):
+    @deprecated
+    def set_cache_file(self, file: str) -> None:
         self.data["CachedDataLocation"] = file

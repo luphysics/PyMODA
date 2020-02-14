@@ -86,8 +86,4 @@ def override(func):
 
     Like in Java, this serves no real purpose other than to make the intention clearer to developers.
     """
-
-    def wrapper(*args, **kwargs):
-        return func(*args, **kwargs)
-
-    return wrapper
+    return func
