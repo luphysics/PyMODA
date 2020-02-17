@@ -14,8 +14,9 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import asyncio
-from typing import Tuple, Union
+from typing import Tuple, Union, Dict, List
 
+import numpy as np
 from PyQt5.QtWidgets import QListWidgetItem
 from numpy import ndarray
 
@@ -26,6 +27,8 @@ from maths.signals.SignalPairs import SignalPairs
 from maths.signals.TimeSeries import TimeSeries
 from maths.signals.data.BAOutputData import BAOutputData
 from processes.MPHandler import MPHandler
+from utils.decorators import override
+from utils.dict_utils import sanitise
 
 
 class BAPresenter(BaseTFPresenter):
@@ -48,6 +51,8 @@ class BAPresenter(BaseTFPresenter):
 
     async def coro_calculate(self):
         """Coroutine which calculates the bispectra."""
+        self.enable_save_data(False)
+
         if self.mp_handler:
             self.mp_handler.stop()
 
@@ -65,6 +70,8 @@ class BAPresenter(BaseTFPresenter):
         for d in data:
             self.on_bispectrum_completed(*d)
 
+        self.enable_save_data(True)
+
         self.view.on_calculate_stopped()
         self.update_plots()
 
@@ -73,6 +80,7 @@ class BAPresenter(BaseTFPresenter):
         self.view.on_calculate_started()
 
     async def coro_biphase(self, x: float, y: float):
+        self.enable_save_data(False)
         self.mp_handler.stop()
 
         fs = self.params.fs
@@ -87,6 +95,8 @@ class BAPresenter(BaseTFPresenter):
 
             for d in data:
                 self.on_biphase_completed(*d)
+
+            self.enable_save_data(True)
 
             self.view.on_calculate_stopped()
             self.update_side_plots(self.get_selected_signal_pair()[0].output_data)
@@ -296,8 +306,9 @@ class BAPresenter(BaseTFPresenter):
         surrppp: ndarray,
         surrxpp: ndarray,
         surrpxx: ndarray,
-        opt: dict,
-    ):
+        opt: Dict,
+    ) -> None:
+        self.opt: Dict = opt
 
         # Attach the data to the first signal in the current pair.
         sig = self.signals.get(name)
@@ -339,7 +350,7 @@ class BAPresenter(BaseTFPresenter):
         biphase3: ndarray,
         biamp4: ndarray,
         biphase4: ndarray,
-    ):
+    ) -> None:
         sig = self.signals.get(name)
         key = f"{freq_x}, {freq_y}"
 
@@ -359,6 +370,62 @@ class BAPresenter(BaseTFPresenter):
 
         data.biamp[key][3] = biamp4
         data.biphase[key][3] = biphase4
+
+    @override
+    def get_data_to_save(self) -> Dict:
+        if not self.opt or not self.params:
+            return
+
+        output_data: List[BAOutputData] = [
+            s.output_data for s, _ in self.signals.get_pairs()
+        ]
+        cols = len(output_data)
+
+        first = output_data[0]
+
+        amp = np.empty((*first.amp_wt1.shape, cols * 2))
+        avg_amp = np.empty((first.avg_amp_wt1.shape[0], cols * 2))
+
+        b111 = np.empty((*first.bispxxx.shape, cols))
+        b222 = np.empty(b111.shape)
+        b122 = np.empty(b111.shape)
+        b211 = np.empty(b111.shape)
+
+        freq = first.freq
+        time = first.times
+        preproc = []  # TODO: Save this and other params
+
+        for index in range(0, len(output_data) * 2, 2):
+            d = output_data[index]
+
+            amp[:, :, index] = d.amp_wt1[:]
+            avg_amp[:, index] = d.avg_amp_wt1[:]
+
+            amp[:, :, index + 1] = d.amp_wt2[:]
+            avg_amp[:, index + 1] = d.avg_amp_wt2[:]
+
+            b111[:, :, index] = d.bispxxx
+            b222[:, :, index] = d.bispppp
+            b122[:, :, index] = d.bispxpp
+            b211[:, :, index] = d.bisppxx
+
+        ba_data = {
+            "amplitude": amp,
+            "avg_amplitude": avg_amp,
+            "frequency": freq,
+            "time": time,
+            "preprocessed_signals": preproc,
+            "b111": b111,
+            "b222": b222,
+            "b122": b122,
+            "b211": b211,
+            "fr": self.view.get_f0() or 1,
+            "fmin": self.opt["fmin"],
+            "fmax": self.opt["fmax"],
+            "preprocessing": "on" if self.params.preprocess else "off",
+            "sampling_frequency": self.params.fs,
+        }
+        return {"BAData": sanitise(ba_data)}
 
     def load_data(self):
         """
