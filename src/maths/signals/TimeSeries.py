@@ -67,11 +67,10 @@ class TimeSeries:
 
     def _generate_times(self) -> ndarray:
         """Generates the time values associated with the data."""
-        times = np.empty(self.signal.shape, dtype=np.float)
-        for i in range(0, len(self.signal)):
-            times[i] = self.initial_time + i / self.frequency
-
-        return times
+        count = len(self.signal)
+        return (
+            np.arange(0, count / self.frequency, 1 / self.frequency) + self.initial_time
+        )
 
     def set_xlimits(self, x1, x2) -> None:
         """

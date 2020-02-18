@@ -11,6 +11,7 @@
   - [Preparing to run](#preparing-to-run)
   - [Running PyMODA](#running-pymoda)
   - [Creating a shortcut](#creating-a-shortcut)
+  - [Saving data](#saving-data)
   - [Updating PyMODA](#updating-pymoda)
   - [Performance and efficiency](#performance-and-efficiency)
 
@@ -97,6 +98,27 @@ An alias will be created, which adds the terminal command `pymoda` to launch PyM
 > **Note:** This will not take effect in currently open shells. Open a new terminal to try it out. 
 
 > **Tip:** If the `-runtime` argument was provided to the instance of PyMODA which created the alias, it does not need to specified when using the `pymoda` command. 
+
+## Saving data
+
+After performing a calculation, the results can be saved using the options under the `Save` item in the menu bar. Results can be saved to `.mat` (MATLAB) and `.npy` (Numpy) files. 
+
+When a data file is opened, it will have the following format:
+
+- In MATLAB: a struct containing a single struct.
+- In Python: a dictionary containing a single dictionary.
+
+For each window, the name of the struct/dictionary is as follows:
+
+| Name | Window | 
+| --- | --- |
+| `TFData` | Time-Frequency Analysis | 
+| `PCData` | Wavelet Phase Coherence |
+| `REData` | Ridge Extraction and Filtering | 
+| `BAData` | Wavelet Bispectrum Analysis | 
+| `DBData` | Dynamical Bayesian Inference |
+
+> **Note:** Saving data is not yet implemented for Dynamical Bayesian Inference.
 
 ## Updating PyMODA
 

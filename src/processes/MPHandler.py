@@ -14,9 +14,10 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from typing import Callable, List, Tuple
+from typing import Callable, List, Tuple, Union
 
 import multiprocess as mp
+from numpy import ndarray
 from scheduler.Scheduler import Scheduler
 
 from gui.windows.bayesian.ParamSet import ParamSet
@@ -76,7 +77,7 @@ class MPHandler:
         for time_series in signals:
             self.scheduler.add(
                 target=_time_frequency,
-                args=(time_series, params),
+                args=(time_series, params, True),
                 process_type=mp.Process,
                 queue_type=mp.Queue,
             )
@@ -265,12 +266,12 @@ class MPHandler:
         return await self.scheduler.run()
 
     async def coro_preprocess(
-        self, signal: TimeSeries, fmin: float, fmax: float
-    ) -> List[Tuple]:
+        self, signals: Union[TimeSeries, List[TimeSeries]], fmin: float, fmax: float
+    ) -> List[ndarray]:
         """
         Performs preprocessing on a single signal.
 
-        :param signal: the signal as a 1D array
+        :param signals: the signal or signals to perform pre-processing on
         :param fmin: the minimum frequency
         :param fmax: the maximum frequency
         :return: list containing the output from each process
@@ -278,13 +279,17 @@ class MPHandler:
         self.stop()
         self.scheduler = Scheduler()
 
-        self.scheduler.add(
-            target=_preprocess,
-            args=(signal.signal, signal.frequency, fmin, fmax),
-            process_type=mp.Process,
-            queue_type=mp.Queue,
-        )
-        return await self.scheduler.run()
+        if isinstance(signals, TimeSeries):
+            signals = [signals]
+
+        for s in signals:
+            self.scheduler.add(
+                target=_preprocess,
+                args=(s.signal, s.frequency, fmin, fmax),
+                process_type=mp.Process,
+                queue_type=mp.Queue,
+            )
+        return await self.scheduler.run()  # Note: ignore possible warning from linter.
 
     def stop(self):
         """

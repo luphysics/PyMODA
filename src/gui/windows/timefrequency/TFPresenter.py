@@ -14,8 +14,9 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import asyncio
-from typing import Union
+from typing import Union, Dict, List, Optional
 
+import numpy as np
 from PyQt5.QtWidgets import QListWidgetItem
 
 from gui.dialogs.FrequencyDialog import FrequencyDialog
@@ -25,6 +26,8 @@ from maths.params.TFParams import TFParams, _wt, _wft, create
 from maths.signals.Signals import Signals
 from maths.signals.data.TFOutputData import TFOutputData
 from processes.MPHandler import MPHandler
+from utils.decorators import override
+from utils.dict_utils import sanitise
 
 
 class TFPresenter(BaseTFPresenter):
@@ -65,6 +68,8 @@ class TFPresenter(BaseTFPresenter):
             if self.view.get_fmin() is None:
                 raise Exception("Minimum frequency must be defined for WFT.")
 
+        self.params = params
+
         self.is_plotted = False
         self.view.main_plot().clear()
         self.view.main_plot().set_in_progress(True)
@@ -84,10 +89,16 @@ class TFPresenter(BaseTFPresenter):
             self.on_transform_completed(*d)
 
     def on_transform_completed(
-        self, name, times, freq, values, ampl, powers, avg_ampl, avg_pow
+        self, name, times, freq, values, ampl, powers, avg_ampl, avg_pow, opt=None
     ) -> None:
-        """Called when the calculation of the desired transform(s) is completed."""
+        """
+        Called when the calculation of the desired transform(s) is completed.
+        """
         self.view.on_calculate_stopped()
+
+        # Get the returned minimum frequency, because otherwise it is unknown if not specified in the GUI.
+        if opt:
+            self.params.set_item("fmin", opt.get("fmin"))
 
         t = self.signals.get(name)
         t.output_data = TFOutputData(
@@ -106,8 +117,54 @@ class TFPresenter(BaseTFPresenter):
 
     def on_all_transforms_completed(self) -> None:
         """Called when all transforms have been completed."""
+        self.enable_save_data(True)
         self.plot_output()
         self.on_all_tasks_completed()
+
+    @override
+    async def coro_get_data_to_save(self) -> Optional[Dict]:
+        """
+        Gets all the data which will be saved in a file, and returns it as a dictionary.
+
+        :return: a dictionary containing the current results
+        """
+        if not self.params:
+            return None
+
+        preproc = await self.coro_preprocess_all_signals()
+        preproc_arr = np.empty((len(preproc[0]), len(preproc)))
+
+        for index, p in enumerate(preproc):
+            preproc_arr[:, index] = p[:, 0]
+
+        output_data: List[TFOutputData] = [s.output_data for s in self.signals]
+        cols = len(output_data)
+
+        first = [d for d in output_data if d.is_valid()][0]
+
+        amp = np.empty((*first.ampl.shape, cols))
+        avg_amp = np.empty((first.avg_ampl.shape[0], cols))
+
+        freq = first.freq
+        time = first.times
+
+        for index, d in enumerate(output_data):
+            if d.is_valid():
+                avg_amp[:, index] = d.avg_ampl[:]
+                amp[:, :, index] = d.ampl[:]
+            else:
+                avg_amp[:, index] = np.NAN
+                amp[:, :, index] = np.NAN
+
+        tfr_data = {
+            "amplitude": amp,
+            "avg_amplitude": avg_amp,
+            "frequency": freq,
+            "time": time,
+            "preprocessed_signals": preproc_arr,
+            **self.params.items_to_save(),
+        }
+        return {"TFData": sanitise(tfr_data)}
 
     def get_values_to_plot(self, amplitude=None) -> tuple:
         """

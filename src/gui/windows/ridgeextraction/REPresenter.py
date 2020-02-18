@@ -14,8 +14,9 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import asyncio
-from typing import Tuple, Union
+from typing import Tuple, Union, Dict, Optional, List
 
+import numpy as np
 from PyQt5.QtWidgets import QListWidgetItem
 from numpy import ndarray
 
@@ -23,6 +24,8 @@ from gui.windows.timefrequency.TFPresenter import TFPresenter
 from maths.params.REParams import REParams
 from maths.params.TFParams import create
 from maths.signals.data.TFOutputData import TFOutputData
+from utils.decorators import override
+from utils.dict_utils import sanitise
 
 
 class REPresenter(TFPresenter):
@@ -38,17 +41,20 @@ class REPresenter(TFPresenter):
         from gui.windows.ridgeextraction.REWindow import REWindow
 
         self.view: REWindow = view
+        self.re_params: REParams = None
 
-    def calculate(self, calculate_all: bool):
+    @override
+    def calculate(self, calculate_all: bool) -> None:
         self.view.set_ridge_filter_disabled(True)
         self.view.switch_to_single_plot()
         super(REPresenter, self).calculate(calculate_all)
 
-    def on_all_transforms_completed(self):
+    @override
+    def on_all_transforms_completed(self) -> None:
         super(REPresenter, self).on_all_transforms_completed()
         self.view.set_ridge_filter_disabled(False)
 
-    def on_ridge_extraction_clicked(self):
+    def on_ridge_extraction_clicked(self) -> None:
         intervals = self.view.get_interval_strings()
         if len(intervals) < 1:
             raise Exception(
@@ -61,9 +67,14 @@ class REPresenter(TFPresenter):
 
         asyncio.ensure_future(self.coro_ridge_extraction())
 
-    async def coro_ridge_extraction(self):
+    async def coro_ridge_extraction(self) -> None:
+        self.enable_save_data(False)
+
+        params = self.get_re_params()
+        self.re_params = params
+
         data: tuple = await self.mp_handler.coro_ridge_extraction(
-            self.get_re_params(), on_progress=self.on_progress_updated
+            params, on_progress=self.on_progress_updated
         )
 
         for d in data:
@@ -85,8 +96,7 @@ class REPresenter(TFPresenter):
         filtered_signal,
         iphi,
         ifreq,
-    ):
-
+    ) -> None:
         sig = self.signals.get(name)
 
         d: TFOutputData = sig.output_data
@@ -103,7 +113,7 @@ class REPresenter(TFPresenter):
         d.freq = freq
         d.times = times
 
-    def on_all_ridge_completed(self):
+    def on_all_ridge_completed(self) -> None:
         print("All ridge extraction completed.")
         sig = self.get_selected_signal()
         data = sig.output_data
@@ -114,13 +124,15 @@ class REPresenter(TFPresenter):
         main.plot(times, data.ampl, data.freq)
         self.plot_ridge_data(data)
 
-    def plot_ridge_data(self, data: TFOutputData):
+        self.enable_save_data(True)
+
+    def plot_ridge_data(self, data: TFOutputData) -> None:
         times = data.times
         filtered, freq, phi = data.get_ridge_data(self.view.get_selected_interval())
 
         self.triple_plot(times, filtered, freq, phi, data.ampl, data.freq)
 
-    def plot_band_data(self, data: TFOutputData):
+    def plot_band_data(self, data: TFOutputData) -> None:
         times = data.times
         band_data = data.get_band_data(self.view.get_selected_interval())
 
@@ -136,7 +148,7 @@ class REPresenter(TFPresenter):
         bottom_y: ndarray,
         main_values: ndarray = None,
         main_freq: ndarray = None,
-    ):
+    ) -> None:
         """
         Plots values on the 3 plots in the main section of the window.
 
@@ -166,7 +178,8 @@ class REPresenter(TFPresenter):
         bottom.clear()
         bottom.plot(x_values, bottom_y)
 
-    def on_signal_selected(self, item: Union[QListWidgetItem, str]):
+    @override
+    def on_signal_selected(self, item: Union[QListWidgetItem, str]) -> None:
         super().on_signal_selected(item)
 
         data = self.get_selected_signal().output_data
@@ -184,19 +197,19 @@ class REPresenter(TFPresenter):
             if d:
                 self.plot_band_data(data)
 
-    def on_interval_selected(self, interval: Tuple[float, float]):
+    def on_interval_selected(self, interval: Tuple[float, float]) -> None:
         """Called when a frequency interval is selected."""
         if interval:
             fmin, fmax = interval
             print(f"Selected interval: {fmin}, {fmax}")
             self.plot_band_data(self.get_selected_signal().output_data)
 
-    def on_filter_clicked(self):
+    def on_filter_clicked(self) -> None:
         """Called when the "bandpass filter" button is clicked."""
         print("Starting filtering...")
         asyncio.ensure_future(self.coro_bandpass_filter())
 
-    async def coro_bandpass_filter(self):
+    async def coro_bandpass_filter(self) -> None:
         data = await self.mp_handler.coro_bandpass_filter(
             self.signals,
             self.view.get_interval_tuples(),
@@ -210,7 +223,7 @@ class REPresenter(TFPresenter):
 
         self.on_all_filter_completed()
 
-    def on_all_filter_completed(self):
+    def on_all_filter_completed(self) -> None:
         """
         Called when all bandpass filter calculations have finished.
         """
@@ -222,6 +235,57 @@ class REPresenter(TFPresenter):
         main = self.view.main_plot()
         main.clear()
         self.plot_band_data(data)
+
+        self.enable_save_data(True)
+
+    @override
+    async def coro_get_data_to_save(self) -> Optional[Dict]:
+        tf_data = await super().coro_get_data_to_save()
+        if not tf_data:
+            return None
+
+        output_data: List[TFOutputData] = [s.output_data for s in self.signals]
+        cols = len(output_data)
+
+        r_intervals = []
+        r_freq = np.empty((tf_data["TFData"]["time"].size, cols))
+        r_phase = np.empty(r_freq.shape)
+        r_bands = np.empty(r_freq.shape)
+        r_bands_phi = np.empty(r_freq.shape)
+        r_bands_amp = np.empty(r_freq.shape)
+
+        for index, d in enumerate(output_data):
+            for key, value in d.ridge_data.items():
+                filt, freq, phase = value
+
+                if key not in r_intervals:
+                    r_intervals.append(key)
+
+                r_freq[:, index] = freq
+                r_phase[:, index] = phase
+
+            try:
+                for key, value in d.band_data.items():
+                    bands, phi, amp = value
+
+                    if key not in r_intervals:
+                        r_intervals.append(key)
+
+                    r_bands[:, index] = bands
+                    r_bands_phi[:, index] = phi
+                    r_bands_amp[:, index] = amp
+            except:
+                pass
+
+        ridge = {
+            "frequency_bands": r_intervals,
+            "ridge_frequency": r_freq,
+            "ridge_phase": r_phase,
+        }
+
+        re_data = {**tf_data["TFData"], **ridge}
+
+        return {"REData": sanitise(re_data)}
 
     def get_re_params(self) -> REParams:
         """
