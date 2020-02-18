@@ -239,8 +239,8 @@ class REPresenter(TFPresenter):
         self.enable_save_data(True)
 
     @override
-    def get_data_to_save(self) -> Optional[Dict]:
-        tf_data = super().get_data_to_save()
+    async def coro_get_data_to_save(self) -> Optional[Dict]:
+        tf_data = await super().coro_get_data_to_save()
         if not tf_data:
             return None
 

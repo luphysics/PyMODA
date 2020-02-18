@@ -157,7 +157,7 @@ class PCPresenter(BaseTFPresenter):
                 raise Exception("Frequency was None. Perhaps it was mistyped?")
 
     @override
-    def get_data_to_save(self) -> Optional[Dict]:
+    async def coro_get_data_to_save(self) -> Optional[Dict]:
         if not self.params:
             return None
 
@@ -179,11 +179,18 @@ class PCPresenter(BaseTFPresenter):
         freq = first.freq
         time = first.times
 
-        preproc = []  # TODO: Save this
+        preproc = await self.coro_preprocess_all_signals()
+        preproc_arr = np.empty((len(preproc[0]), len(preproc)))
+
+        for index, p in enumerate(preproc):
+            preproc_arr[:, index] = p[:, 0]
 
         for index, d in enumerate(output_data):
             if d.is_valid():
-                avg_surrogates[:, index] = d.surrogate_avg[:, 0]
+                try:
+                    avg_surrogates[:, index] = d.surrogate_avg[:, 0]
+                except:
+                    avg_surrogates[:, index] = np.NAN
 
                 coh[:, :, index] = d.phase_coherence[:, :]
                 avg_coh[:, index] = d.overall_coherence[:, index]
@@ -207,7 +214,7 @@ class PCPresenter(BaseTFPresenter):
             "avg_amplitude": avg_amp,
             "frequency": freq,
             "time": time,
-            "preprocessed_signals": preproc,
+            "preprocessed_signals": preproc_arr,
             **self.params.items_to_save(),
         }
         return {"PCData": sanitise(pc_data)}

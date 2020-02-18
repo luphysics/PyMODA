@@ -15,10 +15,11 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import asyncio
 import os
-from typing import Dict
+from typing import Dict, List
 
 import numpy as np
 from PyQt5.QtWidgets import QFileDialog
+from numpy import ndarray
 from scipy.io import savemat
 
 from gui.dialogs.ErrorBox import ErrorBox
@@ -144,17 +145,20 @@ class BaseTFPresenter:
     def load_data(self) -> None:
         pass
 
-    def get_data_to_save(self) -> Dict:
+    async def coro_get_data_to_save(self) -> Dict:
         """
         Returns a dictionary containing the data that will be saved to a file, based on the current results.
         """
         raise Exception("This function should have been implemented by a subclass.")
 
     def save_data_mat(self) -> None:
+        asyncio.ensure_future(self.coro_save_data_mat())
+
+    async def coro_save_data_mat(self) -> None:
         """
         Saves the current results as a .mat file.
         """
-        data = self.get_data_to_save()
+        data = await self.coro_get_data_to_save()
         path = self.get_save_location()
 
         if not path:
@@ -168,10 +172,13 @@ class BaseTFPresenter:
         print(f"Data saved to {path}.")
 
     def save_data_npy(self) -> None:
+        asyncio.ensure_future(self.coro_save_data_npy())
+
+    async def coro_save_data_npy(self) -> None:
         """
         Saves the current results as a .npy file.
         """
-        data = self.get_data_to_save()
+        data = await self.coro_get_data_to_save()
         path = self.get_save_location()
 
         if path:
@@ -230,7 +237,19 @@ class BaseTFPresenter:
 
     async def coro_plot_preprocessed_signal(self) -> None:
         """
-        Coroutine to preprocess the signal and plot the result.
+        Coroutine to preprocess the currently selected signal and plot the result.
+        """
+        sig = self.get_selected_signal()
+        result = await self.coro_preprocess_selected_signal()
+
+        if result and result[0] is not None:
+            self.view.plot_preprocessed_signal(sig.times, sig.signal, result[0])
+
+    async def coro_preprocess_selected_signal(self) -> List[ndarray]:
+        """
+        Coroutine to preprocess the currently selected signal.
+
+        :return: the preprocessed signal as a 1D array
         """
         sig = self.get_selected_signal()
         fmin = self.view.get_fmin()
@@ -239,7 +258,19 @@ class BaseTFPresenter:
         if not self.preproc_mp_handler:
             self.preproc_mp_handler = MPHandler()
 
-        result = await self.preproc_mp_handler.coro_preprocess(sig, fmin, fmax)
+        return await self.preproc_mp_handler.coro_preprocess(sig, fmin, fmax)
 
-        if result and result[0] is not None:
-            self.view.plot_preprocessed_signal(sig.times, sig.signal, result[0])
+    async def coro_preprocess_all_signals(self) -> List[ndarray]:
+        """
+        Coroutine to preprocess all signals.
+
+        :return: a list containing the preprocessed signals as a 1D array each
+        """
+        signals = self.signals
+        fmin = self.view.get_fmin()
+        fmax = self.view.get_fmax()
+
+        if not self.preproc_mp_handler:
+            self.preproc_mp_handler = MPHandler()
+
+        return await self.preproc_mp_handler.coro_preprocess(signals, fmin, fmax)

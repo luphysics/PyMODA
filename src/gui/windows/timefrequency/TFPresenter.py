@@ -122,7 +122,7 @@ class TFPresenter(BaseTFPresenter):
         self.on_all_tasks_completed()
 
     @override
-    def get_data_to_save(self) -> Optional[Dict]:
+    async def coro_get_data_to_save(self) -> Optional[Dict]:
         """
         Gets all the data which will be saved in a file, and returns it as a dictionary.
 
@@ -130,6 +130,12 @@ class TFPresenter(BaseTFPresenter):
         """
         if not self.params:
             return None
+
+        preproc = await self.coro_preprocess_all_signals()
+        preproc_arr = np.empty((len(preproc[0]), len(preproc)))
+
+        for index, p in enumerate(preproc):
+            preproc_arr[:, index] = p[:, 0]
 
         output_data: List[TFOutputData] = [s.output_data for s in self.signals]
         cols = len(output_data)
@@ -141,7 +147,6 @@ class TFPresenter(BaseTFPresenter):
 
         freq = first.freq
         time = first.times
-        preproc = []  # TODO: Save this and other params
 
         for index, d in enumerate(output_data):
             if d.is_valid():
@@ -156,7 +161,7 @@ class TFPresenter(BaseTFPresenter):
             "avg_amplitude": avg_amp,
             "frequency": freq,
             "time": time,
-            "preprocessed_signals": preproc,
+            "preprocessed_signals": preproc_arr,
             **self.params.items_to_save(),
         }
         return {"TFData": sanitise(tfr_data)}

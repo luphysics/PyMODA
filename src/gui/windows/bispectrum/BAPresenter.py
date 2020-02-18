@@ -372,7 +372,7 @@ class BAPresenter(BaseTFPresenter):
         data.biphase[key][3] = biphase4
 
     @override
-    def get_data_to_save(self) -> Dict:
+    async def coro_get_data_to_save(self) -> Dict:
         if not self.opt or not self.params:
             return
 
