@@ -110,6 +110,8 @@ class UpdateWindow(CentredWindow):
         from updater.UpdateThread import UpdateThread
 
         size = await upd.get_repo_size()
+        size *= 1.5  # Use larger size to avoid progress bar appearing to get stuck.
+
         print(f"Got size from GitHub API: {size} bytes.")
 
         self.thread = UpdateThread(self, size)
