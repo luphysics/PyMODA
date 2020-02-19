@@ -169,10 +169,13 @@ class UpdateWindow(CentredWindow):
             return self.on_failed()
 
         self.progress.hide()
+
         self.btn_continue.show()
+        self.btn_continue.setDefault(True)
+        self.btn_continue.setFocus(True)
 
         self.label.setText(
             "The installer window will close while packages are updated.\n"
             "PyMODA will automatically relaunch once the process is complete.\n\n"
-            "This may take over a minute."
+            "This may take over a minute. Please don't close the terminal window."
         )
