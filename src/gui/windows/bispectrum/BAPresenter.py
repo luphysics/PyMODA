@@ -14,7 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import asyncio
-from typing import Tuple, Union, Dict, List
+from typing import Tuple, Union, Dict, List, Optional
 
 import numpy as np
 from PyQt5.QtWidgets import QListWidgetItem
@@ -108,8 +108,11 @@ class BAPresenter(BaseTFPresenter):
         data = self.get_selected_signal_pair()[0].output_data
 
         try:
-            self.update_main_plot(data)
-            self.update_side_plots(data)
+            if "All plots" not in self.view.get_plot_type():
+                self.update_main_plot(data)
+                self.update_side_plots(data)
+            else:
+                self.update_all_plots(data)
         except AttributeError:
             pass
         except ValueError as e:
@@ -131,7 +134,10 @@ class BAPresenter(BaseTFPresenter):
         self.plot_ampl = amplitude_selected
         self.update_plots()
 
-    def update_main_plot(self, data):
+    def update_all_plots(self, data: BAOutputData) -> None:
+        self.view.switch_to_all_plots()
+
+    def update_main_plot(self, data: BAOutputData) -> None:
         """
         Updates the main plot, plotting the wavelet transform or bispectrum depending
         on the selected plot type.
@@ -156,7 +162,7 @@ class BAPresenter(BaseTFPresenter):
             self.view.plot_main.update_ylabel("Frequency (Hz)")
             self.view.plot_main.plot(x=x, y=y, c=c)
 
-    def update_side_plots(self, data: BAOutputData):
+    def update_side_plots(self, data: BAOutputData) -> None:
         """
         Updates the side plot(s). For wavelet transforms this will be
         the average amplitude/power, but for bispectra this will be the
@@ -297,6 +303,15 @@ class BAPresenter(BaseTFPresenter):
         data: BAOutputData,
         tup: Tuple[ndarray, ndarray, ndarray, bool],
     ) -> Tuple[ndarray, ndarray, ndarray, bool]:
+        """
+        Applies surrogates to the data.
+
+        :param plot_type: the type of plot, e.g. "b111" or "b211"
+        :param data: the BAOutputData instance containing the data
+        :param tup: a tuple containing the frequencies, bispectrum and a bool
+        :return: tuple replicating the tuple parameter, but with its bispectrum replaced by a
+        surrogate-adjusted bispectrum
+        """
         fx, fy, bisp, b = tup
 
         K = np.int(np.floor((self.params.surr_count + 1) * self.params.alpha))
@@ -400,9 +415,9 @@ class BAPresenter(BaseTFPresenter):
         data.biphase[key][3] = biphase4
 
     @override
-    async def coro_get_data_to_save(self) -> Dict:
+    async def coro_get_data_to_save(self) -> Optional[Dict]:
         if not self.opt or not self.params:
-            return
+            return None
 
         output_data: List[BAOutputData] = [
             s.output_data for s, _ in self.signals.get_pairs()
@@ -421,7 +436,6 @@ class BAPresenter(BaseTFPresenter):
 
         freq = first.freq
         time = first.times
-        preproc = []  # TODO: Save this and other params
 
         for index in range(0, len(output_data) * 2, 2):
             d = output_data[index]
@@ -442,7 +456,6 @@ class BAPresenter(BaseTFPresenter):
             "avg_amplitude": avg_amp,
             "frequency": freq,
             "time": time,
-            "preprocessed_signals": preproc,
             "b111": b111,
             "b222": b222,
             "b122": b122,
@@ -455,7 +468,7 @@ class BAPresenter(BaseTFPresenter):
         }
         return {"BAData": sanitise(ba_data)}
 
-    def load_data(self):
+    def load_data(self) -> None:
         """
         Loads the data from a file, showing a dialog to set the frequency of
         the signal.

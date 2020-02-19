@@ -161,7 +161,7 @@ class BaseTFPresenter:
         data = await self.coro_get_data_to_save()
         path = self.get_save_location()
 
-        if not path:
+        if not path or not data:
             return
 
         if not path.endswith(".mat"):

@@ -15,7 +15,7 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from typing import Optional, Tuple
 
-from PyQt5.QtWidgets import QListWidgetItem
+from PyQt5.QtWidgets import QListWidgetItem, QGridLayout, QMainWindow, QWidget
 
 from data import resources
 from gui.components.DualSignalComponent import DualSignalComponent
@@ -23,6 +23,7 @@ from gui.components.FreqComponent import FreqComponent
 from gui.components.SurrogateComponent import SurrogateComponent
 from gui.components.VerticalMultiPlotComponent import VerticalMultiPlotComponent
 from gui.plotting.plots.AmplitudePlot import AmplitudePlot
+from gui.plotting.plots.ColorMeshPlot import ColorMeshPlot
 from gui.windows.bispectrum.BAPlot import BAPlot
 from gui.windows.bispectrum.BAPresenter import BAPresenter
 from gui.windows.bispectrum.BAViewProperties import BAViewProperties
@@ -52,6 +53,8 @@ class BAWindow(
         )
         VerticalMultiPlotComponent.__init__(self, self.vbox_right)
 
+        self.all_plot_layout: QGridLayout = None
+
         self.presenter: BAPresenter = self.presenter
         self.presenter.init()
 
@@ -74,6 +77,8 @@ class BAWindow(
 
         self.radio_ampl.toggled.connect(self.on_plot_type_toggled)
         self.checkbox_plot_surr.toggled.connect(self.presenter.update_plots)
+
+        self.all_plot_layout = QGridLayout()
 
     def on_calculate_started(self) -> None:
         super(BAWindow, self).on_calculate_started()
@@ -113,6 +118,7 @@ class BAWindow(
 
         self.vplot_remove_all_plots()
         self.vplot_add_plots(self.plot_right_middle, self.plot_right_bottom)
+        self.plot_main.setVisible(True)
 
         self.plot_right_top = None
 
@@ -121,9 +127,38 @@ class BAWindow(
 
         self.vplot_remove_all_plots()
         self.vplot_add_plots(self.plot_right_top)
+        self.plot_main.setVisible(True)
 
         self.plot_right_middle = None
         self.plot_right_bottom = None
+
+    def switch_to_all_plots(self) -> None:
+        """
+        Switches to the "All plots" layout, which shows both wavelet
+        transforms and all bispectra.
+        """
+        self.vplot_remove_all_plots()
+        self.plot_main.setVisible(False)
+
+        self.wtplot1 = ColorMeshPlot(self.all_plot_layout)
+        self.wtplot2 = ColorMeshPlot(self.all_plot_layout)
+
+        # self.all_plot_layout.addWidget(self.wtplot1, 0, 0)
+        # self.all_plot_layout.addWidget(self.wtplot2, 1, 0)
+
+        self.bplot1 = ColorMeshPlot(self.all_plot_layout)
+        self.bplot2 = ColorMeshPlot(self.all_plot_layout)
+        self.bplot3 = ColorMeshPlot(self.all_plot_layout)
+        self.bplot4 = ColorMeshPlot(self.all_plot_layout)
+
+        # self.all_plot_layout.addWidget(self.bplot1, 1, 1)
+        # self.all_plot_layout.addWidget(self.bplot2, 2, 2)
+        # self.all_plot_layout.addWidget(self.bplot3, 1, 2)
+        # self.all_plot_layout.addWidget(self.bplot4, 2, 1)
+
+        win = QMainWindow()
+        win.setCentralWidget(QWidget())
+        win.show()
 
     def plot_surrogates_enabled(self) -> bool:
         """
@@ -140,9 +175,6 @@ class BAWindow(
 
     def is_wt_selected(self) -> bool:
         return "Wavelet transform" in self.combo_plot_type.currentText()
-
-    def switch_to_all_plots(self) -> None:
-        pass
 
     def on_freq_selected(self, _: QListWidgetItem) -> None:
         self.presenter.update_plots()
