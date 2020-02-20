@@ -14,14 +14,16 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from multiprocess import Queue
-
 from gui.windows.bayesian.ParamSet import ParamSet
 from maths.signals.TimeSeries import TimeSeries
+from processes.mp_utils import process
+from numpy import ndarray
+from maths.num_utils import matlab_to_numpy
 
 
+@process
 def _moda_dynamic_bayesian_inference(
-    queue: Queue, signal1: TimeSeries, signal2: TimeSeries, params: ParamSet
+    signal1: TimeSeries, signal2: TimeSeries, params: ParamSet
 ):
     """
     UNUSED.
@@ -38,8 +40,8 @@ def _moda_dynamic_bayesian_inference(
     sig1 = matlab.double(signal1.signal.tolist())
     sig2 = matlab.double(signal2.signal.tolist())
 
-    int1 = list(params.freq_range1)
-    int2 = list(params.freq_range2)
+    int11, int12 = sorted(params.freq_range1)
+    int21, int22 = sorted(params.freq_range2)
 
     fs = signal1.frequency
     win = params.window
@@ -50,7 +52,28 @@ def _moda_dynamic_bayesian_inference(
     signif = params.confidence_level
 
     result = package.full_bayesian(
-        sig1, sig2, *int1, *int2, fs, win, pr, ovr, bn, ns, signif
+        sig1,
+        sig2,
+        float(int11),
+        float(int12),
+        float(int21),
+        float(int22),
+        fs,
+        win,
+        pr,
+        ovr,
+        bn,
+        ns,
+        signif,
     )
+    out = []
+    for item in result:
+        try:
+            if not isinstance(item, ndarray):
+                item = matlab_to_numpy(item)
+        except:
+            pass
 
-    queue.put((signal1.name, *result))
+        out.append(item)
+
+    return (signal1.name, *out)

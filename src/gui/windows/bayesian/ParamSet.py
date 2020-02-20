@@ -34,17 +34,18 @@ class ParamSet:
     ):
         self.freq_range1 = freq_range1
         self.freq_range2 = freq_range2
-        self.window = window
-        self.propagation_const = propagation_const
-        self.surr_count = surr_count
-        self.overlap = overlap
-        self.order = order
-        self.confidence_level = confidence_level
+        self.window = float(window)
+        self.propagation_const = float(propagation_const)
+        self.surr_count = float(surr_count)
+        self.overlap = float(overlap)
+        self.order = float(order)
+        self.confidence_level = float(confidence_level)
 
     def to_string(self) -> Tuple[str, str]:
         """
         Returns a string representation of this object for each frequency band.
         """
+
         # Function to use for each frequency band.
         def convert(freq: Tuple[float, float]) -> str:
             freq_range_str = ",".join([str(i) for i in freq])

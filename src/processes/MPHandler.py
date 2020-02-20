@@ -21,6 +21,9 @@ from numpy import ndarray
 from scheduler.Scheduler import Scheduler
 
 from gui.windows.bayesian.ParamSet import ParamSet
+from maths.algorithms.matlabwrappers.bayesian_inference import (
+    _moda_dynamic_bayesian_inference,
+)
 from maths.algorithms.multiprocessing.bandpass_filter import _bandpass_filter
 from maths.algorithms.multiprocessing.bayesian_inference import (
     _dynamic_bayesian_inference,
@@ -196,7 +199,7 @@ class MPHandler:
         for params in paramsets:
             for pair in signals.get_pairs():
                 self.scheduler.add(
-                    target=_dynamic_bayesian_inference,
+                    target=_moda_dynamic_bayesian_inference,
                     args=(*pair, params),
                     process_type=mp.Process,
                     queue_type=mp.Queue,
