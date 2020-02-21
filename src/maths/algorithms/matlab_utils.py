@@ -103,8 +103,8 @@ def carr(arr):
     return np.asarray(arr, dtype=np.complex64)
 
 
-def fminsearch(func, x0, xtol):
-    return scipy.optimize.fmin(func=func, x0=x0, xtol=xtol)
+def fminsearch(func, x0, xtol, disp=0):
+    return scipy.optimize.fmin(func=func, x0=x0, xtol=xtol, disp=disp)
 
 
 # Function aliases.
