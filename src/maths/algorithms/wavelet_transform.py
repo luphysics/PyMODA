@@ -286,7 +286,8 @@ def wt(
 
         wp.nv = Nb * log(2) / log(wp.xi2h / wp.xi1h)
         nv = ceil(wp.nv)
-        print(f"Optimal nv determined to be {nv}")
+        if disp_mode:
+            print(f"Optimal nv determined to be {nv}")
 
     freq = 2 ** (
         arange(ceil(nv * np.log2(fmin)), np.floor(nv * np.log2(fmax))).conj().T / nv
