@@ -59,7 +59,7 @@ class MPHandler:
 
     async def coro_transform(
         self, params: TFParams, on_progress: Callable[[int, int], None]
-    ) -> List[tuple]:
+    ) -> List[Tuple]:
         """
         Performs a wavelet transform or windowed Fourier transform of signals.
         Used in "time-frequency analysis".
@@ -74,22 +74,19 @@ class MPHandler:
         signals: Signals = params.signals
         params.remove_signals()  # Don't want to pass large unneeded object to other process.
 
-        for time_series in signals:
-            self.scheduler.add(
-                target=_time_frequency,
-                args=(time_series, params, True),
-                process_type=mp.Process,
-                queue_type=mp.Queue,
-            )
-
-        return await self.scheduler.run()
+        return await self.scheduler.map(
+            target=_time_frequency,
+            args=[(time_series, params, True) for time_series in signals],
+            process_type=mp.Process,
+            queue_type=mp.Queue,
+        )
 
     async def coro_phase_coherence(
         self,
         signals: SignalPairs,
         params: PCParams,
         on_progress: Callable[[int, int], None],
-    ) -> List[tuple]:
+    ) -> List[Tuple]:
         """
         Performs wavelet phase coherence between signal pairs. Used in "wavelet phase coherence".
 
@@ -101,21 +98,17 @@ class MPHandler:
         self.stop()
         self.scheduler = Scheduler(progress_callback=on_progress)
 
-        for i in range(signals.pair_count()):
-            pair = signals.get_pair_by_index(i)
-            self.scheduler.add(
-                target=_phase_coherence,
-                args=(pair, params),
-                subtasks=params.surr_count,
-                process_type=mp.Process,
-                queue_type=mp.Queue,
-            )
-
-        return await self.scheduler.run()
+        return await self.scheduler.map(
+            target=_phase_coherence,
+            args=[(pair, params) for pair in signals.get_pairs()],
+            subtasks=params.surr_count,
+            process_type=mp.Process,
+            queue_type=mp.Queue,
+        )
 
     async def coro_ridge_extraction(
         self, params: REParams, on_progress: Callable[[int, int], None]
-    ) -> List[tuple]:
+    ) -> List[Tuple]:
         """
         Performs ridge extraction on wavelet transforms. Used in "ridge extraction and filtering".
 
@@ -149,9 +142,9 @@ class MPHandler:
     async def coro_bandpass_filter(
         self,
         signals: Signals,
-        intervals: tuple,
+        intervals: Tuple,
         on_progress: Callable[[int, int], None],
-    ) -> List[tuple]:
+    ) -> List[Tuple]:
         """
         Performs bandpass filter on signals. Used in "ridge extraction and filtering".
 
@@ -181,7 +174,7 @@ class MPHandler:
         signals: SignalPairs,
         paramsets: List[ParamSet],
         on_progress: Callable[[int, int], None],
-    ) -> List[tuple]:
+    ) -> List[Tuple]:
         """
         Performs Bayesian inference on signal pairs. Used in "dynamical Bayesian inference".
 
@@ -209,7 +202,7 @@ class MPHandler:
         signals: SignalPairs,
         params: BAParams,
         on_progress: Callable[[int, int], None],
-    ) -> List[tuple]:
+    ) -> List[Tuple]:
         """
         Performs wavelet bispectrum analysis on signal pairs.
         Used in "wavelet bispectrum analysis".
@@ -222,16 +215,13 @@ class MPHandler:
         self.stop()
         self.scheduler = Scheduler(progress_callback=on_progress)
 
-        for pair in signals.get_pairs():
-            self.scheduler.add(
-                target=_bispectrum_analysis,
-                args=(*pair, params),
-                subtasks=4,
-                process_type=mp.Process,
-                queue_type=mp.Queue,
-            )
-
-        return await self.scheduler.run()
+        return await self.scheduler.map(
+            target=_bispectrum_analysis,
+            args=[(*pair, params) for pair in signals.get_pairs()],
+            subtasks=4,
+            process_type=mp.Process,
+            queue_type=mp.Queue,
+        )
 
     async def coro_biphase(
         self,
@@ -240,7 +230,7 @@ class MPHandler:
         f0: float,
         fr: Tuple[float, float],
         on_progress: Callable[[int, int], None],
-    ) -> List[tuple]:
+    ) -> List[Tuple]:
         """
         Calculates biphase and biamplitude. Used in "wavelet bispectrum analysis".
 
@@ -254,16 +244,12 @@ class MPHandler:
         self.stop()
         self.scheduler = Scheduler(progress_callback=on_progress)
 
-        for pair in signals.get_pairs():
-            opt = pair[0].output_data.opt
-            self.scheduler.add(
-                target=_biphase,
-                args=(*pair, fs, f0, fr, opt),
-                process_type=mp.Process,
-                queue_type=mp.Queue,
-            )
-
-        return await self.scheduler.run()
+        args = [
+            (s1, s2, fs, f0, fr, s1.output_data.opt) for s1, s2 in signals.get_pairs()
+        ]
+        return await self.scheduler.map(
+            target=_biphase, args=args, process_type=mp.Prcess, queue_type=mp.Queue
+        )
 
     async def coro_preprocess(
         self, signals: Union[TimeSeries, List[TimeSeries]], fmin: float, fmax: float
@@ -282,14 +268,10 @@ class MPHandler:
         if isinstance(signals, TimeSeries):
             signals = [signals]
 
-        for s in signals:
-            self.scheduler.add(
-                target=_preprocess,
-                args=(s.signal, s.frequency, fmin, fmax),
-                process_type=mp.Process,
-                queue_type=mp.Queue,
-            )
-        return await self.scheduler.run()  # Note: ignore possible warning from linter.
+        args = [(s.signal, s.frequency, fmin, fmax) for s in signals]
+        return await self.scheduler.map(
+            target=_preprocess, args=args, process_type=mp.Process, queue_type=mp.Queue
+        )
 
     def stop(self):
         """
