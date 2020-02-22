@@ -19,6 +19,8 @@
 
 # Introduction
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3679258.svg)](https://doi.org/10.5281/zenodo.3679258)
+
 PyMODA is a Python implementation of MODA (Multiscale Oscillatory Dynamics Analysis). The user interface is written using PyQt5, and the algorithms are mostly packaged as Python libraries from the existing MATLAB code.
 
 PyMODA is cross-platform and does not require any paid software. To get started, see the [User Guide](#user-guide) or the [Developer Guide](docs/developer-guide.md).
