@@ -2,7 +2,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 ## Table of Contents
 
-- [Introduction](#introduction)
+- [PyMODA](#pymoda)
   - [Status](#status)
 - [User Guide](#user-guide)
   - [Requirements](#requirements)
@@ -17,7 +17,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# Introduction
+# PyMODA
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3679258.svg)](https://doi.org/10.5281/zenodo.3679258)
 
