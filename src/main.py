@@ -27,6 +27,7 @@ from os import path
 from qasync import QEventLoop
 
 from gui.Application import Application
+from processes import mp_utils
 from utils import errorhandling, stdout_redirect, args
 
 if __name__ == "__main__":
@@ -46,6 +47,9 @@ if __name__ == "__main__":
     # Setup asyncio to work with PyQt.
     loop = QEventLoop(app)
     asyncio.set_event_loop(loop)
+
+    # Fix multiprocessing on macOS.
+    mp_utils.set_mp_start_method()
 
     # Open the launcher window. Must be called after setting the event loop.
     app.start_launcher()

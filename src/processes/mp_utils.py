@@ -14,8 +14,10 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import os
+from typing import Optional
 
 from utils.args import matlab_runtime
+from utils.os_utils import OS
 
 """
 Contains functions to help with multiprocessing.
@@ -49,3 +51,36 @@ def setup_matlab_runtime():
     path = matlab_runtime()
     if path:
         os.environ["LD_LIBRARY_PATH"] = path
+
+
+def _get_start_method() -> Optional[str]:
+    """
+    Gets the start method, which depends on the current OS. For Windows and Linux, the
+    defaults ('spawn' and 'fork' respectively) are fine.
+
+    For macOS, the default was 'fork' until Python 3.8 but this causes errors:
+
+    "The process has forked and you cannot use this CoreFoundation functionality safely. You MUST exec().
+    Breakon__THE_PROCESS_HAS_FORKED_AND_YOU_CANNOT_USE_THIS_COREFOUNDATION_FUNCTIONALITY___YOU_MUST_EXEC__() to debug."
+
+    Therefore, the start method is set to 'spawn' on macOS.
+    """
+    if OS.is_mac_os():
+        return "spawn"
+
+    return None
+
+
+def set_mp_start_method() -> None:
+    """
+    Sets the multiprocessing start method.
+    """
+    start_method = _get_start_method()
+    if not start_method:
+        return
+
+    import multiprocessing
+    import multiprocess
+
+    multiprocessing.set_start_method(start_method)
+    multiprocess.set_start_method(start_method)
