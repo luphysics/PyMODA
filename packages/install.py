@@ -3,7 +3,8 @@
 """
 Python script which installs all Matlab-packaged libraries and pip dependencies.
 
-Important: moving or renaming this file will break PyMODA's updater. Check the code in 'src/updater' before making changes to command-line arguments or core functionality.
+IMPORTANT: Moving or renaming this file will break PyMODA's updater.
+Check the code in 'src/updater' before making changes to command-line arguments or core functionality.
 """
 
 import os
@@ -12,10 +13,11 @@ import subprocess
 import sys
 import time
 from glob import glob
-from typing import Tuple, Optional
 from os import path
+from typing import Tuple
 
-assert sys.version_info >= (3, 6), "You must use Python 3.6 or greater."
+err_msg_python_version = "Error: Python 3.6 or greater is required. Please install a newer version of Python."
+assert sys.version_info >= (3, 6,), err_msg_python_version
 
 # Pip parameter for avoiding permission issues.
 user_flag = "--user"
@@ -61,6 +63,16 @@ def fatal_error(message: str) -> None:
     sys.exit(1)
 
 
+def arg_exists(character: str) -> bool:
+    """
+    Returns whether a character appears in a command-line argument.
+
+    The arguments in this script are very primitive, and are designed to each be one letter.
+    Any combination of letters, with or without spacing, is valid.
+    """
+    return any(character in arg for arg in sys.argv[1:])
+
+
 if __name__ == "__main__":
     # Set working directory to here.
     wd = path.dirname(path.abspath(__file__))
@@ -68,18 +80,23 @@ if __name__ == "__main__":
 
     print(f"Set working directory to: {os.getcwd()}")
 
-    # Whether the OS is Windows-based.
+    # Set values from command-line arguments.
+    verbose = arg_exists("v")
+    matlab_only = arg_exists("m")
+    dry_run = arg_exists("d")
+    yes = arg_exists("y")
+    force_user = arg_exists("u")
+
+    # Whether the OS is Windows.
     is_windows = "Windows" == platform.system()
 
-    # If Python is in a virtual environment, don't use the --user flag.
-    if os.environ.get("VIRTUAL_ENV"):
-        user_flag = ""
+    # Whether the OS is macOS.
+    is_mac = "Darwin" == platform.system()
 
-    # Set values from command-line arguments.
-    verbose = any(["v" in arg for arg in sys.argv[1:]])
-    matlab_only = any(["m" in arg for arg in sys.argv[1:]])
-    dry_run = any(["d" in arg for arg in sys.argv[1:]])
-    yes = any(["y" in arg for arg in sys.argv[1:]])
+    # If Python is in a virtual environment, don't use the --user flag.
+    # Also, don't use it on macOS unless force-enabled.
+    if not force_user and (os.environ.get("VIRTUAL_ENV") or is_mac):
+        user_flag = ""
 
     if verbose:
         print("Launched in verbose mode.\n")
@@ -105,6 +122,7 @@ if __name__ == "__main__":
             "-v\t\t Verbose\t Prints the output from the commands.\n"
             "-d\t\t Dry-run\t Prints the commands that will be run, but does not run them.\n"
             "-m\t\t MATLAB-only\t Only installs the MATLAB packages. Does not install pip dependencies.\n\n"
+            "-u\t\t User flag\t Forces pip commands to run with the '--user' flag. May be useful on macOS.\n\n"
         )
 
         try:

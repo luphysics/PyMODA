@@ -61,10 +61,18 @@ def _create_shortcut_nix() -> str:
     Creates a command-line alias on *nix to launch PyMODA with current arguments,
     by adding the alias to ~/.bashrc and ~/.zshrc if it exists or zsh is installed.
     """
-    bashrc = _get_abs_path_in_home_folder(".bashrc")  # Bash.
+    if OS.is_linux():
+        bashrc = _get_abs_path_in_home_folder(".bashrc")  # Bash on Linux.
+    else:
+        bashrc = _get_abs_path_in_home_folder(".bash_profile")  # Bash on macOS.
+
     zshrc = _get_abs_path_in_home_folder(".zshrc")  # Zsh.
-    with open(bashrc, "r") as f:
-        bash_lines = f.readlines()
+
+    try:
+        with open(bashrc, "r") as f:
+            bash_lines = f.readlines()
+    except FileNotFoundError:
+        bash_lines = []
 
     try:
         with open(zshrc, "r") as f:
