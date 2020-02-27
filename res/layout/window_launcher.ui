@@ -188,7 +188,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton">
+         <widget class="QPushButton" name="btn_harmonics">
           <property name="minimumSize">
            <size>
             <width>300</width>

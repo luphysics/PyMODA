@@ -69,6 +69,8 @@ class LauncherWindow(CentredWindow):
         self.btn_wavelet_bispectrum.clicked.connect(self.application.start_bispectrum)
         self.btn_dynamical_bayesian.clicked.connect(self.application.start_bayesian)
 
+        self.btn_harmonics.clicked.connect(self.application.start_harmonics)
+
         self.btn_create_shortcut.clicked.connect(self.create_shortcut)
         self.check_matlab_runtime()
 
