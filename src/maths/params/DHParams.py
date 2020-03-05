@@ -13,11 +13,28 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from PyQt5.QtWidgets import QComboBox
+from typing import List
 
-from gui.windows.ViewProperties import ViewProperties
+from maths.params.TFParams import TFParams
 
 
-class DHViewProperties(ViewProperties):
-    def __init__(self):
-        self.combo_plot_type: QComboBox = None
+class DHParams(TFParams):
+    def __init__(self, signals, scale_min, scale_max, time_res, sigma, surr_count):
+        super(DHParams, self).__init__(signals)
+
+        self.surr_count = surr_count
+        self.sigma = sigma
+        self.time_res = time_res
+        self.scale_max = scale_max
+        self.scale_min = scale_min
+
+    def values(self) -> List:
+        items = (
+            self.fs,
+            self.scale_min,
+            self.scale_max,
+            self.sigma,
+            self.time_res,
+            self.surr_count,
+        )
+        return [i for i in items if i is not None]

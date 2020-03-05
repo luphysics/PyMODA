@@ -34,6 +34,7 @@ from maths.algorithms.multiprocessing.preprocess import _preprocess
 from maths.algorithms.multiprocessing.ridge_extraction import _ridge_extraction
 from maths.algorithms.multiprocessing.time_frequency import _time_frequency
 from maths.params.BAParams import BAParams
+from maths.params.DHParams import DHParams
 from maths.params.PCParams import PCParams
 from maths.params.REParams import REParams
 from maths.params.TFParams import TFParams, _fmin, _fmax
@@ -83,6 +84,33 @@ class MPHandler:
             )
 
         return await self.scheduler.run()
+
+    async def coro_harmonics(
+        self,
+        signals: Signals,
+        params: DHParams,
+        on_progress: Callable[[int, int], None],
+    ) -> List[Tuple]:
+        """
+        Detects harmonics in signals.
+
+        :param signals: the signals
+        :param params: the parameters to pass to the harmonic finder
+        :param on_progress: the progress callback
+        :return: list containing the output from each process
+        """
+        # Whether to parallelize the algorithm for each calculation.
+        parallel = len(signals) < Scheduler.optimal_process_count()
+
+        self.stop()
+        self.scheduler = Scheduler(progress_callback=on_progress)
+
+        from pymodalib.algorithms import harmonics
+
+        return await self.scheduler.map(
+            target=harmonics.harmonicfinder,
+            args=[(sig.signal, *params.values(), parallel) for sig in signals],
+        )
 
     async def coro_phase_coherence(
         self,
