@@ -148,7 +148,8 @@ class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
         return self.plot_right
 
     def setup_radio_preproc(self) -> None:
-        self.radio_preproc_on.setChecked(True)
+        if hasattr(self, "radio_preproc_on"):
+            self.radio_preproc_on.setChecked(True)
 
     def get_preprocessing(self) -> None:
         return self.radio_preproc_on.isChecked()

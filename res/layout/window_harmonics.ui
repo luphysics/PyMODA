@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <layout class="QHBoxLayout" name="main_layout" stretch="9,3">
+     <layout class="QHBoxLayout" name="main_layout" stretch="9">
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_7" stretch="9,1">
         <property name="leftMargin">
@@ -121,7 +121,205 @@
           <item row="1" column="1">
            <layout class="QGridLayout" name="gridLayout_5">
             <item row="0" column="0">
-             <widget class="AmplitudePlot" name="plot_right" native="true"/>
+             <layout class="QGridLayout" name="gridLayout_6">
+              <item row="0" column="0">
+               <layout class="QVBoxLayout" name="verticalLayout_2"/>
+              </item>
+              <item row="2" column="0">
+               <layout class="QFormLayout" name="formLayout_3">
+                <property name="labelAlignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+                <property name="formAlignment">
+                 <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+                </property>
+                <item row="0" column="0">
+                 <layout class="QVBoxLayout" name="verticalLayout_9">
+                  <item>
+                   <widget class="QGroupBox" name="groupBox">
+                    <property name="title">
+                     <string>Plot</string>
+                    </property>
+                    <layout class="QGridLayout" name="gridLayout_15" rowstretch="3,0">
+                     <item row="0" column="0">
+                      <widget class="QRadioButton" name="radio_plot_ampl">
+                       <property name="text">
+                        <string>Amplitude</string>
+                       </property>
+                       <property name="checked">
+                        <bool>true</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="0">
+                      <widget class="QRadioButton" name="radio_plot_pow">
+                       <property name="text">
+                        <string>Power</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QGroupBox" name="groupBox">
+                    <property name="title">
+                     <string>Cut Edges</string>
+                    </property>
+                    <layout class="QGridLayout" name="gridLayout_18">
+                     <item row="0" column="0">
+                      <widget class="QRadioButton" name="radio_cut_on">
+                       <property name="text">
+                        <string>On</string>
+                       </property>
+                       <property name="checked">
+                        <bool>true</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="0">
+                      <widget class="QRadioButton" name="radio_cut_off">
+                       <property name="text">
+                        <string>Off</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QGroupBox" name="freqOptions">
+                  <property name="title">
+                   <string>Transform Options</string>
+                  </property>
+                  <layout class="QFormLayout" name="formLayout_2">
+                   <property name="labelAlignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                   <property name="formAlignment">
+                    <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+                   </property>
+                   <item row="1" column="1">
+                    <layout class="QVBoxLayout" name="verticalLayout_6" stretch="0,0">
+                     <item alignment="Qt::AlignHCenter">
+                      <widget class="QLabel" name="label_3">
+                       <property name="frameShape">
+                        <enum>QFrame::NoFrame</enum>
+                       </property>
+                       <property name="text">
+                        <string>Scale max</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item alignment="Qt::AlignHCenter">
+                      <widget class="QLineEdit" name="line_scale_max">
+                       <property name="minimumSize">
+                        <size>
+                         <width>70</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                       <property name="maximumSize">
+                        <size>
+                         <width>70</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>40</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                   <item row="2" column="1">
+                    <layout class="QVBoxLayout" name="verticalLayout_4">
+                     <item alignment="Qt::AlignHCenter">
+                      <widget class="QLabel" name="label_4">
+                       <property name="frameShape">
+                        <enum>QFrame::NoFrame</enum>
+                       </property>
+                       <property name="text">
+                        <string>Scale min</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item alignment="Qt::AlignHCenter">
+                      <widget class="QLineEdit" name="line_scale_min">
+                       <property name="maximumSize">
+                        <size>
+                         <width>76</width>
+                         <height>22</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>0.5</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                   <item row="3" column="1">
+                    <layout class="QVBoxLayout" name="verticalLayout_5">
+                     <item alignment="Qt::AlignHCenter">
+                      <widget class="QLabel" name="label_5">
+                       <property name="frameShape">
+                        <enum>QFrame::NoFrame</enum>
+                       </property>
+                       <property name="text">
+                        <string>Time resolution</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item alignment="Qt::AlignHCenter">
+                      <widget class="QLineEdit" name="line_res">
+                       <property name="maximumSize">
+                        <size>
+                         <width>70</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>0.1</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item row="1" column="0" colspan="2">
+                 <layout class="QFormLayout" name="formLayout_4">
+                  <item row="1" column="1">
+                   <widget class="QGroupBox" name="horizontalGroupBox">
+                    <property name="title">
+                     <string>Surrogate Count</string>
+                    </property>
+                    <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="10,1">
+                     <item>
+                      <widget class="QSlider" name="slider_surrogate_2">
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLineEdit" name="line_surrogate_2"/>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </item>
+              <item row="1" column="0">
+               <layout class="QHBoxLayout" name="data_section"/>
+              </item>
+             </layout>
             </item>
            </layout>
           </item>
@@ -190,281 +388,6 @@
         </item>
        </layout>
       </item>
-      <item>
-       <layout class="QGridLayout" name="gridLayout_6">
-        <item row="0" column="0">
-         <layout class="QVBoxLayout" name="verticalLayout_2">
-          <item>
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item row="2" column="0">
-         <layout class="QFormLayout" name="formLayout_3">
-          <property name="labelAlignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-          <property name="formAlignment">
-           <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
-          </property>
-          <item row="0" column="0">
-           <layout class="QFormLayout" name="formLayout">
-            <item row="0" column="0">
-             <widget class="QGroupBox" name="groupBox">
-              <property name="title">
-               <string>Plot</string>
-              </property>
-              <layout class="QGridLayout" name="gridLayout_15" rowstretch="3,0">
-               <item row="0" column="0">
-                <widget class="QRadioButton" name="radio_plot_ampl">
-                 <property name="text">
-                  <string>Amplitude</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="0">
-                <widget class="QRadioButton" name="radio_plot_pow">
-                 <property name="text">
-                  <string>Power</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QGroupBox" name="groupBox">
-              <property name="title">
-               <string>Preprocessing</string>
-              </property>
-              <layout class="QGridLayout" name="gridLayout_13">
-               <item row="1" column="0">
-                <widget class="QRadioButton" name="radio_preproc_off">
-                 <property name="text">
-                  <string>Off</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="0">
-                <widget class="QRadioButton" name="radio_preproc_on">
-                 <property name="text">
-                  <string>On</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QGroupBox" name="groupBox">
-              <property name="title">
-               <string>Cut Edges</string>
-              </property>
-              <layout class="QGridLayout" name="gridLayout_18">
-               <item row="0" column="0">
-                <widget class="QRadioButton" name="radio_cut_on">
-                 <property name="text">
-                  <string>On</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="0">
-                <widget class="QRadioButton" name="radio_cut_off">
-                 <property name="text">
-                  <string>Off</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QGroupBox" name="groupBox">
-              <property name="title">
-               <string>Transform</string>
-              </property>
-              <layout class="QGridLayout" name="gridLayout_17">
-               <item row="1" column="0">
-                <widget class="QRadioButton" name="radio_transform_wft">
-                 <property name="text">
-                  <string>WFT</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="0">
-                <widget class="QRadioButton" name="radio_transform_wt">
-                 <property name="text">
-                  <string>WT</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item row="0" column="1">
-           <widget class="QGroupBox" name="freqOptions">
-            <property name="title">
-             <string>Transform Options</string>
-            </property>
-            <layout class="QFormLayout" name="formLayout_2">
-             <property name="labelAlignment">
-              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-             </property>
-             <property name="formAlignment">
-              <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
-             </property>
-             <item row="1" column="1">
-              <layout class="QVBoxLayout" name="verticalLayout_6" stretch="0,0">
-               <item alignment="Qt::AlignHCenter">
-                <widget class="QLabel" name="label_3">
-                 <property name="frameShape">
-                  <enum>QFrame::NoFrame</enum>
-                 </property>
-                 <property name="text">
-                  <string>Scale max</string>
-                 </property>
-                </widget>
-               </item>
-               <item alignment="Qt::AlignHCenter">
-                <widget class="QLineEdit" name="line_scale_max">
-                 <property name="minimumSize">
-                  <size>
-                   <width>70</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>70</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>40</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item row="2" column="1">
-              <layout class="QVBoxLayout" name="verticalLayout_4">
-               <item alignment="Qt::AlignHCenter">
-                <widget class="QLabel" name="label_4">
-                 <property name="frameShape">
-                  <enum>QFrame::NoFrame</enum>
-                 </property>
-                 <property name="text">
-                  <string>Scale min</string>
-                 </property>
-                </widget>
-               </item>
-               <item alignment="Qt::AlignHCenter">
-                <widget class="QLineEdit" name="line_scale_min">
-                 <property name="maximumSize">
-                  <size>
-                   <width>76</width>
-                   <height>22</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>0.5</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item row="3" column="1">
-              <layout class="QVBoxLayout" name="verticalLayout_5">
-               <item alignment="Qt::AlignHCenter">
-                <widget class="QLabel" name="label_5">
-                 <property name="frameShape">
-                  <enum>QFrame::NoFrame</enum>
-                 </property>
-                 <property name="text">
-                  <string>Time resolution</string>
-                 </property>
-                </widget>
-               </item>
-               <item alignment="Qt::AlignHCenter">
-                <widget class="QLineEdit" name="line_res">
-                 <property name="maximumSize">
-                  <size>
-                   <width>70</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>0.1</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item row="1" column="0" colspan="2">
-           <layout class="QFormLayout" name="formLayout_4">
-            <item row="1" column="1">
-             <widget class="QGroupBox" name="horizontalGroupBox">
-              <property name="title">
-               <string>Surrogate Count</string>
-              </property>
-              <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="10,1">
-               <item>
-                <widget class="QSlider" name="slider_surrogate_2">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLineEdit" name="line_surrogate_2"/>
-               </item>
-              </layout>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </item>
-        <item row="1" column="0">
-         <layout class="QHBoxLayout" name="data_section">
-          <item alignment="Qt::AlignHCenter">
-           <widget class="QLabel" name="label_6">
-            <property name="frameShape">
-             <enum>QFrame::Box</enum>
-            </property>
-            <property name="text">
-             <string>Length of data</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QWidget" name="dataLength" native="true"/>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </item>
      </layout>
     </item>
    </layout>
@@ -492,12 +415,6 @@
    <class>ColorMeshPlot</class>
    <extends>QWidget</extends>
    <header>gui.plotting.plots.ColorMeshPlot</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>AmplitudePlot</class>
-   <extends>QWidget</extends>
-   <header>gui.plotting.plots.AmplitudePlot</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
