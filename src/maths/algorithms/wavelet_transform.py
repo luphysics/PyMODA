@@ -20,7 +20,6 @@ import scipy.integrate
 import scipy.optimize
 import scipy.special as spec
 from scipy.sparse.linalg.isolve.lsqr import eps
-
 from maths.algorithms.matlab_utils import *
 
 """
@@ -61,6 +60,9 @@ class WindowParams:
     t1h = None
     t2h = None
     f0 = None
+
+    def assume_ompeak(self):
+        return 1.0
 
     def twf(self, t):
         raise NotImplemented("Twf is not implemented. Alter the has_twf property")
@@ -141,6 +143,9 @@ class MorletWavelet(WindowParams):
     @property
     def has_twf(self):
         return self.f0 >= 1
+
+    def assume_ompeak(self):
+        return self.om0
 
     @property
     def name(self):
@@ -281,7 +286,8 @@ def wt(
 
         wp.nv = Nb * log(2) / log(wp.xi2h / wp.xi1h)
         nv = ceil(wp.nv)
-        print(f"Optimal nv determined to be {nv}")
+        if disp_mode:
+            print(f"Optimal nv determined to be {nv}")
 
     freq = 2 ** (
         arange(ceil(nv * np.log2(fmin)), np.floor(nv * np.log2(fmax))).conj().T / nv
@@ -351,8 +357,8 @@ def wt(
     WT = np.zeros((SN, L), dtype=np.complex64) * np.NaN
     ouflag = 0
     if (wp.t2e - wp.t1e) * wp.ompeak / (2 * np.pi * fmax) > L / fs:
-        coib1 = 0
-        coib2 = 0
+        coib1 = np.zeros(coib1.shape)
+        coib2 = np.zeros(coib2.shape)
 
     for sn in range(0, SN):
         freqwf = ff * wp.ompeak / (twopi * freq[sn])
@@ -401,7 +407,7 @@ def wt(
         n2 = np.int(n2)
         NL = np.int(NL)
 
-        WT[sn, arange(0, L)] = out[n1 : NL - n2]
+        WT[sn, arange(0, L)] = out[n1 : NL - n2 + 1]
 
     if cut_edges:
         icoib = nonzero((L - coib1 - coib2) <= 0)[0]
@@ -435,7 +441,8 @@ def parcalc(racc, L, wp, fwt, twf, disp_mode, f0, fmax, wavelet="Lognorm", fs=-1
     racc = min([racc, 1 - 10 ** -6])
     ctol = max([racc / 1000, 10 ** -12])  # parameter of numerical accuracy
     MIC = max([10000, 10 * L])  # max interval count
-    print("Racc %f ctol %f MIC %f" % (racc, ctol, MIC))
+    if disp_mode:
+        print("Racc %f ctol %f MIC %f" % (racc, ctol, MIC))
 
     if fs < 0:
         raise ValueError("FS must be positive")
@@ -443,9 +450,10 @@ def parcalc(racc, L, wp, fwt, twf, disp_mode, f0, fmax, wavelet="Lognorm", fs=-1
     if not isempty(fwt):
         wp.fwt = fwt
         if isempty(wp.ompeak):
-            wp.ompeak = 1
-            if "Morlet" in wavelet:
-                wp.ompeak = twopi * f0
+            # wp.ompeak = 1
+            wp.ompeak = wp.assume_ompeak()
+            # if "Morlet" in wavelet:
+            #    wp.ompeak = twopi * f0
 
             if wp.xi1 > 0 and isfinite(wp.xi2):
                 wp.ompeak = sqrt(wp.xi1 * wp.xi2)
@@ -457,7 +465,7 @@ def parcalc(racc, L, wp, fwt, twf, disp_mode, f0, fmax, wavelet="Lognorm", fs=-1
                 or isnan(fwt(wp.ompeak))
                 or not isfinite(fwt(wp.ompeak))
             ):
-                cp1 = wp.ompeak * np.exp(-10 ** -14)
+                cp1 = wp.ompeak * np.exp(-(10 ** -14))
                 cp2 = wp.ompeak * np.exp(10 ** -14)
                 kk = 1
 
@@ -624,6 +632,10 @@ def parcalc(racc, L, wp, fwt, twf, disp_mode, f0, fmax, wavelet="Lognorm", fs=-1
                     zeros((idm[0].size, 1)),
                     middle.reshape(len(middle), 1),
                     zeros((idp[0].size, 1)),
+                    # PAVLE
+                    # zeros((idm[0].size, 1,)),
+                    # middle.reshape(len(middle), 1),
+                    # zeros((idp[0].size, 1,)),
                 ]
             )
 
@@ -818,7 +830,7 @@ def parcalc(racc, L, wp, fwt, twf, disp_mode, f0, fmax, wavelet="Lognorm", fs=-1
                     or isnan(twf(wp.tpeak))
                     or not isfinite(twf(wp.tpeak))
                 ):
-                    cp1 = wp.tpeak * -10 ** -14
+                    cp1 = wp.tpeak * -(10 ** -14)
                     cp2 = wp.tpeak * 10 ** -14
                     kk = 1
 
@@ -937,6 +949,7 @@ def parcalc(racc, L, wp, fwt, twf, disp_mode, f0, fmax, wavelet="Lognorm", fs=-1
 
                 Ctwf = asarray(
                     [zeros((len(idm), 1)), twf(ct[idc]), zeros((len(idp), 1))]
+                    # [zeros((len(idm), 1)), twf(ct[idc]), zeros((len(idp), 1,))]
                 )
                 idnan = nonzero(isnan(Ctwf))
 
@@ -951,6 +964,7 @@ def parcalc(racc, L, wp, fwt, twf, disp_mode, f0, fmax, wavelet="Lognorm", fs=-1
                 )
 
                 Cfwt = Cfwt[concat([arange(CNq + 1, CL), arange(1, CNq)])]
+                # Cfwt = Cfwt[concat([arange(CNq + 1, CL), arange(1, CNq),])]
 
                 Etwf = abs(Ctwf) ** 2
                 Efwt = abs(Cfwt) ** 2
@@ -1011,6 +1025,7 @@ def parcalc(racc, L, wp, fwt, twf, disp_mode, f0, fmax, wavelet="Lognorm", fs=-1
 
                 Ctwf = asarray(
                     [zeros((len(idm), 1)), twf(ct[idc]), zeros((len(idp), 1))]
+                    # [zeros((len(idm), 1)), twf(ct[idc]), zeros((len(idp), 1,))]
                 )
                 idnan = nonzero(isnan(Ctwf))
 
@@ -1061,7 +1076,10 @@ def parcalc(racc, L, wp, fwt, twf, disp_mode, f0, fmax, wavelet="Lognorm", fs=-1
                 else:
                     ix = min([1 + nonzero(np.diff(abs(Cfwt[1:])) <= 0)[0], len(Cfwt)])
                     cxi0 = interp1(
-                        asarray([0, abs(Cfwt[:ix])]), asarray([0, cxi[:ix]]), ctol
+                        asarray([0, abs(Cfwt[:ix])]),
+                        asarray([0, cxi[:ix]]),
+                        ctol
+                        # asarray([0, abs(Cfwt[:ix]),]), asarray([0, cxi[:ix]]), ctol
                     )
                     axi = []
                     Afwt = []
@@ -1197,9 +1215,7 @@ def sqeps(vfun, xp, lim1, lim2, racc, MIC, nlims):
     nlim1, nlim2 = nlims
 
     kk = 1
-    shp = (
-        0
-    )  # Peak shift - changed from 0 because of scipy algorithm behaving differently to Matlab.
+    shp = 0  # Peak shift - changed from 0 because of scipy algorithm behaving differently to Matlab.
 
     while not np.isfinite(vfun(xp + shp) or isnan(vfun(xp + shp))):
         shp = kk * (10 ** -14)
@@ -1630,6 +1646,9 @@ def fcast(sig, fs, NP, fint, *args):  # line1145
     w = w[-L + 1 :]  # level3
     rw = rw[-L + 1 :]  # level3
     Y = Y[-L + 1 :]  # level3
+    # w = w[-L - 1 :]  # level3
+    # rw = rw[-L - 1 :]  # level3
+    # Y = Y[-L - 1 :]  # level3
 
     MaxOrder = np.min([MaxOrder, np.floor(L + 1 / 3)])
 
@@ -1731,6 +1750,11 @@ def fcast(sig, fs, NP, fint, *args):  # line1145
             FM = np.array(
                 [np.ones((L + 1,)), np.cos(twopi * tf * t), np.sin(twopi * tf * t)]
             ).T
+            # FM = [
+            #    np.ones(L + 1, 1),
+            #    np.cos(2 * np.pi * tf * t),
+            #    np.sin(2 * np.pi * tf * t),
+            # ]
             if not isempty(rw):
                 FM = FM * (rw.T * np.ones((1, 3)))
 
