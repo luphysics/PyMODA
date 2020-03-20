@@ -407,7 +407,7 @@ def wt(
         n2 = np.int(n2)
         NL = np.int(NL)
 
-        WT[sn, arange(0, L)] = out[n1 : NL - n2 + 1]
+        WT[sn, arange(0, L)] = out[n1 : NL - n2]
 
     if cut_edges:
         icoib = nonzero((L - coib1 - coib2) <= 0)[0]
