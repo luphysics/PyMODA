@@ -13,15 +13,16 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import warnings
 from typing import Tuple
 
 import numpy as np
+import pymodalib
 from multiprocess.pool import Pool
 from numpy import ndarray
 
 from maths.algorithms.surrogates import surrogate_calc
 from maths.algorithms.wpc import wphcoh, wpc
-from maths.num_utils import matlab_to_numpy
 from maths.params.PCParams import PCParams
 from maths.signals.TimeSeries import TimeSeries
 from processes.mp_utils import process
@@ -29,7 +30,7 @@ from processes.mp_utils import process
 
 @process
 def _wt_surrogate_calc(
-    wt_signal: ndarray, surrogate: ndarray, params: PCParams
+        wt_signal: ndarray, surrogate: ndarray, params: PCParams
 ) -> ndarray:
     """
     Calculates the phase coherence between a signal and a surrogate.
@@ -39,10 +40,7 @@ def _wt_surrogate_calc(
     :param params: the params object with parameters to pass to the wavelet transform function
     :return: [1D array] the wavelet phase coherence between the signal and the surrogate
     """
-    from maths.algorithms.matlabwrappers import wt
-
-    transform, freq = wt.calculate(surrogate, params)
-    wt_surrogate = matlab_to_numpy(transform)
+    wt_surrogate, _ = pymodalib.wavelet_transform(surrogate, params.fs, **params.get(), Display="off")
 
     surr_avg, _ = wphcoh(wt_signal, wt_surrogate)
     return surr_avg
@@ -50,7 +48,7 @@ def _wt_surrogate_calc(
 
 @process
 def _phase_coherence(
-    signal_pair: Tuple[TimeSeries, TimeSeries], params: PCParams
+        signal_pair: Tuple[TimeSeries, TimeSeries], params: PCParams
 ) -> Tuple[Tuple[TimeSeries, TimeSeries], ndarray, ndarray, ndarray, ndarray]:
     """
     Function which uses `wpc` to calculate phase coherence for a single pair of signals. The signals must have

@@ -17,9 +17,10 @@
 from typing import Tuple, Union, Dict
 
 import numpy as np
+import pymodalib
 from numpy import ndarray
+from pymodalib.utils.matlab import multi_matlab_to_numpy
 
-from maths.num_utils import matlab_to_numpy
 from maths.params.TFParams import TFParams, _wft
 from maths.signals.TimeSeries import TimeSeries
 from processes.mp_utils import process
@@ -27,7 +28,7 @@ from processes.mp_utils import process
 
 @process
 def _time_frequency(
-    time_series: TimeSeries, params: TFParams, return_opt: bool = False
+        time_series: TimeSeries, params: TFParams, return_opt: bool = False
 ) -> Union[
     Tuple[str, ndarray, ndarray, ndarray, ndarray, ndarray, ndarray, ndarray],
     Tuple[str, ndarray, ndarray, ndarray, ndarray, ndarray, ndarray, ndarray, Dict],
@@ -44,26 +45,16 @@ def _time_frequency(
     of the values of the transform; the powers of the values of the transform; the average amplitudes
     of the transform; and the average powers of the transform.
     """
-    # Don't move the import statements.
-    from maths.algorithms.matlabwrappers import wft
-    from maths.algorithms.matlabwrappers import wt
+    wavelet = not params.transform == _wft
 
-    if params.transform == _wft:
-        func = wft
+    if not wavelet:
         return_opt = False
+
+    if wavelet:
+        transform, freq, opt = _wt_func(time_series.signal, params, return_opt)
     else:
-        func = wt
-
-    opt = None
-
-    # WFT does not take a 3rd parameter. This is why we can't simplify the following block into one line.
-    if return_opt:
-        transform, freq, opt = func.calculate(time_series, params, True)
-    else:
-        transform, freq = func.calculate(time_series, params)
-
-    transform = matlab_to_numpy(transform)
-    freq = matlab_to_numpy(freq)
+        transform, freq = _wft_func(time_series, params)
+        opt = {}
 
     amplitude = np.abs(transform)
     power = np.square(amplitude)
@@ -84,6 +75,26 @@ def _time_frequency(
         return out + (opt,)
 
     return out
+
+
+def _wt_func(signal: ndarray, params: TFParams, return_opt: bool):
+    result = pymodalib.wavelet_transform(signal, fs=params.fs, return_opt=return_opt, **params.get())
+
+    try:
+        wt, freq, opt = result
+    except ValueError:
+        wt, freq = result
+        opt = {}
+
+    return wt, freq, opt
+
+
+def _wft_func(signal, params):
+    # Don't move the import statement.
+    from maths.algorithms.matlabwrappers import wft
+
+    transform, freq = wft.calculate(signal, params)
+    return multi_matlab_to_numpy(transform, freq)
 
 
 def avg_ampl_pow(amplitude) -> Tuple[ndarray, ndarray]:
