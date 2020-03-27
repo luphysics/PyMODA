@@ -97,7 +97,7 @@ class Settings:
         if isinstance(out, str):
             out = {branch: out}
 
-        return out
+        return out or {}
 
     def get_latest_commit_on_branch(self) -> Optional[str]:
         """
