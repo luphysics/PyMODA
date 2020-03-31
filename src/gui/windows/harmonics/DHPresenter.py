@@ -85,6 +85,10 @@ class DHPresenter(BaseTFPresenter):
         sig = self.get_selected_signal()
         main_plot = self.view.main_plot()
 
+        lbl = "Frequency (Hz)"
+        main_plot.get_xlabel = lambda: lbl
+        main_plot.get_ylabel = lambda: lbl
+
         if hasattr(sig, "data"):
             scalefreq, res, pos1, pos2 = sig.data
 
@@ -95,10 +99,6 @@ class DHPresenter(BaseTFPresenter):
             main_plot.pcolormesh(
                 scalefreq, sig.data[index + 1], scalefreq, custom_cmap=False
             )
-
-            lbl = "Frequency (Hz)"
-            main_plot.update_xlabel(lbl)
-            main_plot.update_ylabel(lbl)
 
     def load_data(self) -> None:
         self.signals = Signals.from_file(self.open_file)
@@ -134,6 +134,7 @@ class DHPresenter(BaseTFPresenter):
             print(f"Selected signal: '{name}'")
             self.selected_signal_name = name
             self.plot_signal()
+            self.update_plots()
             self.view.on_xlim_edited()
 
     def get_params(self, all_signals: bool = True) -> DHParams:
