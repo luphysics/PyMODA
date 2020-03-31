@@ -121,108 +121,140 @@
           <item row="1" column="1">
            <layout class="QGridLayout" name="gridLayout_5">
             <item row="0" column="0">
-             <layout class="QGridLayout" name="gridLayout_6">
+             <layout class="QGridLayout" name="gridLayout_6" rowstretch="1">
               <item row="0" column="0">
-               <layout class="QVBoxLayout" name="verticalLayout_2"/>
-              </item>
-              <item row="2" column="0">
-               <layout class="QVBoxLayout" name="verticalLayout_11">
+               <layout class="QVBoxLayout" name="verticalLayout_11" stretch="1,1,1,1,5">
                 <item>
                  <widget class="QGroupBox" name="freqOptions">
                   <property name="title">
                    <string>Transform Options</string>
                   </property>
-                  <layout class="QFormLayout" name="formLayout_2">
-                   <property name="labelAlignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                   <property name="formAlignment">
-                    <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
-                   </property>
-                   <item row="1" column="1">
-                    <layout class="QVBoxLayout" name="verticalLayout_6" stretch="0,0">
-                     <item alignment="Qt::AlignHCenter">
-                      <widget class="QLabel" name="label_3">
-                       <property name="frameShape">
-                        <enum>QFrame::NoFrame</enum>
-                       </property>
-                       <property name="text">
-                        <string>Scale max</string>
-                       </property>
-                      </widget>
+                  <layout class="QHBoxLayout" name="horizontalLayout_5">
+                   <item>
+                    <layout class="QVBoxLayout" name="verticalLayout_14">
+                     <item>
+                      <layout class="QVBoxLayout" name="verticalLayout_4">
+                       <item alignment="Qt::AlignHCenter">
+                        <widget class="QLabel" name="label_4">
+                         <property name="frameShape">
+                          <enum>QFrame::NoFrame</enum>
+                         </property>
+                         <property name="text">
+                          <string>Scale min</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item alignment="Qt::AlignHCenter">
+                        <widget class="QLineEdit" name="line_scale_min">
+                         <property name="maximumSize">
+                          <size>
+                           <width>76</width>
+                           <height>22</height>
+                          </size>
+                         </property>
+                         <property name="text">
+                          <string>0.5</string>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
                      </item>
-                     <item alignment="Qt::AlignHCenter">
-                      <widget class="QLineEdit" name="line_scale_max">
-                       <property name="minimumSize">
-                        <size>
-                         <width>70</width>
-                         <height>20</height>
-                        </size>
-                       </property>
-                       <property name="maximumSize">
-                        <size>
-                         <width>70</width>
-                         <height>20</height>
-                        </size>
-                       </property>
-                       <property name="text">
-                        <string>40</string>
-                       </property>
-                      </widget>
-                     </item>
-                    </layout>
-                   </item>
-                   <item row="2" column="1">
-                    <layout class="QVBoxLayout" name="verticalLayout_4">
-                     <item alignment="Qt::AlignHCenter">
-                      <widget class="QLabel" name="label_4">
-                       <property name="frameShape">
-                        <enum>QFrame::NoFrame</enum>
-                       </property>
-                       <property name="text">
-                        <string>Scale min</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item alignment="Qt::AlignHCenter">
-                      <widget class="QLineEdit" name="line_scale_min">
-                       <property name="maximumSize">
-                        <size>
-                         <width>76</width>
-                         <height>22</height>
-                        </size>
-                       </property>
-                       <property name="text">
-                        <string>0.5</string>
-                       </property>
-                      </widget>
+                     <item>
+                      <layout class="QVBoxLayout" name="verticalLayout_6" stretch="0,0">
+                       <item alignment="Qt::AlignHCenter">
+                        <widget class="QLabel" name="label_3">
+                         <property name="frameShape">
+                          <enum>QFrame::NoFrame</enum>
+                         </property>
+                         <property name="text">
+                          <string>Scale max</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item alignment="Qt::AlignHCenter">
+                        <widget class="QLineEdit" name="line_scale_max">
+                         <property name="minimumSize">
+                          <size>
+                           <width>70</width>
+                           <height>20</height>
+                          </size>
+                         </property>
+                         <property name="maximumSize">
+                          <size>
+                           <width>70</width>
+                           <height>20</height>
+                          </size>
+                         </property>
+                         <property name="text">
+                          <string>40</string>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
                      </item>
                     </layout>
                    </item>
-                   <item row="3" column="1">
-                    <layout class="QVBoxLayout" name="verticalLayout_5">
-                     <item alignment="Qt::AlignHCenter">
-                      <widget class="QLabel" name="label_5">
-                       <property name="frameShape">
-                        <enum>QFrame::NoFrame</enum>
-                       </property>
-                       <property name="text">
-                        <string>Time resolution</string>
-                       </property>
-                      </widget>
+                   <item>
+                    <layout class="QVBoxLayout" name="verticalLayout_15">
+                     <item>
+                      <layout class="QVBoxLayout" name="verticalLayout_16">
+                       <item>
+                        <widget class="QLabel" name="label_5">
+                         <property name="frameShape">
+                          <enum>QFrame::NoFrame</enum>
+                         </property>
+                         <property name="text">
+                          <string>Time resolution</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QLineEdit" name="line_res">
+                         <property name="maximumSize">
+                          <size>
+                           <width>70</width>
+                           <height>20</height>
+                          </size>
+                         </property>
+                         <property name="text">
+                          <string>0.1</string>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
                      </item>
-                     <item alignment="Qt::AlignHCenter">
-                      <widget class="QLineEdit" name="line_res">
-                       <property name="maximumSize">
-                        <size>
-                         <width>70</width>
-                         <height>20</height>
-                        </size>
-                       </property>
-                       <property name="text">
-                        <string>0.1</string>
-                       </property>
-                      </widget>
+                     <item>
+                      <layout class="QVBoxLayout" name="verticalLayout_5"/>
+                     </item>
+                     <item>
+                      <layout class="QVBoxLayout" name="verticalLayout_13">
+                       <item>
+                        <widget class="QLabel" name="label">
+                         <property name="text">
+                          <string>Sigma</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QLineEdit" name="line_sigma">
+                         <property name="maximumSize">
+                          <size>
+                           <width>70</width>
+                           <height>20</height>
+                          </size>
+                         </property>
+                         <property name="text">
+                          <string>1.05</string>
+                         </property>
+                         <property name="cursorPosition">
+                          <number>0</number>
+                         </property>
+                         <property name="clearButtonEnabled">
+                          <bool>false</bool>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
                      </item>
                     </layout>
                    </item>
@@ -312,9 +344,6 @@
                  <widget class="PreprocessPlot" name="plot_preproc" native="true"/>
                 </item>
                </layout>
-              </item>
-              <item row="1" column="0">
-               <layout class="QHBoxLayout" name="data_section"/>
               </item>
              </layout>
             </item>

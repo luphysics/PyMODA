@@ -60,7 +60,7 @@ class MPHandler:
         self.scheduler: Scheduler = None
 
     async def coro_transform(
-            self, params: TFParams, on_progress: Callable[[int, int], None]
+        self, params: TFParams, on_progress: Callable[[int, int], None]
     ) -> List[tuple]:
         """
         Performs a wavelet transform or windowed Fourier transform of signals.
@@ -87,11 +87,11 @@ class MPHandler:
         return await self.scheduler.run()
 
     async def coro_harmonics(
-            self,
-            signals: Signals,
-            params: DHParams,
-            preprocess: bool,
-            on_progress: Callable[[int, int], None],
+        self,
+        signals: Signals,
+        params: DHParams,
+        preprocess: bool,
+        on_progress: Callable[[int, int], None],
     ) -> List[Tuple]:
         """
         Detects harmonics in signals.
@@ -110,14 +110,17 @@ class MPHandler:
 
         return await self.scheduler.map(
             target=harmonic_wrapper,
-            args=[(preprocess, sig.signal, params, *params.args(), parallel, params.crop) for sig in signals],
+            args=[
+                (preprocess, sig.signal, params, *params.args(), parallel, params.crop)
+                for sig in signals
+            ],
         )
 
     async def coro_phase_coherence(
-            self,
-            signals: SignalPairs,
-            params: PCParams,
-            on_progress: Callable[[int, int], None],
+        self,
+        signals: SignalPairs,
+        params: PCParams,
+        on_progress: Callable[[int, int], None],
     ) -> List[tuple]:
         """
         Performs wavelet phase coherence between signal pairs. Used in "wavelet phase coherence".
@@ -143,7 +146,7 @@ class MPHandler:
         return await self.scheduler.run()
 
     async def coro_ridge_extraction(
-            self, params: REParams, on_progress: Callable[[int, int], None]
+        self, params: REParams, on_progress: Callable[[int, int], None]
     ) -> List[tuple]:
         """
         Performs ridge extraction on wavelet transforms. Used in "ridge extraction and filtering".
@@ -176,10 +179,10 @@ class MPHandler:
         return await self.scheduler.run()
 
     async def coro_bandpass_filter(
-            self,
-            signals: Signals,
-            intervals: tuple,
-            on_progress: Callable[[int, int], None],
+        self,
+        signals: Signals,
+        intervals: tuple,
+        on_progress: Callable[[int, int], None],
     ) -> List[tuple]:
         """
         Performs bandpass filter on signals. Used in "ridge extraction and filtering".
@@ -206,10 +209,10 @@ class MPHandler:
         return await self.scheduler.run()
 
     async def coro_bayesian(
-            self,
-            signals: SignalPairs,
-            paramsets: List[ParamSet],
-            on_progress: Callable[[int, int], None],
+        self,
+        signals: SignalPairs,
+        paramsets: List[ParamSet],
+        on_progress: Callable[[int, int], None],
     ) -> List[tuple]:
         """
         Performs Bayesian inference on signal pairs. Used in "dynamical Bayesian inference".
@@ -234,10 +237,10 @@ class MPHandler:
         return await self.scheduler.run()
 
     async def coro_bispectrum_analysis(
-            self,
-            signals: SignalPairs,
-            params: BAParams,
-            on_progress: Callable[[int, int], None],
+        self,
+        signals: SignalPairs,
+        params: BAParams,
+        on_progress: Callable[[int, int], None],
     ) -> List[tuple]:
         """
         Performs wavelet bispectrum analysis on signal pairs.
@@ -263,12 +266,12 @@ class MPHandler:
         return await self.scheduler.run()
 
     async def coro_biphase(
-            self,
-            signals: SignalPairs,
-            fs: float,
-            f0: float,
-            fr: Tuple[float, float],
-            on_progress: Callable[[int, int], None],
+        self,
+        signals: SignalPairs,
+        fs: float,
+        f0: float,
+        fr: Tuple[float, float],
+        on_progress: Callable[[int, int], None],
     ) -> List[tuple]:
         """
         Calculates biphase and biamplitude. Used in "wavelet bispectrum analysis".
@@ -295,7 +298,7 @@ class MPHandler:
         return await self.scheduler.run()
 
     async def coro_preprocess(
-            self, signals: Union[TimeSeries, List[TimeSeries]], fmin: float, fmax: float
+        self, signals: Union[TimeSeries, List[TimeSeries]], fmin: float, fmax: float
     ) -> List[ndarray]:
         """
         Performs preprocessing on a single signal.
@@ -332,5 +335,4 @@ def harmonic_wrapper(preprocess, signal, params, *args, **kwargs):
     if preprocess:
         signal = pymodalib.preprocess(signal, params.fs, None, None)
 
-    print(f"Preprocess: {preprocess}.")
     return pymodalib.harmonicfinder(signal, *args, **kwargs)

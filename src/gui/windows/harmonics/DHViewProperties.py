@@ -13,7 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from PyQt5.QtWidgets import QComboBox
+from PyQt5.QtWidgets import QComboBox, QLineEdit
 
 from gui.windows.ViewProperties import ViewProperties
 
@@ -21,3 +21,8 @@ from gui.windows.ViewProperties import ViewProperties
 class DHViewProperties(ViewProperties):
     def __init__(self):
         self.combo_plot_type: QComboBox = None
+
+        self.line_sigma: QLineEdit = None
+        self.line_res: QLineEdit = None
+        self.line_scale_min: QLineEdit = None
+        self.line_scale_max: QLineEdit = None

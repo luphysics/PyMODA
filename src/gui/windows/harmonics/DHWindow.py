@@ -26,7 +26,11 @@ from utils.decorators import floaty
 
 
 class DHWindow(
-    DHViewProperties, BaseTFWindow, SingleSignalComponent, SurrogateComponent, PreprocessComponent
+    DHViewProperties,
+    BaseTFWindow,
+    SingleSignalComponent,
+    SurrogateComponent,
+    PreprocessComponent,
 ):
     """
     The "Detecting Harmonics" window.
@@ -79,4 +83,4 @@ class DHWindow(
 
     @floaty
     def get_sigma(self) -> Optional[float]:
-        return 1.05  # TODO
+        return self.line_sigma.text()
