@@ -136,7 +136,10 @@ class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
             self.line_res.editingFinished.connect(self.on_freq_or_res_edited)
 
     def on_freq_or_res_edited(self) -> None:
-        self.presenter.plot_preprocessed_signal()
+        try:
+            self.presenter.plot_preprocessed_signal()
+        except AttributeError:
+            pass
 
     def main_plot(self) -> ColorMeshPlot:
         return self.plot_main

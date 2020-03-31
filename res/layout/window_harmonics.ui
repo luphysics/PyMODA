@@ -138,32 +138,6 @@
                   <item>
                    <widget class="QGroupBox" name="groupBox">
                     <property name="title">
-                     <string>Plot</string>
-                    </property>
-                    <layout class="QGridLayout" name="gridLayout_15" rowstretch="3,0">
-                     <item row="0" column="0">
-                      <widget class="QRadioButton" name="radio_plot_ampl">
-                       <property name="text">
-                        <string>Amplitude</string>
-                       </property>
-                       <property name="checked">
-                        <bool>true</bool>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="1" column="0">
-                      <widget class="QRadioButton" name="radio_plot_pow">
-                       <property name="text">
-                        <string>Power</string>
-                       </property>
-                      </widget>
-                     </item>
-                    </layout>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QGroupBox" name="groupBox">
-                    <property name="title">
                      <string>Cut Edges</string>
                     </property>
                     <layout class="QGridLayout" name="gridLayout_18">
@@ -399,7 +373,7 @@
      <x>0</x>
      <y>0</y>
      <width>1496</width>
-     <height>29</height>
+     <height>18</height>
     </rect>
    </property>
   </widget>
