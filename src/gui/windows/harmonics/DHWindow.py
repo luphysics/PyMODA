@@ -16,6 +16,7 @@
 from typing import Optional
 
 from data import resources
+from gui.components.PreprocessComponent import PreprocessComponent
 from gui.components.SingleSignalComponent import SingleSignalComponent
 from gui.components.SurrogateComponent import SurrogateComponent
 from gui.windows.common.BaseTFWindow import BaseTFWindow
@@ -25,7 +26,7 @@ from utils.decorators import floaty
 
 
 class DHWindow(
-    DHViewProperties, BaseTFWindow, SingleSignalComponent, SurrogateComponent
+    DHViewProperties, BaseTFWindow, SingleSignalComponent, SurrogateComponent, PreprocessComponent
 ):
     """
     The "Detecting Harmonics" window.
@@ -40,6 +41,7 @@ class DHWindow(
         SurrogateComponent.__init__(
             self, self.slider_surrogate_2, self.line_surrogate_2
         )
+        PreprocessComponent.__init__(self, self.plot_preproc)
 
         self.presenter.init()
 

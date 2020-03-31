@@ -154,6 +154,7 @@ class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
         if hasattr(self, "radio_preproc_on"):
             self.radio_preproc_on.setChecked(True)
 
+    @deprecated
     def get_preprocessing(self) -> None:
         return self.radio_preproc_on.isChecked()
 

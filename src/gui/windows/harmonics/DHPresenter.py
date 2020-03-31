@@ -17,6 +17,7 @@ import asyncio
 from typing import List
 
 from PyQt5.QtWidgets import QListWidgetItem
+from numpy import ndarray
 
 from gui.dialogs.FrequencyDialog import FrequencyDialog
 from gui.windows.common.BaseTFPresenter import BaseTFPresenter
@@ -69,7 +70,7 @@ class DHPresenter(BaseTFPresenter):
         self.view.on_calculate_started()
 
         all_data = await self.mp_handler.coro_harmonics(
-            self.signals_calc, params, self.on_progress_updated
+            self.signals_calc, params, self.view.get_preprocess(), self.on_progress_updated
         )
 
         if not isinstance(all_data, List):
@@ -133,9 +134,20 @@ class DHPresenter(BaseTFPresenter):
         if name != self.selected_signal_name:
             print(f"Selected signal: '{name}'")
             self.selected_signal_name = name
+
             self.plot_signal()
             self.update_plots()
+
             self.view.on_xlim_edited()
+            self.plot_preprocessed_signal()
+
+    async def coro_preprocess_selected_signal(self) -> List[ndarray]:
+        sig = self.get_selected_signal()
+
+        if not self.preproc_mp_handler:
+            self.preproc_mp_handler = MPHandler()
+
+        return await self.preproc_mp_handler.coro_preprocess(sig, None, None)
 
     def get_params(self, all_signals: bool = True) -> DHParams:
         if all_signals:
@@ -151,4 +163,5 @@ class DHPresenter(BaseTFPresenter):
             sigma=self.view.get_sigma(),
             time_res=self.view.get_time_res(),
             surr_count=self.view.get_surr_count(),
+            crop=self.view.get_cut_edges(),
         )

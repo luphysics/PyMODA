@@ -19,16 +19,17 @@ from maths.params.TFParams import TFParams
 
 
 class DHParams(TFParams):
-    def __init__(self, signals, scale_min, scale_max, time_res, sigma, surr_count):
+    def __init__(self, signals, scale_min, scale_max, time_res, sigma, surr_count, crop):
         super(DHParams, self).__init__(signals)
 
+        self.crop = crop
         self.surr_count = surr_count
         self.sigma = sigma
         self.time_res = time_res
         self.scale_max = scale_max
         self.scale_min = scale_min
 
-    def values(self) -> List:
+    def args(self) -> List:
         items = (
             self.fs,
             self.scale_min,

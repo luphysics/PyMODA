@@ -67,8 +67,8 @@ def _phase_coherence(
     """
     s1, s2 = signal_pair
 
-    wt1 = s1.output_data.values
-    wt2 = s2.output_data.values
+    wt1 = s1.output_data.args
+    wt2 = s2.output_data.args
 
     freq = s1.output_data.freq
     fs = s1.frequency
