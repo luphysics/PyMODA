@@ -30,7 +30,7 @@ from processes.mp_utils import process
 
 @process
 def _wt_surrogate_calc(
-        wt_signal: ndarray, surrogate: ndarray, params: PCParams
+    wt_signal: ndarray, surrogate: ndarray, params: PCParams
 ) -> ndarray:
     """
     Calculates the phase coherence between a signal and a surrogate.
@@ -40,7 +40,9 @@ def _wt_surrogate_calc(
     :param params: the params object with parameters to pass to the wavelet transform function
     :return: [1D array] the wavelet phase coherence between the signal and the surrogate
     """
-    wt_surrogate, _ = pymodalib.wavelet_transform(surrogate, params.fs, **params.get(), Display="off")
+    wt_surrogate, _ = pymodalib.wavelet_transform(
+        surrogate, params.fs, **params.get(), Display="off"
+    )
 
     surr_avg, _ = wphcoh(wt_signal, wt_surrogate)
     return surr_avg
@@ -48,7 +50,7 @@ def _wt_surrogate_calc(
 
 @process
 def _phase_coherence(
-        signal_pair: Tuple[TimeSeries, TimeSeries], params: PCParams
+    signal_pair: Tuple[TimeSeries, TimeSeries], params: PCParams
 ) -> Tuple[Tuple[TimeSeries, TimeSeries], ndarray, ndarray, ndarray, ndarray]:
     """
     Function which uses `wpc` to calculate phase coherence for a single pair of signals. The signals must have
@@ -65,8 +67,8 @@ def _phase_coherence(
     """
     s1, s2 = signal_pair
 
-    wt1 = s1.output_data.values
-    wt2 = s2.output_data.values
+    wt1 = s1.output_data.args
+    wt2 = s2.output_data.args
 
     freq = s1.output_data.freq
     fs = s1.frequency

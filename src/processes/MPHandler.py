@@ -17,6 +17,7 @@
 from typing import Callable, List, Tuple, Union
 
 import multiprocess as mp
+import pymodalib
 from numpy import ndarray
 from scheduler.Scheduler import Scheduler
 
@@ -34,6 +35,7 @@ from maths.algorithms.multiprocessing.preprocess import _preprocess
 from maths.algorithms.multiprocessing.ridge_extraction import _ridge_extraction
 from maths.algorithms.multiprocessing.time_frequency import _time_frequency
 from maths.params.BAParams import BAParams
+from maths.params.DHParams import DHParams
 from maths.params.PCParams import PCParams
 from maths.params.REParams import REParams
 from maths.params.TFParams import TFParams, _fmin, _fmax
@@ -79,6 +81,36 @@ class MPHandler:
             args=[(time_series, params, True) for time_series in signals],
             process_type=mp.Process,
             queue_type=mp.Queue,
+        )
+
+    async def coro_harmonics(
+        self,
+        signals: Signals,
+        params: DHParams,
+        preprocess: bool,
+        on_progress: Callable[[int, int], None],
+    ) -> List[Tuple]:
+        """
+        Detects harmonics in signals.
+
+        :param signals: the signals
+        :param params: the parameters to pass to the harmonic finder
+        :param preprocess: whether to perform pre-processing on the signals
+        :param on_progress: the progress callback
+        :return: list containing the output from each process
+        """
+        # Whether to parallelize the algorithm for each calculation.
+        parallel = len(signals) < Scheduler.optimal_process_count()
+
+        self.stop()
+        self.scheduler = Scheduler(progress_callback=on_progress)
+
+        return await self.scheduler.map(
+            target=harmonic_wrapper,
+            args=[
+                (preprocess, sig.signal, params, *params.args(), parallel, params.crop)
+                for sig in signals
+            ],
         )
 
     async def coro_phase_coherence(
@@ -279,3 +311,10 @@ class MPHandler:
         """
         if self.scheduler:
             self.scheduler.terminate()
+
+
+def harmonic_wrapper(preprocess, signal, params, *args, **kwargs):
+    if preprocess:
+        signal = pymodalib.preprocess(signal, params.fs, None, None)
+
+    return pymodalib.harmonicfinder(signal, *args, **kwargs)

@@ -21,10 +21,10 @@ from gui.windows.BaseWindow import BaseWindow
 from gui.windows.LauncherWindow import LauncherWindow
 from gui.windows.bayesian.DBWindow import DBWindow
 from gui.windows.bispectrum.BAWindow import BAWindow
+from gui.windows.harmonics.DHWindow import DHWindow
 from gui.windows.phasecoherence.PCWindow import PCWindow
 from gui.windows.ridgeextraction.REWindow import REWindow
 from gui.windows.timefrequency.TFWindow import TFWindow
-from utils import cache
 
 
 class Application(QApplication):
@@ -34,31 +34,35 @@ class Application(QApplication):
 
     windows = []
 
-    def start_launcher(self):
+    def start_launcher(self) -> None:
         """Opens the launcher window which has buttons to open the other windows."""
         self.open_window(LauncherWindow)
 
-    def start_time_frequency(self):
+    def start_time_frequency(self) -> None:
         """Opens the time-frequency common window."""
         self.open_window(TFWindow)
 
-    def start_phase_coherence(self):
+    def start_phase_coherence(self) -> None:
         """Opens the wavelet phase coherence window."""
         self.open_window(PCWindow)
 
-    def start_ridge_extraction(self):
+    def start_ridge_extraction(self) -> None:
         """Opens the ridge extraction and filtering window."""
         self.open_window(REWindow)
 
-    def start_bispectrum(self):
+    def start_bispectrum(self) -> None:
         """Opens the wavelet bispectrum common window."""
         self.open_window(BAWindow)
 
-    def start_bayesian(self):
+    def start_bayesian(self) -> None:
         """Opens the dynamical Bayesian inference window."""
         self.open_window(DBWindow)
 
-    def open_window(self, WindowType: Type[BaseWindow]):
+    def start_harmonics(self) -> None:
+        """Opens the "detecting harmonics" window."""
+        self.open_window(DHWindow)
+
+    def open_window(self, WindowType: Type[BaseWindow]) -> None:
         """
         Opens a window with a given type which inherits from BaseWindow.
 
@@ -68,7 +72,7 @@ class Application(QApplication):
         self.windows.append(window)
         window.show()
 
-    def notify_close_event(self, window: BaseWindow):
+    def notify_close_event(self, window: BaseWindow) -> None:
         """
         Should be called to notify the application when a window
         is closed. This functionality is implemented in BaseWindow.
@@ -77,6 +81,3 @@ class Application(QApplication):
             self.windows.remove(window)
         except ValueError:
             pass
-
-        if not self.windows:
-            cache.clear()

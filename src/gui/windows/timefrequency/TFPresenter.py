@@ -60,8 +60,10 @@ class TFPresenter(BaseTFPresenter):
         """
         self.is_calculating_all = calc_all
 
+        if self.mp_handler:
+            self.mp_handler.stop()
+
         self.mp_handler = MPHandler()
-        self.mp_handler.stop()
 
         params = self.get_params(all_signals=calc_all)
         if params.transform == _wft:

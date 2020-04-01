@@ -124,13 +124,16 @@ class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
         return "No tasks in progress."
 
     def setup_lineedit_fmin(self) -> None:
-        self.line_fmin.editingFinished.connect(self.on_freq_or_res_edited)
+        if self.line_fmin:
+            self.line_fmin.editingFinished.connect(self.on_freq_or_res_edited)
 
     def setup_lineedit_fmax(self) -> None:
-        self.line_fmax.editingFinished.connect(self.on_freq_or_res_edited)
+        if self.line_fmax:
+            self.line_fmax.editingFinished.connect(self.on_freq_or_res_edited)
 
     def setup_lineedit_res(self) -> None:
-        self.line_res.editingFinished.connect(self.on_freq_or_res_edited)
+        if self.line_res:
+            self.line_res.editingFinished.connect(self.on_freq_or_res_edited)
 
     def on_freq_or_res_edited(self) -> None:
         self.presenter.plot_preprocessed_signal()
@@ -145,8 +148,10 @@ class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
         return self.plot_right
 
     def setup_radio_preproc(self) -> None:
-        self.radio_preproc_on.setChecked(True)
+        if hasattr(self, "radio_preproc_on"):
+            self.radio_preproc_on.setChecked(True)
 
+    @deprecated
     def get_preprocessing(self) -> None:
         return self.radio_preproc_on.isChecked()
 

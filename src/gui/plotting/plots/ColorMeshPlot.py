@@ -23,9 +23,11 @@ from maths.num_utils import subset2d, calc_subset_count
 
 def colormap():
     file = resources.get("colours:colormap.csv")
-    colours = np.loadtxt(file, dtype=float, delimiter=',')
+    colours = np.loadtxt(file, dtype=float, delimiter=",")
 
-    cmap = LinearSegmentedColormap.from_list("colours", colours, N=len(colours), gamma=1.0)
+    cmap = LinearSegmentedColormap.from_list(
+        "colours", colours, N=len(colours), gamma=1.0
+    )
     return cmap
 
 
@@ -45,7 +47,6 @@ class ColorMeshPlot(MatplotlibWidget):
         self.update_ylabel()
         self.update_xlabel()
 
-        finite = c[np.isfinite(c)]  # Remove the 'NaN' items.
         mesh1, mesh2 = np.meshgrid(x, y)
 
         # To improve performance, we could subsample the data. Not actually implemented yet.
@@ -55,15 +56,29 @@ class ColorMeshPlot(MatplotlibWidget):
             mesh2 = subset2d(mesh2, n)
             c = subset2d(c, n)
 
-        self.mesh = self.axes.contourf(mesh1, mesh2, c, 256,
-                                       vmin=np.min(finite), vmax=np.max(finite),
-                                       cmap=colormap())
+        self.mesh = self.axes.contourf(
+            mesh1, mesh2, c, 256, vmin=np.nanmin(c), vmax=np.nanmax(c), cmap=colormap()
+        )
 
         self.apply_scale()
         self.axes.autoscale(False)
         self.on_plot_complete()
 
         # self.colorbar()
+
+    def pcolormesh(self, x, c, y, custom_cmap=True):
+        self.clear()
+
+        self.update_ylabel()
+        self.update_xlabel()
+
+        self.mesh = self.axes.pcolormesh(
+            x, y, c, cmap=colormap() if custom_cmap else None
+        )
+
+        self.apply_scale()
+        self.axes.autoscale(False)
+        self.on_plot_complete()
 
     def plot_line(self, times, values, xlim=False):
         self.axes.plot(times, values, "#00ccff", linewidth=0.8)
