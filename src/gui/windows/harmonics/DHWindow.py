@@ -27,10 +27,10 @@ from utils.decorators import floaty
 
 class DHWindow(
     DHViewProperties,
+    PreprocessComponent,
     BaseTFWindow,
     SingleSignalComponent,
     SurrogateComponent,
-    PreprocessComponent,
 ):
     """
     The "Detecting Harmonics" window.
@@ -39,13 +39,13 @@ class DHWindow(
     def __init__(self, application):
         DHViewProperties.__init__(self)
         BaseTFWindow.__init__(self, application, DHPresenter(self))
+        PreprocessComponent.__init__(self, self.plot_preproc)
 
         SingleSignalComponent.__init__(self, self.signal_plot())
 
         SurrogateComponent.__init__(
             self, self.slider_surrogate_2, self.line_surrogate_2
         )
-        PreprocessComponent.__init__(self, self.plot_preproc)
 
         self.presenter.init()
 
@@ -59,6 +59,13 @@ class DHWindow(
         super().setup_ui()
 
         self.combo_plot_type.currentIndexChanged.connect(self.on_plot_type_changed)
+        self.radio_preproc_on.toggled.connect(self.on_preprocess_toggled)
+
+    def on_preprocess_toggled(self) -> None:
+        if not self.get_preprocess():
+            self.plot_preproc.clear()
+        else:
+            self.presenter.plot_preprocessed_signal()
 
     def get_layout_file(self) -> str:
         return resources.get("layout:window_harmonics.ui")

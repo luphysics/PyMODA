@@ -48,8 +48,30 @@
            </layout>
           </item>
           <item row="0" column="1">
-           <layout class="QGridLayout" name="gridLayout_4" rowstretch="2,2,2,0">
-            <item row="2" column="0" rowspan="2">
+           <layout class="QVBoxLayout" name="verticalLayout_2">
+            <item>
+             <widget class="QGroupBox" name="groupBox">
+              <property name="title">
+               <string>Signal X-Limits</string>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_7" rowstretch="0,0,0,0,0" columnstretch="0,0">
+               <item row="3" column="1">
+                <widget class="QLineEdit" name="line_xlim2"/>
+               </item>
+               <item row="4" column="0" colspan="2">
+                <widget class="QPushButton" name="btn_refresh">
+                 <property name="text">
+                  <string>Refresh</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="0">
+                <widget class="QLineEdit" name="line_xlim1"/>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
              <layout class="QVBoxLayout" name="verticalLayout">
               <item>
                <widget class="QLabel" name="label_2">
@@ -94,28 +116,6 @@
               </item>
              </layout>
             </item>
-            <item row="0" column="0">
-             <widget class="QGroupBox" name="groupBox">
-              <property name="title">
-               <string>Signal X-Limits</string>
-              </property>
-              <layout class="QGridLayout" name="gridLayout_7" rowstretch="0,0,0,0,0" columnstretch="0,0">
-               <item row="3" column="1">
-                <widget class="QLineEdit" name="line_xlim2"/>
-               </item>
-               <item row="4" column="0" colspan="2">
-                <widget class="QPushButton" name="btn_refresh">
-                 <property name="text">
-                  <string>Refresh</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="0">
-                <widget class="QLineEdit" name="line_xlim1"/>
-               </item>
-              </layout>
-             </widget>
-            </item>
            </layout>
           </item>
           <item row="1" column="1">
@@ -123,7 +123,7 @@
             <item row="0" column="0">
              <layout class="QGridLayout" name="gridLayout_6" rowstretch="1">
               <item row="0" column="0">
-               <layout class="QVBoxLayout" name="verticalLayout_11" stretch="1,1,1,1,5">
+               <layout class="QVBoxLayout" name="verticalLayout_11" stretch="1,1,1,5">
                 <item>
                  <widget class="QGroupBox" name="freqOptions">
                   <property name="title">
@@ -262,7 +262,33 @@
                  </widget>
                 </item>
                 <item>
-                 <layout class="QVBoxLayout" name="verticalLayout_9">
+                 <layout class="QHBoxLayout" name="horizontalLayout_7">
+                  <item>
+                   <widget class="QGroupBox" name="verticalGroupBox">
+                    <property name="title">
+                     <string>Pre-processing</string>
+                    </property>
+                    <layout class="QVBoxLayout" name="verticalLayout_10">
+                     <item>
+                      <widget class="QRadioButton" name="radio_preproc_on">
+                       <property name="text">
+                        <string>On</string>
+                       </property>
+                       <property name="checked">
+                        <bool>true</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QRadioButton" name="radio_preproc_off">
+                       <property name="text">
+                        <string>Off</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
                   <item>
                    <widget class="QGroupBox" name="groupBox">
                     <property name="title">
@@ -290,32 +316,6 @@
                    </widget>
                   </item>
                  </layout>
-                </item>
-                <item>
-                 <widget class="QGroupBox" name="verticalGroupBox">
-                  <property name="title">
-                   <string>Pre-processing</string>
-                  </property>
-                  <layout class="QVBoxLayout" name="verticalLayout_10">
-                   <item>
-                    <widget class="QRadioButton" name="radio_preproc_on">
-                     <property name="text">
-                      <string>On</string>
-                     </property>
-                     <property name="checked">
-                      <bool>true</bool>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QRadioButton" name="radio_preproc_off">
-                     <property name="text">
-                      <string>Off</string>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </widget>
                 </item>
                 <item>
                  <layout class="QFormLayout" name="formLayout_4">
