@@ -1,5 +1,5 @@
 aiohttp>=3.6.2
-AsyncProcessScheduler>=0.5.0b1
+AsyncProcessScheduler>=0.6.0b1
 dataclasses>=0.6
 EasySettings>=3.2.0
 matplotlib==3.1.1
