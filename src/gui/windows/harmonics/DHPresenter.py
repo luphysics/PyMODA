@@ -14,8 +14,9 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import asyncio
-from typing import List
+from typing import List, Dict
 
+import numpy as np
 from PyQt5.QtWidgets import QListWidgetItem
 from numpy import ndarray
 
@@ -25,6 +26,8 @@ from maths.params.DHParams import DHParams
 from maths.params.TFParams import create
 from maths.signals.Signals import Signals
 from processes.MPHandler import MPHandler
+from utils.decorators import override
+from utils.dict_utils import sanitise
 
 
 class DHPresenter(BaseTFPresenter):
@@ -52,6 +55,9 @@ class DHPresenter(BaseTFPresenter):
         :param calculate_all: whether to calculate for all signals, or just the current signal
         """
         self.is_calculating_all = calculate_all
+        self.view.enable_save_data(False)
+        for s in self.signals:
+            s.data = None
 
         if self.mp_handler:
             self.mp_handler.stop()
@@ -60,6 +66,7 @@ class DHPresenter(BaseTFPresenter):
 
         params = self.get_params(all_signals=calculate_all)
         self.params = params
+        self.params.preprocess = self.view.get_preprocess()
 
         self.is_plotted = False
         self.view.main_plot().clear()
@@ -70,7 +77,7 @@ class DHPresenter(BaseTFPresenter):
         self.view.on_calculate_started()
 
         all_data = await self.mp_handler.coro_harmonics(
-            self.signals_calc, params, self.view.get_preprocess(), self.on_progress_updated
+            self.signals_calc, params, self.params.preprocess, self.on_progress_updated
         )
 
         if not isinstance(all_data, List):
@@ -79,6 +86,7 @@ class DHPresenter(BaseTFPresenter):
         for signal, data in zip(self.signals_calc, all_data):
             signal.data = data
 
+        self.view.enable_save_data(bool(all_data))
         self.view.on_calculate_stopped()
         self.update_plots()
 
@@ -90,7 +98,7 @@ class DHPresenter(BaseTFPresenter):
         main_plot.get_xlabel = lambda: lbl
         main_plot.get_ylabel = lambda: lbl
 
-        if hasattr(sig, "data"):
+        if hasattr(sig, "data") and sig.data:
             scalefreq, res, pos1, pos2 = sig.data
 
             main_plot.set_log_scale(logarithmic=True, axis="x")
@@ -100,6 +108,8 @@ class DHPresenter(BaseTFPresenter):
             main_plot.pcolormesh(
                 scalefreq, sig.data[index + 1], scalefreq, custom_cmap=False
             )
+        else:
+            main_plot.clear()
 
     def load_data(self) -> None:
         self.signals = Signals.from_file(self.open_file)
@@ -114,6 +124,59 @@ class DHPresenter(BaseTFPresenter):
     def on_data_loaded(self) -> None:
         self.view.update_signal_listview(self.signals.names())
         self.plot_signal()
+
+    @override
+    async def coro_get_data_to_save(self) -> Dict:
+        if not self.params:
+            return None
+
+        preproc = await self.coro_preprocess_all_signals()
+        preproc_arr = np.asarray(preproc)
+        preprocess = self.params.preprocess
+
+        for s in self.signals:
+            if not hasattr(s, "data"):
+                s.data = None
+
+        output_data = [s.data for s in self.signals]
+        cols = len(output_data)
+
+        freq = [d[0] if d else None for d in output_data]
+        res = [d[1] if d else None for d in output_data]
+        pos1 = [d[2] if d else None for d in output_data]
+        pos2 = [d[3] if d else None for d in output_data]
+
+        first = 0
+        while output_data[first] is None:
+            first += 1
+
+        freq_arr = np.empty((cols, *freq[first].shape))
+        res_arr = np.empty((cols, *res[first].shape))
+        pos1_arr = np.empty((cols, *pos1[first].shape))
+        pos2_arr = np.empty((cols, *pos2[first].shape))
+
+        for i in range(cols):
+            if freq[i] is not None:
+                freq_arr[i, :] = freq[i]
+                res_arr[i, :, :] = res[i]
+                pos1_arr[i, :, :] = pos1[i]
+                pos2_arr[i, :, :] = pos2[i]
+            else:
+                freq_arr[i, :] = np.NaN
+                res_arr[i, :, :] = np.NaN
+                pos1_arr[i, :, :] = np.NaN
+                pos2_arr[i, :, :] = np.NaN
+
+        dh_data = {
+            "res": res_arr,
+            "freq": freq_arr,
+            "pos1": pos1_arr,
+            "pos2": pos2_arr,
+            "preprocessed_signals": preproc_arr if preprocess else None,
+            **self.params.items_to_save(),
+        }
+
+        return {"DHData": sanitise(dh_data)}
 
     def plot_signal(self) -> None:
         self.view.plot_signal(self.get_selected_signal())

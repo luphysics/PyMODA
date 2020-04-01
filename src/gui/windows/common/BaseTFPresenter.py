@@ -121,6 +121,7 @@ class BaseTFPresenter:
         """
         if self.mp_handler:
             self.mp_handler.stop()
+
         self.view.on_calculate_stopped()
         self.is_plotted = False
         self.on_all_tasks_completed()
@@ -267,8 +268,12 @@ class BaseTFPresenter:
         :return: a list containing the preprocessed signals as a 1D array each
         """
         signals = self.signals
-        fmin = self.view.get_fmin()
-        fmax = self.view.get_fmax()
+
+        try:
+            fmin = self.view.get_fmin()
+            fmax = self.view.get_fmax()
+        except AttributeError:
+            fmin, fmax = None, None
 
         if not self.preproc_mp_handler:
             self.preproc_mp_handler = MPHandler()

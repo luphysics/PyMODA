@@ -13,13 +13,16 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from typing import List
+from typing import List, Dict
 
 from maths.params.TFParams import TFParams
+from utils.dict_utils import sanitise
 
 
 class DHParams(TFParams):
-    def __init__(self, signals, scale_min, scale_max, time_res, sigma, surr_count, crop):
+    def __init__(
+        self, signals, scale_min, scale_max, time_res, sigma, surr_count, crop
+    ):
         super(DHParams, self).__init__(signals)
 
         self.crop = crop
@@ -39,3 +42,15 @@ class DHParams(TFParams):
             self.surr_count,
         )
         return [i for i in items if i is not None]
+
+    def items_to_save(self) -> Dict:
+        return sanitise(
+            {
+                "crop": self.crop,
+                "surrogates": self.surr_count,
+                "sigma": self.sigma,
+                "scale_max": self.scale_max,
+                "scale_min": self.scale_min,
+                "time_res": self.time_res,
+            }
+        )
