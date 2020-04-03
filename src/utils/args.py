@@ -49,20 +49,20 @@ def parser() -> ArgumentParser:
         action="store",
         nargs=1,
         default=None,
-        help="***Must be specified on Linux.***"
+        help="**Must be specified on Linux.**"
         "\nThe LD_LIBRARY_PATH used to make libraries run using the MATLAB Runtime. ",
     )
     p.add_argument(
         "--no-maximise",
         action="store_false",
         default=True,
-        help="Use this argument to prevent windows from opening in a maximised state.",
+        help="Prevent windows from opening in a maximised state.",
     )
     p.add_argument(
         "--debug",
         action="store_true",
         default=False,
-        help="Use this argument to disable error handling and throw hard exceptions "
+        help="Disable error handling and throw hard exceptions "
         "which will crash the program with a traceback.",
     )
     p.add_argument(
@@ -76,7 +76,13 @@ def parser() -> ArgumentParser:
         "--no-update",
         action="store_true",
         default=False,
-        help="Use this argument to make PyMODA ignore potential updates.",
+        help="Ignore potential updates to PyMODA.",
+    )
+    p.add_argument(
+        "--matlab-wt",
+        action="store_true",
+        default=False,
+        help="Switch to the MATLAB implementation of the wavelet transform.",
     )
     return p
 
@@ -124,6 +130,16 @@ def matlab_runtime() -> Optional[str]:
     if args and args.runtime:
         return args.runtime[0]
     return None
+
+
+def matlab_wt() -> bool:
+    """
+    Returns
+    -------
+    bool
+        Whether to use the MATLAB implementation of the wavelet transform.
+    """
+    return args and args.matlab_wt
 
 
 def post_update() -> bool:

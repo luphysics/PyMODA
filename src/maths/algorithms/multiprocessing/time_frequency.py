@@ -24,11 +24,12 @@ from pymodalib.utils.matlab import multi_matlab_to_numpy
 from maths.params.TFParams import TFParams, _wft
 from maths.signals.TimeSeries import TimeSeries
 from processes.mp_utils import process
+from utils import args
 
 
 @process
 def _time_frequency(
-        time_series: TimeSeries, params: TFParams, return_opt: bool = False
+    time_series: TimeSeries, params: TFParams, return_opt: bool = False
 ) -> Union[
     Tuple[str, ndarray, ndarray, ndarray, ndarray, ndarray, ndarray, ndarray],
     Tuple[str, ndarray, ndarray, ndarray, ndarray, ndarray, ndarray, ndarray, Dict],
@@ -78,7 +79,20 @@ def _time_frequency(
 
 
 def _wt_func(signal: ndarray, params: TFParams, return_opt: bool):
-    result = pymodalib.wavelet_transform(signal, fs=params.fs, return_opt=return_opt, **params.get())
+    result = pymodalib.wavelet_transform(
+        signal=signal,
+        fs=params.fs,
+        fmin=params.get_item("fmin"),
+        fmax=params.get_item("fmax"),
+        resolution=params.get_item("f0"),
+        cut_edges=params.get_item("CutEdges"),
+        wavelet=params.get_item("Wavelet"),
+        padding=params.get_item("Padding"),
+        preprocess=params.get_item("Preprocess"),
+        rel_tolerance=params.get_item("RelTol"),
+        return_opt=return_opt,
+        implementation="matlab" if args.matlab_wt() else "python",
+    )
 
     try:
         wt, freq, opt = result
