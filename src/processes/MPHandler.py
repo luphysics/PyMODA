@@ -31,7 +31,6 @@ from maths.algorithms.multiprocessing.bispectrum_analysis import (
     _biphase,
 )
 from maths.algorithms.multiprocessing.phase_coherence import _phase_coherence
-from maths.algorithms.multiprocessing.preprocess import _preprocess
 from maths.algorithms.multiprocessing.ridge_extraction import _ridge_extraction
 from maths.algorithms.multiprocessing.time_frequency import _time_frequency
 from maths.params.BAParams import BAParams
@@ -323,7 +322,10 @@ class MPHandler:
 
         args = [(s.signal, s.frequency, fmin, fmax) for s in signals]
         return await self.scheduler.map(
-            target=_preprocess, args=args, process_type=mp.Process, queue_type=mp.Queue
+            target=pymodalib.preprocess,
+            args=args,
+            process_type=mp.Process,
+            queue_type=mp.Queue,
         )
 
     def stop(self):
