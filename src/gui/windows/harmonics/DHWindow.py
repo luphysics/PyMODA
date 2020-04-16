@@ -77,12 +77,12 @@ class DHWindow(
         self.presenter.update_plots()
 
     @floaty
-    def get_scale_max(self) -> Optional[float]:
-        return self.line_scale_max.text()
+    def get_fmin(self) -> Optional[float]:
+        return self.line_fmin.text()
 
     @floaty
-    def get_scale_min(self) -> Optional[float]:
-        return self.line_scale_min.text()
+    def get_fmax(self) -> Optional[float]:
+        return self.line_fmax.text()
 
     @floaty
     def get_time_res(self) -> Optional[float]:

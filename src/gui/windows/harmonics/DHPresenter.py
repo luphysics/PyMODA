@@ -218,11 +218,17 @@ class DHPresenter(BaseTFPresenter):
         else:
             self.signals_calc = self.signals.only(self.selected_signal_name)
 
+        fmin = self.view.get_fmin()
+        fmax = self.view.get_fmax()
+
+        scale_min = 1 / fmax
+        scale_max = 1 / fmin
+
         return create(
             signals=self.signals_calc,
             params_type=DHParams,
-            scale_min=self.view.get_scale_min(),
-            scale_max=self.view.get_scale_max(),
+            scale_min=scale_min,
+            scale_max=scale_max,
             sigma=self.view.get_sigma(),
             time_res=self.view.get_time_res(),
             surr_count=self.view.get_surr_count(),

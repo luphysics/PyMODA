@@ -24,5 +24,5 @@ class DHViewProperties(ViewProperties):
 
         self.line_sigma: QLineEdit = None
         self.line_res: QLineEdit = None
-        self.line_scale_min: QLineEdit = None
-        self.line_scale_max: QLineEdit = None
+        self.line_fmax: QLineEdit = None
+        self.line_fmin: QLineEdit = None
