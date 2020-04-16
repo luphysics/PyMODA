@@ -117,6 +117,7 @@ Below is a table listing the other command-line arguments.
 
 | Argument | Use case | Example |
 | ------ | ------ | ------- |
+| `--python-wt` | Specifies that PyMODA should use the Python implementation of the wavelet transform, instead of the MATLAB implementation. | `python src/main.py --python-wt` |
 | `--no-maximise` | Prevents windows from opening in a maximised state, allowing easier viewing of console output. | `python src/main.py --no-maximise` |
 | `--debug` | Disables error handling. | `python src/main.py --debug` | 
 | `-freq` | Specifies the sampling frequency to use. This frequency will be automatically selected in dialogs. | `python src/main.py -freq 10` |

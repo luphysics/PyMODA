@@ -51,7 +51,7 @@ This guide is aimed at users wishing to set up and run PyMODA. If you're interes
 
 > :warning: **Do not use a newer version of the MATLAB Runtime**. MATLAB-packaged libraries are neither forwards nor backwards compatible.
 
-> **Note:** Scientific distributions of Python are not officially supported, but may be compatible. Python 3.8 will not be supported until MATLAB R2020a launches.
+> **Note:** Scientific distributions of Python are not officially supported, but may be compatible. Python 3.8 will not be supported until MATLAB ~R2020a~ R2020b launches.
 
 ## Operating systems
 
