@@ -75,9 +75,7 @@ class MPHandler:
         :return: list containing the output from each process
         """
         self.stop()
-        self.scheduler = Scheduler(
-            progress_callback=on_progress, run_in_thread=self.should_run_in_thread
-        )
+        self.scheduler = Scheduler(progress_callback=on_progress)
 
         signals: Signals = params.signals
         params.remove_signals()  # Don't want to pass large unneeded object to other process.
@@ -109,9 +107,7 @@ class MPHandler:
         parallel = len(signals) < Scheduler.optimal_process_count()
 
         self.stop()
-        self.scheduler = Scheduler(
-            progress_callback=on_progress, run_in_thread=self.should_run_in_thread
-        )
+        self.scheduler = Scheduler(progress_callback=on_progress)
 
         return await self.scheduler.map(
             target=harmonic_wrapper,
@@ -136,9 +132,7 @@ class MPHandler:
         :return: list containing the output from each process
         """
         self.stop()
-        self.scheduler = Scheduler(
-            progress_callback=on_progress, run_in_thread=self.should_run_in_thread
-        )
+        self.scheduler = Scheduler(progress_callback=on_progress)
 
         return await self.scheduler.map(
             target=_phase_coherence,
@@ -159,9 +153,7 @@ class MPHandler:
         :return: list containing the output from each process
         """
         self.stop()
-        self.scheduler = Scheduler(
-            progress_callback=on_progress, run_in_thread=self.should_run_in_thread
-        )
+        self.scheduler = Scheduler(progress_callback=on_progress)
 
         signals = params.signals
         num_transforms = len(signals)
@@ -198,9 +190,7 @@ class MPHandler:
         :return: list containing the output from each process
         """
         self.stop()
-        self.scheduler = Scheduler(
-            progress_callback=on_progress, run_in_thread=self.should_run_in_thread
-        )
+        self.scheduler = Scheduler(progress_callback=on_progress)
 
         for s in signals:
             fs = s.frequency
@@ -230,9 +220,7 @@ class MPHandler:
         :return: list containing the output from each process
         """
         self.stop()
-        self.scheduler = Scheduler(
-            progress_callback=on_progress, run_in_thread=self.should_run_in_thread
-        )
+        self.scheduler = Scheduler(progress_callback=on_progress)
 
         for params in paramsets:
             for pair in signals.get_pairs():
@@ -261,9 +249,7 @@ class MPHandler:
         :return: list containing the output from each process
         """
         self.stop()
-        self.scheduler = Scheduler(
-            progress_callback=on_progress, run_in_thread=self.should_run_in_thread
-        )
+        self.scheduler = Scheduler(progress_callback=on_progress)
 
         return await self.scheduler.map(
             target=_bispectrum_analysis,
@@ -292,9 +278,7 @@ class MPHandler:
         :return: list containing the output from each process
         """
         self.stop()
-        self.scheduler = Scheduler(
-            progress_callback=on_progress, run_in_thread=self.should_run_in_thread
-        )
+        self.scheduler = Scheduler(progress_callback=on_progress)
 
         args = [
             (s1, s2, fs, f0, fr, s1.output_data.opt) for s1, s2 in signals.get_pairs()
