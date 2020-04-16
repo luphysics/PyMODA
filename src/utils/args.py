@@ -79,10 +79,10 @@ def parser() -> ArgumentParser:
         help="Ignore potential updates to PyMODA.",
     )
     p.add_argument(
-        "--matlab-wt",
+        "--python-wt",
         action="store_true",
         default=False,
-        help="Switch to the MATLAB implementation of the wavelet transform.",
+        help="Switch to the Python implementation of the wavelet transform.",
     )
     return p
 
@@ -132,14 +132,14 @@ def matlab_runtime() -> Optional[str]:
     return None
 
 
-def matlab_wt() -> bool:
+def python_wt() -> bool:
     """
     Returns
     -------
     bool
         Whether to use the MATLAB implementation of the wavelet transform.
     """
-    return args and args.matlab_wt
+    return args and args.python_wt
 
 
 def post_update() -> bool:
