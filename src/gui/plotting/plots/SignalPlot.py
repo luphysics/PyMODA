@@ -14,6 +14,8 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+from numpy import ndarray
+
 from gui.plotting.MatplotlibWidget import MatplotlibWidget
 from maths.signals.TimeSeries import TimeSeries
 
@@ -27,7 +29,7 @@ class SignalPlot(MatplotlibWidget):
         MatplotlibWidget.__init__(self, parent)
         self.toolbar.disable_panning()
 
-    def plot(self, data: TimeSeries, clear=True):
+    def plotxy(self, x: ndarray, y: ndarray, clear: bool = True) -> None:
         if clear:
             self.clear()
             self.rect_stack.clear()
@@ -37,14 +39,17 @@ class SignalPlot(MatplotlibWidget):
         self.update_ylabel()
         self.axes.autoscale(True)
 
-        x = data.times
-        y = data.signal
-
         xlim = (x[0], x[-1])
         self.axes.plot(x, y, linewidth=0.7)
         self.axes.autoscale(False)
         self.axes.set_xlim(xlim)
         self.on_plot_complete()
+
+    def plot(self, data: TimeSeries, clear: bool = True) -> None:
+        x = data.times
+        y = data.signal
+
+        self.plotxy(x, y, clear=clear)
 
     def zoom_to(self, rect, save_state=True, trigger_listeners=True) -> None:
         """Override the zoom to not change the range of visible y-values."""

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>697</width>
-    <height>545</height>
+    <height>565</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -242,6 +242,35 @@
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="btn_group_coherence">
+          <property name="minimumSize">
+           <size>
+            <width>300</width>
+            <height>60</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>300</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Group Phase Coherence</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_8">
+        <property name="leftMargin">
+         <number>40</number>
+        </property>
+        <property name="rightMargin">
+         <number>40</number>
+        </property>
+        <item>
          <widget class="QPushButton" name="btn_ridge_extraction">
           <property name="minimumSize">
            <size>
@@ -266,19 +295,6 @@
           </property>
          </widget>
         </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <property name="leftMargin">
-         <number>40</number>
-        </property>
-        <property name="rightMargin">
-         <number>40</number>
-        </property>
-        <property name="bottomMargin">
-         <number>10</number>
-        </property>
         <item>
          <widget class="QPushButton" name="btn_wavelet_bispectrum">
           <property name="minimumSize">
@@ -304,6 +320,19 @@
           </property>
          </widget>
         </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <property name="leftMargin">
+         <number>40</number>
+        </property>
+        <property name="rightMargin">
+         <number>40</number>
+        </property>
+        <property name="bottomMargin">
+         <number>10</number>
+        </property>
         <item>
          <widget class="QPushButton" name="btn_dynamical_bayesian">
           <property name="minimumSize">

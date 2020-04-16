@@ -13,8 +13,8 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-from typing import Callable, List, Tuple, Union
+import functools
+from typing import Callable, List, Tuple, Union, Optional
 
 import multiprocess as mp
 import pymodalib
@@ -109,13 +109,11 @@ class MPHandler:
         self.stop()
         self.scheduler = Scheduler(progress_callback=on_progress)
 
-        return await self.scheduler.map(
-            target=harmonic_wrapper,
-            args=[
-                (preprocess, sig.signal, params, *params.args(), parallel, params.crop)
-                for sig in signals
-            ],
-        )
+        args = [
+            (preprocess, sig.signal, params, *params.args(), parallel, params.crop,)
+            for sig in signals
+        ]
+        return await self.scheduler.map(target=harmonic_wrapper, args=args)
 
     async def coro_phase_coherence(
         self,
@@ -285,6 +283,74 @@ class MPHandler:
         ]
         return await self.scheduler.map(
             target=_biphase, args=args, process_type=mp.Prcess, queue_type=mp.Queue
+        )
+
+    async def coro_group_coherence(
+        self,
+        sig1a: ndarray,
+        sig1b: ndarray,
+        sig2a: ndarray,
+        sig2b: ndarray,
+        fs: float,
+        percentile: Optional[float],
+        max_surrogates: Optional[int],
+        *args,
+        **kwargs
+    ):
+        """
+        Calculates group coherence.
+
+        Parameters
+        ----------
+        sig1a : ndarray
+            The set of signals A for group 1.
+        sig1b : ndarray
+            The set of signals B for group 1.
+        sig2a : ndarray
+            The set of signals A for group 2.
+        sig2b : ndarray
+            The set of signals B for group 2.
+        fs : float
+            The sampling frequency of the signals.
+        percentile : Optional[float]
+            The percentile at which the surrogates will be subtracted.
+        max_surrogates : Optional[int]
+            The maximum number of surrogates.
+        args
+            Arguments to pass to the wavelet transform.
+        kwargs
+            Keyword arguments to pass to the wavelet transform.
+
+        Returns
+        -------
+        freq : ndarray
+            [1D array] The frequencies.
+        coh1 : ndarray
+            [2D array] The residual coherence for group 1.
+        coh2 : ndarray
+            [2D array] The residual coherence for group 2.
+        surr1 : ndarray
+            [3D array] The surrogates for group 1.
+        surr2 : ndarray
+            [3D array] The surrogates for group 2.
+
+        """
+        self.stop()
+        self.scheduler = Scheduler()
+
+        return await self.scheduler.map(
+            target=functools.partial(
+                pymodalib.dual_group_coherence,
+                sig1a,
+                sig1b,
+                sig2a,
+                sig2b,
+                fs,
+                percentile,
+                max_surrogates,
+                *args,
+                **kwargs,
+            )
         )
 
     async def coro_preprocess(

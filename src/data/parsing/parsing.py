@@ -19,6 +19,8 @@ from data.parsing.BaseParser import BaseParser
 from data.parsing.CsvParser import CsvParser
 from data.parsing.MatParser import MatParser
 from data.parsing.NpyParser import NpyParser
+from data.parsing.groups.GroupMatParser import GroupMatParser
+from data.parsing.groups.GroupNpyParser import GroupNpyParser
 
 
 def get_lines(filename):
@@ -34,17 +36,26 @@ def get_lines(filename):
     return lines
 
 
-def get_parser(filename) -> BaseParser:
-    """Gets the appropriate parser for a given file."""
+def get_parser(filename, groups=False) -> BaseParser:
+    """
+    Gets the appropriate parser for a given file.
+
+    Parameters
+    ----------
+    filename : str
+        The name of the file which will be parsed.
+    groups : Optional[bool]
+        (Default = False) Whether the parser is intended to load a signal group, as used by group phase coherence.
+    """
     _, extension = os.path.splitext(filename)
     extension = extension.lower()
 
     if extension == ".mat":
-        return MatParser(filename)
+        return MatParser(filename) if not groups else GroupMatParser(filename)
     elif extension == ".csv":
         return CsvParser(filename)
     elif extension == ".npy":
-        return NpyParser(filename)
+        return NpyParser(filename) if not groups else GroupNpyParser(filename)
 
     raise ParsingException(f"Cannot parse a file with the extension: {extension}")
 

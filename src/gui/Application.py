@@ -21,6 +21,7 @@ from gui.windows.BaseWindow import BaseWindow
 from gui.windows.LauncherWindow import LauncherWindow
 from gui.windows.bayesian.DBWindow import DBWindow
 from gui.windows.bispectrum.BAWindow import BAWindow
+from gui.windows.groupcoherence.GCWindow import GCWindow
 from gui.windows.harmonics.DHWindow import DHWindow
 from gui.windows.phasecoherence.PCWindow import PCWindow
 from gui.windows.ridgeextraction.REWindow import REWindow
@@ -45,6 +46,10 @@ class Application(QApplication):
     def start_phase_coherence(self) -> None:
         """Opens the wavelet phase coherence window."""
         self.open_window(PCWindow)
+
+    def start_group_coherence(self) -> None:
+        """Opens the group phase coherence window."""
+        self.open_window(GCWindow)
 
     def start_ridge_extraction(self) -> None:
         """Opens the ridge extraction and filtering window."""

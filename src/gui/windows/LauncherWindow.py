@@ -48,7 +48,8 @@ class LauncherWindow(CentredWindow):
         super(LauncherWindow, self).__init__(parent)
 
         print(
-            "Welcome to PyMODA. Please do not close this terminal window while PyMODA is running."
+            "Welcome to PyMODA. Please do not close this terminal "
+            "window while PyMODA is running."
         )
 
         # Hidden shortcuts to trigger a check for updates.
@@ -63,6 +64,7 @@ class LauncherWindow(CentredWindow):
 
         self.btn_time_freq.clicked.connect(self.application.start_time_frequency)
         self.btn_wavelet_phase.clicked.connect(self.application.start_phase_coherence)
+        self.btn_group_coherence.clicked.connect(self.application.start_group_coherence)
         self.btn_ridge_extraction.clicked.connect(
             self.application.start_ridge_extraction
         )
