@@ -289,11 +289,73 @@ class MPHandler:
         self,
         sig1a: ndarray,
         sig1b: ndarray,
+        fs: float,
+        percentile: Optional[float],
+        max_surrogates: Optional[int],
+        on_progress: Callable[[int, int], None],
+        *args,
+        **kwargs
+    ):
+        """
+        Calculates group coherence.
+
+        Parameters
+        ----------
+        sig1a : ndarray
+            The set of signals A for group 1.
+        sig1b : ndarray
+            The set of signals B for group 1.
+        fs : float
+            The sampling frequency of the signals.
+        percentile : Optional[float]
+            The percentile at which the surrogates will be subtracted.
+        max_surrogates : Optional[int]
+            The maximum number of surrogates.
+        on_progress : Callable
+            Function called to report progress.
+        args
+            Arguments to pass to the wavelet transform.
+        kwargs
+            Keyword arguments to pass to the wavelet transform.
+
+        Returns
+        -------
+        freq : ndarray
+            [1D array] The frequencies.
+        coh1 : ndarray
+            [2D array] The residual coherence for group 1.
+        surr1 : ndarray
+            [3D array] The surrogates for group 1.
+
+        """
+        self.stop()
+        self.scheduler = Scheduler(progress_callback=on_progress)
+
+        return await self.scheduler.map(
+            target=functools.partial(
+                pymodalib.group_coherence,
+                sig1a,
+                sig1b,
+                fs,
+                percentile,
+                max_surrogates,
+                True,
+                *args,
+                **kwargs,
+            ),
+            args=[tuple(),],
+        )
+
+    async def coro_dual_group_coherence(
+        self,
+        sig1a: ndarray,
+        sig1b: ndarray,
         sig2a: ndarray,
         sig2b: ndarray,
         fs: float,
         percentile: Optional[float],
         max_surrogates: Optional[int],
+        on_progress: Callable[[int, int], None],
         *args,
         **kwargs
     ):
@@ -316,6 +378,8 @@ class MPHandler:
             The percentile at which the surrogates will be subtracted.
         max_surrogates : Optional[int]
             The maximum number of surrogates.
+        on_progress : Callable
+            Function called to report progress.
         args
             Arguments to pass to the wavelet transform.
         kwargs
@@ -336,7 +400,7 @@ class MPHandler:
 
         """
         self.stop()
-        self.scheduler = Scheduler()
+        self.scheduler = Scheduler(progress_callback=on_progress)
 
         return await self.scheduler.map(
             target=functools.partial(
@@ -350,7 +414,8 @@ class MPHandler:
                 max_surrogates,
                 *args,
                 **kwargs,
-            )
+            ),
+            args=[tuple(),],
         )
 
     async def coro_preprocess(

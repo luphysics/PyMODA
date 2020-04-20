@@ -16,7 +16,7 @@
 from argparse import ArgumentParser
 
 # Args are global and should only be modified at startup.
-from typing import Optional
+from typing import Optional, Tuple
 
 from updater import update
 
@@ -35,6 +35,13 @@ def parser() -> ArgumentParser:
         nargs=1,
         default=None,
         help="A preset data file to use when testing.",
+    )
+    p.add_argument(
+        "-files",
+        action="store",
+        nargs=2,
+        default=[None, None],
+        help="A preset pair of data files to use when testing group coherence.",
     )
     p.add_argument(
         "-freq",
@@ -96,10 +103,20 @@ def init():
 
 
 def args_file() -> Optional[str]:
-    """Gets the files from the args, or returns None."""
+    """Gets the file from the args, or returns None."""
     if args and args.file:
         return args.file[0]
     return None
+
+
+def args_files() -> Tuple[Optional[str], Optional[str]]:
+    """
+    Gets the values passed with the '--files' argument.
+    """
+    if args and args.files:
+        return args.files
+
+    return None, None
 
 
 def args_freq() -> Optional[float]:

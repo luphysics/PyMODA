@@ -13,6 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from typing import Optional
 
 from PyQt5 import QtGui
 
@@ -23,6 +24,7 @@ from gui.windows.common.BaseTFWindow import BaseTFWindow
 from gui.windows.groupcoherence.GCPresenter import GCPresenter
 from gui.windows.groupcoherence.GCViewProperties import GCViewProperties
 from gui.windows.groupcoherence.LoadGroupDataDialog import LoadGroupDataDialog
+from utils.decorators import floaty, inty
 
 
 class GCWindow(GCViewProperties, BaseTFWindow, FreqComponent):
@@ -46,6 +48,17 @@ class GCWindow(GCViewProperties, BaseTFWindow, FreqComponent):
         amp = self.amplitude_plot()
         amp.set_xlabel("Overall Coherence")
 
+        self.btn_calculate_single.hide()
+        self.btn_calculate_all.setText("Calculate coherence")
+
+        for p in (self.plot_1a, self.plot_1b, self.plot_2a, self.plot_2b):
+            p.toolbar.hide()
+
+    def on_calculate_stopped(self) -> None:
+        super(GCWindow, self).on_calculate_stopped()
+        self.btn_calculate_single.hide()
+        self.btn_calculate_all.setText("Calculate coherence")
+
     def select_file(self) -> None:
         self.files = LoadGroupDataDialog().get_result()
         if self.files:
@@ -64,7 +77,20 @@ class GCWindow(GCViewProperties, BaseTFWindow, FreqComponent):
     def get_analysis_type(self) -> str:
         return super().get_analysis_type()
 
+    @floaty
+    def get_percentile(self) -> Optional[float]:
+        return self.line_percentile.text()
+
+    @inty
+    def get_max_surrogates(self) -> Optional[float]:
+        return self.line_max_surrogates.text()
+
     def setup_signal_listview(self) -> None:
+        """
+        Override to do nothing.
+        """
+
+    def setup_xlim_edits(self) -> None:
         """
         Override to do nothing.
         """

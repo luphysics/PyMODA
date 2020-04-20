@@ -18,58 +18,274 @@
     <item>
      <layout class="QHBoxLayout" name="main_layout" stretch="9,0">
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_7" stretch="9,1">
+       <layout class="QVBoxLayout" name="verticalLayout_7" stretch="20">
         <property name="leftMargin">
          <number>10</number>
         </property>
         <item>
-         <layout class="QGridLayout" name="gridLayout" rowstretch="3,7" columnstretch="7,2">
-          <item row="1" column="0">
-           <layout class="QGridLayout" name="gridLayout_2">
-            <item row="0" column="0">
-             <widget class="ColorMeshPlot" name="plot_main" native="true"/>
-            </item>
-           </layout>
-          </item>
+         <layout class="QGridLayout" name="gridLayout" rowstretch="4,7" columnstretch="7,2">
           <item row="0" column="0">
-           <layout class="QVBoxLayout" name="verticalLayout">
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
             <property name="sizeConstraint">
              <enum>QLayout::SetMaximumSize</enum>
             </property>
             <item>
-             <widget class="SignalPlot" name="plot_1a" native="true"/>
+             <widget class="QGroupBox" name="verticalGroupBox_2">
+              <property name="title">
+               <string>Group 1</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_9">
+               <item>
+                <widget class="SignalPlot" name="plot_1a" native="true"/>
+               </item>
+               <item>
+                <widget class="SignalPlot" name="plot_1b" native="true"/>
+               </item>
+              </layout>
+             </widget>
             </item>
             <item>
-             <widget class="SignalPlot" name="plot_1b" native="true"/>
-            </item>
-            <item>
-             <widget class="SignalPlot" name="plot_2a" native="true"/>
-            </item>
-            <item>
-             <widget class="SignalPlot" name="plot_2b" native="true"/>
+             <widget class="QGroupBox" name="verticalGroupBox">
+              <property name="title">
+               <string>Group 2</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout">
+               <item>
+                <widget class="SignalPlot" name="plot_2a" native="true"/>
+               </item>
+               <item>
+                <widget class="SignalPlot" name="plot_2b" native="true"/>
+               </item>
+              </layout>
+             </widget>
             </item>
            </layout>
           </item>
           <item row="0" column="1">
-           <layout class="QGridLayout" name="gridLayout_4" rowstretch="2,0">
-            <item row="0" column="0">
-             <widget class="QGroupBox" name="groupBox">
+           <layout class="QVBoxLayout" name="verticalLayout_14">
+            <item>
+             <widget class="QGroupBox" name="">
               <property name="title">
-               <string>Signal X-Limits</string>
+               <string>Wavelet Transform Options</string>
               </property>
-              <layout class="QGridLayout" name="gridLayout_7" rowstretch="0,0,0,0,0" columnstretch="0,0">
-               <item row="3" column="1">
-                <widget class="QLineEdit" name="line_xlim2"/>
-               </item>
-               <item row="4" column="0" colspan="2">
-                <widget class="QPushButton" name="btn_refresh">
-                 <property name="text">
-                  <string>Refresh</string>
+              <layout class="QVBoxLayout" name="verticalLayout_12">
+               <item>
+                <widget class="QGroupBox" name="freqOptions">
+                 <property name="title">
+                  <string>Frequency</string>
                  </property>
+                 <layout class="QFormLayout" name="formLayout_2">
+                  <property name="labelAlignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                  <property name="formAlignment">
+                   <set>Qt::AlignHCenter|Qt::AlignTop</set>
+                  </property>
+                  <item row="1" column="1">
+                   <layout class="QVBoxLayout" name="verticalLayout_6" stretch="0,0">
+                    <item alignment="Qt::AlignHCenter">
+                     <widget class="QLabel" name="label_3">
+                      <property name="frameShape">
+                       <enum>QFrame::NoFrame</enum>
+                      </property>
+                      <property name="text">
+                       <string>Max Fr</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item alignment="Qt::AlignHCenter">
+                     <widget class="QLineEdit" name="line_fmax">
+                      <property name="minimumSize">
+                       <size>
+                        <width>70</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>70</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                  <item row="2" column="1">
+                   <layout class="QVBoxLayout" name="verticalLayout_4">
+                    <item alignment="Qt::AlignHCenter">
+                     <widget class="QLabel" name="label_4">
+                      <property name="frameShape">
+                       <enum>QFrame::NoFrame</enum>
+                      </property>
+                      <property name="text">
+                       <string>Min Fr</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item alignment="Qt::AlignHCenter">
+                     <widget class="QLineEdit" name="line_fmin">
+                      <property name="maximumSize">
+                       <size>
+                        <width>76</width>
+                        <height>22</height>
+                       </size>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                  <item row="3" column="1">
+                   <layout class="QVBoxLayout" name="verticalLayout_5">
+                    <item alignment="Qt::AlignHCenter">
+                     <widget class="QLabel" name="label_5">
+                      <property name="frameShape">
+                       <enum>QFrame::NoFrame</enum>
+                      </property>
+                      <property name="text">
+                       <string>Res</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item alignment="Qt::AlignHCenter">
+                     <widget class="QLineEdit" name="line_res">
+                      <property name="maximumSize">
+                       <size>
+                        <width>70</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                 </layout>
                 </widget>
                </item>
-               <item row="3" column="0">
-                <widget class="QLineEdit" name="line_xlim1"/>
+               <item>
+                <layout class="QVBoxLayout" name="verticalLayout_8">
+                 <item>
+                  <widget class="QGroupBox" name="groupBox">
+                   <property name="title">
+                    <string>Cut Edges</string>
+                   </property>
+                   <layout class="QGridLayout" name="gridLayout_18">
+                    <item row="0" column="0">
+                     <widget class="QRadioButton" name="radio_cut_on">
+                      <property name="text">
+                       <string>On</string>
+                      </property>
+                      <property name="checked">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="0">
+                     <widget class="QRadioButton" name="radio_cut_off">
+                      <property name="text">
+                       <string>Off</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QGroupBox" name="groupBox">
+                   <property name="title">
+                    <string>Preprocessing</string>
+                   </property>
+                   <layout class="QGridLayout" name="gridLayout_13">
+                    <item row="0" column="0">
+                     <widget class="QRadioButton" name="radio_preproc_on">
+                      <property name="text">
+                       <string>On</string>
+                      </property>
+                      <property name="checked">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="0">
+                     <widget class="QRadioButton" name="radio_preproc_off">
+                      <property name="text">
+                       <string>Off</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QGroupBox" name="groupBox_3">
+                   <property name="title">
+                    <string>Wavelet Type</string>
+                   </property>
+                   <layout class="QFormLayout" name="formLayout_4">
+                    <item row="0" column="1">
+                     <widget class="QComboBox" name="combo_wavelet_type">
+                      <item>
+                       <property name="text">
+                        <string>Lognorm</string>
+                       </property>
+                      </item>
+                      <item>
+                       <property name="text">
+                        <string>Morlet</string>
+                       </property>
+                      </item>
+                      <item>
+                       <property name="text">
+                        <string>Bump</string>
+                       </property>
+                      </item>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="">
+              <property name="title">
+               <string>Group Coherence Options</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_2">
+               <item>
+                <widget class="QGroupBox" name="verticalGroupBox">
+                 <property name="title">
+                  <string>Maximum number of surrogates</string>
+                 </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_3">
+                  <item>
+                   <widget class="QLineEdit" name="line_max_surrogates">
+                    <property name="text">
+                     <string>100</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QGroupBox" name="verticalGroupBox">
+                 <property name="title">
+                  <string>Percentile</string>
+                 </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_13">
+                  <item>
+                   <widget class="QLineEdit" name="line_percentile">
+                    <property name="text">
+                     <string>75</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
                </item>
               </layout>
              </widget>
@@ -79,344 +295,82 @@
           <item row="1" column="1">
            <layout class="QGridLayout" name="gridLayout_5">
             <item row="0" column="0">
-             <widget class="AmplitudePlot" name="plot_right" native="true"/>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <widget class="QGroupBox" name="groupBox_2">
-          <property name="title">
-           <string>Log</string>
-          </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_10" stretch="4,1">
-           <item>
-            <widget class="QPlainTextEdit" name="text_log">
-             <property name="readOnly">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <layout class="QVBoxLayout" name="verticalLayout_11">
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_9">
+             <widget class="QGroupBox" name="groupBox_2">
+              <property name="title">
+               <string/>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_10" stretch="4,1">
                <item>
-                <widget class="QPushButton" name="btn_calculate_all">
-                 <property name="text">
-                  <string>Transform All</string>
-                 </property>
-                </widget>
+                <layout class="QVBoxLayout" name="verticalLayout_11">
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_9">
+                   <item>
+                    <widget class="QPushButton" name="btn_calculate_all">
+                     <property name="text">
+                      <string>Transform All</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="btn_calculate_single">
+                     <property name="text">
+                      <string>Transform Single</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <widget class="QProgressBar" name="progress">
+                   <property name="value">
+                    <number>24</number>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="lbl_progress">
+                   <property name="text">
+                    <string>TextLabel</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </item>
                <item>
-                <widget class="QPushButton" name="btn_calculate_single">
-                 <property name="text">
-                  <string>Transform Single</string>
+                <widget class="QPlainTextEdit" name="text_log">
+                 <property name="readOnly">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
               </layout>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="1" column="0">
+           <widget class="QGroupBox" name="groupBox">
+            <layout class="QHBoxLayout" name="horizontalLayout_3">
+             <item>
+              <widget class="GroupCoherencePlot" name="plot_main" native="true"/>
              </item>
              <item>
-              <widget class="QProgressBar" name="progress">
-               <property name="value">
-                <number>24</number>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="lbl_progress">
-               <property name="text">
-                <string>TextLabel</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
+              <widget class="AmplitudePlot" name="plot_right" native="true"/>
              </item>
             </layout>
-           </item>
-          </layout>
-         </widget>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </item>
       <item>
-       <layout class="QGridLayout" name="gridLayout_6" rowstretch="1,10,10">
-        <item row="0" column="0">
-         <layout class="QHBoxLayout" name="data_section">
-          <item alignment="Qt::AlignHCenter">
-           <widget class="QLabel" name="label_6">
-            <property name="frameShape">
-             <enum>QFrame::Box</enum>
-            </property>
-            <property name="text">
-             <string>Length of data</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QWidget" name="dataLength" native="true"/>
-          </item>
-         </layout>
-        </item>
-        <item row="2" column="0">
-         <layout class="QVBoxLayout" name="advanced_options_section" stretch="0">
-          <item>
-           <layout class="QVBoxLayout" name="verticalLayout_2">
-            <item>
-             <widget class="QGroupBox" name="groupBox">
-              <property name="title">
-               <string>Surrogates</string>
-              </property>
-              <layout class="QFormLayout" name="formLayout">
-               <property name="topMargin">
-                <number>5</number>
-               </property>
-               <item row="1" column="1">
-                <layout class="QHBoxLayout" name="horizontalLayout_4">
-                 <item>
-                  <widget class="QGroupBox" name="groupBox">
-                   <property name="title">
-                    <string>Analysis Type</string>
-                   </property>
-                   <layout class="QVBoxLayout" name="verticalLayout_3">
-                    <item>
-                     <widget class="QRadioButton" name="radio_analysis_max">
-                      <property name="text">
-                       <string>Maximum</string>
-                      </property>
-                      <property name="checked">
-                       <bool>true</bool>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QRadioButton" name="radio_analysis_sig">
-                      <property name="text">
-                       <string>Significance</string>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item row="2" column="1">
-                <layout class="QHBoxLayout" name="horizontalLayout_6">
-                 <item>
-                  <widget class="QGroupBox" name="horizontalGroupBox_2">
-                   <property name="title">
-                    <string>Alpha</string>
-                   </property>
-                   <layout class="QHBoxLayout" name="horizontalLayout_5">
-                    <item>
-                     <widget class="QLineEdit" name="line_alpha"/>
-                    </item>
-                   </layout>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="btn_update_threshold">
-                   <property name="text">
-                    <string>Update Threshold</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btn_stats">
-              <property name="text">
-               <string>Calculate</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </item>
+       <layout class="QGridLayout" name="gridLayout_6" rowstretch="1,0">
         <item row="1" column="0">
-         <layout class="QFormLayout" name="formLayout_3">
-          <property name="labelAlignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-          <property name="formAlignment">
-           <set>Qt::AlignHCenter|Qt::AlignTop</set>
-          </property>
-          <item row="0" column="0">
-           <layout class="QVBoxLayout" name="verticalLayout_8">
-            <item>
-             <widget class="QGroupBox" name="groupBox">
-              <property name="title">
-               <string>Cut Edges</string>
-              </property>
-              <layout class="QGridLayout" name="gridLayout_18">
-               <item row="0" column="0">
-                <widget class="QRadioButton" name="radio_cut_on">
-                 <property name="text">
-                  <string>On</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="0">
-                <widget class="QRadioButton" name="radio_cut_off">
-                 <property name="text">
-                  <string>Off</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
-             <widget class="QGroupBox" name="groupBox">
-              <property name="title">
-               <string>Preprocessing</string>
-              </property>
-              <layout class="QGridLayout" name="gridLayout_13">
-               <item row="0" column="0">
-                <widget class="QRadioButton" name="radio_preproc_on">
-                 <property name="text">
-                  <string>On</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="0">
-                <widget class="QRadioButton" name="radio_preproc_off">
-                 <property name="text">
-                  <string>Off</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
-             <widget class="QGroupBox" name="groupBox_3">
-              <property name="title">
-               <string>Wavelet Type</string>
-              </property>
-              <layout class="QFormLayout" name="formLayout_4">
-               <item row="0" column="1">
-                <widget class="QComboBox" name="combo_wavelet_type">
-                 <item>
-                  <property name="text">
-                   <string>Gaussian</string>
-                  </property>
-                 </item>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item row="0" column="1">
-           <widget class="QGroupBox" name="freqOptions">
-            <property name="title">
-             <string>Transform Options</string>
-            </property>
-            <layout class="QFormLayout" name="formLayout_2">
-             <property name="labelAlignment">
-              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-             </property>
-             <property name="formAlignment">
-              <set>Qt::AlignHCenter|Qt::AlignTop</set>
-             </property>
-             <item row="1" column="1">
-              <layout class="QVBoxLayout" name="verticalLayout_6" stretch="0,0">
-               <item alignment="Qt::AlignHCenter">
-                <widget class="QLabel" name="label_3">
-                 <property name="frameShape">
-                  <enum>QFrame::NoFrame</enum>
-                 </property>
-                 <property name="text">
-                  <string>Max Fr</string>
-                 </property>
-                </widget>
-               </item>
-               <item alignment="Qt::AlignHCenter">
-                <widget class="QLineEdit" name="line_fmax">
-                 <property name="minimumSize">
-                  <size>
-                   <width>70</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>70</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item row="2" column="1">
-              <layout class="QVBoxLayout" name="verticalLayout_4">
-               <item alignment="Qt::AlignHCenter">
-                <widget class="QLabel" name="label_4">
-                 <property name="frameShape">
-                  <enum>QFrame::NoFrame</enum>
-                 </property>
-                 <property name="text">
-                  <string>Min Fr</string>
-                 </property>
-                </widget>
-               </item>
-               <item alignment="Qt::AlignHCenter">
-                <widget class="QLineEdit" name="line_fmin">
-                 <property name="maximumSize">
-                  <size>
-                   <width>76</width>
-                   <height>22</height>
-                  </size>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item row="3" column="1">
-              <layout class="QVBoxLayout" name="verticalLayout_5">
-               <item alignment="Qt::AlignHCenter">
-                <widget class="QLabel" name="label_5">
-                 <property name="frameShape">
-                  <enum>QFrame::NoFrame</enum>
-                 </property>
-                 <property name="text">
-                  <string>Res</string>
-                 </property>
-                </widget>
-               </item>
-               <item alignment="Qt::AlignHCenter">
-                <widget class="QLineEdit" name="line_res">
-                 <property name="maximumSize">
-                  <size>
-                   <width>70</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-            </layout>
-           </widget>
-          </item>
-         </layout>
+         <layout class="QVBoxLayout" name="advanced_options_section"/>
         </item>
        </layout>
       </item>
@@ -444,15 +398,15 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>ColorMeshPlot</class>
-   <extends>QWidget</extends>
-   <header>gui.plotting.plots.ColorMeshPlot</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>AmplitudePlot</class>
    <extends>QWidget</extends>
    <header>gui.plotting.plots.AmplitudePlot</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>GroupCoherencePlot</class>
+   <extends>QWidget</extends>
+   <header>gui.plotting.plots.GroupCoherencePlot</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

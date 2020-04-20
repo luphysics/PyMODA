@@ -17,10 +17,12 @@ import functools
 from typing import Iterable
 
 from PyQt5 import uic
+from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QDialog, QFileDialog, QDialogButtonBox
 
 from data import resources
 from gui.BaseUI import BaseUI
+from utils import args
 
 
 class LoadGroupDataDialog(QDialog, BaseUI):
@@ -44,6 +46,8 @@ class LoadGroupDataDialog(QDialog, BaseUI):
     def setup_ui(self) -> None:
         uic.loadUi(resources.get("layout:dialog_select_group.ui"), self)
         self.setup_drops()
+
+        QTimer.singleShot(500, self.check_args)
 
     def get_result(self) -> Iterable[str]:
         """
@@ -111,3 +115,17 @@ class LoadGroupDataDialog(QDialog, BaseUI):
                 pass
 
         return out
+
+    def check_args(self) -> None:
+        """
+        Checks whether the files have been specified in the command line arguments.
+        """
+        files = args.args_files()
+        if files and any(files):
+            self.files = [resources.get(f) for f in files]
+            return self.accept()  # Close dialog.
+
+        file = args.args_file()
+        if file:
+            self.files = [resources.get(file), None]
+            return self.accept()

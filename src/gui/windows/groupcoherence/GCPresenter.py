@@ -14,18 +14,14 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import asyncio
-from typing import Tuple, List, Dict, Optional
-
-from PyQt5.QtWidgets import QListWidgetItem
+from typing import List, Dict, Optional
 
 from gui.dialogs.FrequencyDialog import FrequencyDialog
+from gui.plotting.plots.GroupCoherencePlot import GroupCoherencePlot
 from gui.windows.common.BaseTFPresenter import BaseTFPresenter
-from maths.params.PCParams import PCParams
-from maths.params.TFParams import create
 from maths.signals.SignalGroups import SignalGroups
-from maths.signals.TimeSeries import TimeSeries
-from maths.signals.data.TFOutputData import TFOutputData
 from processes.MPHandler import MPHandler
+from utils import args
 from utils.decorators import override
 
 
@@ -36,7 +32,7 @@ class GCPresenter(BaseTFPresenter):
         from gui.windows.groupcoherence.GCWindow import GCWindow
 
         self.view: GCWindow = self.view
-        self.is_calculating_all = True
+        self.results = None
 
     def calculate(self, calculate_all: bool) -> None:
         asyncio.ensure_future(self.coro_calculate(calculate_all))
@@ -47,7 +43,6 @@ class GCPresenter(BaseTFPresenter):
 
     async def coro_calculate(self, calculate_all: bool) -> None:
         self.view.enable_save_data(False)
-        self.is_calculating_all = calculate_all
 
         if self.mp_handler:
             self.mp_handler.stop()
@@ -60,90 +55,62 @@ class GCPresenter(BaseTFPresenter):
         self.view.amplitude_plot().clear()
         self.view.amplitude_plot().set_in_progress(True)
 
-        params = self.get_params(all_signals=calculate_all)
+        params = self.get_params()
         self.params = params
-
-        self.surrogate_count = self.view.get_surr_count()
-        self.surrogates_enabled = self.view.get_surr_enabled()
 
         self.mp_handler = MPHandler()
 
-        self.view.main_plot().set_log_scale(logarithmic=True)
-        self.view.amplitude_plot().set_log_scale(logarithmic=True)
-
         self.view.on_calculate_started()
-        data = await self.mp_handler.coro_transform(
-            params=params, on_progress=self.on_progress_updated
-        )
 
-        for d in data:
-            self.on_transform_completed(*d)
+        sig1a, sig1b, sig2a, sig2b = self.signals.get_all()
+        if sig2a is None:
+            self.results = (
+                await self.mp_handler.coro_group_coherence(
+                    sig1a,
+                    sig1b,
+                    fs=self.signals.frequency,
+                    on_progress=self.on_progress_updated,
+                    **params,
+                )
+            )[0]
+        else:
+            self.results = (
+                await self.mp_handler.coro_dual_group_coherence(
+                    sig1a,
+                    sig1b,
+                    sig2a,
+                    sig2b,
+                    fs=self.signals.frequency,
+                    on_progress=self.on_progress_updated,
+                    **params,
+                )
+            )[0]
 
-        all_data = await self.coro_phase_coherence(
-            self.signals_calc, params, self.on_progress_updated
-        )
-
-        for d in all_data:
-            self.on_phase_coherence_completed(*d)
-
-        self.plot_phase_coherence()
+        self.enable_save_data(True)
+        self.update_plots()
         self.view.on_calculate_stopped()
         self.on_all_tasks_completed()
-        print("Finished calculating phase coherence.")
 
     async def coro_phase_coherence(self, signals, params, on_progress) -> List[tuple]:
         print("Finished wavelet transform. Calculating phase coherence...")
         return await self.mp_handler.coro_phase_coherence(signals, params, on_progress)
 
-    def on_transform_completed(
-        self, name, times, freq, values, ampl, powers, avg_ampl, avg_pow, opt=None
-    ) -> None:
-        print(f"Calculated wavelet transform for '{name}'")
-
-        if opt:
-            self.params.set_item("fmin", opt.get("fmin"))
-
-        t = self.signals.get(name)
-        t.output_data = TFOutputData(
-            times, values, ampl, freq, powers, avg_ampl, avg_pow
-        )
-
-    def on_phase_coherence_completed(
-        self, signal_pair, tpc, pc, pdiff, surrogate_avg
-    ) -> None:
-        s1, s2 = signal_pair
-
-        d = s1.output_data
-        d.overall_coherence = pc
-        d.phase_coherence = tpc
-        d.surrogate_avg = surrogate_avg
-
-        sig = self.signals.get(s1.name)
-        sig.output_data = d
-
-        self.enable_save_data(True)
-
-    def plot_phase_coherence(self) -> None:
-        data = self.get_selected_signal_pair_data()
-        times = data.times
-        freq = data.freq
-        values = data.phase_coherence
-
-        main = self.view.main_plot()
-        ampl = self.view.amplitude_plot()
-
-        if not data.has_phase_coherence():
+    def update_plots(self) -> None:
+        main: GroupCoherencePlot = self.view.main_plot()
+        if not self.results:
             main.clear()
-            ampl.clear()
             return
 
-        main.update_xlabel("Time (s)")
-        main.update_xlabel("Frequency (Hz)")
-        main.plot(times, values, freq)
-
-        ampl.update_xlabel("Overall coherence")
-        ampl.update_ylabel("Frequency (Hz)")
-        ampl.plot(data.overall_coherence, freq, surrogates=data.surrogate_avg)
+        try:
+            freq, coh1, coh2, surr1, surr2 = self.results
+            main.plot(
+                freq, coh1, coh2, average="median", percentile=self.params["percentile"]
+            )
+        except ValueError:
+            freq, coh1, surr1 = self.results
+            main.plot(
+                freq, coh1, None, average="median", percentile=self.params["percentile"]
+            )
 
     def load_data(self) -> None:
         self.signals = SignalGroups.from_files(self.open_files)
@@ -177,7 +144,7 @@ class GCPresenter(BaseTFPresenter):
         signals = self.signals.get_all()
         times = self.signals.times
 
-        for plot, sig in zip(
+        for plot, sig, title in zip(
             (
                 self.view.plot_1a,
                 self.view.plot_1b,
@@ -185,47 +152,43 @@ class GCPresenter(BaseTFPresenter):
                 self.view.plot_2b,
             ),
             signals,
+            (
+                "Group 1, signals A",
+                "Group 1, signals B",
+                "Group 2, signals A",
+                "Group 2, signals B",
+            ),
         ):
             if sig is not None:
-                plot.plotxy(times, sig)
+                plot.clear()
+                for index in range(sig.shape[0]):
+                    plot.plotxy(times, sig[index, :], clear=False)
+                    plot.axes.set_title(title)
+                    plot.axes.xaxis.set_label_position("bottom")
 
-    def get_selected_signal_pair(self) -> Tuple[TimeSeries, TimeSeries]:
-        return self.signals.get_pair_by_name(self.selected_signal_name)
+    def get_params(self) -> Dict:
+        """
+        Gets the parameters to provide to the group coherence function.
+        Includes the keyword-arguments passed to the wavelet transform.
 
-    def get_selected_signal_pair_data(self) -> TFOutputData:
-        return self.get_selected_signal_pair()[0].output_data
+        Returns
+        -------
+        Dict
+            Dictionary with **kwargs for group coherence.
+        """
+        return {
+            "percentile": self.view.get_percentile(),
+            "max_surrogates": self.view.get_max_surrogates(),
+            "fmin": self.view.get_fmin(),
+            "fmax": self.view.get_fmax(),
+            "resolution": self.view.get_f0(),
+            "cut_edges": self.view.get_cut_edges(),
+            "wavelet": self.view.get_wt_wft_type(),
+            "preprocess": self.view.get_preprocess(),
+            "implementation": "python" if args.python_wt() else "matlab",
+        }
 
-    def on_signal_selected(self, item) -> None:
-        if isinstance(item, QListWidgetItem):
-            name = item.text()
-        else:
-            name = item
-
-        self.signals.reset()
-        if name != self.selected_signal_name:
-            print(f"Selected '{name}'")
-            self.selected_signal_name = name
-            self.plot_signal_groups()
-            self.view.on_xlim_edited()
-            self.plot_phase_coherence()
-
-    def get_params(self, all_signals=True) -> PCParams:
-        if all_signals:
-            self.signals_calc = self.signals
-        else:
-            self.signals_calc = self.signals.only(self.selected_signal_name)
-
-        return create(
-            params_type=PCParams,
-            signals=self.signals_calc,
-            fmin=self.view.get_fmin(),
-            fmax=self.view.get_fmax(),
-            f0=self.view.get_f0(),
-            wavelet=self.view.get_wt_wft_type(),
-            cut_edges=self.view.get_cut_edges(),
-            preprocess=self.view.get_preprocess(),
-            transform="wt",
-            surr_count=self.view.get_surr_count(),
-            surr_method=self.view.get_surr_method(),
-            surr_enabled=self.view.get_surr_enabled(),
-        )
+    def plot_preprocessed_signal(self) -> None:
+        """
+        Do nothing.
+        """

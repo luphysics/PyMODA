@@ -39,7 +39,11 @@ class SignalPlot(MatplotlibWidget):
         self.update_ylabel()
         self.axes.autoscale(True)
 
-        xlim = (x[0], x[-1])
+        if len(x.shape) <= 1:
+            xlim = (x[0], x[-1])
+        else:
+            xlim = (x[0, 0], x[0, -1])
+
         self.axes.plot(x, y, linewidth=0.7)
         self.axes.autoscale(False)
         self.axes.set_xlim(xlim)

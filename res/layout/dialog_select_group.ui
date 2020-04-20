@@ -63,7 +63,7 @@
      <item>
       <widget class="QGroupBox" name="verticalGroupBox">
        <property name="title">
-        <string>Group 2</string>
+        <string>(Optional) Group 2</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>

@@ -46,7 +46,7 @@ class SignalGroups(Signals):
 
     def set_frequency(self, freq: float) -> None:
         self.frequency = float(freq)
-        self.times = np.arange(0, len(self.sig1a) / freq, 1 / freq)
+        self.times = np.arange(0, self.sig1a.shape[1] / freq, 1 / freq)
 
     def get_all(self) -> Tuple[ndarray, ndarray, ndarray, ndarray]:
         return self.sig1a, self.sig1b, self.sig2a, self.sig2b
