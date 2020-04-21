@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>562</width>
-    <height>464</height>
+    <width>824</width>
+    <height>703</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Select data file</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="15,1,1">
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_4">
      <item>
@@ -38,6 +38,22 @@
           </property>
           <property name="text">
            <string>Drag and drop here</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>OR</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -86,6 +102,22 @@
          </widget>
         </item>
         <item>
+         <widget class="QLabel" name="label_2">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>OR</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QPushButton" name="btn_browse2">
           <property name="minimumSize">
            <size>
@@ -102,6 +134,16 @@
       </widget>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>For each group, you may select a .mat or .npy file containing a single 3-dimensional array which contains the signals A and signals B for the group. For example, the array may have dimensions (2xNxM) for some N, M.</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
