@@ -64,7 +64,7 @@
           <item row="0" column="1">
            <layout class="QVBoxLayout" name="verticalLayout_14">
             <item>
-             <widget class="QGroupBox" name="">
+             <widget class="QGroupBox" name="groupBox">
               <property name="title">
                <string>Wavelet Transform Options</string>
               </property>
@@ -176,7 +176,7 @@
                        <string>On</string>
                       </property>
                       <property name="checked">
-                       <bool>true</bool>
+                       <bool>false</bool>
                       </property>
                      </widget>
                     </item>
@@ -184,6 +184,9 @@
                      <widget class="QRadioButton" name="radio_cut_off">
                       <property name="text">
                        <string>Off</string>
+                      </property>
+                      <property name="checked">
+                       <bool>true</bool>
                       </property>
                      </widget>
                     </item>
@@ -250,7 +253,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QGroupBox" name="">
+             <widget class="QGroupBox" name="groupBox">
               <property name="title">
                <string>Group Coherence Options</string>
               </property>
@@ -293,57 +296,132 @@
            </layout>
           </item>
           <item row="1" column="1">
-           <layout class="QGridLayout" name="gridLayout_5">
-            <item row="0" column="0">
+           <layout class="QVBoxLayout" name="verticalLayout_15">
+            <item>
              <widget class="QGroupBox" name="groupBox_2">
               <property name="title">
                <string/>
               </property>
-              <layout class="QVBoxLayout" name="verticalLayout_10" stretch="4,1">
+              <layout class="QVBoxLayout" name="verticalLayout_10" stretch="0,0,0">
                <item>
-                <layout class="QVBoxLayout" name="verticalLayout_11">
-                 <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_9">
-                   <item>
-                    <widget class="QPushButton" name="btn_calculate_all">
-                     <property name="text">
-                      <string>Transform All</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QPushButton" name="btn_calculate_single">
-                     <property name="text">
-                      <string>Transform Single</string>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                 <item>
-                  <widget class="QProgressBar" name="progress">
-                   <property name="value">
-                    <number>24</number>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QLabel" name="lbl_progress">
-                   <property name="text">
-                    <string>TextLabel</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
+                <widget class="QGroupBox" name="groupbox_stats">
+                 <property name="title">
+                  <string>Statistics</string>
+                 </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_16">
+                  <item>
+                   <widget class="QListWidget" name="list_stat"/>
+                  </item>
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_5">
+                    <item>
+                     <widget class="QLabel" name="label">
+                      <property name="text">
+                       <string>fmin:</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QLineEdit" name="line_stat_fmin"/>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="label_2">
+                      <property name="text">
+                       <string>fmax:</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QLineEdit" name="line_stat_fmax"/>
+                    </item>
+                   </layout>
+                  </item>
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_4">
+                    <item>
+                     <widget class="QPushButton" name="btn_stat_add">
+                      <property name="text">
+                       <string>Add freq interval</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="btn_stat_del">
+                      <property name="text">
+                       <string>Delete freq interval</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="btn_stat_calc">
+                    <property name="text">
+                     <string>Calculate statistics</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
                </item>
                <item>
-                <widget class="QPlainTextEdit" name="text_log">
-                 <property name="readOnly">
-                  <bool>true</bool>
+                <widget class="QGroupBox" name="">
+                 <property name="title">
+                  <string>Calculate group coherence</string>
                  </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_11">
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_9">
+                    <item>
+                     <widget class="QPushButton" name="btn_calculate_all">
+                      <property name="text">
+                       <string>Transform All</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="btn_calculate_single">
+                      <property name="text">
+                       <string>Transform Single</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                  <item>
+                   <widget class="QProgressBar" name="progress">
+                    <property name="value">
+                     <number>24</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="lbl_progress">
+                    <property name="text">
+                     <string>TextLabel</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QGroupBox" name="verticalGroupBox">
+                 <property name="title">
+                  <string>Log</string>
+                 </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_18">
+                  <item>
+                   <widget class="QPlainTextEdit" name="text_log">
+                    <property name="readOnly">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
                 </widget>
                </item>
               </layout>
@@ -353,12 +431,33 @@
           </item>
           <item row="1" column="0">
            <widget class="QGroupBox" name="groupBox">
-            <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="8,2">
              <item>
-              <widget class="GroupCoherencePlot" name="plot_main" native="true"/>
+              <widget class="QGroupBox" name="horizontalGroupBox_3">
+               <property name="title">
+                <string>Coherence</string>
+               </property>
+               <layout class="QHBoxLayout" name="horizontalLayout_6">
+                <item>
+                 <widget class="AmplitudePlot" name="plot_right" native="true"/>
+                </item>
+                <item>
+                 <widget class="GroupCoherencePlot" name="plot_main" native="true"/>
+                </item>
+               </layout>
+              </widget>
              </item>
              <item>
-              <widget class="AmplitudePlot" name="plot_right" native="true"/>
+              <widget class="QGroupBox" name="horizontalGroupBox_4">
+               <property name="title">
+                <string>Statistical test</string>
+               </property>
+               <layout class="QHBoxLayout" name="horizontalLayout_7">
+                <item>
+                 <widget class="QTableView" name="tbl_stat"/>
+                </item>
+               </layout>
+              </widget>
              </item>
             </layout>
            </widget>

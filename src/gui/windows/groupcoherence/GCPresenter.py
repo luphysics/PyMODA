@@ -14,7 +14,10 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import asyncio
-from typing import List, Dict, Optional
+from typing import Dict, Optional
+
+from PyQt5.QtGui import QStandardItemModel, QStandardItem
+from PyQt5.QtWidgets import QTableView
 
 from gui.dialogs.FrequencyDialog import FrequencyDialog
 from gui.plotting.plots.GroupCoherencePlot import GroupCoherencePlot
@@ -33,16 +36,18 @@ class GCPresenter(BaseTFPresenter):
 
         self.view: GCWindow = self.view
         self.results = None
+        self.stats = None
 
-    def calculate(self, calculate_all: bool) -> None:
-        asyncio.ensure_future(self.coro_calculate(calculate_all))
-        print("Started calculation...")
+    def calculate(self, _: bool) -> None:
+        asyncio.ensure_future(self.coro_calculate())
+        print("Started calculation. This may take some time...")
 
     def init(self) -> None:
         self.view.select_file()
 
-    async def coro_calculate(self, calculate_all: bool) -> None:
+    async def coro_calculate(self) -> None:
         self.view.enable_save_data(False)
+        self.view.groupbox_stats.setEnabled(False)
 
         if self.mp_handler:
             self.mp_handler.stop()
@@ -86,14 +91,50 @@ class GCPresenter(BaseTFPresenter):
                 )
             )[0]
 
+        self.view.groupbox_stats.setEnabled(True)
         self.enable_save_data(True)
         self.update_plots()
         self.view.on_calculate_stopped()
         self.on_all_tasks_completed()
 
-    async def coro_phase_coherence(self, signals, params, on_progress) -> List[tuple]:
-        print("Finished wavelet transform. Calculating phase coherence...")
-        return await self.mp_handler.coro_phase_coherence(signals, params, on_progress)
+    def calculate_statistical_test(self) -> None:
+        asyncio.ensure_future(self.coro_statistical_test())
+
+    async def coro_statistical_test(self) -> None:
+        bands = self.view.get_frequency_bands()
+        if not bands:
+            return
+
+        try:
+            freq, coh1, coh2, _, _ = self.results
+        except ValueError:
+            freq, coh1, _ = self.results
+            coh2 = None
+
+        self.view.on_calculate_started()
+        self.stats = await self.mp_handler.coro_statistical_test(
+            freq, coh1, coh2, bands, self.on_progress_updated
+        )
+
+        self.view.on_calculate_stopped()
+        self.update_table()
+
+    def update_table(self) -> None:
+        if not self.stats:
+            return
+
+        tbl: QTableView = self.view.tbl_stat
+
+        model = QStandardItemModel()
+        model.setHorizontalHeaderLabels(["Frequency range", "Significance"])
+
+        tbl.setModel(model)
+
+        for key, value in self.stats.items():
+            f1, f2 = key
+            model.appendRow([QStandardItem(f"{f1}-{f2}Hz"), QStandardItem(f"{value}")])
+
+        tbl.resizeColumnsToContents()
 
     def update_plots(self) -> None:
         main: GroupCoherencePlot = self.view.main_plot()

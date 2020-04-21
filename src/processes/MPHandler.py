@@ -14,7 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import functools
-from typing import Callable, List, Tuple, Union, Optional
+from typing import Callable, List, Tuple, Union, Optional, Dict
 
 import multiprocess as mp
 import pymodalib
@@ -295,7 +295,7 @@ class MPHandler:
         on_progress: Callable[[int, int], None],
         *args,
         **kwargs
-    ):
+    ) -> List[Tuple]:
         """
         Calculates group coherence.
 
@@ -358,7 +358,7 @@ class MPHandler:
         on_progress: Callable[[int, int], None],
         *args,
         **kwargs
-    ):
+    ) -> List[Tuple]:
         """
         Calculates group coherence.
 
@@ -417,6 +417,50 @@ class MPHandler:
             ),
             args=[tuple(),],
         )
+
+    async def coro_statistical_test(
+        self,
+        freq: ndarray,
+        coh1: ndarray,
+        coh2: ndarray,
+        bands: List[Tuple[float, float]],
+        on_progress: Callable[[int, int], None],
+    ) -> Dict[Tuple[float, float], float]:
+        """
+        Performs a statistical test on the results of group phase coherence, to check for significance.
+
+        Parameters
+        ----------
+        freq : ndarray
+            [1D array] The frequencies from group coherence.
+        coh1 : ndarray
+            [2D array] The coherence of the first group.
+        coh2 : ndarray
+            [2D array] The coherence of the second group.
+        bands : List[Tuple[float,float]]
+            List containing the frequency bands which will be tested for significance.
+        on_progress : Callable
+            Function called to report progress.
+
+        Returns
+        -------
+        pvalues : Dict[Tuple[float, float], float]
+            A list containing the p-values for each frequency band.
+        """
+        self.stop()
+        self.scheduler = Scheduler(
+            run_in_thread=self.should_run_in_thread, progress_callback=on_progress
+        )
+
+        from pymodalib.algorithms.group_coherence import statistical_test
+
+        results = (
+            await self.scheduler.map(
+                target=statistical_test, args=[(freq, coh1, coh2, bands,)],
+            )
+        )[0]
+
+        return dict(zip(bands, results))
 
     async def coro_preprocess(
         self, signals: Union[TimeSeries, List[TimeSeries]], fmin: float, fmax: float

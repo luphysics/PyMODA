@@ -13,11 +13,20 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from PyQt5.QtWidgets import QSlider, QLineEdit
+from PyQt5.QtWidgets import QLineEdit, QPushButton, QListWidget, QGroupBox
 
 from gui.windows.ViewProperties import ViewProperties
 
 
 class GCViewProperties(ViewProperties):
     def __init__(self):
-        self.line_surrogate: QLineEdit = None
+        self.line_stat_fmin: QLineEdit = None
+        self.line_stat_fmax: QLineEdit = None
+
+        self.btn_stat_add: QPushButton = None
+        self.btn_stat_del: QPushButton = None
+
+        self.btn_stat_calc: QPushButton = None
+
+        self.list_stat: QListWidget = None
+        self.groupbox_stats: QGroupBox = None
