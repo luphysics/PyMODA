@@ -26,6 +26,7 @@ from maths.signals.SignalGroups import SignalGroups
 from processes.MPHandler import MPHandler
 from utils import args
 from utils.decorators import override
+from utils.dict_utils import sanitise
 
 
 class GCPresenter(BaseTFPresenter):
@@ -173,13 +174,36 @@ class GCPresenter(BaseTFPresenter):
 
     @override
     async def coro_get_data_to_save(self) -> Optional[Dict]:
-        if not self.params:
+        if not self.results:
             return None
 
-        return {"GCData": None}  # TODO GC
+        try:
+            freq, coh1, coh2, surr1, surr2 = self.results
+        except ValueError:
+            freq, coh1, surr1 = self.results
+            coh2 = None
+            surr2 = None
+
+        gc_data = {
+            "coherence1": coh1,
+            "coherence2": coh2,
+            "surrogates1": surr1,
+            "surrogates2": surr2,
+            "frequency": freq,
+            "significance": self.stats,
+            **self.params,
+        }
+
+        return {"GCData": sanitise(gc_data)}
 
     def on_data_loaded(self) -> None:
         self.plot_signal_groups()
+
+    def invalidate_data(self) -> None:
+        super().invalidate_data()
+
+        self.results = None
+        self.stats = None
 
     def plot_signal_groups(self) -> None:
         signals = self.signals.get_all()
