@@ -115,7 +115,9 @@ For each window, the name of the struct/dictionary is as follows:
 | Name | Window | 
 | --- | --- |
 | `TFData` | Time-Frequency Analysis | 
+| `DHData` | Detecting Harmonics |
 | `PCData` | Wavelet Phase Coherence |
+| `GCData` | Group Phase Coherence |
 | `REData` | Ridge Extraction and Filtering | 
 | `BAData` | Wavelet Bispectrum Analysis | 
 | `DBData` | Dynamical Bayesian Inference |
