@@ -6,7 +6,7 @@ matplotlib==3.1.1
 multiprocess>=0.70.8
 numpy>=1.17.4
 pre-commit>=1.18.3
-PyMODAlib>=0.5.1b1
+PyMODAlib>=0.5.2b1
 PyOpenGL>=3.1.0
 PyQt5==5.13.0
 PyQt5-sip==12.7.0
