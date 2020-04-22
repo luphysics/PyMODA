@@ -107,6 +107,7 @@ class GCPresenter(BaseTFPresenter):
             self.should_stats_be_enabled(calculating=False)
         )
         self.enable_save_data(True)
+
         self.update_plots()
         self.view.on_calculate_stopped()
         self.on_all_tasks_completed()

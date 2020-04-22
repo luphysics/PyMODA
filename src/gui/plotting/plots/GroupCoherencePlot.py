@@ -48,7 +48,7 @@ class GroupCoherencePlot(MatplotlibWidget):
         color1 = "black"
         color2 = "red"
         alpha = 0.1
-        linewidth = 0.9
+        linewidth = 1.1
 
         self.axes.plot(freq, favg(coh1, axis=0), color=color1, linewidth=linewidth)
         self.axes.fill_between(freq, pc11, pc12, color=color1, alpha=alpha)

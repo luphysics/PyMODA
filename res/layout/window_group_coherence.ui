@@ -283,7 +283,7 @@
                   <item>
                    <widget class="QLineEdit" name="line_percentile">
                     <property name="text">
-                     <string>75</string>
+                     <string>95</string>
                     </property>
                    </widget>
                   </item>
