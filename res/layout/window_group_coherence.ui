@@ -267,7 +267,7 @@
                   <item>
                    <widget class="QLineEdit" name="line_max_surrogates">
                     <property name="text">
-                     <string>100</string>
+                     <string/>
                     </property>
                    </widget>
                   </item>
@@ -365,7 +365,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QGroupBox" name="">
+                <widget class="QGroupBox" name="groupBox">
                  <property name="title">
                   <string>Calculate group coherence</string>
                  </property>

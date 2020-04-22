@@ -14,12 +14,14 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import asyncio
+import os
 from typing import Dict, Optional
 
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from PyQt5.QtWidgets import QTableView
 
 from gui.dialogs.FrequencyDialog import FrequencyDialog
+from gui.dialogs.PyMODAlibCacheDialog import PyMODAlibCacheDialog
 from gui.plotting.plots.GroupCoherencePlot import GroupCoherencePlot
 from gui.windows.common.BaseTFPresenter import BaseTFPresenter
 from maths.signals.SignalGroups import SignalGroups
@@ -27,6 +29,7 @@ from processes.MPHandler import MPHandler
 from utils import args
 from utils.decorators import override
 from utils.dict_utils import sanitise
+from utils.settings import Settings
 
 
 class GCPresenter(BaseTFPresenter):
@@ -44,6 +47,7 @@ class GCPresenter(BaseTFPresenter):
         print("Started calculation. This may take some time...")
 
     def init(self) -> None:
+        self.check_pymodalib_cache()
         self.view.select_file()
 
     async def coro_calculate(self) -> None:
@@ -67,6 +71,11 @@ class GCPresenter(BaseTFPresenter):
         self.mp_handler = MPHandler()
 
         self.view.on_calculate_started()
+
+        if "PYMODALIB_CACHE" not in os.environ:
+            cache = Settings().get_pymodalib_cache()
+            if cache and cache is not "None":
+                os.environ["PYMODALIB_CACHE"] = cache
 
         sig1a, sig1b, sig2a, sig2b = self.signals.get_all()
         if sig2a is None:
@@ -153,6 +162,12 @@ class GCPresenter(BaseTFPresenter):
             main.plot(
                 freq, coh1, None, average="median", percentile=self.params["percentile"]
             )
+
+    def check_pymodalib_cache(self) -> None:
+        if "PYMODALIB_CACHE" in os.environ or self.settings.get_pymodalib_cache():
+            return
+
+        PyMODAlibCacheDialog().run()
 
     def load_data(self) -> None:
         self.signals = SignalGroups.from_files(self.open_files)

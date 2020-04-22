@@ -30,6 +30,7 @@ _key_update_available = "update_available"
 _key_last_update_check = "last_update_check"
 _key_update_source = "update_source"
 _key_save_dir = "save_directory"
+_key_pymodalib_cache = "pymodalib_cache"
 
 
 class Settings:
@@ -156,3 +157,11 @@ class Settings:
     def set_save_directory(self, save_dir: str) -> None:
         self._settings.set(_key_save_dir, save_dir)
         self._settings.save()
+
+    def get_pymodalib_cache(self) -> Optional[str]:
+        return self._settings.get(_key_pymodalib_cache, None)
+
+    def set_pymodalib_cache(self, location: str) -> None:
+        self._settings.set(_key_pymodalib_cache, location or "None")
+        self._settings.save()
+        self._settings.reload_file()
