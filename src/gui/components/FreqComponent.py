@@ -21,22 +21,42 @@ from utils.decorators import floaty
 
 
 class FreqComponent:
-
     """
     A component which handles the 3 frequency-related QLineEdits: fmin, fmax and resolution.
     """
 
-    def __init__(self, lineedit_fmax: QLineEdit, lineedit_fmin: QLineEdit, lineedit_res: QLineEdit):
+    def __init__(
+        self,
+        lineedit_fmax: QLineEdit,
+        lineedit_fmin: QLineEdit,
+        lineedit_res: QLineEdit,
+    ):
         self._res = lineedit_res
         self._fmin = lineedit_fmin
         self._fmax = lineedit_fmax
 
-    @floaty
     def get_fmin(self) -> Optional[float]:
+        fmin, fmax = self.__fmin(), self.__fmax()
+        if fmin is not None and fmax is not None:
+            if fmin > fmax:
+                fmin, fmax = fmax, fmin
+
+        return fmin
+
+    def get_fmax(self) -> Optional[float]:
+        fmin, fmax = self.__fmin(), self.__fmax()
+        if fmin is not None and fmax is not None:
+            if fmin > fmax:
+                fmin, fmax = fmax, fmin
+
+        return fmax
+
+    @floaty
+    def __fmin(self) -> Optional[float]:
         return self._fmin.text()
 
     @floaty
-    def get_fmax(self) -> Optional[float]:
+    def __fmax(self) -> Optional[float]:
         return self._fmax.text()
 
     @floaty
