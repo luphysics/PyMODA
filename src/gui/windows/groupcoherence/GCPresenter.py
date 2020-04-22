@@ -52,7 +52,9 @@ class GCPresenter(BaseTFPresenter):
 
     async def coro_calculate(self) -> None:
         self.view.enable_save_data(False)
-        self.view.groupbox_stats.setEnabled(False)
+        self.view.groupbox_stats.setEnabled(
+            self.should_stats_be_enabled(calculating=True)
+        )
 
         if self.mp_handler:
             self.mp_handler.stop()
@@ -101,11 +103,20 @@ class GCPresenter(BaseTFPresenter):
                 )
             )[0]
 
-        self.view.groupbox_stats.setEnabled(True)
+        self.view.groupbox_stats.setEnabled(
+            self.should_stats_be_enabled(calculating=False)
+        )
         self.enable_save_data(True)
         self.update_plots()
         self.view.on_calculate_stopped()
         self.on_all_tasks_completed()
+
+    def should_stats_be_enabled(self, calculating: bool) -> bool:
+        return bool(
+            self.results
+            and not calculating
+            and all([i is not None for i in self.signals.get_all()])
+        )
 
     def calculate_statistical_test(self) -> None:
         asyncio.ensure_future(self.coro_statistical_test())
