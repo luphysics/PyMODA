@@ -22,12 +22,13 @@ from pathlib import Path
 from PyQt5 import uic
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QKeySequence
-from PyQt5.QtWidgets import QMessageBox, QShortcut, QComboBox
+from PyQt5.QtWidgets import QMessageBox, QShortcut
 
 import updater.update as upd
 from data import resources
 from data.resources import get
 from gui.dialogs.MatlabRuntimeDialog import MatlabRuntimeDialog
+from gui.dialogs.SettingsDialog import SettingsDialog
 from gui.windows.CentredWindow import CentredWindow
 from updater import update
 from updater.update import get_latest_commit
@@ -77,17 +78,16 @@ class LauncherWindow(CentredWindow):
         self.check_matlab_runtime()
 
         self.lbl_update.hide()
+
         self.btn_update.hide()
         self.btn_update.clicked.connect(self.on_update_clicked)
+        self.btn_settings.clicked.connect(self.on_settings_clicked)
 
         retain_size_when_hidden(self.btn_update)
-        retain_size_when_hidden(self.lbl_unstable)
 
-        combo: QComboBox = self.combo_source
-        combo.currentTextChanged.connect(self.on_update_source_changed)
-        combo.setCurrentText(self.settings.get_update_branch().capitalize())
-
-        self.update_stability_warning()
+        # combo: QComboBox = self.combo_source
+        # combo.currentTextChanged.connect(self.on_update_source_changed)
+        # combo.setCurrentText(self.settings.get_update_branch().capitalize())
 
         if args.post_update():
             asyncio.ensure_future(self.post_update())
@@ -126,10 +126,6 @@ class LauncherWindow(CentredWindow):
         status = create_shortcut()
         QMessageBox(text=status).exec()
 
-    def update_stability_warning(self) -> None:
-        stable = self.settings.get_update_branch().lower() == "release"
-        self.lbl_unstable.setVisible(not stable)
-
     def on_update_source_changed(self, branch: str) -> None:
         """
         Called when the selection in the "Update source" ComboBox is changed.
@@ -138,9 +134,19 @@ class LauncherWindow(CentredWindow):
         """
         branch = branch.lower()
         self.settings.set_update_source(branch)
-        self.update_stability_warning()
 
         asyncio.ensure_future(self.check_for_updates(force=True))
+
+    def on_settings_clicked(self) -> None:
+        """
+        Called when the "Settings" button is clicked.
+        """
+        branch = self.settings.get_update_branch()
+        SettingsDialog().run()
+
+        self.settings = Settings()
+        if branch != self.settings.get_update_branch():
+            self.on_update_source_changed(self.settings.get_update_branch())
 
     def on_update_clicked(self) -> None:
         """
