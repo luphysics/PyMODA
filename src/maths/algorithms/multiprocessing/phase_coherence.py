@@ -13,16 +13,16 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-import warnings
 from typing import Tuple
 
 import numpy as np
 import pymodalib
 from multiprocess.pool import Pool
 from numpy import ndarray
+from pymodalib.algorithms.coherence import wphcoh
 
 from maths.algorithms.surrogates import surrogate_calc
-from maths.algorithms.wpc import wphcoh, wpc
+from maths.algorithms.wpc import wpc
 from maths.params.PCParams import PCParams
 from maths.signals.TimeSeries import TimeSeries
 from processes.mp_utils import process
@@ -67,8 +67,8 @@ def _phase_coherence(
     """
     s1, s2 = signal_pair
 
-    wt1 = s1.output_data.args
-    wt2 = s2.output_data.args
+    wt1 = s1.output_data.values
+    wt2 = s2.output_data.values
 
     freq = s1.output_data.freq
     fs = s1.frequency
