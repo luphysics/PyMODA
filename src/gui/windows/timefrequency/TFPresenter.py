@@ -137,7 +137,10 @@ class TFPresenter(BaseTFPresenter):
         preproc_arr = np.empty((len(preproc[0]), len(preproc)))
 
         for index, p in enumerate(preproc):
-            preproc_arr[:, index] = p[:, 0]
+            try:
+                preproc_arr[:, index] = p[:, 0]
+            except IndexError:
+                preproc_arr[:, index] = p[:]
 
         output_data: List[TFOutputData] = [s.output_data for s in self.signals]
         cols = len(output_data)
