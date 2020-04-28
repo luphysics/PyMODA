@@ -52,7 +52,7 @@ def get_parser(filename, groups=False) -> BaseParser:
 
     if extension == ".mat":
         return MatParser(filename) if not groups else GroupMatParser(filename)
-    elif extension == ".csv":
+    elif extension == ".csv" or extension == ".txt":
         return CsvParser(filename)
     elif extension == ".npy":
         return NpyParser(filename) if not groups else GroupNpyParser(filename)
