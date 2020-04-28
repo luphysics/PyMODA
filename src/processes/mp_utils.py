@@ -50,7 +50,10 @@ def setup_matlab_runtime():
     """
     path = matlab_runtime()
     if path:
-        os.environ["LD_LIBRARY_PATH"] = path
+        if OS.is_linux():
+            os.environ["LD_LIBRARY_PATH"] = path
+        elif OS.is_mac_os():
+            os.environ["DYLD_LIBRARY_PATH"] = path
 
 
 def _get_start_method() -> Optional[str]:
