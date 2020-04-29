@@ -282,7 +282,7 @@ class MPHandler:
             (s1, s2, fs, f0, fr, s1.output_data.opt) for s1, s2 in signals.get_pairs()
         ]
         return await self.scheduler.map(
-            target=_biphase, args=args, process_type=mp.Prcess, queue_type=mp.Queue
+            target=_biphase, args=args, process_type=mp.Process, queue_type=mp.Queue
         )
 
     async def coro_group_coherence(
