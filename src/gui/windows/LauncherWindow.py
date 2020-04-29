@@ -49,8 +49,9 @@ class LauncherWindow(CentredWindow):
         super(LauncherWindow, self).__init__(parent)
 
         print(
-            "Welcome to PyMODA. Please do not close this terminal "
-            "window while PyMODA is running."
+            f"Welcome to PyMODA. Please do not close this terminal window while PyMODA is running."
+            f"\n\nPyMODA is running under Python {'.'.join([f'{i}' for i in sys.version_info[:3]])}.\n"
+            f"Python interpreter: {sys.executable}.\n"
         )
 
         # Hidden shortcuts to trigger a check for updates.
