@@ -85,7 +85,9 @@ def _create_shortcut_nix() -> str:
 
     alias_pymoda = "alias pymoda="
     filter_func = lambda line: alias_pymoda not in line
-    line_to_add = f"{alias_pymoda}'{sys.executable} {_python_interpreter_arguments()}'"
+    line_to_add = (
+        f"{alias_pymoda}'{sys.executable} {_python_interpreter_arguments()}'\n\n"
+    )
 
     bash_lines = list(filter(filter_func, bash_lines))
     bash_lines.append(line_to_add)
