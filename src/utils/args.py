@@ -14,8 +14,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 from argparse import ArgumentParser
-
-# Args are global and should only be modified at startup.
 from typing import Optional, Tuple
 
 from updater import update
@@ -56,8 +54,8 @@ def parser() -> ArgumentParser:
         action="store",
         nargs=1,
         default=None,
-        help="**Must be specified on Linux.**"
-        "\nThe LD_LIBRARY_PATH used to make libraries run using the MATLAB Runtime. ",
+        help="**Must be specified on Linux, and may be required on macOS.**"
+        "\nThe LD_LIBRARY_PATH, or DYLD_LIBRARY_PATH, used to make libraries run using the MATLAB Runtime. ",
     )
     p.add_argument(
         "--no-maximise",
@@ -102,13 +100,31 @@ def init():
     args = parser().parse_args()
 
 
+def initargs(func):
+    """
+    Decorator which automatically initialises 'args' if it is None.
+    """
+    global args
+
+    def wrapper(*w_args, **kwargs):
+        if args is None:
+            init()
+
+        return func(*w_args, **kwargs)
+
+    return wrapper
+
+
+@initargs
 def args_file() -> Optional[str]:
     """Gets the file from the args, or returns None."""
     if args and args.file:
         return args.file[0]
+
     return None
 
 
+@initargs
 def args_files() -> Tuple[Optional[str], Optional[str]]:
     """
     Gets the values passed with the '--files' argument.
@@ -119,13 +135,16 @@ def args_files() -> Tuple[Optional[str], Optional[str]]:
     return None, None
 
 
+@initargs
 def args_freq() -> Optional[float]:
     """Gets the frequency from the args, or returns None."""
     if args and args.freq:
         return args.freq[0]
+
     return None
 
 
+@initargs
 def maximise() -> bool:
     """
     Returns whether a window should be maximised, according to the
@@ -134,11 +153,13 @@ def maximise() -> bool:
     return not args or args.no_maximise
 
 
+@initargs
 def debug() -> bool:
     """Returns whether error handling should be disabled."""
     return args and args.debug
 
 
+@initargs
 def matlab_runtime() -> Optional[str]:
     """
     Returns the LD_LIBRARY_PATH for the Matlab Runtime when it has been set with
@@ -146,9 +167,11 @@ def matlab_runtime() -> Optional[str]:
     """
     if args and args.runtime:
         return args.runtime[0]
+
     return None
 
 
+@initargs
 def python_wt() -> bool:
     """
     Returns
@@ -159,6 +182,7 @@ def python_wt() -> bool:
     return args and args.python_wt
 
 
+@initargs
 def post_update() -> bool:
     """
     Returns whether an update has just completed. This argument is set by
@@ -167,6 +191,7 @@ def post_update() -> bool:
     return args and args.post_update
 
 
+@initargs
 def set_post_update(value: bool) -> None:
     """
     Sets the boolean associated with `--post-update` to a value.
@@ -176,6 +201,7 @@ def set_post_update(value: bool) -> None:
         args.post_update = value
 
 
+@initargs
 def no_update() -> bool:
     """
     Returns whether PyMODA should avoid showing that updates are available.
