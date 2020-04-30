@@ -81,7 +81,7 @@ def get(resource: string) -> str:
 
 def _get_base_path():
     """Returns the path to the resources folder."""
-    return "../res/"
+    return "res/"
 
 
 def _get_img_path():

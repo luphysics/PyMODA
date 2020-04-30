@@ -19,11 +19,16 @@ The entry-point of PyMODA.
 """
 
 import asyncio
+import multiprocessing
 import os
 import signal
 import sys
 from os import path
+from pathlib import Path
 
+frozen = getattr(sys, "frozen", False)
+
+import multiprocess
 from qasync import QEventLoop
 
 from gui.Application import Application
@@ -31,12 +36,23 @@ from processes import mp_utils
 from utils import errorhandling, stdout_redirect, args
 
 if __name__ == "__main__":
-    # Fix Ctrl-C behaviour with PyQt.
-    signal.signal(signal.SIGINT, signal.SIG_DFL)
+    # Fix issues when packaged with PyInstaller.
+    for m in (multiprocess, multiprocessing):
+        m.freeze_support()
+
+    # Set the working directory for consistency.
+    if frozen:
+        # When packaged with PyInstaller.
+        location = os.path.abspath(sys._MEIPASS)
+    else:
+        # When running as a normal Python program.
+        location = Path(path.abspath(path.dirname(__file__))).parent
 
     # Set the working directory to the 'src' directory for consistency.
-    location = path.dirname(path.abspath(__file__))
     os.chdir(location)
+
+    # Fix Ctrl-C behaviour with PyQt.
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
 
     args.init()
     errorhandling.init()

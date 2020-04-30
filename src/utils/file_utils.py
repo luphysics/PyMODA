@@ -14,10 +14,10 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import os
+import warnings
 from os import path
-from pathlib import Path
 
-_whitelist = ["src", "temp"]
+_whitelist = ["src", "res"]
 
 
 def get_root_folder() -> str:
@@ -27,15 +27,15 @@ def get_root_folder() -> str:
     WARNING: This function relies on the fact that the current working directory points to `src/`.
     """
     _, folder = path.split(os.getcwd())
-    if folder not in _whitelist:
+    # if folder not in _whitelist:
+    if not any([f in _whitelist for f in os.listdir(os.getcwd())]):
         import inspect
 
-        print(
+        warnings.warn(
             f"\nWARNING: function '{inspect.currentframe().f_code.co_name}' is attempting to find "
-            f"PyMODA's root directory, but the current working directory should be one of: "
-            f"{[f'PyMODA/{folder}' for folder in _whitelist]} for this to work correctly.\n"
+            f"PyMODA's root directory, but the current working directory may not be the root directory."
             f"The current working directory is '{os.getcwd()}'.",
-            end="\n\n",
+            RuntimeWarning,
         )
 
-    return Path(os.getcwd()).parent
+    return os.getcwd()
