@@ -261,22 +261,6 @@
                <item>
                 <widget class="QGroupBox" name="verticalGroupBox">
                  <property name="title">
-                  <string>Maximum number of surrogates</string>
-                 </property>
-                 <layout class="QVBoxLayout" name="verticalLayout_3">
-                  <item>
-                   <widget class="QLineEdit" name="line_max_surrogates">
-                    <property name="text">
-                     <string/>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
-               <item>
-                <widget class="QGroupBox" name="verticalGroupBox">
-                 <property name="title">
                   <string>Percentile</string>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_13">

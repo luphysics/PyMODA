@@ -291,7 +291,6 @@ class MPHandler:
         sig1b: ndarray,
         fs: float,
         percentile: Optional[float],
-        max_surrogates: Optional[int],
         on_progress: Callable[[int, int], None],
         *args,
         **kwargs
@@ -309,8 +308,6 @@ class MPHandler:
             The sampling frequency of the signals.
         percentile : Optional[float]
             The percentile at which the surrogates will be subtracted.
-        max_surrogates : Optional[int]
-            The maximum number of surrogates.
         on_progress : Callable
             Function called to report progress.
         args
@@ -338,7 +335,6 @@ class MPHandler:
                 sig1b,
                 fs,
                 percentile,
-                max_surrogates,
                 True,
                 *args,
                 **kwargs,
@@ -354,7 +350,6 @@ class MPHandler:
         sig2b: ndarray,
         fs: float,
         percentile: Optional[float],
-        max_surrogates: Optional[int],
         on_progress: Callable[[int, int], None],
         *args,
         **kwargs
@@ -376,8 +371,6 @@ class MPHandler:
             The sampling frequency of the signals.
         percentile : Optional[float]
             The percentile at which the surrogates will be subtracted.
-        max_surrogates : Optional[int]
-            The maximum number of surrogates.
         on_progress : Callable
             Function called to report progress.
         args
@@ -411,7 +404,6 @@ class MPHandler:
                 sig2b,
                 fs,
                 percentile,
-                max_surrogates,
                 *args,
                 **kwargs,
             ),

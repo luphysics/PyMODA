@@ -144,10 +144,6 @@ class GCWindow(GCViewProperties, BaseTFWindow, FreqComponent):
     def get_percentile(self) -> Optional[float]:
         return self.line_percentile.text()
 
-    @inty
-    def get_max_surrogates(self) -> Optional[float]:
-        return self.line_max_surrogates.text()
-
     def setup_signal_listview(self) -> None:
         """
         Override to do nothing.

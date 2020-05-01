@@ -128,9 +128,9 @@ class GCPresenter(BaseTFPresenter):
             return
 
         try:
-            freq, coh1, coh2, _, _ = self.results
+            freq, coh1, coh2 = self.results
         except ValueError:
-            freq, coh1, _ = self.results
+            freq, coh1 = self.results
             coh2 = None
 
         self.view.on_calculate_started()
@@ -148,7 +148,7 @@ class GCPresenter(BaseTFPresenter):
         tbl: QTableView = self.view.tbl_stat
 
         model = QStandardItemModel()
-        model.setHorizontalHeaderLabels(["Frequency range", "Significance"])
+        model.setHorizontalHeaderLabels(["Frequency", "Significance"])
 
         tbl.setModel(model)
 
@@ -165,12 +165,12 @@ class GCPresenter(BaseTFPresenter):
             return
 
         try:
-            freq, coh1, coh2, surr1, surr2 = self.results
+            freq, coh1, coh2 = self.results
             main.plot(
                 freq, coh1, coh2, average="median", percentile=self.params["percentile"]
             )
         except ValueError:
-            freq, coh1, surr1 = self.results
+            freq, coh1 = self.results
             main.plot(
                 freq, coh1, None, average="median", percentile=self.params["percentile"]
             )
@@ -270,7 +270,6 @@ class GCPresenter(BaseTFPresenter):
         """
         return {
             "percentile": self.view.get_percentile(),
-            "max_surrogates": self.view.get_max_surrogates(),
             "fmin": self.view.get_fmin(),
             "fmax": self.view.get_fmax(),
             "resolution": self.view.get_f0(),
