@@ -10,6 +10,10 @@ temp/
 .idea/misc.xml
 *.conf
 
+build/*
+!build/linux
+!build/macos
+
 # Ignore MATLAB packaging logs.
 **/PackagingLog.html
 
@@ -119,7 +123,6 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-build/
 develop-eggs/
 dist/
 downloads/
