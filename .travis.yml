@@ -15,8 +15,6 @@ matrix:
       python: 3.7
     - os: osx
       language: generic
-  allow_failures:
-    - os: linux
 
 install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ] ; then sudo chmod +x build/macos/build.sh && build/macos/build.sh ; fi
