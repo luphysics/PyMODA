@@ -3,7 +3,7 @@ if:
   - tag IS present
   - branch = master
 
-language: python
+language: generic
 cache:
   directories:
     - /Library/Caches/Homebrew
@@ -11,10 +11,8 @@ cache:
 
 matrix:
   include:
-    - os: linux
-      python: 3.7
+    - dist: bionic
     - os: osx
-      language: generic
 
 install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ] ; then sudo chmod +x build/macos/build.sh && build/macos/build.sh ; fi

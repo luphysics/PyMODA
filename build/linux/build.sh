@@ -1,20 +1,28 @@
 #!/bin/bash
 set -e 
 
-python3 --version
+sudo add-apt-repository ppa:deadsnakes/ppa -y
 
-python3 -m pip install -U pip
-python3 -m pip install PyInstaller 
+sudo apt-get update
+sudo apt-get install python3.7 python3.7-dev -y
+sudo apt-get install python3-pip -y
 
-python3 packages/install.py -yv
+python3.7 --version
 
-python3 -m PyInstaller main.spec --noconfirm
+python3.7 -m pip install -U pip
+python3.7 -m pip install -U setuptools wheel 
+python3.7 -m pip install -U PyInstaller 
+
+python3.7 packages/install.py -y
+python3.7 -m pip install -U Pillow
+
+python3.7 -m PyInstaller main.spec --noconfirm
 
 cd dist
 mv main PyMODA
 
-tar -zcf PyMODA-linux_64.tar.gz PyMODA
+tar -zcf PyMODA-linux_x86_64.tar.gz PyMODA
 cd ..
 
 mkdir -p releases
-mv dist/PyMODA-linux_64.tar.gz releases/
+mv dist/PyMODA-linux_x86_64.tar.gz releases/
