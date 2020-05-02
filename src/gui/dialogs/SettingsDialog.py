@@ -13,6 +13,8 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import os
+import subprocess
 from typing import Optional
 
 from PyQt5 import uic
@@ -27,6 +29,8 @@ from PyQt5.QtWidgets import (
 
 from data import resources
 from gui.BaseUI import BaseUI
+from utils import file_utils
+from utils.os_utils import OS
 from utils.settings import Settings
 
 
@@ -41,6 +45,7 @@ class SettingsDialog(QDialog, BaseUI):
         self.checkbox_default: QCheckBox = None
         self.line_cache_loc: QLineEdit = None
         self.btn_browse: QPushButton = None
+        self.btn_open_logs: QPushButton = None
 
         self.combo_update_source: QComboBox = None
 
@@ -50,6 +55,7 @@ class SettingsDialog(QDialog, BaseUI):
         uic.loadUi(resources.get("layout:dialog_settings.ui"), self)
 
         self.btn_browse.clicked.connect(self.browse_for_folder)
+        self.btn_open_logs.clicked.connect(self.on_open_logs_clicked)
 
         cache_loc = self.settings.get_pymodalib_cache()
         self.line_cache_loc.setText(cache_loc if cache_loc != "None" else cache_loc)
@@ -78,3 +84,14 @@ class SettingsDialog(QDialog, BaseUI):
 
     def get_location(self) -> Optional[str]:
         return self.line_cache_loc.text()
+
+    @staticmethod
+    def on_open_logs_clicked() -> None:
+        location = file_utils.pymoda_path
+
+        if OS.is_windows():
+            os.startfile(location)
+        elif OS.is_linux():
+            subprocess.Popen(["xdg-open", location])
+        elif OS.is_mac_os():
+            subprocess.Popen(["open", location])

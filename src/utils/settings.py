@@ -20,6 +20,7 @@ from typing import List, Dict, Optional
 
 from easysettings import EasySettings
 
+from utils import file_utils
 from utils.file_utils import get_root_folder
 
 _key_recent_files = "recent_files"
@@ -39,8 +40,7 @@ class Settings:
     """
 
     def __init__(self):
-        location = get_root_folder()
-        filepath = path.join(location, "settings.conf")
+        filepath = file_utils.settings_path
 
         self._settings = EasySettings(filepath)
 

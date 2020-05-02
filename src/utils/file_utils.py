@@ -16,6 +16,24 @@
 import os
 import warnings
 from os import path
+from os.path import join
+
+from utils.os_utils import OS
+
+pymoda_path = None
+
+username = os.environ.get("USERNAME") or os.environ.get("USER")
+home = os.path.expanduser("~")
+
+if OS.is_windows():
+    pymoda_path = f"C:\\Users\\{username}\\AppData\\Roaming\\PyMODA"
+else:
+    pymoda_path = f"{home}/.pymoda"
+
+os.makedirs(pymoda_path, exist_ok=True)
+
+log_path = join(pymoda_path, "pymoda.log")
+settings_path = join(pymoda_path, "settings.conf")
 
 _whitelist = ["src", "res"]
 

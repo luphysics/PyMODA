@@ -13,7 +13,9 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import logging
 import sys
+import traceback
 
 from utils import args
 
@@ -30,15 +32,18 @@ def init():
     sys.excepthook = hook
 
 
-def hook(exc_type, value, traceback):
+def hook(exc_type, value, _traceback):
     """
     Exception hook. KeyboardInterrupts are allowed to stop the program,
     but for other exceptions all subscribers are notified.
     """
+    trace = "".join(traceback.format_exception(exc_type, value, _traceback))
+    logging.log(logging.ERROR, f"\n{trace}\n")
+
     if exc_type is not KeyboardInterrupt and not args.debug():
-        notify_subscribers(exc_type, value, traceback)
+        notify_subscribers(exc_type, value, _traceback)
     else:
-        system_exception(exc_type, value, traceback)
+        system_exception(exc_type, value, _traceback)
 
 
 def subscribe(subscriber):

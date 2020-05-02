@@ -33,7 +33,7 @@ from qasync import QEventLoop
 
 from gui.Application import Application
 from processes import mp_utils
-from utils import errorhandling, stdout_redirect, args
+from utils import errorhandling, stdout_redirect, args, log_utils
 
 if __name__ == "__main__":
     # Fix issues when packaged with PyInstaller.
@@ -55,6 +55,7 @@ if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal.SIG_DFL)
 
     args.init()
+    log_utils.init()
     errorhandling.init()
     stdout_redirect.init()
 
