@@ -25,6 +25,7 @@ from PyQt5.QtGui import QPixmap, QKeySequence
 from PyQt5.QtWidgets import QMessageBox, QShortcut
 
 import updater.update as upd
+import utils
 from data import resources
 from data.resources import get
 from gui.dialogs.MatlabRuntimeDialog import MatlabRuntimeDialog
@@ -153,6 +154,14 @@ class LauncherWindow(CentredWindow):
         """
         Called when the button to update is clicked.
         """
+        if utils.is_frozen:
+            import webbrowser
+
+            webbrowser.open_new_tab(
+                "https://github.com/luphysics/PyMODA/releases/latest"
+            )
+            return
+
         response = QMessageBox().question(
             self,
             "Update",
