@@ -33,6 +33,7 @@ a = Analysis(
     hiddenimports=[
         "qasync",
         "gui.dialogs.files.DragDropLabel",
+        "pkg_resources.py2_warn",
     ],
     hookspath=[],
     runtime_hooks=[],
