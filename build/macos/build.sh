@@ -10,4 +10,8 @@ python3 packages/install.py -yv
 
 python3 -m PyInstaller macos.spec --noconfirm
 
-hdiutil create -srcfolder dist/PyMODA.app PyMODA.dmg
+mv dist/PyMODA.app .
+hdiutil create -srcfolder PyMODA.app PyMODA.dmg
+
+mkdir -p releases
+mv PyMODA.dmg releases/

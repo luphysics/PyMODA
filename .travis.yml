@@ -29,7 +29,7 @@ deploy:
   api_key:
     secure: NzRG8BAjBQCfzCB7DqyEI/KuH/NQGtRnlywgqf1cvaVwPG5itr0Uo9X7sAc2oeIqTpV/7CMQxzqdS+3ujRCyXx9rMQKIMEjEeZU9uLO4QX5AL2JXCac10HB0PXulREa1mMExr9kOGSLs35JQEYCpzdOyesyZGSHTYWjJpuk9/ryyzKSzzJgH99quzGlsguampXX2v8tTpjT49oURFKcF/ra3iWh1ueg+zKgHPaJq5ZNzMFrG2MaAQALAii0AqaXNhsLr3tfCzcHPxxTrCgBxBGk0vSCtGkLOjNCL4GOXTe4wEedeSCjzeJw0eYO7ojM7Zv8bS7whhSeXTgjlKXngcb54+xDpHb/iByesGZwy6M+4Zd+IejjRw5LN5OuBSf/dCSHZ/DYrqdoWFe6cKdWGiRU9VQzCdLFs5vCUZLBjmfaDi1KqKmruV12K9UBDiTXAzXAQG48J2Bv3xXpjrBvBiFXW8O+ddnrlNufsWTmJyV/sLFjnQhWh+FBsByz5es4Zv6whnxSIVLkFJYZZ07RNHKF3AQjphsHU8V/buhuph7FSFsPzejujQOM41QDTpigN1prSyqFEqv+jaM11bEsPujP2JhuWUruSZpDmb/IDrvNXZPT1r7ydtGXiP5qLCEDJy+9xUwrL+guoyCXYDyVxJTD87kzrmTx03aw5e6/o9/M=
   file_glob: true
-  file: 'release/PyMODA.*'
+  file: 'release/PyMODA*'
   on:
     repo: luphysics/PyMODA
     tags: true
