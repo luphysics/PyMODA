@@ -13,10 +13,15 @@ matrix:
   include:
     - dist: bionic
     - os: osx
+    - os: windows
+      before_install:
+        - choco install python --version 3.7.7 -y
+      env: PATH=/c/Python37:/c/Python37/Scripts:$PATH
 
 install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ] ; then sudo chmod +x build/macos/build.sh && build/macos/build.sh ; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ] ; then sudo chmod +x build/linux/build.sh && build/linux/build.sh ; fi
+  - if [ "$TRAVIS_OS_NAME" == "windows" ] ; then chmod +x build/windows/build.sh && build/windows/build.sh ; fi
 
 script: true
 

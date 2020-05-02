@@ -13,6 +13,7 @@ temp/
 build/*
 !build/linux
 !build/macos
+!build/windows
 
 # Ignore MATLAB packaging logs.
 **/PackagingLog.html
