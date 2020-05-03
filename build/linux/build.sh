@@ -16,6 +16,7 @@ python3.7 -m pip install -U PyInstaller
 python3.7 packages/install.py -y
 python3.7 -m pip install -U Pillow
 
+python3.7 build/strip_resources.py -y
 python3.7 -m PyInstaller main.spec --noconfirm
 
 cd dist
