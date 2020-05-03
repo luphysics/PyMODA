@@ -16,8 +16,10 @@
 
 import os
 import sys
+from os.path import join
 from subprocess import Popen, PIPE
 
+import utils
 from updater import update
 from utils.os_utils import OS
 
@@ -29,10 +31,15 @@ def create_shortcut() -> str:
     """
     if OS.is_windows():
         status = _create_shortcut_windows()
+
     elif OS.is_linux():
-        status = _create_shortcut_nix()
+        if utils.is_frozen:
+            status = _create_shortcut_linux()
+        else:
+            status = _create_alias_nix()
+
     elif OS.is_mac_os():
-        status = _create_shortcut_nix()
+        status = _create_alias_nix()
     else:
         status = "Operating system unknown. Could not create shortcut."
 
@@ -56,7 +63,41 @@ def _create_shortcut_windows() -> str:
     return "Created desktop shortcut for PyMODA with current arguments."
 
 
-def _create_shortcut_nix() -> str:
+def _create_shortcut_linux() -> str:
+    """
+    Creates a desktop shortcut on Linux.
+
+    Returns
+    -------
+    status : str
+        The status message to show to the user.
+    """
+    items = ["[Desktop Entry]"]
+
+    key_values = {
+        "Version": "1.0",
+        "Name": "PyMODA",
+        "Exec": f'"{sys.executable}"',
+        "Terminal": "false",
+        "Type": "Application",
+        "StartupNotify": "true",
+        "Categories": "Science;Tools",
+        "X-Desktop-File-Install-Version": "0.15",
+    }
+
+    for key, value in key_values.items():
+        items.append(f"{key}={value}")
+
+    shortcut_dir = "~/.local/share/applications"
+    os.makedirs(shortcut_dir, exist_ok=True)
+
+    with open(join(shortcut_dir, "pymoda.desktop"), "w", encoding="utf-8") as f:
+        f.writelines(items)
+
+    return "Created desktop shortcut."
+
+
+def _create_alias_nix() -> str:
     """
     Creates a command-line alias on *nix to launch PyMODA with current arguments,
     by adding the alias to ~/.bashrc and ~/.zshrc if it exists or zsh is installed.
