@@ -1,0 +1,30 @@
+skip_non_tags: true
+
+image: Visual Studio 2019
+     
+environment:
+  PYTHON: "C:\\PYTHON37-x64"
+
+install:
+  - "%PYTHON%\\python.exe -m pip install -U pip --user"
+
+build_script:
+  - cmd: cmd /c build\windows\build.bat
+
+artifacts:
+  - path: releases/PyMODA-win64.zip
+    name: portable
+
+deploy:
+  - provider: GitHub
+    tag: $(APPVEYOR_REPO_TAG_NAME)
+    description: "Release $(APPVEYOR_REPO_TAG_NAME)"
+    auth_token: 
+      secure: z8OqFPVcisBMWLDG/O/XsyqQaUgGgi4F4L3sMxQxk80JQm2IKmwQZC+fcbMd+RjZ
+    draft: false
+    prerelease: false 
+    force_update: true
+    artifact: portable
+    on:
+      APPVEYOR_REPO_TAG: true
+    
