@@ -6,14 +6,9 @@
   - [Status](#status)
 - [User Guide](#user-guide)
   - [Requirements](#requirements)
-  - [Operating systems](#operating-systems)
-  - [Downloading PyMODA](#downloading-pymoda)
-  - [Preparing to run](#preparing-to-run)
-  - [Running PyMODA](#running-pymoda)
-  - [Creating a shortcut](#creating-a-shortcut)
+  - [Installation](#installation)
+  - [Launching PyMODA after installation](#launching-pymoda-after-installation)
   - [Saving data](#saving-data)
-  - [Updating PyMODA](#updating-pymoda)
-  - [Performance and efficiency](#performance-and-efficiency)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -25,6 +20,8 @@ PyMODA is a Python implementation of MODA (Multiscale Oscillatory Dynamics Analy
 
 PyMODA is cross-platform and does not require any paid software. To get started, see the [User Guide](#user-guide) or the [Developer Guide](docs/developer-guide.md).
 
+> **Note:** If you're a developer, you may be interested in [PyMODAlib](https://github.com/luphysics/PyMODAlib).
+
 ## Status
 
 PyMODA plans to offer all the functionality available in MODA, but development is still in progress. This table shows the current status of different features.
@@ -32,74 +29,71 @@ PyMODA plans to offer all the functionality available in MODA, but development i
 | Window    |  Status | Notes | 
 | ----      |   ---------        |   ---------   |  
 | Time-Frequency Analysis        |  :heavy_check_mark: | |
+| Detecting Harmonics        |  :heavy_check_mark: | |
 | Wavelet Phase Coherence        |  :heavy_check_mark:  | Surrogates require further testing | 
+| Group Phase Coherence        |  :heavy_check_mark:  | | 
 | Ridge Extraction and Filtering |  :heavy_check_mark:  | | 
 | Wavelet Bispectrum Analysis    |  :heavy_check_mark:  | Surrogates cannot be plotted yet |
-| Dynamical Bayesian Inference   |  Implemented | Results are slightly inaccurate |
+| Dynamical Bayesian Inference   |  Partially implemented | Results are inaccurate |
 
 # User Guide
 
 This guide is aimed at users wishing to set up and run PyMODA. If you're interested in modifying or contributing to the program, you should use the [Developer Guide](docs/developer-guide.md).
 
-> **Tip:** If you experience any problems, check the [Common Issues](docs/common-issues.md) document.
-
 ## Requirements
 
-- Python 3.6 or 3.7. **Python 3.8 is not supported yet.** 
-- [MATLAB Runtime](https://www.mathworks.com/products/compiler/matlab-runtime.html), 
-**version R2019a (9.6)**. The runtime does not require a MATLAB license.
+Some of PyMODA's functionality requires the MATLAB Runtime, version 9.6. If you don't have it installed, you'll still be able to use the functionality which doesn't depend on it.
 
-> :warning: **Do not use a newer version of the MATLAB Runtime**. MATLAB-packaged libraries are neither forwards nor backwards compatible.
+## Installation
 
-> **Note:** Scientific distributions of Python are not officially supported, but may be compatible. Python 3.8 will not be supported until MATLAB ~R2020a~ R2020b launches.
+### Windows
 
-## Operating systems
+To install PyMODA, download and run the [setup executable](https://github.com/luphysics/pymoda-install/releases/latest/download/setup-win64.exe). If you see a Windows Smartscreen popup, click "More info", then "Run anyway".
 
-PyMODA should run on Windows, macOS and Linux. Linux performs slightly better than Windows ([see comparison](#windows-vs-linux)).
+If you prefer, you can automate the entire download and installation process using this Powershell command:
 
-> **Note:** You should ensure that you are familiar with the [core knowledge](docs/core-knowledge.md) before proceeding.
+```powershell
+Set-ExecutionPolicy Bypass -Scope Process -Force; 
+iex ((New-Object System.Net.WebClient).DownloadString(
+'https://raw.githubusercontent.com/luphysics/pymoda-install/master/windows/install.ps1'
+))
+```
 
-## Downloading PyMODA
+### Linux 
 
-PyMODA can be downloaded as a .zip file. 
+Copy the following command into a terminal, then press enter:
 
-- [Click here](https://github.com/luphysics/PyMODA/zipball/release) to download the .zip file. 
-- Extract the zip file to a desired location.
-- For simplicity of instructions, rename the folder to `PyMODA`.
+```bash
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/luphysics/pymoda-install/master/linux/install.sh)"
+```
 
-> :warning: Do not place `PyMODA` in a folder which requires admin permissions, such as `C:\Program Files`.
+PyMODA will automatically open when the process is complete. 
 
-## Preparing to run
+> **Tip:** Most terminals require `Ctrl`+`Shift`+`V` instead of `Ctrl`+`V` for pasting.
 
-When the code is downloaded and Python is installed, you'll need to install the dependencies. 
+### macOS
 
-Open a terminal in the `PyMODA` folder and run `python packages/install.py`. When prompted, you will then need to press the `Enter` key to proceed.
+Copy the following command into a terminal, then press enter:
 
-> :warning: For security reasons, do not run this command with elevated permissions.
+```bash
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/luphysics/pymoda-install/master/macos/install.sh)"
+```
 
-## Running PyMODA
+> **Tip:** To open a terminal, press `Cmd`+`Space`, type "terminal" and press enter.
 
-To start PyMODA, run `python src/main.py` in the `PyMODA` folder.
+PyMODA will automatically open when the process is complete. 
 
-> **Note:** Linux users also need to specify the path to the MATLAB Runtime using a command-line argument (see [command-line arguments](/docs/developer-guide.md#command-line-arguments)).
+## Launching PyMODA after installation 
 
-## Creating a shortcut
+### Windows
 
-In the launcher window, click "Create shortcut" to create a shortcut to easily open PyMODA. This has different behaviour on different operating systems.
+On Windows, PyMODA will create a desktop shortcut when it launches for the first time. You can also search for it in the Start menu.
 
-> **Note:** The shortcut will need to be recreated if the path to the PyMODA folder is changed, if the folder is renamed, or if the path to the Python interpreter changes.
+### macOS/Linux
 
-#### Windows
+On macOS and Linux, PyMODA adds a command, `pymoda`, to the terminal. You can use this command to launch PyMODA in future.
 
-A desktop shortcut will be created, which launches PyMODA with the current Python interpreter. If a shortcut already exists, it will be replaced.
-
-#### macOS/Linux
-
-An alias will be created, which adds the terminal command `pymoda` to launch PyMODA with the current Python interpreter. The alias will be added to `~/.bashrc` for Bash, and if Zsh is installed, to `~/.zshrc`. If the alias already exists, it will be replaced.
-
-> **Note:** This will not take effect in currently open shells. Open a new terminal to try it out. 
-
-> **Tip:** If the `-runtime` argument was provided to the instance of PyMODA which created the alias, it does not need to specified when using the `pymoda` command. 
+> **Note:** You may need to restart all open terminals for this to take effect.
 
 ## Saving data
 
@@ -123,65 +117,3 @@ For each window, the name of the struct/dictionary is as follows:
 | `DBData` | Dynamical Bayesian Inference |
 
 > **Note:** Saving data is not yet implemented for Dynamical Bayesian Inference.
-
-## Updating PyMODA
-
-PyMODA checks for updates occasionally, and shows a message in the launcher window if updates are available. 
-
-![Screenshot demonstrating the launcher window when an update is available.](/docs/images/update_available.png)
-
-> **Tip:** You can press `Ctrl`+`U` to trigger an immediate check for updates. 
-
-### Applying an update
-
-To apply an update automatically, press the "Update now" button and accept the confirmation. A dialog will show the download progress, and PyMODA will automatically re-open after the update is complete. 
-
-> **Note:** If you've made modifications to the code, you should use Git instead of the built-in updater. 
-
-### Rolling back to the previous version
-
-If an update fails to apply or introduces a new problem, the previous version of PyMODA can be restored from `PyMODA/backup`. Just copy all of the files and folders from `PyMODA/backup` and paste them into `PyMODA`, overwriting if applicable.
-
-## Performance and efficiency
-
-### Concurrency
-
-When performing multiple discrete calculations - for example, the wavelet transform of 6 signals - PyMODA uses multiprocessing to greatly increase efficiency by allocating different calculations to different CPU cores.
-
-Therefore, it is more efficient to transform multiple signals if possible. Efficiency will plateau when the number of signals is higher than the number of CPU cores.
-
-#### AMD Ryzen 3700X
-
-The AMD Ryzen 3700X is an 8-core, 16-thread CPU. These tests were run on Manjaro Linux.
-
-| Operation | Total time: individually ("Transform Single" for all) | Total time: simultaneously ("Transform All") | Performance improvement |
-| ------------- | ------------- | ------ | ------ |
-| WT on 32 signals | 134s | 19.1s | x7.0 |
-
-#### Intel i7-6700
-
-The Intel i7-6700 is a 4-core, 8-thread CPU. These tests were run on KDE neon.
-
-| Operation | Total time: individually ("Transform Single" for all) | Total time: simultaneously ("Transform All") | Performance improvement |
-| ------------- | ------------- | ------ | ------ |
-| WT on 2 signals | 10s | 5.4s | x1.9 |
-| WT on 6 signals | 30s | 8.4s | x3.6 |
-| WT on 32 signals | 160s | 43.1s | x3.7 |
-
-### Windows vs Linux
-
-Linux performs slightly better than Windows with a small number of signals, and significantly better with many signals.
-
-#### AMD Ryzen 3700X
-
-| Operating system | Time: WT on 1 signal | Time: WT on 32 signals |
-| ---- | ---- | ---- |
-| Windows 10 | 4.7s | 33.1s | 
-| Manjaro Linux | 4.2s | 19.1s | 
-
-#### Intel i7-6700
-
-| Operating system | Time: WT on 6 signals | Time: WT on 32 signals |
-| ---- | ---- | ---- |
-| Windows 10 (VM) | 17.5s | 82s | 
-| Manjaro Linux (VM) | 17.4s | 74s |

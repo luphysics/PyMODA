@@ -3,11 +3,14 @@
 ## Table of Contents
 
 - [Developer Guide](#developer-guide)
+  - [Main requirements](#main-requirements)
   - [Additional requirements](#additional-requirements)
   - [Downloading the code](#downloading-the-code)
   - [Git workflow](#git-workflow)
   - [Collaborator](#collaborator)
   - [Non-collaborator](#non-collaborator)
+  - [Preparing to run](#preparing-to-run)
+  - [Running PyMODA](#running-pymoda)
   - [Command-line arguments](#command-line-arguments)
   - [Error handling](#error-handling)
   - [Project structure](#project-structure)
@@ -22,13 +25,22 @@
 
 This guide is aimed at developers wishing to modify or contribute to the program, and is designed to be accessible to programmers with basic to intermediate knowledge of Python.
 
-> **Tip:** If you experience any difficulties, you can [create an issue on the dedicated page](https://github.com/luphysics/PyMODA/issues/new).
+> **Tip:** If you experience any difficulties, you can check the [Common Issues](docs/common-issues.md) or [create an issue on the dedicated page](https://github.com/luphysics/PyMODA/issues/new).
+
+## Main requirements
+
+- Python 3.6 or 3.7. **Python 3.8 is not supported yet.** 
+- [MATLAB Runtime](https://www.mathworks.com/products/compiler/matlab-runtime.html), 
+**version R2019a (9.6)**. The runtime does not require a MATLAB license.
+
+> :warning: **Do not use a newer version of the MATLAB Runtime**. MATLAB-packaged libraries are neither forwards nor backwards compatible.
+
+> **Note:** Scientific distributions of Python are not officially supported, but may be compatible. Python 3.8 will not be supported until MATLAB ~R2020a~ R2020b launches.
 
 ## Additional requirements
 
-Ensure that your system fulfills the [user requirements](/README.md#requirements). 
-
 To develop the program, you may need to install additional tools:
+
 - Git is required to download the code, save and upload your changes.
 - Qt Designer is required to edit the layout files.
 
@@ -70,7 +82,7 @@ Developers are encouraged to use their own development branches (e.g. `dev` foll
 
 If you are not registered as a collaborator, you should [fork the repository](https://help.github.com/en/articles/fork-a-repo). You can then clone your fork to download the code.
 
-When you make changes, you can open a pull request targeting PyMODA's `master` branch. Do not open a pull request targeting the `release` branch.
+When you make changes, you can open a pull request targeting PyMODA's `master` branch. Please don't open a pull request targeting the `release` branch.
 
 ### Installing Git hooks
 
@@ -97,11 +109,25 @@ Here is an example of committing with the hooks installed. Black formats a Pytho
 
 > **Tip:** If `pre-commit` is not a valid command after installing, try `python -m pre-commit` instead.
 
+## Preparing to run
+
+When the code is downloaded and Python is installed, you'll need to install the dependencies. 
+
+Open a terminal in the `PyMODA` folder and run `python packages/install.py`. When prompted, you will then need to press the `Enter` key to proceed.
+
+> :warning: For security reasons, do not run this command with elevated permissions.
+
+## Running PyMODA
+
+To start PyMODA, run `python src/main.py` in the `PyMODA` folder.
+
+> **Note:** Linux users also need to specify the path to the MATLAB Runtime using a command-line argument (see [command-line arguments](/docs/developer-guide.md#command-line-arguments)).
+
 ## Command-line arguments
 
 PyMODA has several command-line arguments, which can make development easier.
 
-> :warning: `-runtime` must be used on Linux, but should not be necessary on other operating systems.
+> **Note:** Use of the `-runtime` argument should no longer be required.
 
 `-runtime` is used to specify the `LD_LIBRARY_PATH` for the MATLAB Runtime. The `LD_LIBRARY_PATH` is shown by the Runtime installer after installation, and should be saved but not be added to the environment variables manually. 
 
@@ -141,12 +167,14 @@ PyMODA code should follow the standard guidelines and naming conventions for Pyt
 
 ### Window names
 
-PyMODA consists of 5 main windows, whose names are abbreviated in the codebase. The abbreviations are as follows:
+PyMODA consists of 7 main windows, whose names are abbreviated in the codebase. The abbreviations are as follows:
 
 | Name  | Abbreviation | Example class |
 | ------------- | ------------- | ------------- |
 | *Time-Frequency* Analysis  | TF | `TFWindow` |
+| *Detecting Harmonics* | DH | `DHWindow` |
 | Wavelet *Phase Coherence* | PC | `PCWindow` |
+| *Group* Phase *Coherence* | GC | `GCWindow` |
 | *Ridge Extraction* and Filtering  | RE | `REWindow` |
 | Wavelet *Bispectrum Analysis*  | BA | `BAWindow` |
 | *Dynamical Bayesian* Inference  | DB | `DBWindow` |
