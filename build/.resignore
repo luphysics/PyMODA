@@ -1,0 +1,21 @@
+# This file defines files and folders which will be deleted 
+# when 'strip_resources.py' is executed. This reduces the size
+# of the packaged executable. 
+#
+# Paths listed here are relative to the 'res' directory. 
+#
+# Note: This file uses only simplified syntax. 
+# Each value must be a Unix-style pathname pattern.
+
+data/npy
+
+butter.mat
+xp_100Hz.mat
+freq_mod_200Hz.mat
+
+load_*.mat
+noisyyy.mat
+
+heartrate.csv
+ECG.csv 
+ecgtest.csv
