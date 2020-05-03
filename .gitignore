@@ -17,6 +17,11 @@ build/*
 !build/*.py
 !build/.resignore
 
+dist/*
+!dist/linux
+!dist/macos
+!dist/windows
+
 # Ignore MATLAB packaging logs.
 **/PackagingLog.html
 
@@ -127,7 +132,6 @@ __pycache__/
 # Distribution / packaging
 .Python
 develop-eggs/
-dist/
 downloads/
 eggs/
 .eggs/
