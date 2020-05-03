@@ -3,6 +3,7 @@
 ## Table of Contents
 
 - [Developer Guide](#developer-guide)
+  - [Main requirements](#main-requirements)
   - [Additional requirements](#additional-requirements)
   - [Downloading the code](#downloading-the-code)
   - [Git workflow](#git-workflow)
@@ -24,11 +25,20 @@ This guide is aimed at developers wishing to modify or contribute to the program
 
 > **Tip:** If you experience any difficulties, you can [create an issue on the dedicated page](https://github.com/luphysics/PyMODA/issues/new).
 
+## Main requirements
+
+- Python 3.6 or 3.7. **Python 3.8 is not supported yet.** 
+- [MATLAB Runtime](https://www.mathworks.com/products/compiler/matlab-runtime.html), 
+**version R2019a (9.6)**. The runtime does not require a MATLAB license.
+
+> :warning: **Do not use a newer version of the MATLAB Runtime**. MATLAB-packaged libraries are neither forwards nor backwards compatible.
+
+> **Note:** Scientific distributions of Python are not officially supported, but may be compatible. Python 3.8 will not be supported until MATLAB ~R2020a~ R2020b launches.
+
 ## Additional requirements
 
-Ensure that your system fulfills the [user requirements](/README.md#requirements). 
-
 To develop the program, you may need to install additional tools:
+
 - Git is required to download the code, save and upload your changes.
 - Qt Designer is required to edit the layout files.
 

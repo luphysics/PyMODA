@@ -6,6 +6,7 @@
   - [Status](#status)
 - [User Guide](#user-guide)
   - [Requirements](#requirements)
+  - [Installation](#installation)
   - [Operating systems](#operating-systems)
   - [Downloading PyMODA](#downloading-pymoda)
   - [Preparing to run](#preparing-to-run)
@@ -45,13 +46,33 @@ This guide is aimed at users wishing to set up and run PyMODA. If you're interes
 
 ## Requirements
 
-- Python 3.6 or 3.7. **Python 3.8 is not supported yet.** 
-- [MATLAB Runtime](https://www.mathworks.com/products/compiler/matlab-runtime.html), 
-**version R2019a (9.6)**. The runtime does not require a MATLAB license.
+Much of PyMODA's functionality requires the MATLAB Runtime, version 9.6. If you don't have it installed, PyMODA will prompt you to install it when it launches.
 
-> :warning: **Do not use a newer version of the MATLAB Runtime**. MATLAB-packaged libraries are neither forwards nor backwards compatible.
+## Installation
 
-> **Note:** Scientific distributions of Python are not officially supported, but may be compatible. Python 3.8 will not be supported until MATLAB ~R2020a~ R2020b launches.
+### Windows
+
+Download the `PyMODA-win64.zip` file from the `Assets` section on the [Releases](https://github.com/luphysics/PyMODA/releases) page.
+
+Extract the .zip file and launch `PyMODA.exe` from the `PyMODA` folder.
+
+### Linux 
+
+Copy the following command into a terminal, then press enter:
+
+```bash
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/luphysics/PyMODA/master/dist/linux/install.sh)"
+```
+
+PyMODA will be downloaded and will automatically open when the process is complete.
+
+> **Note:** Most terminals require `Ctrl`+`Shift`+`V` instead of `Ctrl`+`V` for pasting.
+
+### macOS
+
+Download the `PyMODA-macOS.dmg` file from the `Assets` section on the [Releases](https://github.com/luphysics/PyMODA/releases) page.
+
+You should be able to mount the `.dmg`, then launch `PyMODA.app`.
 
 ## Operating systems
 
