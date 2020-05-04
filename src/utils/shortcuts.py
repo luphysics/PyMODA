@@ -163,9 +163,18 @@ def _python_interpreter_arguments() -> str:
     """
     Returns the path to the main Python file plus all current arguments.
     """
-    blacklist = [update.arg_post_update]  # Args to avoid adding to shortcut.
-    args = [a for a in sys.argv[1:] if a not in blacklist]
-    return " ".join([_abs_path_to_main_py()] + args)
+    blacklist = [
+        update.arg_post_update,
+        "--create-shortcut",
+    ]  # Args to avoid adding to shortcut.
+
+    args = [a for a in sys.argv if a not in blacklist]
+    if not utils.frozen:
+        args.insert(0, _abs_path_to_main_py())
+    else:
+        args = args[1:]
+
+    return " ".join(args)
 
 
 def _abs_path_to_main_py() -> str:
