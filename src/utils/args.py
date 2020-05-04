@@ -89,6 +89,12 @@ def parser() -> ArgumentParser:
         default=False,
         help="Switch to the Python implementation of the wavelet transform.",
     )
+    p.add_argument(
+        "--create-shortcut",
+        action="store_true",
+        default=False,
+        help="Create a desktop shortcut when PyMODA launches.",
+    )
     return p
 
 
@@ -180,6 +186,14 @@ def python_wt() -> bool:
         Whether to use the MATLAB implementation of the wavelet transform.
     """
     return args and args.python_wt
+
+
+@initargs
+def create_shortcut() -> bool:
+    """
+    Returns whether the '--create-shortcut' argument has been supplied.
+    """
+    return args and args.create_shortcut
 
 
 @initargs

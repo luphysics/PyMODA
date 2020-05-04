@@ -91,6 +91,9 @@ class LauncherWindow(CentredWindow):
         # combo.currentTextChanged.connect(self.on_update_source_changed)
         # combo.setCurrentText(self.settings.get_update_branch().capitalize())
 
+        if args.create_shortcut():
+            self.create_shortcut(silent=True)
+
         if args.post_update():
             asyncio.ensure_future(self.post_update())
         elif update.should_check_for_updates():
@@ -121,12 +124,13 @@ class LauncherWindow(CentredWindow):
         self.lbl_physics.setPixmap(image.scaled(600, 300, Qt.KeepAspectRatio))
 
     @staticmethod
-    def create_shortcut() -> None:
+    def create_shortcut(silent: bool = False) -> None:
         """
         Calls `create_shortcut()` and shows a message box with the result.
         """
         status = create_shortcut()
-        QMessageBox(text=status).exec()
+        if not silent:
+            QMessageBox(text=status).exec()
 
     def on_update_source_changed(self, branch: str) -> None:
         """
