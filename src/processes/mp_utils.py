@@ -14,9 +14,10 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import os
+import sys
 from typing import Optional
 
-from utils import args
+from utils import log_utils
 from utils.args import matlab_runtime
 from utils.os_utils import OS
 
@@ -33,9 +34,12 @@ def process(func):
     """
 
     def wrapper(*args, **kwargs):
-        setup_matlab_runtime()
-        result = func(*args, **kwargs)
-        return result
+        # Initialise logging for the process.
+        log_utils.process_init()
+
+        setup_matlab_runtime()  # TODO: remove, since PyMODAlib handles it? May require adding new environment variable to PyMODAlib.
+
+        return func(*args, **kwargs)
 
     return wrapper
 
@@ -88,3 +92,24 @@ def set_mp_start_method() -> None:
 
     multiprocessing.set_start_method(start_method)
     multiprocess.set_start_method(start_method)
+
+
+def monkeypatch_processes() -> None:
+    """
+    Monkey-patches the Process class to ensure that processes call `sys.excepthook`.
+
+    Without calling this function, it is not possible for processes to log Exceptions.
+    """
+    from multiprocessing import Process as P1
+    from multiprocess.context import Process as P2
+
+    for Process in (P1, P2):
+        Process.__run = Process.run
+        Process.run = __patched_run
+
+
+def __patched_run(self):
+    try:
+        self.__run()
+    except Exception:
+        sys.excepthook(*sys.exc_info())

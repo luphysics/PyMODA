@@ -37,13 +37,20 @@ def hook(exc_type, value, _traceback):
     Exception hook. KeyboardInterrupts are allowed to stop the program,
     but for other exceptions all subscribers are notified.
     """
-    trace = "".join(traceback.format_exception(exc_type, value, _traceback))
-    logging.log(logging.ERROR, f"\n{trace}\n")
+    log_traceback(exc_type, value, _traceback)
 
     if exc_type is not KeyboardInterrupt and not args.debug():
         notify_subscribers(exc_type, value, _traceback)
     else:
         system_exception(exc_type, value, _traceback)
+
+
+def log_traceback(exc, value, tb) -> None:
+    """
+    Logs a traceback for an exception.
+    """
+    trace = "".join(traceback.format_exception(exc, value, tb))
+    logging.log(logging.ERROR, f"\n{trace}\n")
 
 
 def subscribe(subscriber):

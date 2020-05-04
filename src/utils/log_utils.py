@@ -13,17 +13,38 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import datetime
 import logging
+import os
 from logging.handlers import RotatingFileHandler
+from os.path import join
 
-from utils import file_utils
+from utils import file_utils, errorhandling
 
 
-def init() -> None:
-    log_path = file_utils.log_path
+def init(filepath: str = None) -> None:
+    if filepath:
+        log_path = filepath
+    else:
+        log_path = file_utils.log_path
 
     logging.basicConfig(filename=log_path, level=logging.INFO)
     log = logging.getLogger("root")
 
     handler = RotatingFileHandler(log_path, mode="a", maxBytes=1024 * 1024 * 10)
     log.addHandler(handler)
+
+
+def process_init() -> None:
+    """
+    Initialise logging for a process. Different processes need to log to different files,
+    so each process can call this function to start logging.
+    """
+    filename = str(datetime.datetime.now()).replace(" ", "_").replace(":", "-")
+    filename = ".".join(filename.split(".")[:-1])
+
+    filepath = join(file_utils.pymoda_path, "processes")
+    os.makedirs(filepath, exist_ok=True)
+
+    logging.basicConfig(filename=join(filepath, f"{filename}.log"), level=logging.INFO)
+    errorhandling.init()

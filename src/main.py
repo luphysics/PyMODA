@@ -13,26 +13,26 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-
 """
 The entry-point of PyMODA.
 """
+from processes import mp_utils
+
+# Monkey-patch processes to ensure that they can use logging.
+mp_utils.monkeypatch_processes()
 
 import asyncio
 import multiprocessing
+import multiprocess
 import os
+import utils
 import signal
 import sys
+
 from os import path
 from pathlib import Path
-
-frozen = getattr(sys, "frozen", False)
-
-import multiprocess
 from qasync import QEventLoop
-
 from gui.Application import Application
-from processes import mp_utils
 from utils import errorhandling, stdout_redirect, args, log_utils
 
 if __name__ == "__main__":
@@ -41,7 +41,7 @@ if __name__ == "__main__":
         m.freeze_support()
 
     # Set the working directory for consistency.
-    if frozen:
+    if utils.is_frozen:
         # When packaged with PyInstaller.
         location = os.path.abspath(sys._MEIPASS)
     else:
