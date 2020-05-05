@@ -14,6 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import asyncio
+import logging
 import os
 import sys
 import time
@@ -64,6 +65,8 @@ class LauncherWindow(CentredWindow):
 
         self.pymoda_has_set_cache_var = False
         self.reload_settings()
+
+        logging.info("Launcher window has opened!")
 
     def setup_ui(self) -> None:
         uic.loadUi(get("layout:window_launcher.ui"), self)
