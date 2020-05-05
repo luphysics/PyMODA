@@ -15,6 +15,7 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import os
 import sys
+import traceback
 from typing import Optional
 
 from utils import log_utils
@@ -111,5 +112,14 @@ def monkeypatch_processes() -> None:
 def __patched_run(self):
     try:
         self.__run()
-    except Exception:
-        sys.excepthook(*sys.exc_info())
+    except Exception as e:
+        if OS.is_windows():
+            sys.excepthook(*sys.exc_info())
+        else:
+            # For some reason, `sys.excepthook` doesn't work in processes on *nix (even after monkey-patching)
+            # so we'll write the logs manually.
+            tb = "".join(traceback.format_tb(e.__traceback__))
+            msg = f"\n{type(e)}\n{tb}{e}"
+
+            log_utils.process_write_log(msg)
+            raise e

@@ -21,6 +21,8 @@ from os.path import join
 
 from utils import file_utils, errorhandling
 
+global_filename = None  # Only used by processes on macOS/Linux.
+
 
 def init(filepath: str = None) -> None:
     if filepath:
@@ -46,5 +48,23 @@ def process_init() -> None:
     filepath = join(file_utils.pymoda_path, "processes")
     os.makedirs(filepath, exist_ok=True)
 
-    logging.basicConfig(filename=join(filepath, f"{filename}.log"), level=logging.INFO)
+    global global_filename
+    global_filename = join(filepath, f"{filename}.log")
+
+    logging.basicConfig(filename=global_filename, level=logging.INFO)
     errorhandling.init()
+
+
+def process_write_log(msg: str) -> None:
+    """
+    Used by processes on macOS/Linux; writes a message to the log file manually.
+
+    Parameters
+    ----------
+    msg : str
+        The text to append to the log file.
+    """
+    global global_filename
+
+    with open(global_filename, "a+") as f:
+        f.write(msg)
