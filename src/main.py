@@ -16,23 +16,21 @@
 """
 The entry-point of PyMODA.
 """
-from processes import mp_utils
-
-# Monkey-patch processes to ensure that they can use logging.
-mp_utils.monkeypatch_processes()
 
 import asyncio
 import multiprocessing
-import multiprocess
 import os
-import utils
 import signal
 import sys
-
 from os import path
 from pathlib import Path
+
+import multiprocess
 from qasync import QEventLoop
+
+import utils
 from gui.Application import Application
+from processes import mp_utils
 from utils import errorhandling, stdout_redirect, args, log_utils
 
 if __name__ == "__main__":

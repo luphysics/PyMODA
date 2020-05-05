@@ -35,9 +35,6 @@ def process(func):
     """
 
     def wrapper(*args, **kwargs):
-        # Initialise logging for the process.
-        log_utils.process_init()
-
         setup_matlab_runtime()  # TODO: remove, since PyMODAlib handles it? May require adding new environment variable to PyMODAlib.
 
         return func(*args, **kwargs)
