@@ -61,6 +61,9 @@ class LauncherWindow(CentredWindow):
         self.update_shortcut_force = QShortcut(QKeySequence("Ctrl+Shift+U"), self)
         self.update_shortcut_force.activated.connect(self.force_show_update)
 
+        self.pymoda_has_set_cache_var = False
+        self.reload_settings()
+
     def setup_ui(self) -> None:
         uic.loadUi(get("layout:window_launcher.ui"), self)
         self.load_banner_images()
@@ -116,6 +119,20 @@ class LauncherWindow(CentredWindow):
             if not dialog.dont_show_again:
                 sys.exit(0)
 
+    def reload_settings(self) -> None:
+        self.settings = Settings()
+
+        cache_var = "PYMODALIB_CACHE"
+        cache = self.settings.get_pymodalib_cache()
+
+        if (
+            (not os.environ.get(cache_var) or self.pymoda_has_set_cache_var)
+            and cache
+            and cache != "None"
+        ):
+            self.pymoda_has_set_cache_var = True
+            os.environ[cache_var] = cache
+
     def load_banner_images(self) -> None:
         """
         Loads the banner images and displays them at the top of the window.
@@ -150,7 +167,7 @@ class LauncherWindow(CentredWindow):
         branch = self.settings.get_update_branch()
         SettingsDialog().run()
 
-        self.settings = Settings()
+        self.reload_settings()
         if branch != self.settings.get_update_branch():
             self.on_update_source_changed(self.settings.get_update_branch())
 
