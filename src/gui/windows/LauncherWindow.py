@@ -23,6 +23,7 @@ from PyQt5 import uic
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QKeySequence
 from PyQt5.QtWidgets import QMessageBox, QShortcut
+from pymodalib.utils.matlab_runtime import RuntimeStatus
 
 import updater.update as upd
 import utils
@@ -107,8 +108,13 @@ class LauncherWindow(CentredWindow):
         Checks whether the LD_LIBRARY_PATH for the MATLAB Runtime is correctly passed to
         the program, and shows a dialog if appropriate.
         """
+        from pymodalib.utils.matlab_runtime import get_runtime_status
+
+        status = get_runtime_status()
+
         if (
-            OS.is_linux()
+            not OS.is_windows()
+            and status is RuntimeStatus.NOT_EXISTS
             and not args.matlab_runtime()
             and self.settings.is_runtime_warning_enabled()
         ):
