@@ -33,7 +33,7 @@ from utils import args
 from utils.file_utils import get_root_folder
 from utils.settings import Settings
 
-os.environ["PYTHONPATH"] = "."
+os.environ["PYTHONPATH"] = "src"
 
 import asyncio
 import json
