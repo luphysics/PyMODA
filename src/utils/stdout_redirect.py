@@ -14,14 +14,20 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import datetime
+import logging
 import sys
 
 
 class StdOut:
-
     def write(self, text):
-        sys_out.write(text)  # Output text as normal.
-        for s in subscribers:  # Notify subscribers.
+        # Output text as normal.
+        sys_out.write(text)
+
+        # Write to log file.
+        logging.info(msg=text)
+
+        # Notify subscribers.
+        for s in subscribers:
             if isinstance(s, WindowLogger):
                 s.update(text)
             else:
@@ -71,7 +77,7 @@ class WindowLogger:
 
         if count > self.max_lines:
             # Remove the first half of the lines to save memory.
-            self.lines = self.lines[count // 2:]
+            self.lines = self.lines[count // 2 :]
 
         self.func("\n".join(self.lines))
 
