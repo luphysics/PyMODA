@@ -14,6 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import asyncio
+import logging
 import os
 import sys
 import time
@@ -47,7 +48,6 @@ class LauncherWindow(CentredWindow):
     """
 
     def __init__(self, parent):
-        self.settings = Settings()
         super(LauncherWindow, self).__init__(parent)
 
         print(
@@ -131,6 +131,10 @@ class LauncherWindow(CentredWindow):
         cache_var = "PYMODALIB_CACHE"
         cache = self.settings.get_pymodalib_cache()
 
+        logging.info(
+            f"PyMODAlib cache is {os.environ.get(cache_var)} in environment, {cache} in settings."
+        )
+
         if (
             (not os.environ.get(cache_var) or self.pymoda_has_set_cache_var)
             and cache
@@ -138,6 +142,8 @@ class LauncherWindow(CentredWindow):
         ):
             self.pymoda_has_set_cache_var = True
             os.environ[cache_var] = cache
+
+            logging.info(f"Set {cache_var} = {os.environ.get(cache_var)}")
 
     def load_banner_images(self) -> None:
         """
