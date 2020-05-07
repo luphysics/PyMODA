@@ -49,6 +49,7 @@ class LauncherWindow(CentredWindow):
     """
 
     def __init__(self, parent):
+        self.settings = Settings()
         super(LauncherWindow, self).__init__(parent)
 
         print(
