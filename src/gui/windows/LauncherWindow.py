@@ -20,6 +20,7 @@ import sys
 import time
 from pathlib import Path
 
+import pymodalib
 from PyQt5 import uic
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QKeySequence
@@ -65,6 +66,8 @@ class LauncherWindow(CentredWindow):
         self.pymoda_has_set_cache_var = False
         self.reload_settings()
 
+        logging.info(f"PyMODAlib version == '{pymodalib.__version__}'")
+
     def setup_ui(self) -> None:
         uic.loadUi(get("layout:window_launcher.ui"), self)
         self.load_banner_images()
@@ -90,10 +93,6 @@ class LauncherWindow(CentredWindow):
         self.btn_settings.clicked.connect(self.on_settings_clicked)
 
         retain_size_when_hidden(self.btn_update)
-
-        # combo: QComboBox = self.combo_source
-        # combo.currentTextChanged.connect(self.on_update_source_changed)
-        # combo.setCurrentText(self.settings.get_update_branch().capitalize())
 
         if args.create_shortcut():
             self.create_shortcut(silent=True)
