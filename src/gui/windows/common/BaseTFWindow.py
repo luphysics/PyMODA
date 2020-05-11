@@ -17,7 +17,7 @@ from functools import partial
 from typing import List
 
 from PyQt5 import uic, QtGui
-from PyQt5.QtWidgets import QProgressBar, QPushButton
+from PyQt5.QtWidgets import QProgressBar, QPushButton, QMessageBox
 
 from gui.dialogs.files.SelectFileDialog import SelectFileDialog
 from gui.plotting.plots.AmplitudePlot import AmplitudePlot
@@ -217,6 +217,22 @@ class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
         btn.clicked.connect(partial(self.presenter.calculate, True))
 
         self.setup_progress()
+
+    def on_calculate_failed(self, errormsg: str) -> None:
+        """
+        Called when a calculation fails.
+        """
+        msgbox = QMessageBox()
+        msgbox.setWindowTitle("Error")
+        msgbox.setIcon(QMessageBox.Warning)
+
+        summary = list(filter(lambda i: i.strip(), errormsg.split("\n")))[-1]
+        msgbox.setText(
+            f"Calculation failed. Summary:\n\n{summary}\n\nPlease see the log file for details."
+        )
+        msgbox.setDetailedText(errormsg)
+
+        msgbox.exec()
 
     def setup_progress(self) -> None:
         self.update_progress(0, 0)

@@ -64,7 +64,10 @@ class MPHandler:
         self.scheduler: Scheduler = None
 
     async def coro_transform(
-        self, params: TFParams, on_progress: Callable[[int, int], None]
+        self,
+        params: TFParams,
+        on_progress: Callable[[int, int], None],
+        on_error: Callable[[str], None],
     ) -> List[Tuple]:
         """
         Performs a wavelet transform or windowed Fourier transform of signals.
@@ -76,7 +79,10 @@ class MPHandler:
         """
         self.stop()
         self.scheduler = Scheduler(
-            progress_callback=on_progress, raise_exceptions=True, capture_stdout=True
+            progress_callback=on_progress,
+            raise_exceptions=True,
+            capture_stdout=True,
+            error_callback=on_error,
         )
 
         signals: Signals = params.signals
@@ -95,6 +101,7 @@ class MPHandler:
         params: DHParams,
         preprocess: bool,
         on_progress: Callable[[int, int], None],
+        on_error: Callable[[str], None],
     ) -> List[Tuple]:
         """
         Detects harmonics in signals.
@@ -110,7 +117,10 @@ class MPHandler:
 
         self.stop()
         self.scheduler = Scheduler(
-            progress_callback=on_progress, raise_exceptions=True, capture_stdout=True
+            progress_callback=on_progress,
+            raise_exceptions=True,
+            capture_stdout=True,
+            error_callback=on_error,
         )
 
         args = [
@@ -124,6 +134,7 @@ class MPHandler:
         signals: SignalPairs,
         params: PCParams,
         on_progress: Callable[[int, int], None],
+        on_error: Callable[[str], None],
     ) -> List[Tuple]:
         """
         Performs wavelet phase coherence between signal pairs. Used in "wavelet phase coherence".
@@ -135,7 +146,10 @@ class MPHandler:
         """
         self.stop()
         self.scheduler = Scheduler(
-            progress_callback=on_progress, raise_exceptions=True, capture_stdout=True
+            progress_callback=on_progress,
+            raise_exceptions=True,
+            capture_stdout=True,
+            error_callback=on_error,
         )
 
         return await self.scheduler.map(
@@ -147,7 +161,10 @@ class MPHandler:
         )
 
     async def coro_ridge_extraction(
-        self, params: REParams, on_progress: Callable[[int, int], None]
+        self,
+        params: REParams,
+        on_progress: Callable[[int, int], None],
+        on_error: Callable[[str], None],
     ) -> List[Tuple]:
         """
         Performs ridge extraction on wavelet transforms. Used in "ridge extraction and filtering".
@@ -158,7 +175,10 @@ class MPHandler:
         """
         self.stop()
         self.scheduler = Scheduler(
-            progress_callback=on_progress, raise_exceptions=True, capture_stdout=True
+            progress_callback=on_progress,
+            raise_exceptions=True,
+            capture_stdout=True,
+            error_callback=on_error,
         )
 
         signals = params.signals
@@ -186,6 +206,7 @@ class MPHandler:
         signals: Signals,
         intervals: Tuple,
         on_progress: Callable[[int, int], None],
+        on_error: Callable[[str], None],
     ) -> List[Tuple]:
         """
         Performs bandpass filter on signals. Used in "ridge extraction and filtering".
@@ -197,7 +218,10 @@ class MPHandler:
         """
         self.stop()
         self.scheduler = Scheduler(
-            progress_callback=on_progress, raise_exceptions=True, capture_stdout=True
+            progress_callback=on_progress,
+            raise_exceptions=True,
+            capture_stdout=True,
+            error_callback=on_error,
         )
 
         for s in signals:
@@ -218,6 +242,7 @@ class MPHandler:
         signals: SignalPairs,
         paramsets: List[ParamSet],
         on_progress: Callable[[int, int], None],
+        on_error: Callable[[str], None],
     ) -> List[Tuple]:
         """
         Performs Bayesian inference on signal pairs. Used in "dynamical Bayesian inference".
@@ -229,7 +254,10 @@ class MPHandler:
         """
         self.stop()
         self.scheduler = Scheduler(
-            progress_callback=on_progress, raise_exceptions=True, capture_stdout=True
+            progress_callback=on_progress,
+            raise_exceptions=True,
+            capture_stdout=True,
+            error_callback=on_error,
         )
 
         for params in paramsets:
@@ -248,6 +276,7 @@ class MPHandler:
         signals: SignalPairs,
         params: BAParams,
         on_progress: Callable[[int, int], None],
+        on_error: Callable[[str], None],
     ) -> List[Tuple]:
         """
         Performs wavelet bispectrum analysis on signal pairs.
@@ -260,7 +289,10 @@ class MPHandler:
         """
         self.stop()
         self.scheduler = Scheduler(
-            progress_callback=on_progress, raise_exceptions=True, capture_stdout=True
+            progress_callback=on_progress,
+            raise_exceptions=True,
+            capture_stdout=True,
+            error_callback=on_error,
         )
 
         return await self.scheduler.map(
@@ -278,6 +310,7 @@ class MPHandler:
         f0: float,
         fr: Tuple[float, float],
         on_progress: Callable[[int, int], None],
+        on_error: Callable[[str], None],
     ) -> List[Tuple]:
         """
         Calculates biphase and biamplitude. Used in "wavelet bispectrum analysis".
@@ -291,7 +324,10 @@ class MPHandler:
         """
         self.stop()
         self.scheduler = Scheduler(
-            progress_callback=on_progress, raise_exceptions=True, capture_stdout=True
+            progress_callback=on_progress,
+            raise_exceptions=True,
+            capture_stdout=True,
+            error_callback=on_error,
         )
 
         args = [
@@ -308,6 +344,7 @@ class MPHandler:
         fs: float,
         percentile: Optional[float],
         on_progress: Callable[[int, int], None],
+        on_error: Callable[[str], None],
         *args,
         **kwargs
     ) -> List[Tuple]:
@@ -343,7 +380,10 @@ class MPHandler:
         """
         self.stop()
         self.scheduler = Scheduler(
-            progress_callback=on_progress, raise_exceptions=True, capture_stdout=True
+            progress_callback=on_progress,
+            raise_exceptions=True,
+            capture_stdout=True,
+            error_callback=on_error,
         )
 
         return await self.scheduler.map(
@@ -369,6 +409,7 @@ class MPHandler:
         fs: float,
         percentile: Optional[float],
         on_progress: Callable[[int, int], None],
+        on_error: Callable[[str], None],
         *args,
         **kwargs
     ) -> List[Tuple]:
@@ -412,7 +453,10 @@ class MPHandler:
         """
         self.stop()
         self.scheduler = Scheduler(
-            progress_callback=on_progress, raise_exceptions=True, capture_stdout=True
+            progress_callback=on_progress,
+            raise_exceptions=True,
+            capture_stdout=True,
+            error_callback=on_error,
         )
 
         return await self.scheduler.map(
@@ -437,6 +481,7 @@ class MPHandler:
         coh2: ndarray,
         bands: List[Tuple[float, float]],
         on_progress: Callable[[int, int], None],
+        on_error: Callable[[str], None],
     ) -> Dict[Tuple[float, float], float]:
         """
         Performs a statistical test on the results of group phase coherence, to check for significance.
@@ -465,6 +510,7 @@ class MPHandler:
             progress_callback=on_progress,
             raise_exceptions=True,
             capture_stdout=True,
+            error_callback=on_error,
         )
 
         from pymodalib.algorithms.group_coherence import statistical_test
@@ -478,7 +524,11 @@ class MPHandler:
         return dict(zip(bands, results))
 
     async def coro_preprocess(
-        self, signals: Union[TimeSeries, List[TimeSeries]], fmin: float, fmax: float
+        self,
+        signals: Union[TimeSeries, List[TimeSeries]],
+        fmin: float,
+        fmax: float,
+        on_error: Callable[[str], None],
     ) -> List[ndarray]:
         """
         Performs preprocessing on a single signal.
@@ -490,7 +540,10 @@ class MPHandler:
         """
         self.stop()
         self.scheduler = Scheduler(
-            run_in_thread=True, raise_exceptions=True, capture_stdout=True
+            run_in_thread=True,
+            raise_exceptions=True,
+            capture_stdout=True,
+            error_callback=on_error,
         )
 
         if isinstance(signals, TimeSeries):

@@ -72,7 +72,9 @@ class PCPresenter(BaseTFPresenter):
 
         self.view.on_calculate_started()
         data = await self.mp_handler.coro_transform(
-            params=params, on_progress=self.on_progress_updated
+            params=params,
+            on_progress=self.on_progress_updated,
+            on_error=self.error_callback,
         )
 
         for d in data:
@@ -92,7 +94,9 @@ class PCPresenter(BaseTFPresenter):
 
     async def coro_phase_coherence(self, signals, params, on_progress) -> List[tuple]:
         print("Finished wavelet transform. Calculating phase coherence...")
-        return await self.mp_handler.coro_phase_coherence(signals, params, on_progress)
+        return await self.mp_handler.coro_phase_coherence(
+            signals, params, on_progress, on_error=self.error_callback
+        )
 
     def on_transform_completed(
         self, name, times, freq, values, ampl, powers, avg_ampl, avg_pow, opt=None

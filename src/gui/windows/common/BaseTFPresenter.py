@@ -88,6 +88,9 @@ class BaseTFPresenter:
     def on_progress_updated(self, current, total) -> None:
         self.view.update_progress(current, total)
 
+    def error_callback(self, msg: str) -> None:
+        self.view.on_calculate_failed(msg)
+
     def on_all_tasks_completed(self) -> None:
         self.tasks_completed = 0
 
