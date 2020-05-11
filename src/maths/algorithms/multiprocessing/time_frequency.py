@@ -79,7 +79,9 @@ def _time_frequency(
 
 
 def _wt_func(signal: ndarray, params: TFParams, return_opt: bool):
-    impl = "matlab" if not args.python_wt() else "python"
+    impl = params.get_item("implementation") or (
+        "matlab" if not args.python_wt() else "python"
+    )
 
     result = pymodalib.wavelet_transform(
         signal=signal,

@@ -146,3 +146,12 @@ class TFWindow(
         else:
             transform = "wt"
         return transform
+
+    def get_implementation(self) -> str:
+        """
+        Returns
+        -------
+        {"python", "matlab"}
+            The implementation selected in the GUI.
+        """
+        return self.combo_impl.currentText().lower()

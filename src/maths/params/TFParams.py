@@ -64,6 +64,7 @@ class TFParams:
         preprocess=True,
         rel_tolerance=0.01,
         transform=_wft,
+        implementation: str = "matlab",
     ):
         """
         Constructor which takes the desired parameters and converts
@@ -102,6 +103,7 @@ class TFParams:
             _window: window,
             _wavelet: wavelet,
             _preprocess: "on" if preprocess else "off",
+            "implementation": implementation,
         }
 
     def get(self) -> dict:
@@ -140,6 +142,7 @@ class TFParams:
             "cut_edges": self.get_item(_cut_edges),
             "fr": self.get_item(_f0),
             "preprocessing": self.get_item(_preprocess),
+            "implementation": self.get_item("implementation"),
         }
         return sanitise(out)
 

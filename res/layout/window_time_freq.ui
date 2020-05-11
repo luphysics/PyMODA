@@ -54,7 +54,7 @@
               <item>
                <widget class="QLabel" name="label_2">
                 <property name="text">
-                 <string>Select data (scroll area)</string>
+                 <string>Select signal</string>
                 </property>
                </widget>
               </item>
@@ -281,16 +281,6 @@
             </item>
             <item row="1" column="1">
              <layout class="QGridLayout" name="gridLayout_9">
-              <item row="3" column="0">
-               <widget class="QPushButton" name="btn_stats">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="text">
-                 <string>Calculate</string>
-                </property>
-               </widget>
-              </item>
               <item row="0" column="0">
                <widget class="QGroupBox" name="groupBox">
                 <property name="enabled">
@@ -347,6 +337,23 @@
                   </widget>
                  </item>
                 </layout>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QPushButton" name="btn_stats">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>Calculate</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="label_7">
+                <property name="text">
+                 <string>(Not implemented yet)</string>
+                </property>
                </widget>
               </item>
              </layout>
@@ -471,26 +478,6 @@
             </item>
            </layout>
           </item>
-          <item row="1" column="0" colspan="2">
-           <layout class="QFormLayout" name="formLayout_4">
-            <item row="0" column="1">
-             <widget class="QLabel" name="label_11">
-              <property name="text">
-               <string>WT / WFT Type</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QComboBox" name="combo_window">
-              <item>
-               <property name="text">
-                <string>Gaussian</string>
-               </property>
-              </item>
-             </widget>
-            </item>
-           </layout>
-          </item>
           <item row="0" column="1">
            <widget class="QGroupBox" name="freqOptions">
             <property name="title">
@@ -583,6 +570,51 @@
              </item>
             </layout>
            </widget>
+          </item>
+          <item row="1" column="0" colspan="2">
+           <layout class="QFormLayout" name="formLayout_4">
+            <item row="0" column="1">
+             <widget class="QGroupBox" name="verticalGroupBox">
+              <property name="title">
+               <string>Implementation</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_12">
+               <item>
+                <widget class="QComboBox" name="combo_impl">
+                 <item>
+                  <property name="text">
+                   <string>Python</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>MATLAB</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QGroupBox" name="verticalGroupBox">
+              <property name="title">
+               <string>WT/WFT Type</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_13">
+               <item>
+                <widget class="QComboBox" name="combo_window">
+                 <item>
+                  <property name="text">
+                   <string>Gaussian</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
         </item>

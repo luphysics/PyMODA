@@ -244,6 +244,7 @@ class TFPresenter(BaseTFPresenter):
             cut_edges=self.view.get_cut_edges(),
             preprocess=self.view.get_preprocess(),
             transform=self.view.get_transform_type(),
+            implementation=self.view.get_implementation(),
         )
 
     def load_data(self) -> None:

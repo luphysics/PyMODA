@@ -13,14 +13,15 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from PyQt5.QtWidgets import QRadioButton
+from PyQt5.QtWidgets import QRadioButton, QComboBox
 
 from gui.plotting.plots.PreprocessPlot import PreprocessPlot
 from gui.windows.ViewProperties import ViewProperties
 
 
 class TFViewProperties(ViewProperties):
-
     def __init__(self):
         self.radio_transform_wt: QRadioButton = None
         self.plot_preproc: PreprocessPlot = None
+
+        self.combo_impl: QComboBox = None
