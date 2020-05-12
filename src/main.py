@@ -37,8 +37,7 @@ from utils import errorhandling, stdout_redirect, args, log_utils
 
 if __name__ == "__main__":
     # Fix issues when packaged with PyInstaller.
-    for m in (multiprocess, multiprocessing):
-        m.freeze_support()
+    multiprocessing.freeze_support()
 
     # Set the working directory for consistency.
     if utils.is_frozen:
