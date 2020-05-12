@@ -67,7 +67,12 @@ class LauncherWindow(CentredWindow):
         self.pymoda_has_set_cache_var = False
         self.reload_settings()
 
-        logging.info(f"PyMODAlib version == '{pymodalib.__version__}'")
+        import main
+
+        logging.info(f"PyMODA version == 'v{main.__version__}'")
+        logging.info(f"PyMODAlib version == 'v{pymodalib.__version__}'")
+
+        self.setWindowTitle(f"PyMODA v{main.__version__}")
 
     def setup_ui(self) -> None:
         uic.loadUi(get("layout:window_launcher.ui"), self)
