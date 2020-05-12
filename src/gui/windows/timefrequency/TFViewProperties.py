@@ -13,7 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from PyQt5.QtWidgets import QRadioButton, QComboBox
+from PyQt5.QtWidgets import QRadioButton, QComboBox, QCheckBox
 
 from gui.plotting.plots.PreprocessPlot import PreprocessPlot
 from gui.windows.ViewProperties import ViewProperties
@@ -25,3 +25,4 @@ class TFViewProperties(ViewProperties):
         self.plot_preproc: PreprocessPlot = None
 
         self.combo_impl: QComboBox = None
+        self.chkbox_run_in_thread: QCheckBox = None

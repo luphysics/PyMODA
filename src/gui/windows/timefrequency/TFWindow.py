@@ -155,3 +155,6 @@ class TFWindow(
             The implementation selected in the GUI.
         """
         return self.combo_impl.currentText().lower()
+
+    def get_run_in_thread(self) -> bool:
+        return self.chkbox_run_in_thread.isChecked()

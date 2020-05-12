@@ -84,7 +84,9 @@ class TFPresenter(BaseTFPresenter):
         self.view.on_calculate_started()
 
         all_data = await self.mp_handler.coro_transform(
-            params, self.on_progress_updated
+            params,
+            self.on_progress_updated,
+            run_in_thread=self.view.get_run_in_thread(),
         )
 
         for d in all_data:

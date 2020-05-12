@@ -18,6 +18,7 @@ from typing import Callable, List, Tuple, Union, Optional, Dict
 
 import multiprocess as mp
 import pymodalib
+from PyQt5.QtCore import QThread
 from numpy import ndarray
 from scheduler.Scheduler import Scheduler
 
@@ -64,7 +65,10 @@ class MPHandler:
         self.scheduler: Scheduler = None
 
     async def coro_transform(
-        self, params: TFParams, on_progress: Callable[[int, int], None]
+        self,
+        params: TFParams,
+        on_progress: Callable[[int, int], None],
+        run_in_thread: bool,
     ) -> List[Tuple]:
         """
         Performs a wavelet transform or windowed Fourier transform of signals.
@@ -76,7 +80,10 @@ class MPHandler:
         """
         self.stop()
         self.scheduler = Scheduler(
-            progress_callback=on_progress, raise_exceptions=True, capture_stdout=True
+            progress_callback=on_progress,
+            raise_exceptions=True,
+            capture_stdout=True,
+            run_in_thread=run_in_thread,
         )
 
         signals: Signals = params.signals
