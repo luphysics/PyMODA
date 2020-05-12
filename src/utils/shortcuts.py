@@ -34,9 +34,9 @@ def create_shortcut() -> str:
 
     elif OS.is_linux():
         if utils.is_frozen:
-            status = _create_shortcut_linux()
-        else:
-            status = _create_alias_nix()
+            _create_shortcut_linux()
+
+        status = _create_alias_nix()
 
     elif OS.is_mac_os():
         status = _create_alias_nix()

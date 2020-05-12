@@ -96,6 +96,7 @@ class LauncherWindow(CentredWindow):
         retain_size_when_hidden(self.btn_update)
 
         if args.create_shortcut():
+            logging.info("Creating desktop shortcut silently.")
             self.create_shortcut(silent=True)
 
         if args.post_update():
