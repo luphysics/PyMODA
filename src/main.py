@@ -19,23 +19,22 @@ The entry-point of PyMODA.
 
 __version__ = "0.4.8"
 
-import asyncio
-import multiprocessing
-import os
-import signal
-import sys
-from os import path
-from pathlib import Path
-
-import multiprocess
-from qasync import QEventLoop
-
-import utils
-from gui.Application import Application
-from processes import mp_utils
-from utils import errorhandling, stdout_redirect, args, log_utils
-
 if __name__ == "__main__":
+    import asyncio
+    import multiprocessing
+    import os
+    import signal
+    import sys
+    from os import path
+    from pathlib import Path
+
+    from qasync import QEventLoop
+
+    import utils
+    from gui.Application import Application
+    from processes import mp_utils
+    from utils import errorhandling, stdout_redirect, args, log_utils
+
     # Fix issues when packaged with PyInstaller.
     multiprocessing.freeze_support()
 
