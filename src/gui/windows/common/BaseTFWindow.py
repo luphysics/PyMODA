@@ -229,7 +229,11 @@ class BaseTFWindow(BaseTFViewProperties, MaximisedWindow):
             progress.hide()
         else:
             progress.show()
-            progress.setValue(current / total * 100)
+            if current == 0:
+                progress.setRange(0, 0)
+            else:
+                progress.setRange(0, total)
+                progress.setValue(current / total * 100)
 
         lbl.setText(self.progress_message(current, total))
 
