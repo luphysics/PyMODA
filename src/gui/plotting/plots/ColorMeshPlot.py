@@ -18,7 +18,7 @@ from matplotlib.colors import LinearSegmentedColormap
 
 from data import resources
 from gui.plotting.MatplotlibWidget import MatplotlibWidget
-from maths.num_utils import subset2d, calc_subset_count
+from maths.num_utils import subsample2d
 
 
 def colormap():
@@ -49,12 +49,13 @@ class ColorMeshPlot(MatplotlibWidget):
 
         mesh1, mesh2 = np.meshgrid(x, y)
 
-        # To improve performance, we could subsample the data. Not actually implemented yet.
-        n = calc_subset_count(c)
-        if n > 1:
-            mesh1 = subset2d(mesh1, n)
-            mesh2 = subset2d(mesh2, n)
-            c = subset2d(c, n)
+        target_width = 3840 / 4  # 4K resolution, divided by 4.
+
+        # To improve performance, subsample the data.
+        if target_width < c.shape[1]:
+            mesh1 = subsample2d(mesh1, target_width)
+            mesh2 = subsample2d(mesh2, target_width)
+            c = subsample2d(c, target_width)
 
         self.mesh = self.axes.contourf(
             mesh1, mesh2, c, 256, vmin=np.nanmin(c), vmax=np.nanmax(c), cmap=colormap()

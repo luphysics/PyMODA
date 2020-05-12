@@ -76,14 +76,32 @@ def isfloat(var: Any) -> bool:
     return float_or_none(var) is not None
 
 
-def subset2d(arr, count):
-    shape = arr.shape
-    new_shape = (np.int(np.ceil(shape[0] / count)), np.int(np.ceil(shape[1] / count)))
+def subsample2d(arr, target):
+    """
+    Subsamples 2d arrays of data, using a naive algorithm (take every n-th element without interpolation).
+
+    .. note ::
+        Currently, this function only subsamples the array in the x-direction.
+
+    Parameters
+    ----------
+    arr : ndarray
+        [2D array] The array to subsample.
+    target : int
+        The target width of the array.
+
+    Returns
+    -------
+    ndarray
+        The subsampled array.
+    """
+    x, y = arr.shape
+
+    factor = int(np.ceil(y / target))
+    new_shape = (x, int(np.ceil(y / factor)))
     result = np.empty(shape=new_shape, dtype=arr.dtype)
 
-    for i in range(new_shape[0]):
-        result[i] = arr[i * count][::count]
-
+    result[:, :] = arr[:, ::factor]
     return result
 
 
@@ -94,7 +112,7 @@ def calc_subset_count(arr):
     significantly affecting the appearance of the
     results.
     """
-    return 1  # TODO: add implementation.
+    return int(np.ceil(arr.shape[1] / 3840))
 
 
 def matlab_to_numpy(arr) -> ndarray:
