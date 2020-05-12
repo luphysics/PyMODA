@@ -16,6 +16,7 @@
 import os
 import sys
 import traceback
+from timeit import default_timer as timer
 from typing import Optional
 
 from utils import log_utils
@@ -35,9 +36,14 @@ def process(func):
     """
 
     def wrapper(*args, **kwargs):
-        setup_matlab_runtime()  # TODO: remove, since PyMODAlib handles it? May require adding new environment variable to PyMODAlib.
+        # TODO: remove, since PyMODAlib handles it?
+        setup_matlab_runtime()
 
-        return func(*args, **kwargs)
+        start = timer()
+        result = func(*args, **kwargs)
+        print(f"Time taken to calculate result: {timer() - start:.1f} seconds.")
+
+        return result
 
     return wrapper
 
