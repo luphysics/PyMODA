@@ -57,7 +57,9 @@ if __name__ == "__main__":
     args.init()
     log_utils.init()
     errorhandling.init()
-    stdout_redirect.init()
+
+    # Note: disabled due to crashes when using threads.
+    # stdout_redirect.init()
 
     app = Application(sys.argv)
 
