@@ -60,6 +60,9 @@ class MPHandler:
     # using a thread because this will cause issues with the LD_LIBRARY_PATH.
     should_run_in_thread = not OS.is_linux()
 
+    # On macOS, multiprocess has issues so we need to use threads for everything.
+    only_threads = OS.is_mac_os()
+
     def __init__(self):
         self.scheduler: Scheduler = None
 
@@ -76,7 +79,10 @@ class MPHandler:
         """
         self.stop()
         self.scheduler = Scheduler(
-            progress_callback=on_progress, raise_exceptions=True, capture_stdout=True
+            progress_callback=on_progress,
+            raise_exceptions=True,
+            capture_stdout=True,
+            only_threads=self.only_threads,
         )
 
         signals: Signals = params.signals
@@ -110,7 +116,10 @@ class MPHandler:
 
         self.stop()
         self.scheduler = Scheduler(
-            progress_callback=on_progress, raise_exceptions=True, capture_stdout=True
+            progress_callback=on_progress,
+            raise_exceptions=True,
+            capture_stdout=True,
+            only_threads=self.only_threads,
         )
 
         args = [
@@ -135,7 +144,10 @@ class MPHandler:
         """
         self.stop()
         self.scheduler = Scheduler(
-            progress_callback=on_progress, raise_exceptions=True, capture_stdout=True
+            progress_callback=on_progress,
+            raise_exceptions=True,
+            capture_stdout=True,
+            only_threads=self.only_threads,
         )
 
         return await self.scheduler.map(
@@ -158,7 +170,10 @@ class MPHandler:
         """
         self.stop()
         self.scheduler = Scheduler(
-            progress_callback=on_progress, raise_exceptions=True, capture_stdout=True
+            progress_callback=on_progress,
+            raise_exceptions=True,
+            capture_stdout=True,
+            only_threads=self.only_threads,
         )
 
         signals = params.signals
@@ -197,7 +212,10 @@ class MPHandler:
         """
         self.stop()
         self.scheduler = Scheduler(
-            progress_callback=on_progress, raise_exceptions=True, capture_stdout=True
+            progress_callback=on_progress,
+            raise_exceptions=True,
+            capture_stdout=True,
+            only_threads=self.only_threads,
         )
 
         for s in signals:
@@ -229,7 +247,10 @@ class MPHandler:
         """
         self.stop()
         self.scheduler = Scheduler(
-            progress_callback=on_progress, raise_exceptions=True, capture_stdout=True
+            progress_callback=on_progress,
+            raise_exceptions=True,
+            capture_stdout=True,
+            only_threads=self.only_threads,
         )
 
         for params in paramsets:
@@ -260,7 +281,10 @@ class MPHandler:
         """
         self.stop()
         self.scheduler = Scheduler(
-            progress_callback=on_progress, raise_exceptions=True, capture_stdout=True
+            progress_callback=on_progress,
+            raise_exceptions=True,
+            capture_stdout=True,
+            only_threads=self.only_threads,
         )
 
         return await self.scheduler.map(
@@ -291,7 +315,10 @@ class MPHandler:
         """
         self.stop()
         self.scheduler = Scheduler(
-            progress_callback=on_progress, raise_exceptions=True, capture_stdout=True
+            progress_callback=on_progress,
+            raise_exceptions=True,
+            capture_stdout=True,
+            only_threads=self.only_threads,
         )
 
         args = [
@@ -343,7 +370,10 @@ class MPHandler:
         """
         self.stop()
         self.scheduler = Scheduler(
-            progress_callback=on_progress, raise_exceptions=True, capture_stdout=True
+            progress_callback=on_progress,
+            raise_exceptions=True,
+            capture_stdout=True,
+            only_threads=self.only_threads,
         )
 
         return await self.scheduler.map(
@@ -412,7 +442,10 @@ class MPHandler:
         """
         self.stop()
         self.scheduler = Scheduler(
-            progress_callback=on_progress, raise_exceptions=True, capture_stdout=True
+            progress_callback=on_progress,
+            raise_exceptions=True,
+            capture_stdout=True,
+            only_threads=self.only_threads,
         )
 
         return await self.scheduler.map(
@@ -465,6 +498,7 @@ class MPHandler:
             progress_callback=on_progress,
             raise_exceptions=True,
             capture_stdout=True,
+            only_threads=self.only_threads,
         )
 
         from pymodalib.algorithms.group_coherence import statistical_test
@@ -490,7 +524,10 @@ class MPHandler:
         """
         self.stop()
         self.scheduler = Scheduler(
-            run_in_thread=True, raise_exceptions=True, capture_stdout=True
+            run_in_thread=True,
+            raise_exceptions=True,
+            capture_stdout=True,
+            only_threads=self.only_threads,
         )
 
         if isinstance(signals, TimeSeries):
