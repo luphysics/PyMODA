@@ -16,6 +16,7 @@
 import datetime
 import logging
 import sys
+import threading
 
 
 class StdOut:
@@ -28,10 +29,11 @@ class StdOut:
 
         # Notify subscribers.
         for s in subscribers:
-            if isinstance(s, WindowLogger):
-                s.update(text)
-            else:
-                s(text)
+            if threading.current_thread() is threading.main_thread():
+                if isinstance(s, WindowLogger):
+                    s.update(text)
+                else:
+                    s(text)
 
     def flush(self):
         return
