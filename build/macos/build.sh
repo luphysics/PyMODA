@@ -12,7 +12,10 @@ python3 build/strip_resources.py -y
 python3 -m PyInstaller macos.spec --noconfirm
 
 mv dist/PyMODA.app .
+
+zip -r PyMODA-macOS.zip PyMODA.app 
 hdiutil create -srcfolder PyMODA.app PyMODA-macOS.dmg
 
 mkdir -p releases
 mv PyMODA-macOS.dmg releases/
+mv PyMODA-macOS.zip releases/
