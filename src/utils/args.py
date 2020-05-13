@@ -95,6 +95,12 @@ def parser() -> ArgumentParser:
         default=False,
         help="Create a desktop shortcut when PyMODA launches.",
     )
+    p.add_argument(
+        "--launcher",
+        action="store_true",
+        default=False,
+        help="Used when PyMODA is launched by the PyMODA launcher.",
+    )
     return p
 
 
