@@ -17,7 +17,7 @@
 The entry-point of PyMODA.
 """
 
-__version__ = "0.5.0"
+__version__ = "0.5.2"
 
 import asyncio
 import multiprocessing
