@@ -80,14 +80,6 @@ class Updater(ABC):
 
 
 class WindowsUpdater(Updater):
-    """
-    1. Download .zip file.
-    2. Extract to cwd. Structure: pymoda-new/PyMODA/PyMODA.exe
-    3. Rename pymoda-new/PyMODA to pymoda-new/TAG
-    4. Move pymoda-new/TAG to $AppData/PyMODA/TAG
-    5. Create "latest-TAG" file.
-    """
-
     def download_launcher(self) -> None:
         warnings.warn("Cannot download launcher on Windows.")
 
@@ -168,44 +160,15 @@ class NixUpdater(Updater, ABC):
 
 
 class LinuxUpdater(NixUpdater):
-    """
-    Update process for Linux:
-
-    1. Download tarball.
-    2. Extract to cwd. Structure: pymoda-temp ('pymoda-temp' is the root folder)
-    3. Rename pymoda-temp to TAG
-    4. Move TAG to ~/.pymoda/TAG
-    5. Create "latest-TAG" file.
-    """
-
     def move_files(self) -> None:
         launcher_dir = launcher.get_launcher_directory()
         shutil.move(join("pymoda-temp", "PyMODA"), join(launcher_dir, self.tag))
 
 
 class MacUpdater(NixUpdater):
-    """
-    Update process for macOS:
-
-    1. Download tarball.
-    2. Extract to cwd. Structure: pymoda-temp ('pymoda-temp' is the '.app' folder)
-    3. Move pymoda-temp into a new folder, pymoda-container
-    4. Rename pymoda-container/pymoda-temp to pymoda-container/PyMODA.app
-    5. Rename pymoda-container to TAG and move to ~/.pymoda/TAG
-    6. Create "latest-TAG" file.
-    """
-
     def move_files(self) -> None:
         launcher_dir = launcher.get_launcher_directory()
-
-        os.mkdir("pymoda-container")
-        shutil.move("pymoda-temp", "pymoda-container")
-
-        os.rename(
-            join("pymoda-container", "pymoda-temp"),
-            join("pymoda-container", "PyMODA.app"),
-        )
-        shutil.move("pymoda-container", join(launcher_dir, self.tag))
+        shutil.move("pymoda-temp", join(launcher_dir, self.tag))
 
 
 def get_instance(tag) -> Updater:
