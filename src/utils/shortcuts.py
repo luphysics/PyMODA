@@ -20,7 +20,6 @@ from os.path import join
 from subprocess import Popen, PIPE
 
 import utils
-from updater import update
 from utils.os_utils import OS
 
 
@@ -164,7 +163,7 @@ def _python_interpreter_arguments() -> str:
     Returns the path to the main Python file plus all current arguments.
     """
     blacklist = [
-        update.arg_post_update,
+        "--post-update",
         "--create-shortcut",
     ]  # Args to avoid adding to shortcut.
 

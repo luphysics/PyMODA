@@ -15,13 +15,11 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import os
 import time
-from os import path
 from typing import List, Dict, Optional
 
 from easysettings import EasySettings
 
 from utils import file_utils
-from utils.file_utils import get_root_folder
 
 _key_recent_files = "recent_files"
 _key_recent_frequencies = "recent_freq"
@@ -32,6 +30,7 @@ _key_last_update_check = "last_update_check"
 _key_update_source = "update_source"
 _key_save_dir = "save_directory"
 _key_pymodalib_cache = "pymodalib_cache"
+_key_updating = "updating"
 
 
 class Settings:
@@ -140,6 +139,9 @@ class Settings:
     def should_check_updates(self) -> bool:
         return time.time() - self._settings.get(_key_last_update_check, 0.0) > 3600 * 6
 
+    def get_last_update_check(self) -> float:
+        return self._settings.get(_key_last_update_check, 0)
+
     def set_last_update_check(self, time: float) -> None:
         self._settings.set(_key_last_update_check, time)
         self._settings.save()
@@ -165,3 +167,10 @@ class Settings:
         self._settings.set(_key_pymodalib_cache, location or "None")
         self._settings.save()
         self._settings.reload_file()
+
+    def set_update_in_progress(self, updating: bool) -> None:
+        self._settings.set(_key_updating, updating)
+        self._settings.save()
+
+    def get_update_in_progress(self) -> bool:
+        return self._settings.get(_key_updating, False)

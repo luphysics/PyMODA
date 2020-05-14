@@ -18,7 +18,7 @@ from typing import Type
 from PyQt5.QtWidgets import QApplication
 
 from gui.windows.BaseWindow import BaseWindow
-from gui.windows.LauncherWindow import LauncherWindow
+from gui.windows.launcher.LauncherWindow import LauncherWindow
 from gui.windows.bayesian.DBWindow import DBWindow
 from gui.windows.bispectrum.BAWindow import BAWindow
 from gui.windows.groupcoherence.GCWindow import GCWindow

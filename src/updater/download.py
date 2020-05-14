@@ -14,14 +14,18 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import time
 from http.client import HTTPResponse
 
 from PyQt5.QtCore import pyqtSignal
 
+from utils.os_utils import OS
 
-def _chunked_download(
-    filename: str, response: HTTPResponse, size: int, progress_signal: pyqtSignal
+
+def chunked_download(
+    filename: str,
+    response: HTTPResponse,
+    size: int = None,
+    progress_signal: pyqtSignal = None,
 ) -> None:
     """
     Downloads the zip file and emits progress.
@@ -45,16 +49,33 @@ def _chunked_download(
             f.write(buffer)
             bytes_downloaded += block_size
 
-            progress_signal.emit(bytes_downloaded / size * 100)
+            if progress_signal:
+                progress_signal.emit(bytes_downloaded / size * 100)
 
 
-def _mock_download(progress_signal: pyqtSignal) -> None:
-    """
-    Pretends to download a zip file. Used for testing when the zip file is
-    already stored in the current working directory.
-    """
-    counter = 0
-    while counter <= 100:
-        progress_signal.emit(counter)
-        counter += 1
-        time.sleep(2 / 100)
+def get_pymoda_download_url() -> str:
+    asset = ""
+
+    if OS.is_windows():
+        asset = "PyMODA-win64.zip"
+    elif OS.is_linux():
+        asset = "PyMODA-linux_x86_64.tar.gz"
+    elif OS.is_mac_os():
+        asset = "PyMODA-macOS.tar.gz"
+
+    return f"https://github.com/luphysics/pymoda/releases/latest/download/{asset}"
+
+
+def get_launcher_download_url() -> str:
+    asset = ""
+
+    if OS.is_windows():
+        return ""
+    elif OS.is_linux():
+        asset = "launcher-linux"
+    elif OS.is_mac_os():
+        asset = "launcher-macos"
+
+    return (
+        f"https://github.com/luphysics/pymoda-launcher/releases/latest/download/{asset}"
+    )

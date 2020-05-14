@@ -13,13 +13,12 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-import os
-from urllib.request import urlopen
+import logging
 
 from PyQt5.QtCore import QThread, pyqtSignal
 
-from updater import update as upd
-from updater.download import _chunked_download, _mock_download
+from updater import Updater
+from utils import launcher
 
 temp_filename = "pymoda-temp.zip"
 
@@ -31,91 +30,54 @@ class UpdateThread(QThread):
 
     # Signals for displaying progress and success/failure.
     download_progress_signal = pyqtSignal(float)
-    download_finished_signal = pyqtSignal(bool)
-    extract_finished_signal = pyqtSignal(bool)
+    downloading_signal = pyqtSignal(bool)
+    extracting_signal = pyqtSignal(bool)
     copy_finished_signal = pyqtSignal(bool)
+    error_signal = pyqtSignal(bool)
 
-    def __init__(self, window, size):
+    release_tag = None
+
+    def __init__(self):
         super().__init__()
-        self.window = window
-        self.size = size
+
+        self.updater = None
 
     def run(self) -> None:
-        """
-        Updates PyMODA.
-        """
-        # Download the zip file.
-        success = self.download_zip()
-        self.download_finished_signal.emit(success)
-
-        if not success:
-            return
-
-        # Extract the zip file.
-        success = self.extract_zip()
-        self.extract_finished_signal.emit(success)
-
-        if not success:
-            return
-
-        # Overwrite the old version with the new version.
-        success = self.copy_files()
-        self.copy_finished_signal.emit(success)
-
-    def download_zip(self) -> bool:
-        """
-        Downloads the zip file containing the new version of PyMODA.
-
-        :return: whether the function completed successfully
-        """
-        # Pretend to download the file if an environment variable, MOCK_DOWNLOAD, is set.
-        if os.environ.get("MOCK_DOWNLOAD") is not None:
-            _mock_download(self.download_progress_signal)
-            return True
-
         try:
-            branch, zip_url, commit_url = upd.get_update_params()
-            print(f"Downloading new version of PyMODA from {zip_url}...")
-            with urlopen(zip_url) as response:
-                _chunked_download(
-                    temp_filename, response, self.size, self.download_progress_signal
-                )
-
-            success = True
+            self.do_update()
         except Exception as e:
-            print(e)
-            success = False
+            logging.error(e)
+            self.error_signal.emit(True)
 
-        return success
+    def do_update(self) -> None:
+        logging.info("Update thread has started.")
+        if not self.release_tag:
+            return logging.error("No release tag.")
 
-    @staticmethod
-    def extract_zip() -> bool:
-        """
-        Extracts the zip file containing the new version of PyMODA.
+        self.updater = Updater.get_instance(self.release_tag)
 
-        :return: whether the function completed successfully
-        """
-        try:
-            upd.extract_zip(temp_filename)
-            success = True
-        except Exception as e:
-            print(e)
-            success = False
+        if self.updater.is_version_present():
+            return logging.warning(
+                f"Version {self.release_tag} is already installed. Aborting..."
+            )
 
-        return success
+        # Download launcher if not present.
+        if not launcher.is_launcher_present():
+            logging.info("Downloading launcher...")
+            self.updater.download_launcher()
+            logging.info("Launcher downloaded.")
 
-    @staticmethod
-    def copy_files() -> bool:
-        """
-        Overwrites the old version of PyMODA with the new version.
+        logging.info("Downloading archive...")
+        self.downloading_signal.emit(True)
+        self.updater.download_archive(self.release_tag)
 
-        :return: whether the function completed successfully
-        """
-        try:
-            upd.copy_files()
-            success = True
-        except Exception as e:
-            print(e)
-            success = False
+        logging.info("Extracting archive...")
+        self.extracting_signal.emit(True)
+        self.updater.extract_archive()
 
-        return success
+        logging.info("Moving files from extracted archive...")
+        self.updater.move_files()
+        self.updater.finish()
+
+        self.copy_finished_signal.emit(True)
+        logging.info("Update process complete.")

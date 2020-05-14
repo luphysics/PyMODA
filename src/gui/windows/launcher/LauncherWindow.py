@@ -18,29 +18,37 @@ import logging
 import os
 import sys
 import time
+import warnings
+from enum import Enum
 from pathlib import Path
 
 import pymodalib
 from PyQt5 import uic
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QKeySequence
-from PyQt5.QtWidgets import QMessageBox, QShortcut
+from PyQt5.QtWidgets import QMessageBox, QShortcut, QLabel
 from pymodalib.utils.matlab_runtime import RuntimeStatus
 
-import updater.update as upd
 import utils
 from data import resources
 from data.resources import get
 from gui.dialogs.MatlabRuntimeDialog import MatlabRuntimeDialog
 from gui.dialogs.SettingsDialog import SettingsDialog
 from gui.windows.CentredWindow import CentredWindow
-from updater import update
-from updater.update import get_latest_commit
+from updater import check
+from updater.UpdateThread import UpdateThread
 from utils import args
 from utils.os_utils import OS
 from utils.qutils import retain_size_when_hidden
 from utils.settings import Settings
 from utils.shortcuts import create_shortcut
+
+
+class UpdateStatus(Enum):
+    NOT_AVAILABLE = 0
+    DOWNLOADING = 1
+    FINISHED = 2
+    ERROR = 3
 
 
 class LauncherWindow(CentredWindow):
@@ -50,6 +58,16 @@ class LauncherWindow(CentredWindow):
 
     def __init__(self, parent):
         self.settings = Settings()
+
+        self.lbl_update_status = None
+
+        self.update_thread = UpdateThread()
+
+        self.update_thread.downloading_signal.connect(self.on_download_finished)
+        self.update_thread.extracting_signal.connect(self.on_extract_finished)
+        self.update_thread.copy_finished_signal.connect(self.on_copy_finished)
+        self.update_thread.error_signal.connect(self.on_update_error)
+
         super(LauncherWindow, self).__init__(parent)
 
         print(
@@ -63,6 +81,10 @@ class LauncherWindow(CentredWindow):
         self.update_shortcut.activated.connect(self.force_check_updates)
         self.update_shortcut_force = QShortcut(QKeySequence("Ctrl+Shift+U"), self)
         self.update_shortcut_force.activated.connect(self.force_show_update)
+
+        self.updating = False
+        self.update_status = UpdateStatus.NOT_AVAILABLE
+        self.update_statusbar()
 
         self.pymoda_has_set_cache_var = False
         self.reload_settings()
@@ -98,6 +120,9 @@ class LauncherWindow(CentredWindow):
         self.btn_update.clicked.connect(self.on_update_clicked)
         self.btn_settings.clicked.connect(self.on_settings_clicked)
 
+        self.lbl_update_status = QLabel("")
+        self.statusBar().addPermanentWidget(self.lbl_update_status)
+
         retain_size_when_hidden(self.btn_update)
 
         if args.create_shortcut():
@@ -106,8 +131,22 @@ class LauncherWindow(CentredWindow):
 
         if args.post_update():
             asyncio.ensure_future(self.post_update())
-        elif update.should_check_for_updates():
+        else:
             asyncio.ensure_future(self.check_for_updates())
+
+    def update_statusbar(self) -> None:
+        status = self.update_status
+
+        if status is UpdateStatus.NOT_AVAILABLE:
+            self.lbl_update_status.setText("No updates available.")
+        elif status is UpdateStatus.DOWNLOADING:
+            self.lbl_update_status.setText("Downloading update...")
+        elif status is UpdateStatus.FINISHED:
+            self.lbl_update_status.setText(
+                "Update installed, will activate on next launch."
+            )
+        elif status is UpdateStatus.ERROR:
+            self.lbl_update_status.setText("Error while updating; see log for details.")
 
     def check_matlab_runtime(self) -> None:
         """
@@ -228,7 +267,7 @@ class LauncherWindow(CentredWindow):
         self.settings.set_latest_commit(await get_latest_commit())
 
         # Remove the `--post-update` argument to prevent confusion in other parts of the program.
-        sys.argv.remove(update.arg_post_update)
+        sys.argv.remove("--post-update")
         args.set_post_update(False)
 
         # After updating, we want the relaunched window to be obvious.
@@ -262,49 +301,24 @@ class LauncherWindow(CentredWindow):
 
         :param force: whether to force an update check, even if there was a recent check
         """
-        # If there was an update found the last time we checked.
-        if self.settings.get_update_available_on_branch():
-            self.show_update_available(True)
-            print(
-                f"Update is available on branch '{self.settings.get_update_branch()}'."
-            )
+        if self.updating:
             return
 
-        # If we should check for updates again now.
-        elif not self.settings.should_check_updates() and not force:
-            self.show_update_available(False)
-            print(f"Skipping a check for updates.")
+        if (".git" in os.listdir(".") and not force) or (
+            not self.settings.get_update_in_progress()
+            and not force
+            and time.time() - self.settings.get_last_update_check() < 3600
+        ):
             return
 
-        # Retrieve the latest commit from the GitHub API.
-        new_commit = await get_latest_commit()
-
-        if new_commit is None:
-            self.show_update_available(False)
-            return
-
-        # If it's the first ever check for updates.
-        elif self.settings.get_latest_commit_on_branch() is None:
-            self.settings.set_latest_commit(new_commit)
-            self.show_update_available(False)
-
-        # If there's an update available.
-        elif new_commit != self.settings.get_latest_commit_on_branch():
-            self.settings.set_update_available(True)
-            self.show_update_available(True)
-            print(
-                f"Found new update on branch '{self.settings.get_update_branch()}'. Commit hash: {new_commit}"
-            )
-
-        # No updates available.
+        available, tag = check.is_update_available()
+        if available:
+            logging.info(f"Found new release: {tag}")
+            self.update_thread.release_tag = tag
+            self.start_background_update()
         else:
-            self.settings.set_update_available(False)
-            self.show_update_available(False)
-            print(
-                f"No updates available on branch '{self.settings.get_update_branch()}'."
-            )
+            logging.info("No updates available.")
 
-        # Set now as the last time at which an update check occurred.
         self.settings.set_last_update_check(time.time())
 
     def show_update_available(self, show: bool) -> None:
@@ -314,3 +328,37 @@ class LauncherWindow(CentredWindow):
         for item in (self.lbl_update, self.btn_update):
             item.setStyleSheet("color: blue;")
             item.setVisible(show)
+
+    def start_background_update(self) -> None:
+        try:
+            print("Starting background update...")
+            self.update_thread.start()
+
+            self.updating = True
+            self.settings.set_update_in_progress(True)
+
+            self.update_statusbar()
+        except:
+            warnings.warn("Cannot start update thread more than once.", RuntimeWarning)
+
+    def on_download_finished(self) -> None:
+        self.update_status = UpdateStatus.DOWNLOADING
+        self.update_statusbar()
+
+    def on_extract_finished(self) -> None:
+        self.update_statusbar()
+
+    def on_copy_finished(self) -> None:
+        self.update_status = UpdateStatus.FINISHED
+
+        self.settings.set_update_in_progress(False)
+        self.updating = False
+
+        self.update_statusbar()
+
+    def on_update_error(self) -> None:
+        self.updating = False
+        self.settings.set_update_in_progress(False)
+
+        self.update_status = UpdateStatus.ERROR
+        self.update_statusbar()

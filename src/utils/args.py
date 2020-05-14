@@ -16,7 +16,6 @@
 from argparse import ArgumentParser
 from typing import Optional, Tuple
 
-from updater import update
 
 args = None
 
@@ -71,7 +70,7 @@ def parser() -> ArgumentParser:
         "which will crash the program with a traceback.",
     )
     p.add_argument(
-        update.arg_post_update,
+        "--post-update",
         action="store_true",
         default=False,
         help="This argument should not be supplied manually. "
