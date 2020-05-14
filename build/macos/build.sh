@@ -14,8 +14,6 @@ python3 -m PyInstaller macos.spec --noconfirm
 mv dist/PyMODA.app .
 
 tar -zcf PyMODA-macOS.tar.gz PyMODA.app
-hdiutil create -srcfolder PyMODA.app PyMODA-macOS.dmg
 
 mkdir -p releases
-mv PyMODA-macOS.dmg releases/
 mv PyMODA-macOS.tar.gz releases/
