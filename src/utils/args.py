@@ -99,6 +99,12 @@ def parser() -> ArgumentParser:
         default=False,
         help="Passed by the PyMODA launcher when it starts PyMODA.",
     )
+    p.add_argument(
+        "--from-shortcut",
+        action="store_true",
+        default=False,
+        help="Used to inform PyMODA that it was opened via a shortcut.",
+    )
     return p
 
 
@@ -233,3 +239,11 @@ def launcher() -> bool:
     Returns whether PyMODA was started via the launcher.
     """
     return args and args.launcher
+
+
+@initargs
+def from_shortcut() -> bool:
+    """
+    Returns whether the --from-shortcut argument was passed.
+    """
+    return args and args.from_shortcut

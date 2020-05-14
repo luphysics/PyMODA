@@ -16,10 +16,11 @@
 
 import os
 import sys
-from os.path import join
 from subprocess import Popen, PIPE
+from typing import List
 
 import utils
+from utils import launcher
 from utils.os_utils import OS
 
 
@@ -30,13 +31,8 @@ def create_shortcut() -> str:
     """
     if OS.is_windows():
         status = _create_shortcut_windows()
-
     elif OS.is_linux():
-        if utils.is_frozen:
-            _create_shortcut_linux()
-
         status = _create_alias_nix()
-
     elif OS.is_mac_os():
         status = _create_alias_nix()
     else:
@@ -55,45 +51,18 @@ def _create_shortcut_windows() -> str:
 
     path = os.path.join(winshell.desktop(), "PyMODA.lnk")
     with winshell.shortcut(path) as s:
-        s.path = sys.executable  # Path to Python interpreter.
+        s.path = _get_executable_windows()
         s.description = "Shortcut to launch PyMODA."
         s.arguments = _python_interpreter_arguments()
 
     return "Created desktop shortcut for PyMODA with current arguments."
 
 
-def _create_shortcut_linux() -> str:
-    """
-    Creates a desktop shortcut on Linux.
+def _get_executable_windows() -> str:
+    if launcher.is_launcher_present():
+        return launcher.get_launcher_path()
 
-    Returns
-    -------
-    status : str
-        The status message to show to the user.
-    """
-    items = ["[Desktop Entry]"]
-
-    key_values = {
-        "Version": "1.0",
-        "Name": "PyMODA",
-        "Exec": f'"{sys.executable}"',
-        "Terminal": "false",
-        "Type": "Application",
-        "StartupNotify": "true",
-        "Categories": "Science;Tools",
-        "X-Desktop-File-Install-Version": "0.15",
-    }
-
-    for key, value in key_values.items():
-        items.append(f"{key}={value}")
-
-    shortcut_dir = "~/.local/share/applications"
-    os.makedirs(shortcut_dir, exist_ok=True)
-
-    with open(join(shortcut_dir, "pymoda.desktop"), "w", encoding="utf-8") as f:
-        f.writelines(items)
-
-    return "Created desktop shortcut."
+    return sys.executable
 
 
 def _create_alias_nix() -> str:
@@ -124,18 +93,21 @@ def _create_alias_nix() -> str:
             zsh_lines = None
 
     alias_pymoda = "alias pymoda="
-    filter_func = lambda line: alias_pymoda not in line
     line_to_add = (
-        f"{alias_pymoda}'{sys.executable} {_python_interpreter_arguments()}'\n\n"
+        f"{alias_pymoda}'{_get_executable_nix()} {_python_interpreter_arguments()}'\n\n"
     )
 
-    bash_lines = list(filter(filter_func, bash_lines))
+    def filter_out_alias(lines: List[str]) -> List[str]:
+        return list(filter(lambda line: alias_pymoda not in line, lines))
+
+    bash_lines = filter_out_alias(bash_lines)
     bash_lines.append(line_to_add)
+
     with open(bashrc, "w") as f:
         f.writelines(bash_lines)
 
     if zsh_lines is not None:
-        zsh_lines = list(filter(filter_func, zsh_lines))
+        zsh_lines = filter_out_alias(zsh_lines)
         zsh_lines.append(line_to_add)
 
         with open(zshrc, "w") as f:
@@ -145,6 +117,13 @@ def _create_alias_nix() -> str:
         "Created 'pymoda' alias to launch PyMODA with current arguments. "
         "Open a new terminal in any folder and try typing 'pymoda'."
     )
+
+
+def _get_executable_nix() -> str:
+    if launcher.is_launcher_present():
+        return launcher.get_launcher_path()
+
+    return sys.executable
 
 
 def _get_abs_path_in_home_folder(file_name: str) -> str:
@@ -165,6 +144,7 @@ def _python_interpreter_arguments() -> str:
     blacklist = [
         "--post-update",
         "--create-shortcut",
+        "--from-shortcut",
     ]  # Args to avoid adding to shortcut.
 
     args = [a for a in sys.argv if a not in blacklist]
@@ -173,6 +153,7 @@ def _python_interpreter_arguments() -> str:
     else:
         args = args[1:]
 
+    args.append("--from-shortcut")
     return " ".join(args)
 
 
