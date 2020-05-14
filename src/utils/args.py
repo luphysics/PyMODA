@@ -16,7 +16,6 @@
 from argparse import ArgumentParser
 from typing import Optional, Tuple
 
-
 args = None
 
 
@@ -98,7 +97,7 @@ def parser() -> ArgumentParser:
         "--launcher",
         action="store_true",
         default=False,
-        help="Used when PyMODA is launched by the PyMODA launcher.",
+        help="Passed by the PyMODA launcher when it starts PyMODA.",
     )
     return p
 
@@ -226,3 +225,11 @@ def no_update() -> bool:
     Returns whether PyMODA should avoid showing that updates are available.
     """
     return args and args.no_update
+
+
+@initargs
+def launcher() -> bool:
+    """
+    Returns whether PyMODA was started via the launcher.
+    """
+    return args and args.launcher

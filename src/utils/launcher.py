@@ -14,9 +14,12 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 import os
+import subprocess
+import sys
 from os.path import join
 
 from utils import file_utils
+from utils.os_utils import OS
 
 
 def get_launcher_directory() -> str:
@@ -30,3 +33,26 @@ def is_launcher_present() -> bool:
             for name in ["launcher", "launcher.exe"]
         ]
     )
+
+
+def get_launcher_path() -> str:
+    folder = get_launcher_directory()
+
+    target = join(folder, _get_launcher_name())
+
+    if os.path.exists(target):
+        return target
+    else:
+        return None
+
+
+def _get_launcher_name() -> str:
+    return "launcher.exe" if OS.is_windows() else "launcher"
+
+
+def start_via_launcher() -> None:
+    target = get_launcher_path()
+    if not target:
+        return
+
+    subprocess.Popen([target, *sys.argv[1:]])

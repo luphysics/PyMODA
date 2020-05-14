@@ -33,12 +33,17 @@ from qasync import QEventLoop
 import utils
 from gui.Application import Application
 from processes import mp_utils
-from utils import errorhandling, stdout_redirect, args, log_utils
+from utils import errorhandling, stdout_redirect, args, log_utils, launcher
 
 if __name__ == "__main__":
     # Fix issues when packaged with PyInstaller.
     for m in (multiprocess, multiprocessing):
         m.freeze_support()
+
+    # If not started via the launcher, exit and run new instance via launcher.
+    if utils.frozen and not args.launcher() and launcher.is_launcher_present():
+        launcher.start_via_launcher()
+        sys.exit(0)
 
     # Set the working directory for consistency.
     if utils.is_frozen:
