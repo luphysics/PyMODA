@@ -25,13 +25,17 @@ def _tuple_version(version_tag: str) -> Tuple[int, int, int]:
     return tuple([int(v) for v in version_tag.replace("v", "").split(".")])
 
 
+def is_version_newer(new: str, old: str) -> bool:
+    return _tuple_version(new) > _tuple_version(old)
+
+
 def is_update_available() -> Tuple[bool, str]:
     import main
 
     releases = get_releases()
 
     latest = releases[0]
-    return _tuple_version(latest.title) > _tuple_version(main.__version__), latest.title
+    return is_version_newer(latest.title, main.__version__), latest.title
 
 
 def get_releases() -> List[GitRelease]:

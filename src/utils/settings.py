@@ -13,12 +13,14 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import logging
 import os
 import time
 from typing import List, Dict, Optional
 
 from easysettings import EasySettings
 
+from updater.check import is_version_newer
 from utils import file_utils
 
 _key_recent_files = "recent_files"
@@ -31,6 +33,7 @@ _key_update_source = "update_source"
 _key_save_dir = "save_directory"
 _key_pymodalib_cache = "pymodalib_cache"
 _key_updating = "updating"
+_key_version = "pymoda_version"
 
 
 class Settings:
@@ -174,3 +177,17 @@ class Settings:
 
     def get_update_in_progress(self) -> bool:
         return self._settings.get(_key_updating, False)
+
+    def get_pymoda_version(self) -> str:
+        return self._settings.get(_key_version, None)
+
+    def set_pymoda_version(self, version: str) -> None:
+        current = self._settings.get(_key_version)
+
+        if not current or is_version_newer(new=version, old=current):
+            self._settings.set(_key_version, version)
+            self._settings.save()
+        else:
+            logging.error(
+                f"Trying to set PyMODA version to {version}, but the current value is {current}"
+            )

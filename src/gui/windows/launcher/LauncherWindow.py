@@ -37,6 +37,7 @@ from gui.dialogs.SettingsDialog import SettingsDialog
 from gui.windows.CentredWindow import CentredWindow
 from updater import check
 from updater.UpdateThread import UpdateThread
+from updater.check import is_version_newer
 from utils import args
 from utils.os_utils import OS
 from utils.qutils import retain_size_when_hidden
@@ -96,6 +97,7 @@ class LauncherWindow(CentredWindow):
         logging.info(f"Opened via launcher: {args.launcher()}")
 
         self.setWindowTitle(f"PyMODA v{main.__version__}")
+        asyncio.ensure_future(self.check_if_updated())
 
     def setup_ui(self) -> None:
         uic.loadUi(get("layout:window_launcher.ui"), self)
@@ -136,6 +138,34 @@ class LauncherWindow(CentredWindow):
             asyncio.ensure_future(self.post_update())
         else:
             asyncio.ensure_future(self.check_for_updates())
+
+    async def check_if_updated(self) -> None:
+        await asyncio.sleep(0.5)
+
+        import main
+
+        old_version = self.settings.get_pymoda_version()
+
+        if not old_version:
+            return self.settings.set_pymoda_version(main.__version__)
+
+        if old_version != main.__version__ and is_version_newer(
+            main.__version__, old_version
+        ):
+            logging.info(
+                f"Showing dialog for update: {old_version} -> {main.__version__}"
+            )
+            self.settings.set_pymoda_version(main.__version__)
+
+            msgbox = QMessageBox()
+            msgbox.setWindowTitle("Updated")
+
+            msgbox.setIcon(QMessageBox.Information)
+            msgbox.setText(
+                f"PyMODA successfully updated from v{old_version} to v{main.__version__}."
+            )
+
+            msgbox.exec()
 
     def update_statusbar(self) -> None:
         status = self.update_status
