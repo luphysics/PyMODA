@@ -93,6 +93,7 @@ class LauncherWindow(CentredWindow):
 
         logging.info(f"PyMODA version == 'v{main.__version__}'")
         logging.info(f"PyMODAlib version == 'v{pymodalib.__version__}'")
+        logging.info(f"Opened via launcher: {args.launcher()}")
 
         self.setWindowTitle(f"PyMODA v{main.__version__}")
 
@@ -112,7 +113,9 @@ class LauncherWindow(CentredWindow):
         self.btn_harmonics.clicked.connect(self.application.start_harmonics)
 
         self.btn_create_shortcut.clicked.connect(self.create_shortcut)
-        self.check_matlab_runtime()
+
+        # TODO: check for Matlab runtime, but show less intrusive message.
+        # self.check_matlab_runtime()
 
         self.lbl_update.hide()
 
