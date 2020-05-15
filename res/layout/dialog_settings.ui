@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>693</width>
-    <height>620</height>
+    <width>488</width>
+    <height>399</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,46 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_2" stretch="2,2,1">
-     <item>
-      <widget class="QGroupBox" name="verticalGroupBox">
-       <property name="maximumSize">
-        <size>
-         <width>16777215</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="title">
-        <string>Update source</string>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout_3">
-        <item>
-         <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string>Set the branch from which PyMODA downloads updates. Use &quot;Release&quot; for a stable experience, or &quot;Staging&quot; to get beta updates.</string>
-          </property>
-          <property name="wordWrap">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="combo_update_source">
-          <item>
-           <property name="text">
-            <string>Release</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Staging</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
+    <layout class="QVBoxLayout" name="verticalLayout_2" stretch="2,1">
      <item>
       <widget class="QGroupBox" name="verticalGroupBox">
        <property name="maximumSize">

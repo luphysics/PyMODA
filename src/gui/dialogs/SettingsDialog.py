@@ -24,7 +24,6 @@ from PyQt5.QtWidgets import (
     QLineEdit,
     QPushButton,
     QFileDialog,
-    QComboBox,
 )
 
 from data import resources
@@ -47,8 +46,6 @@ class SettingsDialog(QDialog, BaseUI):
         self.btn_browse: QPushButton = None
         self.btn_open_logs: QPushButton = None
 
-        self.combo_update_source: QComboBox = None
-
         super().__init__()
 
     def setup_ui(self) -> None:
@@ -60,16 +57,9 @@ class SettingsDialog(QDialog, BaseUI):
         cache_loc = self.settings.get_pymodalib_cache()
         self.line_cache_loc.setText(cache_loc if cache_loc != "None" else cache_loc)
 
-        self.combo_update_source.setCurrentText(
-            self.settings.get_update_branch().capitalize()
-        )
-
     def run(self) -> None:
         if QDialog.Accepted == self.exec():
             self.settings.set_pymodalib_cache(self.get_location())
-            self.settings.set_update_source(
-                self.combo_update_source.currentText().lower()
-            )
             print("Settings saved.")
         else:
             print("Settings not saved.")
@@ -83,7 +73,8 @@ class SettingsDialog(QDialog, BaseUI):
             self.line_cache_loc.setText(cache_location)
 
     def get_location(self) -> Optional[str]:
-        return self.line_cache_loc.text()
+        text = self.line_cache_loc.text()
+        return text if text != "None" else None
 
     @staticmethod
     def on_open_logs_clicked() -> None:

@@ -168,7 +168,7 @@ class Settings:
         return self._settings.get(_key_pymodalib_cache, None)
 
     def set_pymodalib_cache(self, location: str) -> None:
-        self._settings.set(_key_pymodalib_cache, location or "None")
+        self._settings.set(_key_pymodalib_cache, location)
         self._settings.save()
         self._settings.reload_file()
 
