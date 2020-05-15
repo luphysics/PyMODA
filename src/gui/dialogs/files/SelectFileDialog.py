@@ -13,6 +13,8 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+import os
+from os.path import join
 
 from PyQt5 import uic
 from PyQt5.QtCore import QTimer
@@ -81,9 +83,19 @@ class SelectFileDialog(QDialog, BaseUI):
         dialog = QFileDialog()
         dialog.setFileMode(QFileDialog.AnyFile)
 
+        folder = self.settings.get_last_opened_directory()
+        if not folder:
+            folder = join(os.getcwd(), "res", "data")
+
+        dialog.setDirectory(folder)
+
         if dialog.exec():
-            filenames = dialog.selectedFiles()
-            self.set_file(filenames[0])
+            filepath = dialog.selectedFiles()[0]
+
+            directory, filename = os.path.split(filepath)
+            self.settings.set_last_opened_directory(directory)
+
+            self.set_file(filepath)
             self.lbl_drag_drop.show_selected_file(self.file)
 
             if self.file:

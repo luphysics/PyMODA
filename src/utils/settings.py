@@ -34,6 +34,7 @@ _key_save_dir = "save_directory"
 _key_pymodalib_cache = "pymodalib_cache"
 _key_updating = "updating"
 _key_version = "pymoda_version"
+_key_directory = "last_opened_directory"
 
 
 class Settings:
@@ -191,3 +192,10 @@ class Settings:
             logging.error(
                 f"Trying to set PyMODA version to {version}, but the current value is {current}"
             )
+
+    def set_last_opened_directory(self, directory: str) -> None:
+        self._settings.set(_key_directory, directory)
+        self._settings.save()
+
+    def get_last_opened_directory(self) -> str:
+        return self._settings.get(_key_directory, None)
