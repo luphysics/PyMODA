@@ -20,6 +20,7 @@ from PyQt5.QtWidgets import QDialog, QDialogButtonBox
 
 from data import resources
 from gui.BaseUI import BaseUI
+from gui.dialogs.UseShortcutComponent import UseShortcutComponent
 from maths.num_utils import float_or_none, float_to_str
 from utils import args
 from utils.settings import Settings
@@ -39,6 +40,7 @@ class FrequencyDialog(QDialog, BaseUI):
         self.settings = Settings()
 
         super(FrequencyDialog, self).__init__()
+        self.use_component = UseShortcutComponent(self, self.use_recent_freq)
 
     def setup_ui(self) -> None:
         uic.loadUi(resources.get("layout:dialog_frequency.ui"), self)

@@ -22,6 +22,7 @@ from PyQt5.QtWidgets import QDialog, QFileDialog, QComboBox, QDialogButtonBox
 
 from data import resources
 from gui.BaseUI import BaseUI
+from gui.dialogs.UseShortcutComponent import UseShortcutComponent
 from utils import args
 from utils.settings import Settings
 
@@ -41,6 +42,7 @@ class SelectFileDialog(QDialog, BaseUI):
         self.buttonBox: QDialogButtonBox = None
 
         super().__init__()
+        self.use_shortcut = UseShortcutComponent(self, self.use_recent_file)
 
     def setup_ui(self):
         uic.loadUi(resources.get("layout:dialog_select_file.ui"), self)
