@@ -154,4 +154,7 @@ class TFWindow(
         {"python", "matlab"}
             The implementation selected in the GUI.
         """
-        return self.combo_impl.currentText().lower()
+        try:
+            return self.combo_impl.currentText().lower()
+        except AttributeError:
+            return "python"
