@@ -167,12 +167,20 @@ class GCPresenter(BaseTFPresenter):
         try:
             freq, coh1, coh2 = self.results
             main.plot(
-                freq, coh1, coh2, average="median", percentile=self.params["percentile"]
+                freq,
+                coh1,
+                coh2,
+                average="median",
+                percentile=self.view.get_plotting_percentile(),
             )
         except ValueError:
             freq, coh1 = self.results
             main.plot(
-                freq, coh1, None, average="median", percentile=self.params["percentile"]
+                freq,
+                coh1,
+                None,
+                average="median",
+                percentile=self.view.get_plotting_percentile(),
             )
 
     def check_pymodalib_cache(self) -> None:

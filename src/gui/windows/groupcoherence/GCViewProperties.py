@@ -30,3 +30,6 @@ class GCViewProperties(ViewProperties):
 
         self.list_stat: QListWidget = None
         self.groupbox_stats: QGroupBox = None
+
+        self.line_percentile: QLineEdit = None
+        self.line_plot_percentile: QLineEdit = None

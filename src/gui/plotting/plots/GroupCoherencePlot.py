@@ -27,6 +27,9 @@ class GroupCoherencePlot(MatplotlibWidget):
     def plot(self, freq, coh1, coh2, average="median", percentile: float = 75):
         self.clear()
 
+        if percentile is None or percentile > 100:
+            return
+
         self.update_ylabel()
         self.update_xlabel()
 

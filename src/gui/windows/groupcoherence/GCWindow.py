@@ -25,7 +25,7 @@ from gui.windows.common.BaseTFWindow import BaseTFWindow
 from gui.windows.groupcoherence.GCPresenter import GCPresenter
 from gui.windows.groupcoherence.GCViewProperties import GCViewProperties
 from gui.windows.groupcoherence.LoadGroupDataDialog import LoadGroupDataDialog
-from utils.decorators import floaty, inty
+from utils.decorators import floaty
 
 
 class GCWindow(GCViewProperties, BaseTFWindow, FreqComponent):
@@ -58,6 +58,9 @@ class GCWindow(GCViewProperties, BaseTFWindow, FreqComponent):
         self.list_stat.itemSelectionChanged.connect(self.on_frequency_band_selected)
 
         self.groupbox_stats.setEnabled(False)
+        self.line_plot_percentile.textChanged.connect(
+            lambda _: self.presenter.update_plots()
+        )
 
         for p in (self.plot_1a, self.plot_1b, self.plot_2a, self.plot_2b):
             p.toolbar.hide()
@@ -143,6 +146,10 @@ class GCWindow(GCViewProperties, BaseTFWindow, FreqComponent):
     @floaty
     def get_percentile(self) -> Optional[float]:
         return self.line_percentile.text()
+
+    @floaty
+    def get_plotting_percentile(self) -> Optional[float]:
+        return self.line_plot_percentile.text()
 
     def setup_signal_listview(self) -> None:
         """

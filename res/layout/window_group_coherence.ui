@@ -261,13 +261,38 @@
                <item>
                 <widget class="QGroupBox" name="verticalGroupBox">
                  <property name="title">
-                  <string>Percentile</string>
+                  <string>Surrogate Percentile</string>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_13">
                   <item>
                    <widget class="QLineEdit" name="line_percentile">
                     <property name="text">
                      <string>95</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="verticalGroupBox">
+              <property name="title">
+               <string>Plotting Options</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_3">
+               <item>
+                <widget class="QGroupBox" name="verticalGroupBox">
+                 <property name="title">
+                  <string>Percentile</string>
+                 </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_17">
+                  <item>
+                   <widget class="QLineEdit" name="line_plot_percentile">
+                    <property name="text">
+                     <string>75</string>
                     </property>
                    </widget>
                   </item>
