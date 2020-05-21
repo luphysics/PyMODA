@@ -1,40 +1,25 @@
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-## Table of Contents
-
-- [PyMODA](#pymoda)
-  - [Status](#status)
-- [User Guide](#user-guide)
-  - [Requirements](#requirements)
-  - [Installation](#installation)
-  - [Launching PyMODA after installation](#launching-pymoda-after-installation)
-  - [Saving data](#saving-data)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
 # PyMODA
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3679258.svg)](https://doi.org/10.5281/zenodo.3679258)
+[![License: GPL](https://img.shields.io/badge/License-GPLv3-10b515.svg)](https://github.com/luphysics/PyMODA/blob/master/LICENSE)
 
-PyMODA is a Python implementation of MODA (Multiscale Oscillatory Dynamics Analysis). The user interface is written using PyQt5, and the algorithms are mostly packaged as Python libraries from the existing MATLAB code.
+PyMODA is a Python implementation of MODA (Multiscale Oscillatory Dynamics Analysis). The user interface is written using PyQt5, and the algorithms are imported from [PyMODAlib](https://github.com/luphysics/PyMODAlib). PyMODA is packaged as a standalone program using PyInstaller.
 
-PyMODA is cross-platform and does not require any paid software. To get started, see the [User Guide](#user-guide) or the [Developer Guide](docs/developer-guide.md).
-
-> **Note:** If you're a developer, you may be interested in [PyMODAlib](https://github.com/luphysics/PyMODAlib).
+PyMODA is cross-platform and does not require any paid software. To get started, please see the [User Guide](#user-guide) or the [Developer Guide](docs/developer-guide.md).
 
 ## Status
 
 PyMODA plans to offer all the functionality available in MODA, but development is still in progress. This table shows the current status of different features.
 
-| Window    |  Status | Notes | 
-| ----      |   ---------        |   ---------   |  
-| Time-Frequency Analysis        |  :heavy_check_mark: | |
-| Detecting Harmonics        |  :heavy_check_mark: | |
-| Wavelet Phase Coherence        |  :heavy_check_mark:  | Surrogates require further testing | 
-| Group Phase Coherence        |  :heavy_check_mark:  | | 
-| Ridge Extraction and Filtering |  :heavy_check_mark:  | | 
-| Wavelet Bispectrum Analysis    |  :heavy_check_mark:  | Surrogates cannot be plotted yet |
-| Dynamical Bayesian Inference   |  Partially implemented | Results are inaccurate |
+| Window    |  Status | Works without MATLAB Runtime | Notes | 
+| ----      |   ---------  | ------- |   ---------   |  
+| Time-Frequency Analysis        |  :heavy_check_mark: | :heavy_check_mark: | |
+| Detecting Harmonics        |  :heavy_check_mark: | :heavy_check_mark: | |
+| Wavelet Phase Coherence        |  :heavy_check_mark: | Required for surrogates only | Surrogates not perfected | 
+| Group Phase Coherence        |  :heavy_check_mark:  | :heavy_check_mark: | | 
+| Ridge Extraction and Filtering |  :heavy_check_mark: | No | | 
+| Wavelet Bispectrum Analysis    |  :heavy_check_mark: | No | |
+| Dynamical Bayesian Inference   |  Partially implemented | :heavy_check_mark: | Algorithm not perfected |
 
 # User Guide
 
