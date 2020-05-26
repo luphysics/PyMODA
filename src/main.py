@@ -28,7 +28,7 @@ from os import path
 from pathlib import Path
 
 import multiprocess
-from qasync import QEventLoop
+import qasync
 
 import utils
 from gui.Application import Application
@@ -41,19 +41,19 @@ if __name__ == "__main__":
         m.freeze_support()
 
     # If not started via the launcher, exit and run new instance via launcher.
-    if utils.frozen and not args.launcher() and launcher.is_launcher_present():
+    if utils.is_frozen and not args.launcher() and launcher.is_launcher_present():
         launcher.start_via_launcher()
         sys.exit(0)
 
-    # Set the working directory for consistency.
+    # Choose the desired working directory.
     if utils.is_frozen:
-        # When packaged with PyInstaller.
+        # When packaged with PyInstaller, use the directory containing the executable.
         location = os.path.abspath(sys._MEIPASS)
     else:
-        # When running as a normal Python program.
+        # When running as a normal Python program, use the root of the repository.
         location = Path(path.abspath(path.dirname(__file__))).parent
 
-    # Set the working directory to the 'src' directory for consistency.
+    # Set the working directory for consistency.
     os.chdir(location)
 
     # Fix Ctrl-C behaviour with PyQt.
@@ -67,7 +67,7 @@ if __name__ == "__main__":
     app = Application(sys.argv)
 
     # Setup asyncio to work with PyQt.
-    loop = QEventLoop(app)
+    loop = qasync.QEventLoop(app)
     asyncio.set_event_loop(loop)
 
     # Fix multiprocessing on macOS.
