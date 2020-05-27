@@ -51,7 +51,7 @@ class TFWindow(
             "Rect",
             "Kaiser-a",
         ],  # Windowed Fourier transform.
-        ["Lognorm", "Morlet", "Bump"],  # Wavelet transform.
+        ["Lognorm", "Morlet", "Morse-a"],  # Wavelet transform.
     )
 
     def __init__(self, application, presenter=None):

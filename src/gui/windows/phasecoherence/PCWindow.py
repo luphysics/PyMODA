@@ -27,14 +27,20 @@ from gui.windows.phasecoherence.PCPresenter import PCPresenter
 from gui.windows.phasecoherence.PCViewProperties import PCViewProperties
 
 
-class PCWindow(PCViewProperties, BaseTFWindow, SurrogateComponent, FreqComponent, DualSignalComponent):
+class PCWindow(
+    PCViewProperties,
+    BaseTFWindow,
+    SurrogateComponent,
+    FreqComponent,
+    DualSignalComponent,
+):
     """
     The phase coherence window.
     """
 
     name = "Wavelet Phase Coherence"
 
-    _wavelet_types = ["Lognorm", "Morlet", "Bump"]
+    _wavelet_types = ["Lognorm", "Morlet", "Morse-a"]
     _surrogate_types = ["RP", "FT", "AAFT", "IAAFT1", "IAAFT2", "WIAAFT", "tshift"]
 
     def __init__(self, application: Application):
