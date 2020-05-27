@@ -7,7 +7,7 @@ multiprocess==0.70.8
 numpy==1.18.3
 pre-commit==1.18.3
 PyGithub==1.46
-PyMODAlib==0.10.1b1
+PyMODAlib==0.11.0b1
 PyOpenGL==3.1.0
 PyQt5==5.14.2
 PyQt5-sip==12.7.0
