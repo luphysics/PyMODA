@@ -13,7 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-
+import logging
 from http.client import HTTPResponse
 
 from PyQt5.QtCore import pyqtSignal
@@ -34,8 +34,19 @@ def chunked_download(
     :param size: the size of the download, in bytes; used for progress
     :param progress_signal: the PyQt signal with which to emit download progress
     """
+    if progress_signal is None:
+        logging.warning(f"Progress signal is None.")
+
     if not size:
-        size = 10 ** 6 * 44
+        length = response.headers.get("content-length")
+        if length:
+            length = int(length)
+            logging.info(f"Download size is {length / 1024 ** 2:.1f}MB.")
+
+            size = length
+        else:
+            size = 10 ** 6 * 44
+            logging.warning(f"Guessing download size.")
 
     with open(filename, "wb") as f:
         bytes_downloaded = 0
