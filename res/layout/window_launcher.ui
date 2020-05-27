@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>697</width>
-    <height>565</height>
+    <height>629</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -70,36 +70,43 @@
          <number>100</number>
         </property>
         <property name="bottomMargin">
-         <number>0</number>
+         <number>20</number>
         </property>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_10">
-          <property name="sizeConstraint">
-           <enum>QLayout::SetDefaultConstraint</enum>
-          </property>
+         <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
-           <widget class="QLabel" name="lbl_update">
-            <property name="font">
-             <font>
-              <weight>50</weight>
-              <italic>false</italic>
-              <bold>false</bold>
-              <underline>false</underline>
-              <strikeout>false</strikeout>
-             </font>
+           <widget class="QProgressBar" name="progress_updating">
+            <property name="maximum">
+             <number>0</number>
             </property>
-            <property name="text">
-             <string>Updates are available.</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            <property name="value">
+             <number>0</number>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="btn_update">
+           <widget class="QLabel" name="lbl_updating">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
             <property name="text">
-             <string>Update now</string>
+             <string>PyMODA is updating. It's safe to exit while the update is in progress.</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="lbl_update_complete">
+            <property name="styleSheet">
+             <string notr="true">color:blue;</string>
+            </property>
+            <property name="text">
+             <string>Update complete! Restart PyMODA to finish the process.</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>

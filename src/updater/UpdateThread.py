@@ -54,7 +54,9 @@ class UpdateThread(QThread):
         if not self.release_tag:
             return logging.error("No release tag.")
 
-        self.updater = Updater.get_instance(self.release_tag)
+        self.updater = Updater.get_instance(
+            self.release_tag, self.download_progress_signal
+        )
 
         if self.updater.is_version_present():
             return logging.warning(

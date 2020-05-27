@@ -26,7 +26,7 @@ import pymodalib
 from PyQt5 import uic
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QKeySequence
-from PyQt5.QtWidgets import QMessageBox, QShortcut, QLabel
+from PyQt5.QtWidgets import QMessageBox, QShortcut, QLabel, QProgressBar
 from pymodalib.utils.matlab_runtime import RuntimeStatus
 
 import utils
@@ -40,7 +40,6 @@ from updater.UpdateThread import UpdateThread
 from updater.check import is_version_newer
 from utils import args
 from utils.os_utils import OS
-from utils.qutils import retain_size_when_hidden
 from utils.settings import Settings
 from utils.shortcuts import create_shortcut
 
@@ -68,6 +67,7 @@ class LauncherWindow(CentredWindow):
         self.update_thread.extracting_signal.connect(self.on_extract_finished)
         self.update_thread.copy_finished_signal.connect(self.on_copy_finished)
         self.update_thread.error_signal.connect(self.on_update_error)
+        self.update_thread.download_progress_signal.connect(self.on_download_progress)
 
         super(LauncherWindow, self).__init__(parent)
 
@@ -84,8 +84,8 @@ class LauncherWindow(CentredWindow):
         self.update_shortcut_force.activated.connect(self.force_show_update)
 
         self.updating = False
-        self.update_status = UpdateStatus.NOT_AVAILABLE
-        self.update_statusbar()
+        self.current_update_status = UpdateStatus.NOT_AVAILABLE
+        self.update_status_ui()
 
         self.pymoda_has_set_cache_var = False
         self.reload_settings()
@@ -119,16 +119,14 @@ class LauncherWindow(CentredWindow):
         # TODO: check for Matlab runtime, but show less intrusive message.
         # self.check_matlab_runtime()
 
-        self.lbl_update.hide()
+        self.lbl_updating.setVisible(False)
+        self.progress_updating.setVisible(False)
+        self.lbl_update_complete.setVisible(False)
 
-        self.btn_update.hide()
-        self.btn_update.clicked.connect(self.on_update_clicked)
         self.btn_settings.clicked.connect(self.on_settings_clicked)
 
         self.lbl_update_status = QLabel("")
         self.statusBar().addPermanentWidget(self.lbl_update_status)
-
-        retain_size_when_hidden(self.btn_update)
 
         if args.create_shortcut():
             logging.info("Creating desktop shortcut silently.")
@@ -167,19 +165,43 @@ class LauncherWindow(CentredWindow):
 
             msgbox.exec()
 
-    def update_statusbar(self) -> None:
-        status = self.update_status
+    def update_status_ui(self) -> None:
+        status = self.current_update_status
 
         if status is UpdateStatus.NOT_AVAILABLE:
             self.lbl_update_status.setText("No updates available.")
+            self.progress_updating.setVisible(False)
+            self.lbl_updating.setVisible(False)
+            self.lbl_update_complete.setVisible(False)
         elif status is UpdateStatus.DOWNLOADING:
             self.lbl_update_status.setText("Downloading update...")
+            self.lbl_updating.setVisible(True)
+            self.progress_updating.setVisible(True)
         elif status is UpdateStatus.FINISHED:
             self.lbl_update_status.setText(
                 "Update installed, will activate on next launch."
             )
+            self.lbl_updating.setVisible(False)
+            self.progress_updating.setVisible(False)
+            self.lbl_update_complete.setVisible(True)
         elif status is UpdateStatus.ERROR:
             self.lbl_update_status.setText("Error while updating; see log for details.")
+            self.lbl_updating.setVisible(False)
+            self.progress_updating.setVisible(False)
+
+    def on_download_progress(self, value: float) -> None:
+        """
+        Called to update the download progress bar.
+        """
+        progress: QProgressBar = self.progress_updating
+
+        progress.setVisible(True)
+        progress.setRange(0, 100)
+        progress.setValue(value)
+
+        if value > 100:
+            progress.setRange(0, 0)
+            progress.setValue(0)
 
     def check_matlab_runtime(self) -> None:
         """
@@ -370,28 +392,28 @@ class LauncherWindow(CentredWindow):
             self.updating = True
             self.settings.set_update_in_progress(True)
 
-            self.update_statusbar()
+            self.update_status_ui()
         except:
             warnings.warn("Cannot start update thread more than once.", RuntimeWarning)
 
     def on_download_finished(self) -> None:
-        self.update_status = UpdateStatus.DOWNLOADING
-        self.update_statusbar()
+        self.current_update_status = UpdateStatus.DOWNLOADING
+        self.update_status_ui()
 
     def on_extract_finished(self) -> None:
-        self.update_statusbar()
+        self.update_status_ui()
 
     def on_copy_finished(self) -> None:
-        self.update_status = UpdateStatus.FINISHED
+        self.current_update_status = UpdateStatus.FINISHED
 
         self.settings.set_update_in_progress(False)
         self.updating = False
 
-        self.update_statusbar()
+        self.update_status_ui()
 
     def on_update_error(self) -> None:
         self.updating = False
         self.settings.set_update_in_progress(False)
 
-        self.update_status = UpdateStatus.ERROR
-        self.update_statusbar()
+        self.current_update_status = UpdateStatus.ERROR
+        self.update_status_ui()

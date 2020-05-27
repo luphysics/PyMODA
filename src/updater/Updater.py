@@ -31,7 +31,8 @@ from utils.os_utils import OS
 
 
 class Updater(ABC):
-    def __init__(self, tag: str):
+    def __init__(self, tag: str, progress_signal):
+        self.progress_signal = progress_signal
         self.tag = tag
 
     @abstractmethod
@@ -91,7 +92,11 @@ class WindowsUpdater(Updater):
 
         url = self._download_url()
         with urlopen(url) as response:
-            chunked_download(filename="pymoda-temp.zip", response=response)
+            chunked_download(
+                filename="pymoda-temp.zip",
+                response=response,
+                progress_signal=self.progress_signal,
+            )
 
     def extract_archive(self) -> None:
         try:
@@ -108,6 +113,10 @@ class WindowsUpdater(Updater):
         launcher_dir = launcher.get_launcher_directory()
 
         os.rename(join("pymoda-temp", "PyMODA"), join("pymoda-temp", self.tag))
+
+        if self.tag in os.listdir(launcher_dir):
+            shutil.rmtree(join(launcher_dir, self.tag))
+
         shutil.move(join("pymoda-temp", self.tag), launcher_dir)
 
 
@@ -123,7 +132,11 @@ class NixUpdater(Updater, ABC):
 
         if url:
             with urlopen(url) as response:
-                chunked_download(filename="launcher-temp", response=response)
+                chunked_download(
+                    filename="launcher-temp",
+                    response=response,
+                    progress_signal=self.progress_signal,
+                )
 
         try:
             os.remove(join(launcher_dir, "launcher"))
@@ -145,7 +158,11 @@ class NixUpdater(Updater, ABC):
         url = self._download_url()
 
         with urlopen(url) as response:
-            chunked_download(filename="pymoda-temp.tar.gz", response=response)
+            chunked_download(
+                filename="pymoda-temp.tar.gz",
+                response=response,
+                progress_signal=self.progress_signal,
+            )
 
     def extract_archive(self) -> None:
         try:
@@ -162,16 +179,24 @@ class NixUpdater(Updater, ABC):
 class LinuxUpdater(NixUpdater):
     def move_files(self) -> None:
         launcher_dir = launcher.get_launcher_directory()
+
+        if self.tag in os.listdir(launcher_dir):
+            shutil.rmtree(join(launcher_dir, self.tag))
+
         shutil.move(join("pymoda-temp", "PyMODA"), join(launcher_dir, self.tag))
 
 
 class MacUpdater(NixUpdater):
     def move_files(self) -> None:
         launcher_dir = launcher.get_launcher_directory()
+
+        if self.tag in os.listdir(launcher_dir):
+            shutil.rmtree(join(launcher_dir, self.tag))
+
         shutil.move("pymoda-temp", join(launcher_dir, self.tag))
 
 
-def get_instance(tag) -> Updater:
+def get_instance(tag, progress_signal) -> Updater:
     """
     Creates the Updater for the current OS.
 
@@ -179,6 +204,8 @@ def get_instance(tag) -> Updater:
     ----------
     tag : str
         The release tag of the latest release.
+    progress_signal : pyqtSignal
+        Signal which emits the download progress.
 
     Returns
     -------
@@ -186,8 +213,8 @@ def get_instance(tag) -> Updater:
         The Updater for the current OS.
     """
     if OS.is_windows():
-        return WindowsUpdater(tag)
+        return WindowsUpdater(tag, progress_signal)
     elif OS.is_linux():
-        return LinuxUpdater(tag)
+        return LinuxUpdater(tag, progress_signal)
     else:
-        return MacUpdater(tag)
+        return MacUpdater(tag, progress_signal)
