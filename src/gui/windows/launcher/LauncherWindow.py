@@ -36,6 +36,7 @@ from gui.dialogs.MatlabRuntimeDialog import MatlabRuntimeDialog
 from gui.dialogs.SettingsDialog import SettingsDialog
 from gui.windows.CentredWindow import CentredWindow
 from updater import check
+from updater.CleanupThread import CleanupThread
 from updater.UpdateThread import UpdateThread
 from updater.check import is_version_newer
 from utils import args
@@ -61,10 +62,13 @@ class LauncherWindow(CentredWindow):
 
         self.lbl_update_status = None
 
-        self.update_thread = UpdateThread()
+        self.cleanup_thread = CleanupThread()
+        self.cleanup_thread.start()
 
+        self.update_thread = UpdateThread()
         self.update_thread.downloading_signal.connect(self.on_download_finished)
         self.update_thread.extracting_signal.connect(self.on_extract_finished)
+
         self.update_thread.copy_finished_signal.connect(self.on_copy_finished)
         self.update_thread.error_signal.connect(self.on_update_error)
         self.update_thread.download_progress_signal.connect(self.on_download_progress)
