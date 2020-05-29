@@ -16,9 +16,9 @@
 from typing import Tuple
 
 import numpy as np
+from pymodalib.implementations.python.filtering import loop_butter
 from scipy.signal import hilbert
 from numpy import ndarray
-from maths.algorithms.loop_butter import loop_butter
 from maths.signals.TimeSeries import TimeSeries
 
 from processes.mp_utils import process
