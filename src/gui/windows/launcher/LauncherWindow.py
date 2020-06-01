@@ -23,7 +23,7 @@ from enum import Enum
 from pathlib import Path
 
 import pymodalib
-from PyQt5 import uic
+from PyQt5 import uic, QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QKeySequence
 from PyQt5.QtWidgets import QMessageBox, QShortcut, QLabel, QProgressBar
@@ -140,6 +140,10 @@ class LauncherWindow(CentredWindow):
             asyncio.ensure_future(self.post_update())
         else:
             asyncio.ensure_future(self.check_for_updates())
+
+    def closeEvent(self, e: QtGui.QCloseEvent) -> None:
+        loop = asyncio.get_event_loop()
+        loop.stop()
 
     async def check_if_updated(self) -> None:
         await asyncio.sleep(0.5)
