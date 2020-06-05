@@ -66,6 +66,10 @@ class DBWindow(DBViewProperties, BaseTFWindow, SurrogateComponent, DualSignalCom
             partial(self.on_paramset_selected, 1)
         )
 
+        self.slider_time.valueChanged.connect(self.presenter.on_time_slider_changed)
+        self.checkbox_mean.toggled.connect(self.on_mean_toggled)
+        self.on_mean_toggled()
+
     def on_toggle_plots(self) -> None:
         """
         The view either displays a 3-plot layout or a 2-plot-layout; this function
@@ -102,6 +106,14 @@ class DBWindow(DBViewProperties, BaseTFWindow, SurrogateComponent, DualSignalCom
                 i.show()
             else:
                 i.hide()
+
+    def on_mean_toggled(self):
+        self.groupbox_slider.setEnabled(not self.checkbox_mean.isChecked())
+
+        try:
+            self.presenter.plot_bayesian()
+        except:
+            pass
 
     def on_calculate_started(self):
         super(DBWindow, self).on_calculate_started()
@@ -222,6 +234,10 @@ class DBWindow(DBViewProperties, BaseTFWindow, SurrogateComponent, DualSignalCom
 
     def setup_lineedit_res(self):
         pass
+
+    @inty
+    def get_time_slider_value(self) -> Optional[int]:
+        return self.slider_time.value()
 
     @floaty
     def get_freq_range1(self) -> Optional[Tuple[float, float]]:

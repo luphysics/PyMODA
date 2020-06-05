@@ -64,6 +64,7 @@ class DBPresenter(BaseTFPresenter):
             self.on_bayesian_inference_completed(*d)
 
         if data:
+            self.update_slider()
             self.plot_bayesian()
         else:
             print("No data returned; are any parameter sets added?")
@@ -91,6 +92,21 @@ class DBPresenter(BaseTFPresenter):
         signal.db_data = DBOutputData(
             tm, p1, p2, cpl1, cpl2, cf1, cf2, mcf1, mcf2, surr_cpl1, surr_cpl2
         )
+
+    def update_slider(self) -> None:
+        signal, _ = self.get_selected_signal_pair()
+        data: DBOutputData = signal.db_data
+
+        cf1 = data.cf1
+        length = cf1.shape[2]
+
+        slider = self.view.slider_time
+        slider.setMinimum(0)
+        slider.setMaximum(length - 1)
+        slider.setTickInterval(1)
+
+    def on_time_slider_changed(self, _):
+        self.plot_bayesian()
 
     def plot_bayesian(self) -> None:
         """
@@ -173,8 +189,13 @@ class DBPresenter(BaseTFPresenter):
         x1 = np.arange(0, 2 * np.pi, 0.13)
         y1 = x1
 
-        z1 = data.mcf1
-        z2 = data.mcf2
+        if self.view.checkbox_mean.isChecked():
+            z1 = data.mcf1
+            z2 = data.mcf2
+        else:
+            index = self.view.get_time_slider_value()
+            z1 = data.cf1[:, :, index]
+            z2 = data.cf2[:, :, index]
 
         zmax = max(np.max(z1), np.max(z2))
         zmin = min(np.min(z1), np.min(z2))
@@ -190,6 +211,9 @@ class DBPresenter(BaseTFPresenter):
 
         for p in (left, right):
             p.axes.set_zlim([zmin, zmax])
+
+        for p in (left, right):
+            p.canvas.draw()
 
         # TODO: why are the titles not visible?
         left.axes.set_title("Time-averaged CF 2 -> 1")

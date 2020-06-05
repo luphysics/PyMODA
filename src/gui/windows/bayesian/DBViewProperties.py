@@ -21,6 +21,7 @@ from PyQt5.QtWidgets import (
     QListWidget,
     QHBoxLayout,
     QCheckBox,
+    QGroupBox,
 )
 
 from gui.windows.ViewProperties import ViewProperties
@@ -66,3 +67,7 @@ class DBViewProperties(ViewProperties):
 
         # The button used to toggle between the 3-plot and 2-plot UI.
         self.btn_toggle_plots: QPushButton = None
+
+        self.slider_time: QSlider = None
+        self.checkbox_mean: QCheckBox = None
+        self.groupbox_slider: QGroupBox = None

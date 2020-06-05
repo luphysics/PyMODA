@@ -133,7 +133,7 @@
        </layout>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_6" stretch="0,4,0,0">
+       <layout class="QVBoxLayout" name="verticalLayout_6" stretch="0,4,0">
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_15" stretch="4,6">
           <item>
@@ -210,7 +210,7 @@
          </layout>
         </item>
         <item>
-         <layout class="QVBoxLayout" name="advanced_options_section" stretch="0,0,0,3,1">
+         <layout class="QVBoxLayout" name="advanced_options_section" stretch="0,0,0,3,0">
           <item>
            <widget class="QGroupBox" name="horizontalGroupBox_2">
             <property name="title">
@@ -345,51 +345,6 @@
              <string>Parameters</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_4">
-             <item row="0" column="0">
-              <layout class="QHBoxLayout" name="horizontalLayout_14" stretch="3,1">
-               <item>
-                <widget class="QLabel" name="label_10">
-                 <property name="text">
-                  <string>Window size (s)</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLineEdit" name="lineedit_window_size">
-                 <property name="text">
-                  <string>50</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item row="1" column="1">
-              <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="3,1">
-               <item>
-                <widget class="QLabel" name="label_4">
-                 <property name="layoutDirection">
-                  <enum>Qt::LeftToRight</enum>
-                 </property>
-                 <property name="text">
-                  <string>Order (F0)</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLineEdit" name="lineedit_order">
-                 <property name="text">
-                  <string>2</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
              <item row="0" column="1">
               <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="3,1">
                <item>
@@ -409,27 +364,6 @@
                 <widget class="QLineEdit" name="lineedit_overlap">
                  <property name="text">
                   <string>1</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item row="1" column="0">
-              <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="3,1">
-               <item>
-                <widget class="QLabel" name="label">
-                 <property name="text">
-                  <string>Propagation const</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLineEdit" name="lineedit_propagation_const">
-                 <property name="text">
-                  <string>0.2</string>
                  </property>
                 </widget>
                </item>
@@ -459,6 +393,72 @@
                </item>
               </layout>
              </item>
+             <item row="1" column="0">
+              <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="3,1">
+               <item>
+                <widget class="QLabel" name="label">
+                 <property name="text">
+                  <string>Propagation const</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="lineedit_propagation_const">
+                 <property name="text">
+                  <string>0.2</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="1" column="1">
+              <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="3,1">
+               <item>
+                <widget class="QLabel" name="label_4">
+                 <property name="layoutDirection">
+                  <enum>Qt::LeftToRight</enum>
+                 </property>
+                 <property name="text">
+                  <string>Order (F0)</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="lineedit_order">
+                 <property name="text">
+                  <string>2</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="0" column="0">
+              <layout class="QHBoxLayout" name="horizontalLayout_14" stretch="3,1">
+               <item>
+                <widget class="QLabel" name="label_10">
+                 <property name="text">
+                  <string>Window size (s)</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="lineedit_window_size">
+                 <property name="text">
+                  <string>50</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
             </layout>
            </widget>
           </item>
@@ -483,25 +483,51 @@
          </layout>
         </item>
         <item>
-         <widget class="QLabel" name="label_9">
-          <property name="text">
-           <string>Start: Time evolution: End; Go to start for average</string>
+         <widget class="QGroupBox" name="">
+          <property name="title">
+           <string>Coupling plot</string>
           </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_9">
+           <item>
+            <widget class="QCheckBox" name="checkbox_mean">
+             <property name="text">
+              <string>Mean coupling</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="groupbox_slider">
+             <property name="title">
+              <string>Time evolution</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_8">
+              <item>
+               <widget class="QSlider" name="slider_time">
+                <property name="maximum">
+                 <number>20</number>
+                </property>
+                <property name="pageStep">
+                 <number>1</number>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="tickPosition">
+                 <enum>QSlider::TicksBelow</enum>
+                </property>
+                <property name="tickInterval">
+                 <number>0</number>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
          </widget>
-        </item>
-        <item>
-         <layout class="QVBoxLayout" name="verticalLayout_9">
-          <item>
-           <widget class="QSlider" name="horizontalSlider">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-         </layout>
         </item>
        </layout>
       </item>
@@ -516,7 +542,7 @@
      <x>0</x>
      <y>0</y>
      <width>1601</width>
-     <height>29</height>
+     <height>18</height>
     </rect>
    </property>
   </widget>
