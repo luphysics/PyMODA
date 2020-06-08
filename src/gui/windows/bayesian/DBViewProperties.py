@@ -65,6 +65,10 @@ class DBViewProperties(ViewProperties):
         self.db3d_plot_left: DBPlot3d = None
         self.db3d_plot_right: DBPlot3d = None
 
+        # The groupboxes containing the 3d plots.
+        self.db3d_grpbox_left: QGroupBox = None
+        self.db3d_grpbox_right: QGroupBox = None
+
         # The button used to toggle between the 3-plot and 2-plot UI.
         self.btn_toggle_plots: QPushButton = None
 

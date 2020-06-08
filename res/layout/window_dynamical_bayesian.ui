@@ -50,10 +50,28 @@
           <item>
            <layout class="QHBoxLayout" name="hbox_dual_plot">
             <item>
-             <widget class="DBPlot3d" name="db3d_plot_left" native="true"/>
+             <widget class="QGroupBox" name="db3d_grpbox_left">
+              <property name="title">
+               <string>Time-averaged Coupling Function (2-&gt;1)</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_10">
+               <item>
+                <widget class="DBPlot3d" name="db3d_plot_left" native="true"/>
+               </item>
+              </layout>
+             </widget>
             </item>
             <item>
-             <widget class="DBPlot3d" name="db3d_plot_right" native="true"/>
+             <widget class="QGroupBox" name="db3d_grpbox_right">
+              <property name="title">
+               <string>Time-averaged Coupling Function (1-&gt;2)</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_12">
+               <item>
+                <widget class="DBPlot3d" name="db3d_plot_right" native="true"/>
+               </item>
+              </layout>
+             </widget>
             </item>
            </layout>
           </item>
@@ -483,7 +501,7 @@
          </layout>
         </item>
         <item>
-         <widget class="QGroupBox" name="">
+         <widget class="QGroupBox" name="groupBox">
           <property name="title">
            <string>Coupling plot</string>
           </property>

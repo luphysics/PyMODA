@@ -76,7 +76,7 @@ class DBWindow(DBViewProperties, BaseTFWindow, SurrogateComponent, DualSignalCom
          is called when the user toggles between them.
         """
         triple_plot = (self.db_plot_top, self.db_plot_middle, self.db_plot_bottom)
-        dual_plot = (self.db3d_plot_left, self.db3d_plot_right)
+        dual_plot = (self.db3d_grpbox_left, self.db3d_grpbox_right)
 
         if self.is_triple_plot:
             self.set_visible(triple_plot, False)
