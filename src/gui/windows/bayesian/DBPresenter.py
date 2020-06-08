@@ -55,13 +55,15 @@ class DBPresenter(BaseTFPresenter):
         if self.mp_handler:
             self.mp_handler.stop()
 
+        param_sets = self.get_paramsets()
+
         self.mp_handler = MPHandler()
         data = await self.mp_handler.coro_bayesian(
-            self.signals, self.get_paramsets(), self.on_progress_updated
+            self.signals, param_sets, self.on_progress_updated
         )
 
-        for d in data:
-            self.on_bayesian_inference_completed(*d)
+        for d, p in zip(data, param_sets):
+            self.on_bayesian_inference_completed(p.to_string(), *d)
 
         if data:
             self.update_slider()
@@ -74,6 +76,7 @@ class DBPresenter(BaseTFPresenter):
 
     def on_bayesian_inference_completed(
         self,
+        key: str,
         signal_name: str,
         tm,
         p1,
@@ -89,13 +92,21 @@ class DBPresenter(BaseTFPresenter):
     ):
         signal = self.signals.get(signal_name)
 
-        signal.db_data = DBOutputData(
+        if not hasattr(signal, "db_data"):
+            signal.db_data = {}
+
+        signal.db_data[key] = DBOutputData(
             tm, p1, p2, cpl1, cpl2, cf1, cf2, mcf1, mcf2, surr_cpl1, surr_cpl2
         )
 
     def update_slider(self) -> None:
         signal, _ = self.get_selected_signal_pair()
-        data: DBOutputData = signal.db_data
+
+        try:
+            key = self.get_selected_param_set().to_string()
+            data: DBOutputData = signal.db_data[key]
+        except (AttributeError, KeyError):
+            return
 
         cf1 = data.cf1
         length = cf1.shape[2]
@@ -117,7 +128,8 @@ class DBPresenter(BaseTFPresenter):
 
         times = signal.times
         try:
-            data: DBOutputData = signal.db_data
+            key = self.get_selected_param_set().to_string()
+            data: DBOutputData = signal.db_data.get(key)
         except AttributeError:
             return
 
@@ -139,6 +151,9 @@ class DBPresenter(BaseTFPresenter):
 
         for p in (top, middle, bottom):
             p.clear()
+
+        if not data:
+            return
 
         for p in (middle, top):
             p.axes.xaxis.label.set_visible(False)
@@ -172,6 +187,9 @@ class DBPresenter(BaseTFPresenter):
 
         for p in (left, right):
             p.clear()
+
+        if not data:
+            return
 
         xlabel = r"$\phi_1$"
         ylabel = r"$\phi_2$"
@@ -246,6 +264,16 @@ class DBPresenter(BaseTFPresenter):
 
     def has_paramset(self, text1, text2):
         return self.get_paramset(text1, text2) is not None
+
+    def get_selected_param_set(self) -> ParamSet:
+        param_sets = self.get_paramsets()
+
+        try:
+            index = self.view.listwidget_freq_band1.selectedIndexes()[0].row()
+        except IndexError:
+            return 0
+
+        return param_sets[index]
 
     def add_paramset(self, params: ParamSet):
         self.param_sets[params.to_string()] = params

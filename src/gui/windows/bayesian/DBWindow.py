@@ -125,7 +125,7 @@ class DBWindow(DBViewProperties, BaseTFWindow, SurrogateComponent, DualSignalCom
         self.btn_calculate_single.hide()
         self.btn_calculate_all.setText("Calculate")
 
-    def get_param_set(self) -> ParamSet:
+    def create_param_set(self) -> ParamSet:
         """
         Creates a parameter set from the current UI elements. This is used when
         adding a parameter set to the list.
@@ -166,6 +166,9 @@ class DBWindow(DBViewProperties, BaseTFWindow, SurrogateComponent, DualSignalCom
 
         self.fill_paramset_ui(text1, text2)
 
+        self.presenter.update_slider()
+        self.presenter.plot_bayesian()
+
     def fill_paramset_ui(self, text1, text2) -> None:
         """
         Fills the UI with the values from a parameter set.
@@ -189,7 +192,7 @@ class DBWindow(DBViewProperties, BaseTFWindow, SurrogateComponent, DualSignalCom
         """
         Called when the user clicks the "add parameter set" button.
         """
-        params = self.get_param_set()
+        params = self.create_param_set()
         band1, band2 = params.to_string()
 
         if not self.presenter.has_paramset(band1, band2):
@@ -201,6 +204,7 @@ class DBWindow(DBViewProperties, BaseTFWindow, SurrogateComponent, DualSignalCom
             self.listwidget_freq_band2.setCurrentRow(lastIndex)
 
             self.presenter.add_paramset(params)
+            self.presenter.plot_bayesian()
 
     def on_delete_paramset_clicked(self):
         """
@@ -219,6 +223,8 @@ class DBWindow(DBViewProperties, BaseTFWindow, SurrogateComponent, DualSignalCom
 
         for i in (item1, item2):
             sip.delete(i)
+
+        self.presenter.plot_bayesian()
 
     def setup_radio_preproc(self):
         pass
