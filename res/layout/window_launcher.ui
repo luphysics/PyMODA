@@ -90,7 +90,7 @@
              <bool>true</bool>
             </property>
             <property name="text">
-             <string>PyMODA is updating. It's safe to exit while the update is in progress.</string>
+             <string>PyMODA is updating. You can continue using PyMODA, and it's safe to exit at any time.</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
