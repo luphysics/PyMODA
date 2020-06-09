@@ -17,6 +17,7 @@ from typing import Tuple
 
 import numpy as np
 from numpy import ndarray
+from pymodalib.utils.decorators import matlabwrapper
 
 from maths.num_utils import matlab_to_numpy
 from maths.params.REParams import REParams
@@ -24,7 +25,7 @@ from maths.signals.TimeSeries import TimeSeries
 from processes.mp_utils import process
 
 
-@process
+@matlabwrapper(module="ridge_extraction")
 def _ridge_extraction(
     time_series: TimeSeries, params: REParams
 ) -> Tuple[

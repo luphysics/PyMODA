@@ -18,10 +18,12 @@ from typing import Tuple
 
 import numpy as np
 from numpy import ndarray
+from pymodalib.utils.decorators import matlabwrapper
 
 from maths.num_utils import multi_matlab_to_numpy
 
 
+@matlabwrapper(module="bispecWavPython")
 def calculate(
     signal1: ndarray, signal2: ndarray, fs, params: dict
 ) -> Tuple[ndarray, ndarray, ndarray, ndarray, dict]:

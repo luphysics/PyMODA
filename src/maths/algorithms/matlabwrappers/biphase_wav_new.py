@@ -21,10 +21,12 @@ due to issues with the LD_LIBRARY_PATH.
 from typing import Tuple
 
 from numpy import ndarray
+from pymodalib.utils.decorators import matlabwrapper
 
 from maths.num_utils import matlab_to_numpy
 
 
+@matlabwrapper(module="biphaseWavNew")
 def calculate(
     signal1: ndarray, signal2: ndarray, fs, f0, fr, opt: dict
 ) -> Tuple[ndarray, ndarray]:
