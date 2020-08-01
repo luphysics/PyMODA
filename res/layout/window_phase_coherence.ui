@@ -151,146 +151,8 @@
        </layout>
       </item>
       <item>
-       <layout class="QGridLayout" name="gridLayout_6" rowstretch="1,10,10">
+       <layout class="QGridLayout" name="gridLayout_6" rowstretch="1,0">
         <item row="0" column="0">
-         <layout class="QHBoxLayout" name="data_section">
-          <item alignment="Qt::AlignHCenter">
-           <widget class="QLabel" name="label_6">
-            <property name="frameShape">
-             <enum>QFrame::Box</enum>
-            </property>
-            <property name="text">
-             <string>Length of data</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QWidget" name="dataLength" native="true"/>
-          </item>
-         </layout>
-        </item>
-        <item row="2" column="0">
-         <layout class="QVBoxLayout" name="advanced_options_section" stretch="0">
-          <item>
-           <layout class="QVBoxLayout" name="verticalLayout_2">
-            <item>
-             <widget class="QGroupBox" name="groupBox">
-              <property name="title">
-               <string>Surrogates</string>
-              </property>
-              <layout class="QFormLayout" name="formLayout">
-               <property name="topMargin">
-                <number>5</number>
-               </property>
-               <item row="1" column="1">
-                <widget class="QGroupBox" name="horizontalGroupBox">
-                 <property name="title">
-                  <string>Surrogate Count</string>
-                 </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="10,1">
-                  <item>
-                   <widget class="QSlider" name="slider_surrogate">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLineEdit" name="line_surrogate"/>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
-               <item row="2" column="1">
-                <layout class="QHBoxLayout" name="horizontalLayout_4">
-                 <item>
-                  <widget class="QGroupBox" name="verticalGroupBox">
-                   <property name="title">
-                    <string>Method</string>
-                   </property>
-                   <layout class="QVBoxLayout" name="verticalLayout_9">
-                    <item>
-                     <widget class="QComboBox" name="combo_method"/>
-                    </item>
-                   </layout>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QGroupBox" name="groupBox">
-                   <property name="title">
-                    <string>Analysis Type</string>
-                   </property>
-                   <layout class="QVBoxLayout" name="verticalLayout_3">
-                    <item>
-                     <widget class="QRadioButton" name="radio_analysis_max">
-                      <property name="text">
-                       <string>Maximum</string>
-                      </property>
-                      <property name="checked">
-                       <bool>true</bool>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QRadioButton" name="radio_analysis_sig">
-                      <property name="text">
-                       <string>Significance</string>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item row="3" column="1">
-                <layout class="QHBoxLayout" name="horizontalLayout_6">
-                 <item>
-                  <widget class="QGroupBox" name="horizontalGroupBox_2">
-                   <property name="title">
-                    <string>Alpha</string>
-                   </property>
-                   <layout class="QHBoxLayout" name="horizontalLayout_5">
-                    <item>
-                     <widget class="QLineEdit" name="line_alpha"/>
-                    </item>
-                   </layout>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="btn_update_threshold">
-                   <property name="text">
-                    <string>Update Threshold</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="checkbox_surr">
-              <property name="text">
-               <string>Enable surrogates</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btn_stats">
-              <property name="text">
-               <string>Calculate</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </item>
-        <item row="1" column="0">
          <layout class="QFormLayout" name="formLayout_3">
           <property name="labelAlignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -467,6 +329,127 @@
           </item>
          </layout>
         </item>
+        <item row="1" column="0">
+         <layout class="QVBoxLayout" name="advanced_options_section" stretch="0">
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_2">
+            <item>
+             <widget class="QGroupBox" name="groupBox">
+              <property name="title">
+               <string>Surrogates</string>
+              </property>
+              <layout class="QFormLayout" name="formLayout">
+               <property name="topMargin">
+                <number>5</number>
+               </property>
+               <item row="1" column="1">
+                <widget class="QGroupBox" name="horizontalGroupBox">
+                 <property name="title">
+                  <string>Surrogate Count</string>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="10,1">
+                  <item>
+                   <widget class="QSlider" name="slider_surrogate">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLineEdit" name="line_surrogate"/>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <layout class="QHBoxLayout" name="horizontalLayout_4">
+                 <item>
+                  <widget class="QGroupBox" name="verticalGroupBox">
+                   <property name="title">
+                    <string>Method</string>
+                   </property>
+                   <layout class="QVBoxLayout" name="verticalLayout_9">
+                    <item>
+                     <widget class="QComboBox" name="combo_method"/>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QGroupBox" name="groupBox">
+                   <property name="title">
+                    <string>Analysis Type</string>
+                   </property>
+                   <layout class="QVBoxLayout" name="verticalLayout_3">
+                    <item>
+                     <widget class="QRadioButton" name="radio_analysis_max">
+                      <property name="text">
+                       <string>Maximum</string>
+                      </property>
+                      <property name="checked">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QRadioButton" name="radio_analysis_sig">
+                      <property name="text">
+                       <string>Significance</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item row="3" column="1">
+                <layout class="QHBoxLayout" name="horizontalLayout_6">
+                 <item>
+                  <widget class="QGroupBox" name="horizontalGroupBox_2">
+                   <property name="title">
+                    <string>Alpha</string>
+                   </property>
+                   <layout class="QHBoxLayout" name="horizontalLayout_5">
+                    <item>
+                     <widget class="QLineEdit" name="line_alpha"/>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="btn_update_threshold">
+                   <property name="text">
+                    <string>Update Threshold</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="checkbox_surr">
+              <property name="text">
+               <string>Enable surrogates</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_stats">
+              <property name="text">
+               <string>Calculate</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
        </layout>
       </item>
      </layout>
@@ -480,7 +463,7 @@
      <x>0</x>
      <y>0</y>
      <width>1496</width>
-     <height>29</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>

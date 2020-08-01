@@ -178,35 +178,7 @@
       </item>
       <item>
        <layout class="QGridLayout" name="gridLayout_6">
-        <item row="0" column="0">
-         <layout class="QVBoxLayout" name="verticalLayout_2">
-          <item>
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
         <item row="1" column="0">
-         <layout class="QHBoxLayout" name="data_section">
-          <item alignment="Qt::AlignHCenter">
-           <widget class="QLabel" name="label_6">
-            <property name="frameShape">
-             <enum>QFrame::Box</enum>
-            </property>
-            <property name="text">
-             <string>Length of data</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QWidget" name="dataLength" native="true"/>
-          </item>
-         </layout>
-        </item>
-        <item row="3" column="0">
          <layout class="QVBoxLayout" name="advanced_options_section" stretch="0,0">
           <item>
            <widget class="QGroupBox" name="groupBox">
@@ -293,7 +265,7 @@
           </item>
          </layout>
         </item>
-        <item row="2" column="0">
+        <item row="0" column="0">
          <layout class="QFormLayout" name="formLayout_3">
           <property name="labelAlignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -537,7 +509,7 @@
      <x>0</x>
      <y>0</y>
      <width>1496</width>
-     <height>29</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>
