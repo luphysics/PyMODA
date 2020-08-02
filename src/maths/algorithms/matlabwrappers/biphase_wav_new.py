@@ -26,7 +26,7 @@ from pymodalib.utils.decorators import matlabwrapper
 from maths.num_utils import matlab_to_numpy
 
 
-@matlabwrapper(module="biphaseWavNew")
+@matlabwrapper(module="biphaseWavPython")
 def calculate(
     signal1: ndarray, signal2: ndarray, fs, f0, fr, opt: dict
 ) -> Tuple[ndarray, ndarray]:
