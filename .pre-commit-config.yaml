@@ -2,7 +2,7 @@ repos:
 
 # Doctoc generates the table of contents for each markdown file.
 -   repo: https://github.com/thlorenz/doctoc
-    rev: v1.4.0
+    rev: v2.0.0
     hooks:
     -   id: doctoc
         args: ["docs",                          # Apply to everything inside the 'docs' folder.
@@ -12,7 +12,7 @@ repos:
 
 # Black formats Python files.
 -   repo: https://github.com/ambv/black
-    rev: stable
+    rev: 21.5b1
     hooks:
     - id: black
       language_version: python3
