@@ -4,7 +4,7 @@ dataclasses==0.6
 EasySettings==4.0.0
 matplotlib==3.1.1
 multiprocess==0.70.8
-numpy==1.18.3
+numpy==1.22.0
 pre-commit==1.18.3
 PyGithub==1.46
 PyMODAlib==0.11.2b1
